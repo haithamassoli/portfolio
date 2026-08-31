@@ -65,6 +65,26 @@ export const ui = {
 			'The rest of the job is the unglamorous half: caching for campus wifi that drops, reconciling bookings so two people cannot take the same hour, keeping a list at sixty frames per second on a four-year-old Android. That is the part I enjoy.',
 		'about.stackTitle': 'What I reach for',
 		'about.stackLede': 'Ordered by how often, not by how impressive.',
+		'stats.eyebrow': 'By the numbers',
+		'stats.title': 'Two and a half thousand hours',
+		'stats.lede':
+			'Counted, not estimated. The editor time comes from WakaTime, the repositories from GitHub, and both are read fresh every time the site is built.',
+		'stats.languages': 'Hours by language',
+		'stats.editors': 'Hours by editor',
+		'stats.years': 'Public repositories by year',
+		'stats.hours': 'Hours',
+		'stats.repos': 'Repositories',
+		'stats.languagesDesc':
+			'TypeScript takes three quarters of the total. Everything past the top four is summed into one row.',
+		'stats.editorsDesc':
+			'VS Code still holds most of it, with Cursor and Claude Code taking the recent share.',
+		'stats.yearsDesc':
+			'Repositories counted by the year they were created, forks excluded.',
+		'stats.total': 'hours tracked',
+		'stats.repoCount': 'public repositories',
+		'stats.stale':
+			'Live figures were unavailable at build time; these are the last recorded ones.',
+		'stats.source': 'Sources',
 		'hire.eyebrow': 'Hire me',
 		'hire.title': 'Tell me about the project',
 		'hire.lede':
@@ -199,6 +219,25 @@ export const ui = {
 			'وبقية العمل هي نصفه غير اللامع: تخزين محلي لشبكة جامعة تنقطع، وتوفيق حجوزات كي لا يأخذ شخصان الساعة نفسها، وإبقاء قائمة تعمل بستين إطارًا في الثانية على هاتف أندرويد عمره أربع سنوات. وهذا هو الجزء الذي أستمتع به.',
 		'about.stackTitle': 'أدواتي',
 		'about.stackLede': 'مرتّبة بحسب كثرة الاستخدام، لا بحسب وقعها.',
+		'stats.eyebrow': 'بالأرقام',
+		'stats.title': 'ألفان وسبعُمئة ساعة',
+		'stats.lede':
+			'أرقام محسوبة لا مقدَّرة. ساعات المحرّر من WakaTime، والمستودعات من GitHub، وكلاهما يُقرأ من جديد مع كل بناء للموقع.',
+		'stats.languages': 'الساعات بحسب اللغة',
+		'stats.editors': 'الساعات بحسب المحرّر',
+		'stats.years': 'المستودعات العامة بحسب السنة',
+		'stats.hours': 'ساعة',
+		'stats.repos': 'مستودعًا',
+		'stats.languagesDesc':
+			'تأخذ TypeScript ثلاثة أرباع المجموع، وما بعد اللغات الأربع الأولى مجموع في سطر واحد.',
+		'stats.editorsDesc':
+			'ما يزال VS Code يحمل أكثرها، ويأخذ Cursor وClaude Code النصيب الأحدث.',
+		'stats.yearsDesc': 'المستودعات محسوبة بسنة إنشائها، دون النسخ المتفرّعة.',
+		'stats.total': 'ساعة مُسجَّلة',
+		'stats.repoCount': 'مستودعًا عامًّا',
+		'stats.stale':
+			'تعذّر جلب الأرقام الحيّة أثناء البناء، وهذه آخر ما سُجّل منها.',
+		'stats.source': 'المصادر',
 		'hire.eyebrow': 'وظّفني',
 		'hire.title': 'حدثني عن المشروع',
 		'hire.lede':

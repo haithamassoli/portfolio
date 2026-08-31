@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import profile from '../assets/images/profile.png';
 import { featured, rest } from '../data/projects';
+import { devStats } from '../data/dev-stats';
 import { href, toolbox, useT, type Lang } from '../i18n';
+import { DevStatsCharts } from '../components/DevStatsCharts';
 import Hero from '../components/Hero.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 
@@ -16,6 +18,13 @@ const t = useT(lang);
 /* The grid is deliberately uneven: a wide one, then a pair, then a wide one.
    Nothing here is a uniform three-up card wall. */
 const spans = [12, 7, 5, 12, 5, 7, 7, 5];
+
+/* Read once at build time, in the frontmatter, so nothing here ships to the
+   browser except the handful of rows the charts draw. */
+const stats = await devStats();
+/* Western digits in both languages: the chart axes use them, and a mixed pair
+   in one sentence reads worse than either on its own. */
+const number = new Intl.NumberFormat('en-US');
 ---
 
 <Hero lang={lang} />
@@ -115,6 +124,52 @@ const spans = [12, 7, 5, 12, 5, 7, 7, 5];
 		<ul class="sr-list">{toolbox.map((item) => <li>{item}</li>)}</ul>
 	</div>
 
+	<div class="wrap" id="stats">
+		<div class="stats reveal-fast">
+			<header class="head stats__head">
+				<p class="mono eyebrow">{t('stats.eyebrow')}</p>
+				<h2 class="head__title">{t('stats.title')}</h2>
+				<p class="lede">{t('stats.lede')}</p>
+				<p class="mono stats__count">
+					<span>{number.format(stats.totalHours)} {t('stats.total')}</span>
+					<span aria-hidden="true">·</span>
+					<span>{number.format(stats.repoCount)} {t('stats.repoCount')}</span>
+				</p>
+				{stats.stale && <p class="mono stats__stale">{t('stats.stale')}</p>}
+			</header>
+
+			<DevStatsCharts
+				client:visible
+				stats={stats}
+				labels={{
+					hours: t('stats.hours'),
+					repos: t('stats.repos'),
+					languagesTitle: t('stats.languages'),
+					editorsTitle: t('stats.editors'),
+					yearsTitle: t('stats.years'),
+					languagesDesc: t('stats.languagesDesc'),
+					editorsDesc: t('stats.editorsDesc'),
+					yearsDesc: t('stats.yearsDesc'),
+				}}
+			/>
+
+			<p class="mono stats__source">
+				{t('stats.source')}:
+				<a
+					href="https://wakatime.com/@haithamassoli"
+					rel="noopener"
+					target="_blank">WakaTime</a
+				>
+				<span aria-hidden="true">·</span>
+				<a
+					href="https://github.com/haithamassoli"
+					rel="noopener"
+					target="_blank">GitHub</a
+				>
+			</p>
+		</div>
+	</div>
+
 	<div class="wrap">
 		<div class="closer reveal-fast">
 			<p class="closer__text">{t('hire.lede')}</p>
@@ -193,6 +248,77 @@ const spans = [12, 7, 5, 12, 5, 7, 7, 5];
 
 	.more__head {
 		margin-block: clamp(2rem, 5vw, 3rem);
+	}
+
+	/* ---- by the numbers ---- */
+
+	.stats {
+		margin-block-start: clamp(3rem, 8vw, 6rem);
+	}
+
+	.stats__head {
+		margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.stats__count {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.9ch;
+		color: var(--bone);
+		font-size: var(--step--1);
+	}
+
+	.stats__stale {
+		color: var(--muted);
+		font-size: var(--step--1);
+	}
+
+	.stats :global(.charts) {
+		display: grid;
+		gap: clamp(1rem, 2.5vw, 1.5rem);
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 60rem) {
+		.stats :global(.charts) {
+			grid-template-columns: 1fr 1fr;
+		}
+		.stats :global(.panel--wide) {
+			grid-column: 1 / -1;
+		}
+	}
+
+	.stats :global(.panel) {
+		margin: 0;
+		padding: clamp(1rem, 2.5vw, 1.5rem);
+		background: var(--ink-2);
+		border: 1px solid var(--rule);
+		border-radius: 0.9rem;
+	}
+
+	.stats :global(.panel__title) {
+		color: var(--muted);
+		font-size: var(--step--1);
+		margin-block-end: 0.75rem;
+	}
+
+	.stats__source {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.9ch;
+		margin-block-start: 1.25rem;
+		color: var(--muted);
+		font-size: var(--step--1);
+	}
+
+	.stats__source a {
+		color: var(--bone);
+		text-decoration-color: var(--rule-strong);
+		text-underline-offset: 0.3em;
+	}
+
+	.stats__source a:hover {
+		color: var(--signal);
 	}
 
 	/* ---- about ---- */
