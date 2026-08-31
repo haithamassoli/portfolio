@@ -32,7 +32,6 @@ export interface DevStats {
 	days: Day[];
 	/** Top languages by time typed, everything past the cut folded into one. */
 	languages: Slice[];
-	editors: Slice[];
 	totalHours: number;
 	contributions: number;
 	currentStreak: number;
@@ -78,12 +77,6 @@ const FROZEN: DevStats = {
 		{ name: 'Markdown', hours: 103 },
 		{ name: 'Other', hours: 321 },
 	],
-	editors: [
-		{ name: 'VS Code', hours: 2148 },
-		{ name: 'Cursor', hours: 274 },
-		{ name: 'Claude Code', hours: 221 },
-		{ name: 'Other', hours: 124 },
-	],
 	totalHours: 2767,
 	contributions: 992,
 	currentStreak: 4,
@@ -100,7 +93,6 @@ interface WakaStats {
 	data: {
 		total_seconds: number;
 		languages: WakaSlice[];
-		editors: WakaSlice[];
 	};
 }
 
@@ -186,7 +178,6 @@ async function live(): Promise<DevStats> {
 	return {
 		days,
 		languages: topSlices(waka.data.languages, 3),
-		editors: topSlices(waka.data.editors, 3),
 		totalHours: Math.round(waka.data.total_seconds / 3600),
 		contributions: days.reduce((sum, day) => sum + (day.count ?? 0), 0),
 		currentStreak: currentStreak(days),

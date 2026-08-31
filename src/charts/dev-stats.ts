@@ -1,11 +1,9 @@
 import { defineChart } from '@tanstack/charts';
 import { areaY } from '@tanstack/charts/area';
-import { barX } from '@tanstack/charts/bar';
 import { treemap } from '@tanstack/charts/hierarchy/treemap';
 import { cell } from '@tanstack/charts/rect';
 import { scaleBand } from '@tanstack/charts/scales/band';
 import { scaleLinear } from '@tanstack/charts/scales/linear';
-import { stack } from '@tanstack/charts/stack';
 import { tooltip } from '@tanstack/charts/tooltip';
 import type { Day, Slice } from '../data/dev-stats';
 
@@ -29,7 +27,7 @@ const RAMP = ['#874131', '#bf4f36', '#f26546', '#ff8563'] as const;
 /** Index is GitHub's own 0-4 bucket. Exported for the calendar's key. */
 export const LEVEL_COLORS = [EMPTY, ...RAMP] as const;
 
-/* Identity colours for the treemap and the share bar. Four hues that hold
+/* Identity colours for the treemap. Four hues that hold
    apart under deuteranopia and protanopia on this surface, worst pair 11 ΔE
    across every combination rather than just neighbours. "Other" is a
    remainder rather than a thing, so it takes the neutral and never a hue. */
@@ -294,66 +292,6 @@ export function languageTreemap(slices: readonly Slice[], hoursLabel: string) {
 					id: 'hours',
 					label: hoursLabel,
 					text: (point) => whole.format(point.datum.data?.hours ?? 0),
-				},
-			],
-		},
-	});
-}
-
-/**
- * Every editor in one normalised row. The question is only "what share of the
- * time", so the axis is a percentage and the row carries no baseline label.
- */
-export function editorShare(slices: readonly Slice[], hoursLabel: string) {
-	const total = slices.reduce((sum, slice) => sum + slice.hours, 0);
-	const percent = new Intl.NumberFormat('en-US', {
-		style: 'percent',
-		maximumFractionDigits: 1,
-	});
-
-	return defineChart({
-		marks: [
-			barX(slices, {
-				id: 'editors',
-				x: 'hours',
-				y: () => 'editors',
-				z: 'name',
-				color: 'name',
-				key: 'name',
-				layout: stack({ offset: 'normalize', order: 'input' }),
-				inset: 0.5,
-				radius: 3,
-			}),
-		],
-		scales: {
-			x: {
-				// Pinned: a normalised row runs 0 to 1, and left to itself the axis
-				// ticks every tenth and then thins the hundred per cent off the end.
-				scale: scaleLinear().domain([0, 1]),
-				axis: {
-					line: false,
-					ticks: { values: [0, 0.25, 0.5, 0.75, 1], format: percent.format },
-				},
-			},
-			y: { scale: scaleBand, axis: false },
-		},
-		color: identityScale(slices.map((slice) => slice.name)),
-		theme: THEME,
-		focus: 'nearest',
-		tooltip: {
-			use: tooltip,
-			items: [
-				{ field: 'name', label: '' },
-				{
-					id: 'share',
-					label: '',
-					text: (point) =>
-						total > 0 ? percent.format(point.datum.hours / total) : null,
-				},
-				{
-					id: 'hours',
-					label: hoursLabel,
-					text: (point) => whole.format(point.datum.hours),
 				},
 			],
 		},

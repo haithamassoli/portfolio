@@ -72,7 +72,6 @@ export const ui = {
 		'stats.calendar': 'Contributions, last year',
 		'stats.cumulative': 'The same year, added up',
 		'stats.languages': 'Hours by language',
-		'stats.editors': 'Hours by editor',
 		'stats.contributions': 'Contributions',
 		'stats.hours': 'Hours',
 		'stats.day': 'Contributions',
@@ -84,8 +83,6 @@ export const ui = {
 			'The running total of the same year. Flat stretches are the quiet weeks; the steep ones are the pushes.',
 		'stats.languagesDesc':
 			'Block area is share of time. TypeScript takes three quarters of it.',
-		'stats.editorsDesc':
-			'One row split by share of time. VS Code still holds most of it, with Cursor and Claude Code taking the recent share.',
 		'stats.total': 'hours tracked',
 		'stats.contribCount': 'contributions this year',
 		'stats.streak': 'day streak',
@@ -234,7 +231,6 @@ export const ui = {
 		'stats.calendar': 'المساهمات في السنة الماضية',
 		'stats.cumulative': 'السنة نفسها، مجموعة',
 		'stats.languages': 'الساعات بحسب اللغة',
-		'stats.editors': 'الساعات بحسب المحرّر',
 		'stats.contributions': 'مساهمة',
 		'stats.hours': 'ساعة',
 		'stats.day': 'مساهمة',
@@ -246,8 +242,6 @@ export const ui = {
 			'المجموع التراكمي للسنة نفسها. المقاطع المستوية هي الأسابيع الهادئة، والحادّة هي الدفعات.',
 		'stats.languagesDesc':
 			'مساحة المربّع هي نصيبها من الوقت، وتأخذ TypeScript ثلاثة أرباعه.',
-		'stats.editorsDesc':
-			'صفّ واحد مقسوم بحسب نصيب كل محرّر من الوقت. ما يزال VS Code يحمل أكثرها، ويأخذ Cursor وClaude Code النصيب الأحدث.',
 		'stats.total': 'ساعة مُسجَّلة',
 		'stats.contribCount': 'مساهمة هذه السنة',
 		'stats.streak': 'يومًا متتاليًا',

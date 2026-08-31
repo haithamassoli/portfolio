@@ -4,11 +4,11 @@ import {
 	LEVEL_COLORS,
 	contributionCalendar,
 	cumulativeContributions,
-	editorShare,
+	identityColors,
 	monthTicks,
 	toCells,
 } from './dev-stats';
-import { topSlices, type Day, type Slice } from '../data/dev-stats';
+import { topSlices, type Day } from '../data/dev-stats';
 
 /** A run of days from a Sunday, so weekday 0 lines up with column 0. */
 function year(levels: readonly number[], start = '2025-08-31'): Day[] {
@@ -131,35 +131,27 @@ test('the running total never falls', () => {
 	expect(totals).toEqual([2, 2, 2, 7, 8, 8, 11]);
 });
 
-test('the editor row is normalised, so segment width is share', () => {
-	const editors: Slice[] = [
-		{ name: 'VS Code', hours: 75 },
-		{ name: 'Cursor', hours: 25 },
-	];
-	const scene = createChartScene(editorShare(editors, 'Hours'), {
-		width: 900,
-		height: 96,
-	});
+test('Other takes the neutral, never one of the identity hues', () => {
+	const colors = identityColors(['TypeScript', 'JSON', 'Markdown', 'Other']);
 
-	const [first, second] = markRects(scene.nodes);
-	// 75 against 25 in a row of any width: three to one.
-	expect((first.width ?? 0) / (second.width ?? 0)).toBeCloseTo(3, 1);
+	expect(colors.map((entry) => entry.name)).toEqual([
+		'TypeScript',
+		'JSON',
+		'Markdown',
+		'Other',
+	]);
+	// A remainder is not a thing, so it must not borrow a real language's hue.
+	const hues = colors.slice(0, 3).map((entry) => entry.color);
+	expect(new Set(hues).size).toBe(3);
+	expect(hues).not.toContain(colors[3].color);
 });
 
-test('Other takes the neutral, never one of the identity hues', () => {
-	const editors: Slice[] = [
-		{ name: 'VS Code', hours: 60 },
-		{ name: 'Cursor', hours: 30 },
-		{ name: 'Other', hours: 10 },
-	];
-	const scene = createChartScene(editorShare(editors, 'Hours'), {
-		width: 900,
-		height: 96,
-	});
+test('a name keeps its hue when the rows around it change', () => {
+	const before = identityColors(['TypeScript', 'JSON', 'Other']);
+	const after = identityColors(['TypeScript', 'JSON', 'Markdown', 'Other']);
 
-	const fills = markRects(scene.nodes).map((rect) => rect.style?.fill);
-	expect(new Set(fills).size).toBe(3);
-	// The remainder must not borrow the colour of a real editor.
-	expect(fills[2]).not.toBe(fills[0]);
-	expect(fills[2]).not.toBe(fills[1]);
+	// Adding a language must not repaint the ones already on the chart.
+	expect(after[0].color).toBe(before[0].color);
+	expect(after[1].color).toBe(before[1].color);
+	expect(after.at(-1)?.color).toBe(before.at(-1)?.color);
 });

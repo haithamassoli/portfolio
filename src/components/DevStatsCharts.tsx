@@ -4,14 +4,13 @@ import {
 	LEVEL_COLORS,
 	contributionCalendar,
 	cumulativeContributions,
-	editorShare,
 	identityColors,
 	languageTreemap,
 } from '../charts/dev-stats';
 import type { DevStats, Slice } from '../data/dev-stats';
 
-/* Both identity charts need one: a treemap always has a tile too narrow for
-   its own label, and a normalised row has several. */
+/* A treemap always ends up with a tile too narrow for its own label, so the
+   names live outside it. */
 function Key({ slices }: { slices: readonly Slice[] }) {
 	return (
 		<ul className="mono key key--names" dir="ltr">
@@ -38,7 +37,6 @@ interface Props {
 		calendar: string;
 		cumulative: string;
 		languages: string;
-		editors: string;
 		contributions: string;
 		hours: string;
 		day: string;
@@ -47,7 +45,6 @@ interface Props {
 		calendarDesc: string;
 		cumulativeDesc: string;
 		languagesDesc: string;
-		editorsDesc: string;
 	};
 }
 
@@ -63,10 +60,6 @@ export function DevStatsCharts({ stats, labels }: Props) {
 	const languages = useMemo(
 		() => languageTreemap(stats.languages, labels.hours),
 		[stats.languages, labels.hours],
-	);
-	const editors = useMemo(
-		() => editorShare(stats.editors, labels.hours),
-		[stats.editors, labels.hours],
 	);
 
 	/* The captions follow the page direction, the plots do not: the axes are
@@ -134,20 +127,6 @@ export function DevStatsCharts({ stats, labels }: Props) {
 					/>
 				</div>
 				<Key slices={stats.languages} />
-			</figure>
-
-			<figure className="panel panel--wide">
-				<figcaption className="mono panel__title">{labels.editors}</figcaption>
-				<div dir="ltr">
-					<Chart
-						ariaLabel={labels.editors}
-						ariaDescription={labels.editorsDesc}
-						definition={editors}
-						height={96}
-						initialWidth={900}
-					/>
-				</div>
-				<Key slices={stats.editors} />
 			</figure>
 		</div>
 	);
