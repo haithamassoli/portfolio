@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import type { Project } from '../data/projects';
 import { href, useT, type Lang } from '../i18n';
 import Frame from '../components/Frame.astro';
@@ -11,15 +12,18 @@ interface Props {
 
 const { project: p, next, lang } = Astro.props;
 const t = useT(lang);
-const copy = p[lang];
 
 const links = [
 	{ key: 'project.live', url: p.links.live },
-	{ key: 'project.play', url: p.links.play },
-	{ key: 'project.apple', url: p.links.apple },
+	{ key: 'project.play', url: p.links.playGoogle },
+	{ key: 'project.apple', url: p.links.appStore },
+	{ key: 'project.vscode', url: p.links.vscode },
 	{ key: 'project.github', url: p.links.github },
 ] as const;
 const shown = links.filter((l) => l.url);
+
+/* The cover is already in the frame above; the strip is the rest. */
+const strip = p.shots.filter((s) => s !== p.image);
 ---
 
 <article class="project">
@@ -29,9 +33,9 @@ const shown = links.filter((l) => l.url);
 		</a>
 
 		<header class="head">
-			<p class="mono eyebrow enter" style="--i:0">{copy.role} · {p.year}</p>
-			<h1 class="head__title enter" style="--i:1">{copy.title}</h1>
-			<p class="head__tagline enter" style="--i:2">{copy.tagline}</p>
+			<p class="mono eyebrow enter" style="--i:0">{p.role[lang]} · {p.year}</p>
+			<h1 class="head__title enter" style="--i:1">{p.title[lang]}</h1>
+			<p class="head__tagline enter" style="--i:2">{p.tagline[lang]}</p>
 		</header>
 	</div>
 
@@ -47,15 +51,53 @@ const shown = links.filter((l) => l.url);
 
 	<div class="wrap body">
 		<div class="body__main">
-			<p class="lede reveal-fast">{copy.summary}</p>
+			<p class="lede reveal-fast">{p.summary[lang]}</p>
+
+			<section class="prose reveal-fast">
+				{p.overview[lang].map((para) => <p>{para}</p>)}
+			</section>
 
 			{
-				copy.highlights && (
+				strip.length > 0 && (
+					<section class="gallery reveal-fast">
+						{strip.map((shot) => (
+							<Image
+								class="gallery__shot"
+								src={shot}
+								alt={p.title[lang]}
+								sizes="(min-width: 62rem) 40vw, 90vw"
+								widths={[480, 800, 1200]}
+								loading="lazy"
+							/>
+						))}
+					</section>
+				)
+			}
+
+			{
+				p.challenges.length > 0 && (
+					<section class="challenges reveal-fast">
+						<h2 class="sub mono">{t('project.challenges')}</h2>
+						<ol>
+							{p.challenges.map((c) => (
+								<li class="challenge">
+									<h3 class="challenge__title">{c.title[lang]}</h3>
+									<p class="challenge__problem">{c.problem[lang]}</p>
+									<p class="challenge__solution">{c.solution[lang]}</p>
+								</li>
+							))}
+						</ol>
+					</section>
+				)
+			}
+
+			{
+				p.outcomes[lang].length > 0 && (
 					<section class="highlights reveal-fast">
-						<h2 class="sub mono">{t('project.highlights')}</h2>
+						<h2 class="sub mono">{t('project.outcomes')}</h2>
 						<ul>
-							{copy.highlights.map((h) => (
-								<li>{h}</li>
+							{p.outcomes[lang].map((o) => (
+								<li>{o}</li>
 							))}
 						</ul>
 					</section>
@@ -66,7 +108,10 @@ const shown = links.filter((l) => l.url);
 		<aside class="body__meta reveal-fast">
 			<dl>
 				<dt class="sub mono">{t('project.role')}</dt>
-				<dd>{copy.role}</dd>
+				<dd>{p.role[lang]}</dd>
+
+				<dt class="sub mono">{t('project.status')}</dt>
+				<dd>{t(`status.${p.status}`)}</dd>
 
 				<dt class="sub mono">{t('project.year')}</dt>
 				<dd>{p.year}</dd>
@@ -107,9 +152,9 @@ const shown = links.filter((l) => l.url);
 		<div class="wrap next__inner">
 			<span class="mono next__label">{t('project.next')}</span>
 			<span class="next__title"
-				>{next[lang].title}<span class="arrow">→</span></span
+				>{next.title[lang]}<span class="arrow">→</span></span
 			>
-			<span class="next__tagline">{next[lang].tagline}</span>
+			<span class="next__tagline">{next.tagline[lang]}</span>
 		</div>
 	</a>
 </article>
@@ -187,6 +232,68 @@ const shown = links.filter((l) => l.url);
 		color: var(--muted);
 		margin: 0;
 		font-weight: 400;
+	}
+
+	.prose {
+		display: grid;
+		gap: 1.2rem;
+		max-width: var(--measure);
+		color: color-mix(in oklab, var(--bone) 88%, var(--muted));
+	}
+
+	.gallery {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+	}
+
+	.gallery__shot {
+		inline-size: 100%;
+		block-size: auto;
+		border: 1px solid var(--rule);
+		border-radius: 0.7rem;
+	}
+
+	/* ---- challenges ---- */
+
+	.challenges ol {
+		list-style: none;
+		margin: 1.25rem 0 0;
+		padding: 0;
+		display: grid;
+		gap: 1.75rem;
+		max-width: var(--measure);
+		counter-reset: challenge;
+	}
+
+	.challenge {
+		border-top: 1px solid var(--rule);
+		padding-block-start: 1.25rem;
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.challenge__title {
+		font-size: var(--step-1);
+		counter-increment: challenge;
+	}
+
+	.challenge__title::before {
+		content: counter(challenge, decimal-leading-zero) ' ';
+		color: var(--accent);
+		font-family: var(--font-mono);
+		font-size: var(--step--1);
+	}
+
+	.challenge__problem {
+		color: var(--muted);
+	}
+
+	/* the answer to the line above it — the rule marks the turn */
+	.challenge__solution {
+		border-inline-start: 2px solid var(--accent);
+		padding-inline-start: 1rem;
+		color: color-mix(in oklab, var(--bone) 88%, var(--muted));
 	}
 
 	.highlights ul {
