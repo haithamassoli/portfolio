@@ -17,12 +17,12 @@ public/
 ## Using it
 
 ```ts
-import { projects, getProject, profile, t } from "@/content";
+import { projects, getProject, profile, t } from '@/content';
 
-const p = getProject("aoun")!;
-t(p.title, "ar");        // "عون"
-t(p.overview, "en");     // string[] — render as <p> blocks
-p.challenges.map(c => t(c.problem, locale));
+const p = getProject('aoun')!;
+t(p.title, 'ar'); // "عون"
+t(p.overview, 'en'); // string[] — render as <p> blocks
+p.challenges.map((c) => t(c.problem, locale));
 ```
 
 Every user-visible string is `{ en, ar }`. Nothing is English-only, so the
@@ -32,13 +32,13 @@ language switch never falls back.
 
 Each project carries enough for a full page:
 
-| field | what it is |
-|---|---|
-| `summary` | 2–4 sentences under the title |
-| `overview` | long-form paragraphs — the story |
-| `challenges` | `{ title, problem, solution }[]` — the problems faced |
-| `outcomes` | result bullets |
-| `stack`, `links`, `gallery`, `year`, `role`, `status` | metadata |
+| field                                                 | what it is                                            |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| `summary`                                             | 2–4 sentences under the title                         |
+| `overview`                                            | long-form paragraphs — the story                      |
+| `challenges`                                          | `{ title, problem, solution }[]` — the problems faced |
+| `outcomes`                                            | result bullets                                        |
+| `stack`, `links`, `gallery`, `year`, `role`, `status` | metadata                                              |
 
 74 challenge entries across 39 projects.
 
@@ -49,7 +49,7 @@ Each project carries enough for a full page:
   Aoun, the store-listed apps, and the rest of the documented ones.
 - `sourced: false` (12) — reconstructed from the stack and shape of the repo,
   because the repo only had a `create-next-app` README. The stack and what the
-  product does are accurate; the *specific* engineering problems are plausible
+  product does are accurate; the _specific_ engineering problems are plausible
   reconstruction, not recovered fact.
 
 Read the 12 `sourced: false` ones before publishing and correct anything that

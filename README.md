@@ -38,9 +38,28 @@ All commands are run from the root of the project, from a terminal:
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run lint`            | Lint with ESLint                                 |
+| `npm run format`          | Format everything with Prettier                  |
+| `npm run format:check`    | Check formatting (what CI runs)                  |
+| `npm run typecheck`       | Type-check with `astro check`                    |
+| `npm test`                | Unit tests (Vitest, `src/**/*.test.ts`)          |
+| `npm run test:e2e`        | E2E tests (Playwright, `e2e/`)                   |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## ✅ CI
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request:
+lint → format check → typecheck → unit tests → build.
+
+Run the same chain locally with:
+
+```sh
+npm run lint && npm run format:check && npm run typecheck && npm test && npm run build
+```
+
+Playwright is not in CI — run `npm run test:e2e` locally (first time: `npx playwright install`).

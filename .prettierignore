@@ -1,0 +1,5 @@
+dist/
+.astro/
+.agents/
+package-lock.json
+skills-lock.json
