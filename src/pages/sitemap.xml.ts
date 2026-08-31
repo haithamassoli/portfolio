@@ -4,7 +4,7 @@ import { canonical, languages, href, type Lang } from '../i18n';
 
 /* The route table lives in [...slug].astro; this mirrors it. Two languages of
    home, hire, and every project — no dependency needed for eighty URLs. */
-const paths = ['', 'hire', ...projects.map((p) => `work/${p.slug}`)];
+const paths = ['', 'work', 'hire', ...projects.map((p) => `work/${p.slug}`)];
 
 export const GET: APIRoute = ({ site }) => {
 	const url = (lang: Lang, path: string) => canonical(href(lang, path), site!);

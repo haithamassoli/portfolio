@@ -5,6 +5,7 @@ import Base from '../layouts/Base.astro';
 import Home from '../sections/Home.astro';
 import HirePage from '../sections/HirePage.astro';
 import ProjectPage from '../sections/ProjectPage.astro';
+import WorkPage from '../sections/WorkPage.astro';
 
 /* Every page in both languages comes from here. Adding a project adds two
    routes; there is nothing else to wire up. */
@@ -15,6 +16,10 @@ export function getStaticPaths() {
 			{
 				params: { slug: lang === 'en' ? undefined : 'ar' },
 				props: { lang, kind: 'home' as const, index: -1 },
+			},
+			{
+				params: { slug: `${prefix}work` },
+				props: { lang, kind: 'work' as const, index: -1 },
 			},
 			{
 				params: { slug: `${prefix}hire` },
@@ -38,6 +43,14 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 	kind === 'home' && (
 		<Base lang={lang}>
 			<Home lang={lang} />
+		</Base>
+	)
+}
+
+{
+	kind === 'work' && (
+		<Base lang={lang} title={t('work.all')} description={t('work.allLede')}>
+			<WorkPage lang={lang} />
 		</Base>
 	)
 }

@@ -37,3 +37,12 @@ test('the hire form blocks an incomplete brief', async ({ page }) => {
 		page.getByRole('button', { name: /Compose the email/i }),
 	).toBeDisabled();
 });
+
+test('the work page lists every project, grouped', async ({ page }) => {
+	await page.goto('/work');
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+		'All projects',
+	);
+	await expect(page.locator('.card')).toHaveCount(39);
+	await expect(page.locator('.group')).toHaveCount(6);
+});

@@ -10,7 +10,7 @@ const t = useT(lang);
 const other = swapLangHref(Astro.url.pathname, lang);
 
 const links = [
-	{ label: t('nav.work'), to: href(lang, '#work') },
+	{ label: t('nav.work'), to: href(lang, 'work') },
 	{ label: t('nav.about'), to: href(lang, '#about') },
 	{ label: t('nav.hire'), to: href(lang, 'hire') },
 ];

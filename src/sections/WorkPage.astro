@@ -1,0 +1,100 @@
+---
+import type { ProjectCategory } from '../../content/types';
+import ProjectCard from '../components/ProjectCard.astro';
+import { projects } from '../data/projects';
+import { useT, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+
+/* Grouped by what the thing is, biggest group first. A group with nothing in
+   it drops out on its own, so adding a category to content/ needs no edit
+   here beyond its label. */
+const order: ProjectCategory[] = [
+	'web',
+	'mobile',
+	'ai',
+	'client',
+	'desktop',
+	'extension',
+];
+
+const groups = order
+	.map((category) => ({
+		category,
+		items: projects.filter((p) => p.category === category),
+	}))
+	.filter((g) => g.items.length > 0);
+---
+
+<section class="section">
+	<div class="wrap">
+		<header class="head reveal-fast">
+			<p class="mono eyebrow">{t('nav.work')}</p>
+			<h1 class="head__title">{t('work.all')}</h1>
+			<p class="lede">{t('work.allLede')}</p>
+		</header>
+
+		{
+			groups.map(({ category, items }) => (
+				<div class="group">
+					<h2 class="mono group__head reveal-fast">
+						{t(`cat.${category}`)}
+						<span class="group__count">{items.length}</span>
+					</h2>
+
+					<div class="grid">
+						{items.map((p, i) => (
+							<ProjectCard
+								project={p}
+								lang={lang}
+								loading={category === order[0] && i < 2 ? 'eager' : 'lazy'}
+							/>
+						))}
+					</div>
+				</div>
+			))
+		}
+	</div>
+</section>
+
+<style>
+	.head {
+		display: grid;
+		gap: 1rem;
+		max-width: 46rem;
+		margin-block-end: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.head__title {
+		font-size: var(--step-3);
+	}
+
+	.group + .group {
+		margin-block-start: clamp(3rem, 7vw, 5rem);
+	}
+
+	.group__head {
+		display: flex;
+		align-items: baseline;
+		gap: 0.8ch;
+		color: var(--muted);
+		padding-block-end: 0.8rem;
+		margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.group__count {
+		color: var(--signal);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(12, 1fr);
+		gap: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 3vw, 2.5rem);
+	}
+</style>
