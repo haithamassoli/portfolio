@@ -300,7 +300,14 @@ const spans = [12, 7, 5, 12, 5, 7, 7, 5];
 	}
 
 	:global([dir='rtl']) .ticker__track {
-		animation-direction: reverse;
+		animation-name: ticker-rtl;
+	}
+
+	/* ponytail: RTL lays the second copy to the left, so it scrolls the other way */
+	@keyframes ticker-rtl {
+		to {
+			transform: translateX(50%);
+		}
 	}
 
 	.ticker__list {
