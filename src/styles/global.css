@@ -4,6 +4,13 @@
 	--font-sans: var(--font-thmanyah);
 }
 
+html {
+	scrollbar-color: var(--color-primary-500) transparent;
+	scroll-behavior: smooth;
+	-webkit-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
 h1,
 h2,
 h3,
