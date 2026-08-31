@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form';
+import { z } from 'zod';
 import '../styles/hire-form.css';
 import { useId, useState } from 'react';
 
@@ -26,16 +27,22 @@ export type HireFormProps = {
 
 const REQUIRED_COUNT = 8;
 
-/** Plain functions, no schema library — the whole ruleset is eight lines.
- *  Exported so the unit test can hit them without mounting the form. */
-export const required = (msg: string) => (v: string) =>
-	v.trim() ? undefined : msg;
-export const minLen = (n: number, msg: string) => (v: string) =>
-	v.trim().length >= n ? undefined : msg;
-export const isEmail = (msg: string) => (v: string) =>
-	/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? undefined : msg;
-export const isPhone = (msg: string) => (v: string) =>
-	(v.match(/\d/g) ?? []).length >= 10 ? undefined : msg;
+/** One schema for the whole brief. Messages come from the dictionary so the
+ *  Arabic form fails in Arabic. Exported so the unit test can parse without
+ *  mounting the form. */
+export const hireSchema = (t: Record<string, string>) =>
+	z.object({
+		fullName: z.string().trim().min(3, t['err.fullName']),
+		email: z.email(t['err.email']),
+		phone: z
+			.string()
+			.refine((v) => (v.match(/\d/g) ?? []).length >= 10, t['err.phone']),
+		deal: z.string(),
+		location: z.string(),
+		summary: z.string().trim().min(12, t['err.summary']),
+		budget: z.string().trim().min(1, t['err.budget']),
+		techStack: z.array(z.string()).min(1, t['err.techStack']),
+	});
 
 const filled = (v: Values) =>
 	[
@@ -66,6 +73,8 @@ export default function HireForm(props: HireFormProps) {
 			budget: '',
 			techStack: [] as string[],
 		} satisfies Values,
+		// onMount so the empty brief is invalid — the button starts disabled.
+		validators: { onMount: hireSchema(t), onChange: hireSchema(t) },
 		onSubmit: ({ value }) => {
 			const label = (opts: Option[], v: string) =>
 				opts.find((o) => o.value === v)?.label ?? v;
@@ -137,12 +146,7 @@ export default function HireForm(props: HireFormProps) {
 			</form.Subscribe>
 
 			<div className="fields">
-				<form.Field
-					name="fullName"
-					validators={{
-						onChange: ({ value }) => minLen(3, t['err.fullName'])(value),
-					}}
-				>
+				<form.Field name="fullName">
 					{(f) => (
 						<Text
 							field={f}
@@ -154,12 +158,7 @@ export default function HireForm(props: HireFormProps) {
 				</form.Field>
 
 				<div className="pair">
-					<form.Field
-						name="email"
-						validators={{
-							onChange: ({ value }) => isEmail(t['err.email'])(value),
-						}}
-					>
+					<form.Field name="email">
 						{(f) => (
 							<Text
 								field={f}
@@ -172,12 +171,7 @@ export default function HireForm(props: HireFormProps) {
 						)}
 					</form.Field>
 
-					<form.Field
-						name="phone"
-						validators={{
-							onChange: ({ value }) => isPhone(t['err.phone'])(value),
-						}}
-					>
+					<form.Field name="phone">
 						{(f) => (
 							<Text
 								field={f}
@@ -215,13 +209,7 @@ export default function HireForm(props: HireFormProps) {
 					)}
 				</form.Field>
 
-				<form.Field
-					name="techStack"
-					validators={{
-						onChange: ({ value }) =>
-							value.length ? undefined : t['err.techStack'],
-					}}
-				>
+				<form.Field name="techStack">
 					{(f) => (
 						<fieldset className="group">
 							<legend className="label mono">{t['hire.techStack']}</legend>
@@ -231,7 +219,7 @@ export default function HireForm(props: HireFormProps) {
 									return (
 										<label
 											key={o.value}
-											className={`chip${on ? 'chip--on' : ''}`}
+											className={on ? 'chip chip--on' : 'chip'}
 										>
 											<input
 												type="checkbox"
@@ -267,12 +255,7 @@ export default function HireForm(props: HireFormProps) {
 					)}
 				</form.Field>
 
-				<form.Field
-					name="summary"
-					validators={{
-						onChange: ({ value }) => minLen(12, t['err.summary'])(value),
-					}}
-				>
+				<form.Field name="summary">
 					{(f) => (
 						<Text
 							field={f}
@@ -284,12 +267,7 @@ export default function HireForm(props: HireFormProps) {
 					)}
 				</form.Field>
 
-				<form.Field
-					name="budget"
-					validators={{
-						onChange: ({ value }) => required(t['err.budget'])(value),
-					}}
-				>
+				<form.Field name="budget">
 					{(f) => (
 						<Text
 							field={f}
@@ -371,7 +349,7 @@ function Text({
 	const msg = firstError(field.state.meta);
 	const Tag = multiline ? 'textarea' : 'input';
 	return (
-		<p className={`field${msg ? 'field--bad' : ''}`}>
+		<p className={msg ? 'field field--bad' : 'field'}>
 			<label className="label mono" htmlFor={id}>
 				{label}
 			</label>
@@ -415,7 +393,7 @@ function Choice({
 				{options.map((o) => (
 					<label
 						key={o.value}
-						className={`chip${value === o.value ? 'chip--on' : ''}`}
+						className={value === o.value ? 'chip chip--on' : 'chip'}
 					>
 						<input
 							type="radio"

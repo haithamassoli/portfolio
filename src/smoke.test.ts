@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { isEmail, isPhone, minLen } from './components/HireForm';
+import { hireSchema } from './components/HireForm';
 import { projects } from './data/projects';
 import { href, swapLangHref, ui } from './i18n';
 
@@ -33,12 +33,29 @@ test('the two dictionaries carry the same keys', () => {
 });
 
 test('hire form rejects what it should', () => {
-	const bad = 'nope';
-	expect(isEmail(bad)('me@example.com')).toBeUndefined();
-	expect(isEmail(bad)('me@example')).toBe(bad);
-	expect(isEmail(bad)('me @example.com')).toBe(bad);
-	expect(isPhone(bad)('+962 79 123 4567')).toBeUndefined();
-	expect(isPhone(bad)('0791')).toBe(bad);
-	expect(minLen(3, bad)('  a  ')).toBe(bad);
-	expect(minLen(3, bad)('Layla')).toBeUndefined();
+	const t = ui.en as unknown as Record<string, string>;
+	const schema = hireSchema(t);
+	const ok = {
+		fullName: 'Layla',
+		email: 'me@example.com',
+		phone: '+962 79 123 4567',
+		deal: 'part',
+		location: 'remote',
+		summary: 'A booking app for a clinic.',
+		budget: '5000 USD',
+		techStack: ['web'],
+	};
+	expect(schema.safeParse(ok).success).toBe(true);
+
+	const errorOn = (patch: Partial<typeof ok>) => {
+		const r = schema.safeParse({ ...ok, ...patch });
+		return r.success ? undefined : r.error.issues[0].message;
+	};
+	expect(errorOn({ email: 'me@example' })).toBe(t['err.email']);
+	expect(errorOn({ email: 'me @example.com' })).toBe(t['err.email']);
+	expect(errorOn({ phone: '0791' })).toBe(t['err.phone']);
+	expect(errorOn({ fullName: '  a  ' })).toBe(t['err.fullName']);
+	expect(errorOn({ summary: 'too short' })).toBe(t['err.summary']);
+	expect(errorOn({ budget: '   ' })).toBe(t['err.budget']);
+	expect(errorOn({ techStack: [] })).toBe(t['err.techStack']);
 });
