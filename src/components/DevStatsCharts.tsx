@@ -1,70 +1,120 @@
 import { Chart } from '@tanstack/charts/react';
 import { useMemo } from 'react';
-import { hoursBar, reposPerYear } from '../charts/dev-stats';
-import type { DevStats } from '../data/dev-stats';
+import {
+	LEVEL_COLORS,
+	contributionCalendar,
+	cumulativeContributions,
+	editorShare,
+	identityColors,
+	languageTreemap,
+} from '../charts/dev-stats';
+import type { DevStats, Slice } from '../data/dev-stats';
+
+/* Both identity charts need one: a treemap always has a tile too narrow for
+   its own label, and a normalised row has several. */
+function Key({ slices }: { slices: readonly Slice[] }) {
+	return (
+		<ul className="mono key key--names" dir="ltr">
+			{identityColors(slices.map((slice) => slice.name)).map(
+				({ name, color }) => (
+					<li key={name}>
+						<span
+							aria-hidden="true"
+							className="key__swatch"
+							style={{ background: color }}
+						/>
+						{name}
+					</li>
+				),
+			)}
+		</ul>
+	);
+}
 
 interface Props {
 	stats: DevStats;
 	/** Pre-translated so the island never has to carry the whole dictionary. */
 	labels: {
+		calendar: string;
+		cumulative: string;
+		languages: string;
+		editors: string;
+		contributions: string;
 		hours: string;
-		repos: string;
-		languagesTitle: string;
-		editorsTitle: string;
-		yearsTitle: string;
+		day: string;
+		less: string;
+		more: string;
+		calendarDesc: string;
+		cumulativeDesc: string;
 		languagesDesc: string;
 		editorsDesc: string;
-		yearsDesc: string;
 	};
 }
 
-/* One bar per row plus breathing room. Fixing the height per row keeps the
-   three panels from jumping around as the numbers change between builds. */
-const rowHeight = (rows: number) => 44 + rows * 34;
-
 export function DevStatsCharts({ stats, labels }: Props) {
-	// One ceiling for both hours charts, rounded here rather than left to each
-	// axis, so the two read against the same ruler.
-	const maxHours = useMemo(() => {
-		const largest = Math.max(
-			...stats.languages.map((slice) => slice.hours),
-			...stats.editors.map((slice) => slice.hours),
-		);
-		return Math.ceil(largest / 100) * 100;
-	}, [stats.languages, stats.editors]);
-
-	// Both panels sit on one row, so both get the taller one's height.
-	const hoursHeight = rowHeight(
-		Math.max(stats.languages.length, stats.editors.length),
+	const calendar = useMemo(
+		() => contributionCalendar(stats.days, labels.day),
+		[stats.days, labels.day],
+	);
+	const cumulative = useMemo(
+		() => cumulativeContributions(stats.days, labels.contributions),
+		[stats.days, labels.contributions],
 	);
 	const languages = useMemo(
-		() => hoursBar(stats.languages, labels.hours, maxHours),
-		[stats.languages, labels.hours, maxHours],
+		() => languageTreemap(stats.languages, labels.hours),
+		[stats.languages, labels.hours],
 	);
 	const editors = useMemo(
-		() => hoursBar(stats.editors, labels.hours, maxHours),
-		[stats.editors, labels.hours, maxHours],
-	);
-	const years = useMemo(
-		() => reposPerYear(stats.years, labels.repos),
-		[stats.years, labels.repos],
+		() => editorShare(stats.editors, labels.hours),
+		[stats.editors, labels.hours],
 	);
 
 	/* The captions follow the page direction, the plots do not: the axes are
-	   numeric and every category name is Latin, so mirroring them would only
-	   put the baseline on the wrong side. */
+	   numeric, the calendar runs oldest to newest, and every category name is
+	   Latin. Mirroring them would only put the year on backwards. */
 	return (
 		<div className="charts">
+			<figure className="panel panel--wide">
+				<figcaption className="mono panel__title">{labels.calendar}</figcaption>
+				{/* Fifty-three columns will not fit a phone. The calendar keeps its
+				    square cells and scrolls sideways instead of turning to slivers. */}
+				<div className="scroller" dir="ltr">
+					<div className="scroller__track">
+						<Chart
+							ariaLabel={labels.calendar}
+							ariaDescription={labels.calendarDesc}
+							definition={calendar}
+							height={150}
+							initialWidth={900}
+						/>
+					</div>
+				</div>
+				{/* Five swatches in markup beat a legend mark that would have to be
+				    laid out around the calendar. */}
+				<p className="mono key" dir="ltr">
+					<span>{labels.less}</span>
+					{LEVEL_COLORS.map((color, level) => (
+						<span
+							aria-hidden="true"
+							className="key__swatch"
+							key={level}
+							style={{ background: color }}
+						/>
+					))}
+					<span>{labels.more}</span>
+				</p>
+			</figure>
+
 			<figure className="panel">
 				<figcaption className="mono panel__title">
-					{labels.languagesTitle}
+					{labels.cumulative}
 				</figcaption>
 				<div dir="ltr">
 					<Chart
-						ariaLabel={labels.languagesTitle}
-						ariaDescription={labels.languagesDesc}
-						definition={languages}
-						height={hoursHeight}
+						ariaLabel={labels.cumulative}
+						ariaDescription={labels.cumulativeDesc}
+						definition={cumulative}
+						height={300}
 						initialWidth={420}
 					/>
 				</div>
@@ -72,32 +122,32 @@ export function DevStatsCharts({ stats, labels }: Props) {
 
 			<figure className="panel">
 				<figcaption className="mono panel__title">
-					{labels.editorsTitle}
+					{labels.languages}
 				</figcaption>
 				<div dir="ltr">
 					<Chart
-						ariaLabel={labels.editorsTitle}
-						ariaDescription={labels.editorsDesc}
-						definition={editors}
-						height={hoursHeight}
+						ariaLabel={labels.languages}
+						ariaDescription={labels.languagesDesc}
+						definition={languages}
+						height={300}
 						initialWidth={420}
 					/>
 				</div>
+				<Key slices={stats.languages} />
 			</figure>
 
 			<figure className="panel panel--wide">
-				<figcaption className="mono panel__title">
-					{labels.yearsTitle}
-				</figcaption>
+				<figcaption className="mono panel__title">{labels.editors}</figcaption>
 				<div dir="ltr">
 					<Chart
-						ariaLabel={labels.yearsTitle}
-						ariaDescription={labels.yearsDesc}
-						definition={years}
-						height={rowHeight(stats.years.length)}
-						initialWidth={640}
+						ariaLabel={labels.editors}
+						ariaDescription={labels.editorsDesc}
+						definition={editors}
+						height={96}
+						initialWidth={900}
 					/>
 				</div>
+				<Key slices={stats.editors} />
 			</figure>
 		</div>
 	);

@@ -66,22 +66,30 @@ export const ui = {
 		'about.stackTitle': 'What I reach for',
 		'about.stackLede': 'Ordered by how often, not by how impressive.',
 		'stats.eyebrow': 'By the numbers',
-		'stats.title': 'Two and a half thousand hours',
+		'stats.title': 'A year of days, and where the hours went',
 		'stats.lede':
-			'Counted, not estimated. The editor time comes from WakaTime, the repositories from GitHub, and both are read fresh every time the site is built.',
+			'Counted, not estimated. The calendar is every public contribution of the last year, the hours come from WakaTime, and both are read fresh every time the site is built.',
+		'stats.calendar': 'Contributions, last year',
+		'stats.cumulative': 'The same year, added up',
 		'stats.languages': 'Hours by language',
 		'stats.editors': 'Hours by editor',
-		'stats.years': 'Public repositories by year',
+		'stats.contributions': 'Contributions',
 		'stats.hours': 'Hours',
-		'stats.repos': 'Repositories',
+		'stats.day': 'Contributions',
+		'stats.less': 'Less',
+		'stats.more': 'More',
+		'stats.calendarDesc':
+			'One square per day, brightest on the busiest. Reads left to right, from a year ago to today.',
+		'stats.cumulativeDesc':
+			'The running total of the same year. Flat stretches are the quiet weeks; the steep ones are the pushes.',
 		'stats.languagesDesc':
-			'TypeScript takes three quarters of the total. Everything past the top four is summed into one row.',
+			'Block area is share of time. TypeScript takes three quarters of it.',
 		'stats.editorsDesc':
-			'VS Code still holds most of it, with Cursor and Claude Code taking the recent share.',
-		'stats.yearsDesc':
-			'Repositories counted by the year they were created, forks excluded.',
+			'One row split by share of time. VS Code still holds most of it, with Cursor and Claude Code taking the recent share.',
 		'stats.total': 'hours tracked',
-		'stats.repoCount': 'public repositories',
+		'stats.contribCount': 'contributions this year',
+		'stats.streak': 'day streak',
+		'stats.activeDays': 'days with something shipped',
 		'stats.stale':
 			'Live figures were unavailable at build time; these are the last recorded ones.',
 		'stats.source': 'Sources',
@@ -220,21 +228,30 @@ export const ui = {
 		'about.stackTitle': 'أدواتي',
 		'about.stackLede': 'مرتّبة بحسب كثرة الاستخدام، لا بحسب وقعها.',
 		'stats.eyebrow': 'بالأرقام',
-		'stats.title': 'ألفان وسبعُمئة ساعة',
+		'stats.title': 'سنة من الأيام، وأين ذهبت الساعات',
 		'stats.lede':
-			'أرقام محسوبة لا مقدَّرة. ساعات المحرّر من WakaTime، والمستودعات من GitHub، وكلاهما يُقرأ من جديد مع كل بناء للموقع.',
+			'أرقام محسوبة لا مقدَّرة. الرزنامة هي كل مساهمة عامة في السنة الماضية، والساعات من WakaTime، وكلاهما يُقرأ من جديد مع كل بناء للموقع.',
+		'stats.calendar': 'المساهمات في السنة الماضية',
+		'stats.cumulative': 'السنة نفسها، مجموعة',
 		'stats.languages': 'الساعات بحسب اللغة',
 		'stats.editors': 'الساعات بحسب المحرّر',
-		'stats.years': 'المستودعات العامة بحسب السنة',
+		'stats.contributions': 'مساهمة',
 		'stats.hours': 'ساعة',
-		'stats.repos': 'مستودعًا',
+		'stats.day': 'مساهمة',
+		'stats.less': 'أقل',
+		'stats.more': 'أكثر',
+		'stats.calendarDesc':
+			'مربّع لكل يوم، أسطعها أكثرها شغلًا. يُقرأ من اليسار إلى اليمين، من قبل سنة إلى اليوم.',
+		'stats.cumulativeDesc':
+			'المجموع التراكمي للسنة نفسها. المقاطع المستوية هي الأسابيع الهادئة، والحادّة هي الدفعات.',
 		'stats.languagesDesc':
-			'تأخذ TypeScript ثلاثة أرباع المجموع، وما بعد اللغات الأربع الأولى مجموع في سطر واحد.',
+			'مساحة المربّع هي نصيبها من الوقت، وتأخذ TypeScript ثلاثة أرباعه.',
 		'stats.editorsDesc':
-			'ما يزال VS Code يحمل أكثرها، ويأخذ Cursor وClaude Code النصيب الأحدث.',
-		'stats.yearsDesc': 'المستودعات محسوبة بسنة إنشائها، دون النسخ المتفرّعة.',
+			'صفّ واحد مقسوم بحسب نصيب كل محرّر من الوقت. ما يزال VS Code يحمل أكثرها، ويأخذ Cursor وClaude Code النصيب الأحدث.',
 		'stats.total': 'ساعة مُسجَّلة',
-		'stats.repoCount': 'مستودعًا عامًّا',
+		'stats.contribCount': 'مساهمة هذه السنة',
+		'stats.streak': 'يومًا متتاليًا',
+		'stats.activeDays': 'يومًا فيه شيء أُنجز',
 		'stats.stale':
 			'تعذّر جلب الأرقام الحيّة أثناء البناء، وهذه آخر ما سُجّل منها.',
 		'stats.source': 'المصادر',

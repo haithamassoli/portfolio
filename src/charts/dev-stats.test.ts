@@ -1,33 +1,39 @@
 import { createChartScene } from '@tanstack/charts';
 import { expect, test } from 'vitest';
-import { hoursBar, reposPerYear } from './dev-stats';
-import { topSlices, type Slice, type YearRepos } from '../data/dev-stats';
+import {
+	LEVEL_COLORS,
+	contributionCalendar,
+	cumulativeContributions,
+	editorShare,
+	monthTicks,
+	toCells,
+} from './dev-stats';
+import { topSlices, type Day, type Slice } from '../data/dev-stats';
 
-const languages: Slice[] = [
-	{ name: 'TypeScript', hours: 2118 },
-	{ name: 'JSON', hours: 225 },
-	{ name: 'Other', hours: 273 },
-];
-
-const years: YearRepos[] = [
-	{ year: 2021, repos: 19 },
-	{ year: 2022, repos: 33 },
-	{ year: 2026, repos: 33 },
-];
+/** A run of days from a Sunday, so weekday 0 lines up with column 0. */
+function year(levels: readonly number[], start = '2025-08-31'): Day[] {
+	const from = new Date(`${start}T00:00:00Z`);
+	return levels.map((level, index) => {
+		const day = new Date(from);
+		day.setUTCDate(from.getUTCDate() + index);
+		return { date: day.toISOString().slice(0, 10), level, count: level };
+	});
+}
 
 interface RectLike {
 	kind: string;
 	width?: number;
+	style?: { fill?: string };
 	children?: readonly RectLike[];
 	interaction?: unknown;
 }
 
-/** Painted bar widths, in draw order. Guides and grid lines carry no point. */
-function barWidths(nodes: readonly unknown[]): number[] {
-	const found: number[] = [];
+/** Painted mark rects, in draw order. Guides and grid lines carry no point. */
+function markRects(nodes: readonly unknown[]): RectLike[] {
+	const found: RectLike[] = [];
 	const walk = (children: readonly RectLike[]) => {
 		for (const node of children) {
-			if (node.kind === 'rect' && node.interaction) found.push(node.width ?? 0);
+			if (node.kind === 'rect' && node.interaction) found.push(node);
 			else if (node.children) walk(node.children);
 		}
 	};
@@ -65,55 +71,95 @@ test('a tail that rounds to zero hours adds no Other row', () => {
 	expect(folded).toEqual([{ name: 'TypeScript', hours: 10 }]);
 });
 
-test('hours run along x and bar length tracks them', () => {
-	const scene = createChartScene(hoursBar(languages, 'Hours', 2118), {
-		width: 640,
-		height: 260,
-	});
+test('days fall into weekday rows and weekly columns', () => {
+	// Sixteen days from a Sunday: two full columns and a stub of two.
+	const cells = toCells(year(Array(16).fill(1)));
 
-	expect(scene.points).toHaveLength(languages.length);
-	for (const [index, point] of scene.points.entries()) {
-		expect(point.datum).toBe(languages[index]);
-		expect(point.xValue).toBe(languages[index].hours);
-	}
-
-	// TypeScript is ~9.4x JSON, so its bar must be drawn ~9.4x longer. Bar
-	// length, not the bar's end position, is what a reader compares.
-	const [ts, json] = barWidths(scene.nodes);
-	expect(ts / json).toBeCloseTo(2118 / 225, 1);
+	expect(cells.slice(0, 7).map((cell) => cell.week)).toEqual([
+		0, 0, 0, 0, 0, 0, 0,
+	]);
+	expect(cells.slice(0, 7).map((cell) => cell.weekday)).toEqual([
+		0, 1, 2, 3, 4, 5, 6,
+	]);
+	expect(cells[7]).toMatchObject({ week: 1, weekday: 0 });
+	expect(cells[14].week).toBe(2);
 });
 
-test('repositories per year keep one bar per year', () => {
-	const scene = createChartScene(reposPerYear(years, 'Repositories'), {
-		width: 420,
-		height: 260,
-	});
+test('a year starting mid-week still lands its first days in column zero', () => {
+	// 2025-09-03 is a Wednesday: the first column holds only four days.
+	const cells = toCells(year(Array(10).fill(0), '2025-09-03'));
 
-	expect(scene.points.map((point) => point.datum)).toEqual(years);
-	expect(scene.points.map((point) => point.yValue)).toEqual([19, 33, 33]);
-
-	// Equal counts must land at the same height even in different years.
-	expect(scene.points[1].y).toBe(scene.points[2].y);
+	expect(cells[0]).toMatchObject({ week: 0, weekday: 3 });
+	expect(cells[3]).toMatchObject({ week: 0, weekday: 6 });
+	// Saturday ends the column, so the next day opens a new one.
+	expect(cells[4]).toMatchObject({ week: 1, weekday: 0 });
 });
 
-test('a shared domain stops a small chart rescaling to its own maximum', () => {
-	const size = { width: 640, height: 260 };
-	const ceiling = 2000;
-	// Same label width in both, so only the domain can move the geometry.
-	const alone: Slice[] = [{ name: 'A', hours: 1000 }];
-	const alongside: Slice[] = [
-		{ name: 'B', hours: 2000 },
-		{ name: 'A', hours: 1000 },
+test('month labels skip the opening stub and never repeat a column', () => {
+	const cells = toCells(year(Array(120).fill(0)));
+	const ticks = monthTicks(cells);
+
+	// 120 days from 31 August touches Aug, Sep, Oct, Nov and Dec; the one-day
+	// August stub gets no label.
+	expect(ticks).toHaveLength(4);
+	expect(new Set(ticks).size).toBe(ticks.length);
+	expect(ticks).toEqual([...ticks].sort((a, b) => a - b));
+});
+
+test('every day gets a square, coloured by its own level', () => {
+	const days = year([0, 1, 2, 3, 4, 0, 1]);
+	const scene = createChartScene(contributionCalendar(days, 'Contributions'), {
+		width: 900,
+		height: 150,
+	});
+
+	const squares = markRects(scene.nodes);
+	expect(squares).toHaveLength(days.length);
+	expect(squares.map((square) => square.style?.fill)).toEqual(
+		days.map((day) => LEVEL_COLORS[day.level]),
+	);
+});
+
+test('the running total never falls', () => {
+	const days = year([2, 0, 0, 5, 1, 0, 3]);
+	const scene = createChartScene(
+		cumulativeContributions(days, 'Contributions'),
+		{ width: 420, height: 240 },
+	);
+
+	const totals = scene.points.map((point) => point.yValue);
+	expect(totals).toEqual([2, 2, 2, 7, 8, 8, 11]);
+});
+
+test('the editor row is normalised, so segment width is share', () => {
+	const editors: Slice[] = [
+		{ name: 'VS Code', hours: 75 },
+		{ name: 'Cursor', hours: 25 },
 	];
+	const scene = createChartScene(editorShare(editors, 'Hours'), {
+		width: 900,
+		height: 96,
+	});
 
-	const [soloBar] = barWidths(
-		createChartScene(hoursBar(alone, 'Hours', ceiling), size).nodes,
-	);
-	const [, pairedBar] = barWidths(
-		createChartScene(hoursBar(alongside, 'Hours', ceiling), size).nodes,
-	);
+	const [first, second] = markRects(scene.nodes);
+	// 75 against 25 in a row of any width: three to one.
+	expect((first.width ?? 0) / (second.width ?? 0)).toBeCloseTo(3, 1);
+});
 
-	// 1,000 hours is 1,000 hours: half the axis in the chart that happens to
-	// hold nothing bigger, and half the axis next to a bar twice its size.
-	expect(soloBar).toBeCloseTo(pairedBar, 5);
+test('Other takes the neutral, never one of the identity hues', () => {
+	const editors: Slice[] = [
+		{ name: 'VS Code', hours: 60 },
+		{ name: 'Cursor', hours: 30 },
+		{ name: 'Other', hours: 10 },
+	];
+	const scene = createChartScene(editorShare(editors, 'Hours'), {
+		width: 900,
+		height: 96,
+	});
+
+	const fills = markRects(scene.nodes).map((rect) => rect.style?.fill);
+	expect(new Set(fills).size).toBe(3);
+	// The remainder must not borrow the colour of a real editor.
+	expect(fills[2]).not.toBe(fills[0]);
+	expect(fills[2]).not.toBe(fills[1]);
 });

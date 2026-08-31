@@ -130,41 +130,61 @@ const number = new Intl.NumberFormat('en-US');
 				<p class="mono eyebrow">{t('stats.eyebrow')}</p>
 				<h2 class="head__title">{t('stats.title')}</h2>
 				<p class="lede">{t('stats.lede')}</p>
-				<p class="mono stats__count">
-					<span>{number.format(stats.totalHours)} {t('stats.total')}</span>
-					<span aria-hidden="true">·</span>
-					<span>{number.format(stats.repoCount)} {t('stats.repoCount')}</span>
-				</p>
-				{stats.stale && <p class="mono stats__stale">{t('stats.stale')}</p>}
 			</header>
+
+			<dl class="figures">
+				<div class="figure">
+					<dt class="figure__value">{number.format(stats.contributions)}</dt>
+					<dd class="mono figure__label">{t('stats.contribCount')}</dd>
+				</div>
+				<div class="figure">
+					<dt class="figure__value">{number.format(stats.currentStreak)}</dt>
+					<dd class="mono figure__label">{t('stats.streak')}</dd>
+				</div>
+				<div class="figure">
+					<dt class="figure__value">{number.format(stats.activeDays)}</dt>
+					<dd class="mono figure__label">{t('stats.activeDays')}</dd>
+				</div>
+				<div class="figure">
+					<dt class="figure__value">{number.format(stats.totalHours)}</dt>
+					<dd class="mono figure__label">{t('stats.total')}</dd>
+				</div>
+			</dl>
+
+			{stats.stale && <p class="mono stats__stale">{t('stats.stale')}</p>}
 
 			<DevStatsCharts
 				client:visible
 				stats={stats}
 				labels={{
+					calendar: t('stats.calendar'),
+					cumulative: t('stats.cumulative'),
+					languages: t('stats.languages'),
+					editors: t('stats.editors'),
+					contributions: t('stats.contributions'),
 					hours: t('stats.hours'),
-					repos: t('stats.repos'),
-					languagesTitle: t('stats.languages'),
-					editorsTitle: t('stats.editors'),
-					yearsTitle: t('stats.years'),
+					day: t('stats.day'),
+					less: t('stats.less'),
+					more: t('stats.more'),
+					calendarDesc: t('stats.calendarDesc'),
+					cumulativeDesc: t('stats.cumulativeDesc'),
 					languagesDesc: t('stats.languagesDesc'),
 					editorsDesc: t('stats.editorsDesc'),
-					yearsDesc: t('stats.yearsDesc'),
 				}}
 			/>
 
 			<p class="mono stats__source">
 				{t('stats.source')}:
 				<a
-					href="https://wakatime.com/@haithamassoli"
-					rel="noopener"
-					target="_blank">WakaTime</a
-				>
-				<span aria-hidden="true">·</span>
-				<a
 					href="https://github.com/haithamassoli"
 					rel="noopener"
 					target="_blank">GitHub</a
+				>
+				<span aria-hidden="true">·</span>
+				<a
+					href="https://wakatime.com/@haithamassoli"
+					rel="noopener"
+					target="_blank">WakaTime</a
 				>
 			</p>
 		</div>
@@ -260,15 +280,42 @@ const number = new Intl.NumberFormat('en-US');
 		margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
 	}
 
-	.stats__count {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.9ch;
-		color: var(--bone);
+	.figures {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: clamp(1rem, 3vw, 2rem);
+		margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	@media (min-width: 46rem) {
+		.figures {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	.figure {
+		display: grid;
+		gap: 0.35rem;
+		padding-inline-start: 0.9rem;
+		border-inline-start: 2px solid var(--signal);
+	}
+
+	.figure__value {
+		font-size: var(--step-2);
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+
+	.figure__label {
+		margin: 0;
+		color: var(--muted);
 		font-size: var(--step--1);
+		line-height: 1.35;
 	}
 
 	.stats__stale {
+		margin-block-end: 1rem;
 		color: var(--muted);
 		font-size: var(--step--1);
 	}
@@ -290,6 +337,9 @@ const number = new Intl.NumberFormat('en-US');
 
 	.stats :global(.panel) {
 		margin: 0;
+		/* Grid items default to min-content width, which would let the
+		   calendar's scroll track widen the whole column instead of scrolling. */
+		min-inline-size: 0;
 		padding: clamp(1rem, 2.5vw, 1.5rem);
 		background: var(--ink-2);
 		border: 1px solid var(--rule);
@@ -300,6 +350,48 @@ const number = new Intl.NumberFormat('en-US');
 		color: var(--muted);
 		font-size: var(--step--1);
 		margin-block-end: 0.75rem;
+	}
+
+	.stats :global(.scroller) {
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: thin;
+	}
+
+	.stats :global(.scroller__track) {
+		min-inline-size: 44rem;
+	}
+
+	/* ---- calendar key ---- */
+
+	.stats :global(.key) {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.4rem;
+		margin: 0.5rem 0 0;
+		color: var(--muted);
+		font-size: var(--step--1);
+	}
+
+	.stats :global(.key--names) {
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		list-style: none;
+		padding: 0;
+	}
+
+	.stats :global(.key--names li) {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5ch;
+		margin-inline-end: 1.2ch;
+	}
+
+	.stats :global(.key__swatch) {
+		inline-size: 0.7rem;
+		block-size: 0.7rem;
+		border-radius: 2px;
 	}
 
 	.stats__source {
