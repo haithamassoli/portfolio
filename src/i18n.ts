@@ -4,6 +4,10 @@ export type Lang = keyof typeof languages;
 export const defaultLang: Lang = 'en';
 export const dirOf = (lang: Lang) => (lang === 'ar' ? 'rtl' : 'ltr');
 
+/** Absolute, no trailing slash — the one spelling of a page we advertise. */
+export const canonical = (path: string, site: URL | string) =>
+	new URL(path, site).href.replace(/(?<=[^/])\/$/, '');
+
 /** `/about` in English, `/ar/about` in Arabic. Pass '' for the home page. */
 export const href = (lang: Lang, path = '') =>
 	lang === defaultLang ? `/${path}` : `/ar/${path}`;
@@ -127,6 +131,13 @@ export const ui = {
 		'footer.rights': 'All rights reserved',
 		'404.title': 'Nothing at this address',
 		'404.lede': 'The page moved or never existed. The work is still here.',
+		'500.title': 'Something broke on my side',
+		'500.lede':
+			'Not your fault — the server tripped over itself. Try again in a moment, or go back to the work.',
+		'422.title': 'That did not go through',
+		'422.lede':
+			'Something in what you sent did not check out. Go back, look over the fields, and send it again.',
+		'error.home': 'Back to the home page',
 	},
 	ar: {
 		'meta.title': 'هيثم العسولي — تطبيقات بلغتين',
@@ -244,6 +255,13 @@ export const ui = {
 		'footer.rights': 'جميع الحقوق محفوظة',
 		'404.title': 'لا شيء على هذا العنوان',
 		'404.lede': 'انتقلت الصفحة أو لم توجد أصلًا. الأعمال ما زالت هنا.',
+		'500.title': 'حدث خطأ من جهتي',
+		'500.lede':
+			'الخطأ ليس منك — تعثّر الخادم. جرّب بعد لحظات، أو عد إلى الأعمال.',
+		'422.title': 'لم يمرّ الطلب',
+		'422.lede':
+			'شيء ممّا أرسلته لم يجتز التحقق. عد وراجع الحقول ثم أرسله من جديد.',
+		'error.home': 'العودة إلى الصفحة الرئيسية',
 	},
 } as const;
 
