@@ -3,6 +3,8 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 
+import react from '@astrojs/react';
+
 // https://astro.build/config
 export default defineConfig({
 	fonts: [
@@ -41,8 +43,26 @@ export default defineConfig({
 				],
 			},
 		},
+		{
+			provider: fontProviders.google(),
+			name: 'Martian Mono',
+			cssVariable: '--font-mono',
+			fallbacks: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+			weights: [400, 600],
+			subsets: ['latin'],
+			styles: ['normal'],
+		},
 	],
+
+	i18n: {
+		locales: ['en', 'ar'],
+		defaultLocale: 'en',
+		routing: { prefixDefaultLocale: false },
+	},
+
 	vite: {
 		plugins: [tailwindcss()],
 	},
+
+	integrations: [react()],
 });

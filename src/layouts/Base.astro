@@ -1,0 +1,66 @@
+---
+import { Font } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import { dirOf, useT, type Lang } from '../i18n';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+	lang: Lang;
+	title?: string;
+	description?: string;
+	accent?: string;
+}
+
+const { lang, title, description, accent } = Astro.props;
+const t = useT(lang);
+const dir = dirOf(lang);
+const siteName = lang === 'ar' ? t('name.arabic') : t('name.latin');
+const pageTitle = title ? `${title} — ${siteName}` : t('meta.title');
+---
+
+<!doctype html>
+<html lang={lang} dir={dir} style={accent ? `--accent:${accent}` : undefined}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle}</title>
+		<meta name="description" content={description ?? t('meta.desc')} />
+		<meta name="theme-color" content="#16183a" />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={description ?? t('meta.desc')} />
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content={lang === 'ar' ? 'ar_JO' : 'en_US'} />
+		<link
+			rel="alternate"
+			hreflang="en"
+			href={new URL(
+				Astro.url.pathname.replace(/^\/ar(?=\/|$)/, '') || '/',
+				Astro.site ?? Astro.url.origin,
+			)}
+		/>
+		<link
+			rel="alternate"
+			hreflang="ar"
+			href={new URL(
+				'/ar' + (Astro.url.pathname.replace(/^\/ar(?=\/|$)/, '') || '/'),
+				Astro.site ?? Astro.url.origin,
+			)}
+		/>
+		<Font
+			cssVariable="--font-thmanyah"
+			preload={[{ weight: 400 }, { weight: 900 }]}
+		/>
+		<Font cssVariable="--font-mono" preload={[{ weight: 400 }]} />
+		<ClientRouter />
+	</head>
+	<body>
+		<a class="skip mono" href="#main">{t('nav.skip')}</a>
+		<Nav lang={lang} />
+		<main id="main" tabindex="-1"><slot /></main>
+		<Footer lang={lang} />
+	</body>
+</html>

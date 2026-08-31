@@ -1,21 +1,391 @@
 @import 'tailwindcss';
 
+/* --------------------------------------------------------------------------
+   Ink & bone. The site is an indigo field with a bone field pressed against
+   it; the seam between them is where the two scripts meet, and the only
+   place the signal orange is allowed to shout.
+   -------------------------------------------------------------------------- */
+
 @theme {
 	--font-sans: var(--font-thmanyah);
+	--font-mono: var(--font-mono);
+
+	--color-ink: #16183a;
+	--color-ink-2: #1d2050;
+	--color-ink-3: #262a63;
+	--color-bone: #f0ebe1;
+	--color-bone-2: #ddd5c6;
+	--color-signal: #ff5a1f;
+	--color-muted: #9a9cbe;
+}
+
+:root {
+	--ink: #16183a;
+	--ink-2: #1d2050;
+	--ink-3: #262a63;
+	--bone: #f0ebe1;
+	--bone-2: #ddd5c6;
+	--signal: #ff5a1f;
+	--muted: #9a9cbe;
+	--rule: color-mix(in oklab, var(--bone) 16%, transparent);
+	--rule-strong: color-mix(in oklab, var(--bone) 30%, transparent);
+
+	/* Per-page accent. Project pages override it. */
+	--accent: var(--signal);
+
+	--gutter: clamp(1.25rem, 5vw, 5rem);
+	--measure: 62ch;
+
+	--step--1: clamp(0.75rem, 0.72rem + 0.15vw, 0.82rem);
+	--step-0: clamp(0.95rem, 0.9rem + 0.25vw, 1.06rem);
+	--step-1: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem);
+	--step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+	--step-3: clamp(2rem, 1.6rem + 2vw, 3.4rem);
+	--step-4: clamp(2.8rem, 1.8rem + 4.5vw, 6rem);
+	--step-5: clamp(3.5rem, 1.4rem + 9vw, 10rem);
+
+	color-scheme: dark;
+	accent-color: var(--signal);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
 }
 
 html {
-	scrollbar-color: var(--color-primary-500) transparent;
 	scroll-behavior: smooth;
 	-webkit-text-size-adjust: none;
 	text-size-adjust: none;
+	scrollbar-color: var(--ink-3) var(--ink);
+}
+
+body {
+	margin: 0;
+	background: var(--ink);
+	color: var(--bone);
+	font-family: var(--font-sans);
+	font-size: var(--step-0);
+	line-height: 1.65;
+	font-weight: 300;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
 }
 
 h1,
 h2,
 h3,
-h4,
-h5,
-h6 {
+h4 {
+	font-weight: 900;
+	line-height: 0.92;
+	letter-spacing: -0.03em;
+	text-wrap: balance;
+	margin: 0;
 	font-feature-settings: 'salt' 1;
+}
+
+/* Arabic has no capitals and sits taller in its box — it needs the extra
+   leading back and none of the Latin tracking. */
+:root[lang='ar'] h1,
+:root[lang='ar'] h2,
+:root[lang='ar'] h3,
+:root[lang='ar'] h4,
+[dir='rtl'] h1,
+[dir='rtl'] h2,
+[dir='rtl'] h3,
+[dir='rtl'] h4 {
+	letter-spacing: 0;
+	line-height: 1.12;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+a {
+	color: inherit;
+	text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+	text-underline-offset: 0.25em;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+	color: inherit;
+}
+
+:focus-visible {
+	outline: 2px solid var(--signal);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+::selection {
+	background: var(--signal);
+	color: var(--bone);
+}
+
+/* ---- shared primitives -------------------------------------------------- */
+
+.wrap {
+	max-width: 84rem;
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+/* Mono is the utility voice: eyebrows, tags, counts, form labels. Latin only —
+   Arabic in these slots falls back to the sans, which the stack handles. */
+.mono {
+	font-family: var(--font-mono);
+	font-size: var(--step--1);
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1.4;
+}
+
+[dir='rtl'] .mono {
+	font-family: var(--font-sans);
+	letter-spacing: 0;
+	text-transform: none;
+	font-weight: 500;
+}
+
+.eyebrow {
+	color: var(--accent);
+	display: flex;
+	align-items: center;
+	gap: 0.75ch;
+}
+
+.eyebrow::before {
+	content: '';
+	inline-size: 2.5rem;
+	block-size: 1px;
+	background: currentColor;
+	flex: none;
+}
+
+.lede {
+	font-size: var(--step-1);
+	line-height: 1.5;
+	max-width: var(--measure);
+	color: color-mix(in oklab, var(--bone) 82%, var(--muted));
+}
+
+.section {
+	padding-block: clamp(4.5rem, 10vw, 9rem);
+	position: relative;
+}
+
+.rule {
+	border: 0;
+	border-top: 1px solid var(--rule);
+	margin: 0;
+}
+
+.tag {
+	font-family: var(--font-mono);
+	font-size: 0.68rem;
+	letter-spacing: 0.06em;
+	padding: 0.3em 0.7em 0.35em;
+	border: 1px solid var(--rule);
+	border-radius: 999px;
+	color: var(--muted);
+	white-space: nowrap;
+}
+
+.tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+/* The one loud control. */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7ch;
+	padding: 0.85em 1.5em;
+	border-radius: 999px;
+	border: 1px solid var(--accent);
+	background: var(--accent);
+	color: var(--ink);
+	font-family: var(--font-mono);
+	font-size: var(--step--1);
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	text-decoration: none;
+	cursor: pointer;
+	transition:
+		transform 0.25s cubic-bezier(0.2, 0.9, 0.25, 1),
+		box-shadow 0.25s;
+}
+
+[dir='rtl'] .btn {
+	font-family: var(--font-sans);
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 10px 30px -10px
+		color-mix(in oklab, var(--accent) 70%, transparent);
+}
+
+.btn:active {
+	transform: translateY(0);
+}
+
+.btn--ghost {
+	background: transparent;
+	color: var(--bone);
+	border-color: var(--rule-strong);
+}
+
+.btn--ghost:hover {
+	border-color: var(--accent);
+	color: var(--accent);
+	box-shadow: none;
+}
+
+/* An arrow that points the way the page reads. */
+.arrow {
+	display: inline-block;
+	transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+[dir='rtl'] .arrow {
+	scale: -1 1;
+}
+
+a:hover > .arrow,
+.btn:hover .arrow {
+	transform: translateX(0.3em);
+}
+
+.skip {
+	position: absolute;
+	inset-inline-start: var(--gutter);
+	top: -4rem;
+	z-index: 100;
+	background: var(--signal);
+	color: var(--ink);
+	padding: 0.6rem 1rem;
+	border-radius: 0 0 0.5rem 0.5rem;
+	transition: top 0.2s;
+}
+
+.skip:focus {
+	top: 0;
+}
+
+/* ---- scroll-driven reveal ----------------------------------------------- */
+/* Native, no JS, no library. Browsers without view() timelines simply get the
+   finished state, which is the correct fallback. */
+
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		.reveal {
+			animation: reveal linear both;
+			animation-timeline: view();
+			animation-range: entry 5% cover 26%;
+		}
+
+		.reveal-fast {
+			animation: reveal linear both;
+			animation-timeline: view();
+			animation-range: entry 0% cover 18%;
+		}
+	}
+}
+
+@keyframes reveal {
+	from {
+		opacity: 0;
+		transform: translateY(2.5rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ---- entrance choreography ---------------------------------------------- */
+/* One orchestrated moment on load, then the page stays still. */
+
+@media (prefers-reduced-motion: no-preference) {
+	.enter {
+		animation: enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+		animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+	}
+}
+
+@keyframes enter {
+	from {
+		opacity: 0;
+		transform: translateY(1.5rem);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+	}
+}
+
+/* ---- language flip ------------------------------------------------------ */
+/* Switching language mirrors the page across the seam rather than reloading
+   into a different site. */
+
+::view-transition-old(root) {
+	animation: seam-out 0.4s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+::view-transition-new(root) {
+	animation: seam-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+@keyframes seam-out {
+	to {
+		clip-path: inset(0 50% 0 50%);
+		opacity: 0.4;
+	}
+}
+
+@keyframes seam-in {
+	from {
+		clip-path: inset(0 50% 0 50%);
+		opacity: 0.4;
+	}
+	to {
+		clip-path: inset(0 0 0 0);
+		opacity: 1;
+	}
 }

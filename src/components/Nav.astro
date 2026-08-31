@@ -1,0 +1,176 @@
+---
+import { href, swapLangHref, useT, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+const other = swapLangHref(Astro.url.pathname, lang);
+
+const links = [
+	{ label: t('nav.work'), to: href(lang, '#work') },
+	{ label: t('nav.about'), to: href(lang, '#about') },
+	{ label: t('nav.hire'), to: href(lang, 'hire') },
+];
+---
+
+<header class="bar">
+	<a class="mark" href={href(lang)} aria-label={t('nav.home')}>
+		<span class="mark__face mark__face--latin">H</span>
+		<span class="mark__face mark__face--arabic">ه</span>
+	</a>
+
+	<nav class="links mono" aria-label={t('nav.work')}>
+		{links.map((l) => <a href={l.to}>{l.label}</a>)}
+	</nav>
+
+	<a
+		class="lang mono"
+		href={other}
+		hreflang={lang === 'ar' ? 'en' : 'ar'}
+		lang={lang === 'ar' ? 'en' : 'ar'}
+	>
+		<span class="lang__short">{t('nav.langShort')}</span>
+		<span class="lang__long">{t('nav.lang')}</span>
+	</a>
+</header>
+
+<style>
+	.bar {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		gap: clamp(0.75rem, 3vw, 2.5rem);
+		padding: 0.75rem var(--gutter);
+		background: color-mix(in oklab, var(--ink) 78%, transparent);
+		backdrop-filter: blur(14px) saturate(1.4);
+		border-bottom: 1px solid var(--rule);
+	}
+
+	/* The monogram holds both scripts in one box and swaps on hover — the
+	   smallest possible statement of what the site is about. */
+	.mark {
+		position: relative;
+		display: grid;
+		place-items: center;
+		inline-size: 2.25rem;
+		block-size: 2.25rem;
+		flex: none;
+		border: 1px solid var(--rule-strong);
+		border-radius: 0.55rem;
+		text-decoration: none;
+		overflow: hidden;
+		transition: border-color 0.3s;
+	}
+
+	.mark:hover {
+		border-color: var(--signal);
+	}
+
+	.mark__face {
+		grid-area: 1 / 1;
+		font-size: 1.05rem;
+		font-weight: 900;
+		line-height: 1;
+		transition:
+			transform 0.4s cubic-bezier(0.7, 0, 0.2, 1),
+			opacity 0.3s;
+	}
+
+	.mark__face--arabic {
+		color: var(--signal);
+		transform: translateY(110%);
+		opacity: 0;
+	}
+
+	.mark:hover .mark__face--latin {
+		transform: translateY(-110%);
+		opacity: 0;
+	}
+
+	.mark:hover .mark__face--arabic {
+		transform: none;
+		opacity: 1;
+	}
+
+	.links {
+		display: flex;
+		gap: clamp(0.9rem, 3vw, 2rem);
+		margin-inline-end: auto;
+	}
+
+	.links a {
+		text-decoration: none;
+		color: var(--muted);
+		position: relative;
+		padding-block: 0.35rem;
+		transition: color 0.25s;
+	}
+
+	.links a::after {
+		content: '';
+		position: absolute;
+		inset-inline: 0;
+		bottom: 0;
+		block-size: 1px;
+		background: var(--signal);
+		scale: 0 1;
+		transform-origin: var(--origin, left);
+		transition: scale 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+	}
+
+	:global([dir='rtl']) .links a::after {
+		--origin: right;
+	}
+
+	.links a:hover {
+		color: var(--bone);
+	}
+
+	.links a:hover::after {
+		scale: 1 1;
+	}
+
+	.lang {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6ch;
+		flex: none;
+		padding: 0.4rem 0.85rem;
+		border: 1px solid var(--rule-strong);
+		border-radius: 999px;
+		text-decoration: none;
+		color: var(--bone);
+		transition:
+			background 0.25s,
+			border-color 0.25s,
+			color 0.25s;
+	}
+
+	.lang:hover {
+		background: var(--signal);
+		border-color: var(--signal);
+		color: var(--ink);
+	}
+
+	.lang__short {
+		font-weight: 600;
+	}
+
+	.lang__long {
+		display: none;
+	}
+
+	@media (min-width: 46rem) {
+		.lang__long {
+			display: inline;
+		}
+		.lang__short {
+			opacity: 0.5;
+		}
+	}
+</style>

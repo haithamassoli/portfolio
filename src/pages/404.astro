@@ -1,0 +1,32 @@
+---
+import { href, useT } from '../i18n';
+import Base from '../layouts/Base.astro';
+
+const lang = 'en' as const;
+const t = useT(lang);
+---
+
+<Base lang={lang} title={t('404.title')}>
+	<section class="section wrap lost">
+		<p class="mono eyebrow enter" style="--i:0">404</p>
+		<h1 class="lost__title enter" style="--i:1">{t('404.title')}</h1>
+		<p class="lede enter" style="--i:2">{t('404.lede')}</p>
+		<a class="btn enter" style="--i:3" href={href(lang, '#work')}>
+			{t('work.all')}<span class="arrow">→</span>
+		</a>
+	</section>
+</Base>
+
+<style>
+	.lost {
+		display: grid;
+		gap: 1.25rem;
+		justify-items: start;
+		align-content: center;
+		min-block-size: 60svh;
+	}
+
+	.lost__title {
+		font-size: var(--step-4);
+	}
+</style>

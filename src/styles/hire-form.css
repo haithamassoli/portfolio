@@ -1,0 +1,275 @@
+/* The hire form is a React island, so Astro's scoped styles do not reach it.
+   Everything it needs lives here and leans on the tokens in global.css. */
+
+.hire-form {
+	position: relative;
+	display: grid;
+	gap: 2rem;
+	padding: clamp(1.5rem, 4vw, 2.5rem);
+	background: var(--ink-2);
+	border: 1px solid var(--rule);
+	border-radius: 1rem;
+	overflow: hidden;
+}
+
+/* Completion meter — the seam, filling up as the brief gets answered. */
+.hire-form .meter {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	block-size: 2px;
+	background: var(--rule);
+}
+
+.hire-form .meter > span {
+	display: block;
+	block-size: 100%;
+	background: var(--signal);
+	transform-origin: left;
+	transition: scale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[dir='rtl'] .hire-form .meter > span {
+	transform-origin: right;
+}
+
+.hire-form .fields {
+	display: grid;
+	gap: 1.75rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.hire-form .fields > * {
+		animation: enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+	.hire-form .fields > :nth-child(1) {
+		animation-delay: 60ms;
+	}
+	.hire-form .fields > :nth-child(2) {
+		animation-delay: 120ms;
+	}
+	.hire-form .fields > :nth-child(3) {
+		animation-delay: 180ms;
+	}
+	.hire-form .fields > :nth-child(4) {
+		animation-delay: 240ms;
+	}
+	.hire-form .fields > :nth-child(5) {
+		animation-delay: 300ms;
+	}
+	.hire-form .fields > :nth-child(6) {
+		animation-delay: 360ms;
+	}
+	.hire-form .fields > :nth-child(7) {
+		animation-delay: 420ms;
+	}
+}
+
+.hire-form .pair {
+	display: grid;
+	gap: 1.75rem;
+}
+
+@media (min-width: 34rem) {
+	.hire-form .pair {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+/* ---- text fields -------------------------------------------------------- */
+
+.hire-form .field {
+	display: grid;
+	gap: 0.4rem;
+	margin: 0;
+}
+
+.hire-form .label {
+	color: var(--muted);
+	transition: color 0.25s;
+}
+
+.hire-form .field:focus-within .label {
+	color: var(--signal);
+}
+
+.hire-form input,
+.hire-form textarea {
+	inline-size: 100%;
+	background: transparent;
+	border: 0;
+	border-bottom: 1px solid var(--rule-strong);
+	border-radius: 0;
+	padding: 0.55rem 0.15rem;
+	font-size: var(--step-0);
+	transition: border-color 0.25s;
+}
+
+.hire-form textarea {
+	resize: vertical;
+	line-height: 1.6;
+}
+
+.hire-form input::placeholder,
+.hire-form textarea::placeholder {
+	color: color-mix(in oklab, var(--muted) 78%, transparent);
+}
+
+.hire-form input:focus,
+.hire-form textarea:focus {
+	outline: none;
+	border-color: var(--signal);
+}
+
+.hire-form input:focus-visible,
+.hire-form textarea:focus-visible {
+	outline: 2px solid var(--signal);
+	outline-offset: 4px;
+}
+
+.hire-form .field--bad input,
+.hire-form .field--bad textarea {
+	border-color: var(--signal);
+}
+
+/* Errors take no space until there is one. */
+.hire-form .err {
+	display: grid;
+	grid-template-rows: 0fr;
+	overflow: hidden;
+	color: var(--signal);
+	font-size: 0.78rem;
+	line-height: 1.45;
+	transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hire-form .err:not(:empty) {
+	grid-template-rows: 1fr;
+	padding-block-start: 0.2rem;
+}
+
+/* ---- choice chips ------------------------------------------------------- */
+
+.hire-form .group {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.7rem;
+}
+
+.hire-form .chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.hire-form .chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6ch;
+	padding: 0.45rem 0.95rem;
+	border: 1px solid var(--rule-strong);
+	border-radius: 999px;
+	font-size: 0.88rem;
+	cursor: pointer;
+	user-select: none;
+	transition:
+		border-color 0.25s,
+		background 0.25s,
+		color 0.25s,
+		transform 0.2s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.hire-form .chip:hover {
+	border-color: var(--bone-2);
+}
+
+.hire-form .chip:active {
+	transform: scale(0.97);
+}
+
+.hire-form .chip:has(:focus-visible) {
+	outline: 2px solid var(--signal);
+	outline-offset: 3px;
+}
+
+.hire-form .chip input {
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.hire-form .chip--on {
+	border-color: var(--signal);
+	background: color-mix(in oklab, var(--signal) 16%, transparent);
+	color: var(--bone);
+}
+
+.hire-form .chip__dot,
+.hire-form .chip__box {
+	display: grid;
+	place-items: center;
+	inline-size: 0.9rem;
+	block-size: 0.9rem;
+	flex: none;
+	border: 1px solid var(--rule-strong);
+	color: var(--ink);
+	transition:
+		background 0.25s,
+		border-color 0.25s,
+		scale 0.25s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.hire-form .chip__dot {
+	border-radius: 50%;
+}
+
+.hire-form .chip__box {
+	border-radius: 0.25rem;
+}
+
+.hire-form .chip__box svg {
+	scale: 0;
+	transition: scale 0.25s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.hire-form .chip--on .chip__dot,
+.hire-form .chip--on .chip__box {
+	background: var(--signal);
+	border-color: var(--signal);
+	box-shadow: inset 0 0 0 3px var(--ink-2);
+}
+
+.hire-form .chip--on .chip__box {
+	box-shadow: none;
+}
+
+.hire-form .chip--on .chip__box svg {
+	scale: 1;
+}
+
+/* ---- submit ------------------------------------------------------------- */
+
+.hire-form .submit {
+	justify-content: center;
+	inline-size: 100%;
+}
+
+.hire-form .submit:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.hire-form .note {
+	text-align: center;
+	color: var(--muted);
+	margin: -1rem 0 0;
+	font-size: 0.7rem;
+	text-transform: none;
+	letter-spacing: 0.02em;
+}

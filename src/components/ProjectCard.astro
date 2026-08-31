@@ -1,0 +1,98 @@
+---
+import type { Project } from '../data/projects';
+import { href, useT, type Lang } from '../i18n';
+import Frame from './Frame.astro';
+
+interface Props {
+	project: Project;
+	lang: Lang;
+	span?: number;
+	loading?: 'eager' | 'lazy';
+}
+
+const { project: p, lang, span = 6, loading } = Astro.props;
+const t = useT(lang);
+const copy = p[lang];
+---
+
+<a
+	class="card reveal"
+	href={href(lang, `work/${p.slug}`)}
+	style={`--accent:${p.accent}; --span:${span}`}
+>
+	<Frame
+		project={p}
+		lang={lang}
+		name={`shot-${p.slug}`}
+		loading={loading}
+		sizes={span >= 10
+			? '(min-width: 60rem) 90vw, 100vw'
+			: '(min-width: 60rem) 50vw, 100vw'}
+	/>
+
+	<div class="card__body">
+		<div class="card__head">
+			<h3 class="card__title">{copy.title}</h3>
+			<span class="mono card__year">{p.year}</span>
+		</div>
+		<p class="card__tagline">{copy.tagline}</p>
+		<ul class="tags">
+			{p.stack.slice(0, 5).map((s) => <li class="tag">{s}</li>)}
+		</ul>
+		<span class="card__cta mono"
+			>{t('work.read')} <span class="arrow">→</span></span
+		>
+	</div>
+</a>
+
+<style>
+	.card {
+		grid-column: span var(--span);
+		display: flex;
+		flex-direction: column;
+		gap: 1.1rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	@media (max-width: 56rem) {
+		.card {
+			grid-column: span 12;
+		}
+	}
+
+	.card__head {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		justify-content: space-between;
+	}
+
+	.card__title {
+		font-size: var(--step-2);
+		transition: color 0.3s;
+	}
+
+	.card:hover .card__title {
+		color: var(--accent);
+	}
+
+	.card__year {
+		color: var(--muted);
+		flex: none;
+	}
+
+	.card__tagline {
+		color: var(--muted);
+		max-width: 44ch;
+		line-height: 1.5;
+	}
+
+	.card__cta {
+		color: var(--accent);
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6ch;
+		margin-block-start: auto;
+	}
+</style>

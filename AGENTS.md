@@ -20,3 +20,10 @@ Consult these guides before working on related tasks:
 - [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+
+## Skills from dependencies
+
+`npm run skills` links skills shipped by allowlisted packages (`agentSkills` in
+`package.json`) into `.agents/skills` and `.claude/skills`. The links are
+gitignored and CI runs `npm run skills -- --check`. Add a package to
+`agentSkills.packages` to opt in; drop individual skills via `agentSkills.exclude`.

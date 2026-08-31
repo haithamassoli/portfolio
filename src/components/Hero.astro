@@ -1,0 +1,263 @@
+---
+import { dirOf, href, ui, useT, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'ar' ? 'en' : 'ar';
+
+const primaryName = lang === 'ar' ? t('name.arabic') : t('name.latin');
+const mirrorName = lang === 'ar' ? t('name.latin') : t('name.arabic');
+const mirrorRole = ui[other]['hero.role'];
+---
+
+<section class="hero">
+	<div class="hero__grid">
+		<div class="hero__field hero__field--primary">
+			<p class="mono eyebrow enter" style="--i:0">{t('hero.role')}</p>
+
+			<h1 class="name">
+				{
+					primaryName.split(' ').map((word, i) => (
+						<span class="name__line">
+							<span class="name__word" style={`--i:${i + 1}`}>
+								{word}
+							</span>
+						</span>
+					))
+				}
+			</h1>
+
+			<p class="lede enter" style="--i:4">{t('hero.lede')}</p>
+
+			<div class="hero__ctas enter" style="--i:5">
+				<a class="btn" href={href(lang, '#work')}>
+					{t('hero.cta')}<span class="arrow">→</span>
+				</a>
+				<a class="btn btn--ghost" href={href(lang, 'hire')}>{t('hero.cta2')}</a>
+			</div>
+		</div>
+
+		<div class="hero__seam" aria-hidden="true">
+			<span class="hero__seam-label mono">{t('hero.seam')}</span>
+		</div>
+
+		<div
+			class="hero__field hero__field--mirror"
+			dir={dirOf(other)}
+			lang={other}
+		>
+			<span class="name name--ghost">
+				{
+					mirrorName.split(' ').map((word, i) => (
+						<span class="name__line">
+							<span class="name__word" style={`--i:${i + 2}`}>
+								{word}
+							</span>
+						</span>
+					))
+				}
+			</span>
+			<p class="mono hero__mirror-role enter" style="--i:6">{mirrorRole}</p>
+		</div>
+	</div>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.hero__grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		min-block-size: min(84svh, 46rem);
+	}
+
+	@media (min-width: 56rem) {
+		.hero__grid {
+			grid-template-columns: 1.12fr 0 0.88fr;
+		}
+	}
+
+	.hero__field {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 1.6rem;
+		padding: clamp(3rem, 8vw, 6rem) var(--gutter);
+	}
+
+	.hero__field--primary {
+		align-items: start;
+	}
+
+	/* The bone half. It bleeds to the viewport edge on purpose: the page is two
+	   fields pressed together, not a card sitting on a background. */
+	.hero__field--mirror {
+		background: var(--bone);
+		color: var(--ink);
+		align-items: end;
+		text-align: end;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	.hero__mirror-role {
+		color: color-mix(in oklab, var(--ink) 74%, var(--bone));
+		max-width: 22ch;
+	}
+
+	/* ---- the seam ---- */
+
+	.hero__seam {
+		position: relative;
+		/* the mirror field animates clip-path, which would otherwise paint over
+		   the label straddling the line */
+		z-index: 2;
+		background: var(--signal);
+		block-size: 1px;
+		inline-size: 100%;
+	}
+
+	@media (min-width: 56rem) {
+		.hero__seam {
+			inline-size: 1px;
+			block-size: auto;
+		}
+	}
+
+	/* Physical properties on purpose: the label centres on the line itself, and
+	   `inset-inline-start` follows the vertical writing mode instead. */
+	.hero__seam-label {
+		position: absolute;
+		top: 50%;
+		inset-inline-start: var(--gutter);
+		translate: 0 -50%;
+		background: var(--ink);
+		color: var(--signal);
+		padding: 0.3rem 0.7rem;
+		border: 1px solid var(--signal);
+		border-radius: 999px;
+		white-space: nowrap;
+		font-size: 0.62rem;
+	}
+
+	@media (min-width: 56rem) {
+		.hero__seam-label {
+			writing-mode: vertical-rl;
+			padding: 0.7rem 0.3rem;
+			/* cleared first: in a vertical writing mode it resolves to `top` */
+			inset-inline-start: auto;
+			top: 50%;
+			left: 0;
+			translate: -50% -50%;
+		}
+		:global([dir='rtl']) .hero__seam-label {
+			writing-mode: vertical-lr;
+		}
+	}
+
+	/* ---- the name ---- */
+
+	.name {
+		display: flex;
+		flex-direction: column;
+		font-size: var(--step-5);
+		font-weight: 900;
+		line-height: 0.88;
+		letter-spacing: -0.045em;
+		margin: 0;
+	}
+
+	:global([dir='rtl']) .name,
+	.hero__field--mirror .name {
+		letter-spacing: 0;
+	}
+
+	:global([lang='ar']) .name {
+		line-height: 1.08;
+	}
+
+	.name--ghost {
+		color: transparent;
+		-webkit-text-stroke: 1.5px color-mix(in oklab, var(--ink) 45%, var(--bone));
+		font-size: clamp(2.6rem, 7vw, 7.5rem);
+	}
+
+	.name__line {
+		display: block;
+		overflow: hidden;
+		padding-block-end: 0.06em;
+	}
+
+	.name__word {
+		display: block;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.name__word {
+			animation: rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+			animation-delay: calc(var(--i, 0) * 100ms + 200ms);
+		}
+
+		.hero__seam {
+			animation: seam 0.8s cubic-bezier(0.7, 0, 0.2, 1) both;
+			transform-origin: top;
+		}
+
+		.hero__field--mirror {
+			animation: field 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+		}
+	}
+
+	@keyframes rise {
+		from {
+			transform: translateY(105%);
+		}
+		to {
+			transform: none;
+		}
+	}
+
+	@keyframes seam {
+		from {
+			scale: 1 0;
+		}
+		to {
+			scale: 1 1;
+		}
+	}
+
+	@keyframes field {
+		from {
+			clip-path: inset(0 0 0 100%);
+		}
+		to {
+			clip-path: inset(0 0 0 0);
+		}
+	}
+
+	:global([dir='rtl']) .hero__field--mirror {
+		animation-name: field-rtl;
+	}
+
+	@keyframes field-rtl {
+		from {
+			clip-path: inset(0 100% 0 0);
+		}
+		to {
+			clip-path: inset(0 0 0 0);
+		}
+	}
+
+	.hero__ctas {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+</style>

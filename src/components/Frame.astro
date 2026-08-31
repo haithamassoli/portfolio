@@ -1,0 +1,413 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../data/projects';
+import type { Lang } from '../i18n';
+
+interface Props {
+	project: Project;
+	lang: Lang;
+	/** Morph target for the card → project-page view transition. */
+	name?: string;
+	sizes?: string;
+	loading?: 'eager' | 'lazy';
+}
+
+const {
+	project: p,
+	lang,
+	name,
+	sizes = '(min-width: 60rem) 50vw, 100vw',
+	loading = 'lazy',
+} = Astro.props;
+const copy = p[lang];
+const site = p.links.live ?? p.links.play ?? p.links.apple ?? p.links.github;
+const host = site ? new URL(site).hostname.replace(/^www\./, '') : 'localhost';
+const alt = `${copy.title} — ${copy.tagline}`;
+---
+
+<div
+	class:list={['frame', `frame--${p.frame}`]}
+	data-frame={p.frame}
+	transition:name={name}
+>
+	{
+		p.frame === 'browser' && (
+			<>
+				<div class="chrome chrome--browser">
+					<span class="dots">
+						<>
+							<i />
+							<i />
+							<i />
+						</>
+					</span>
+					<span class="url mono" dir="ltr">
+						{host}
+					</span>
+				</div>
+				{p.image && (
+					<Image
+						class="shot"
+						src={p.image}
+						alt={alt}
+						sizes={sizes}
+						loading={loading}
+						widths={[480, 800, 1200, 1600]}
+					/>
+				)}
+			</>
+		)
+	}
+
+	{
+		p.frame === 'phone' && (
+			<>
+				<div class="chrome chrome--store">
+					<span class="icon" aria-hidden="true">
+						{copy.title.trim()[0]}
+					</span>
+					<span class="store-meta">
+						<span class="store-name">{copy.title}</span>
+						<span class="stars mono" aria-hidden="true">
+							★★★★★ <em>{p.year}</em>
+						</span>
+					</span>
+					<span class="get mono">
+						{p.links.apple && p.links.play
+							? 'iOS · Android'
+							: p.links.apple
+								? 'iOS'
+								: 'Android'}
+					</span>
+				</div>
+				{p.image && (
+					<Image
+						class="shot"
+						src={p.image}
+						alt={alt}
+						sizes={sizes}
+						loading={loading}
+						widths={[480, 800, 1200, 1600]}
+					/>
+				)}
+			</>
+		)
+	}
+
+	{
+		p.frame === 'postcard' && (
+			<>
+				{p.image && (
+					<Image
+						class="shot"
+						src={p.image}
+						alt={alt}
+						sizes={sizes}
+						loading={loading}
+						widths={[480, 800, 1200, 1600]}
+					/>
+				)}
+				<span class="stamp mono" aria-hidden="true">
+					{p.year}
+				</span>
+				{p.place && <div class="caption mono">{p.place[lang]}</div>}
+			</>
+		)
+	}
+
+	{
+		p.frame === 'editor' && (
+			<>
+				<div class="chrome chrome--editor">
+					<span class="tab mono">extension.js</span>
+					<span class="dots dots--end">
+						<>
+							<i />
+							<i />
+							<i />
+						</>
+					</span>
+				</div>
+				<pre class="code mono" dir="ltr" aria-hidden="true">
+					<code>
+						<>
+							<span class="ln">1</span>
+							<span class="kw">const</span>
+						</>{' '}
+						bar = vscode.window.<span class="fn">createStatusBarItem</span>();
+						<>
+							<span class="ln">2</span>
+							<span class="kw">const</span>
+						</>{' '}
+						azkar = [<span class="str">'سبحان الله وبحمده'</span>,{' '}
+						<span class="str">'الحمد لله'</span>];
+						<span class="ln">3</span>
+						<>
+							<span class="ln">4</span>
+							<span class="kw">const</span>
+						</>{' '}
+						tick = <span class="fn">setInterval</span>(() =&gt; {'{'}
+						<span class="ln">5</span> bar.text = azkar[i++ % azkar.length];
+						<span class="ln">6</span> bar.<span class="fn">show</span>();{' '}
+						<span class="cm">// a glance, not an interruption</span>
+						<span class="ln">7</span>
+						{'}'}, minutes * 60_000);
+						<span class="ln">8</span>
+						<span class="ln">9</span>context.subscriptions.
+						<span class="fn">push</span>({'{'} dispose: () =&gt;{' '}
+						<span class="fn">clearInterval</span>(tick) {'}'});
+					</code>
+				</pre>
+				<div class="status" dir="rtl">
+					<span class="status__dhikr">سبحان الله وبحمده</span>
+					<span class="status__meta mono" dir="ltr">
+						every 30 min
+					</span>
+				</div>
+			</>
+		)
+	}
+</div>
+
+<style>
+	.frame {
+		position: relative;
+		background: var(--ink-2);
+		border: 1px solid var(--rule);
+		border-radius: 0.9rem;
+		overflow: hidden;
+		transition:
+			border-color 0.4s,
+			transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	:global(a:hover) > .frame,
+	:global(a:focus-visible) > .frame {
+		border-color: color-mix(in oklab, var(--accent) 60%, transparent);
+		transform: translateY(-4px);
+	}
+
+	.shot {
+		display: block;
+		inline-size: 100%;
+		block-size: auto;
+		aspect-ratio: 16 / 9;
+		/* full-bleed cards would otherwise eat a whole screen */
+		max-block-size: min(66svh, 32rem);
+		object-fit: cover;
+		object-position: top center;
+		transition: scale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	:global(a:hover) > .frame .shot {
+		scale: 1.025;
+	}
+
+	/* ---- chrome, shared ---- */
+
+	.chrome {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.55rem 0.85rem;
+		background: color-mix(in oklab, var(--ink) 70%, var(--ink-3));
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.dots {
+		display: inline-flex;
+		gap: 0.3rem;
+		flex: none;
+	}
+
+	.dots i {
+		inline-size: 0.5rem;
+		block-size: 0.5rem;
+		border-radius: 50%;
+		background: var(--rule-strong);
+	}
+
+	.dots--end {
+		margin-inline-start: auto;
+	}
+
+	/* ---- browser ---- */
+
+	.url {
+		flex: 1;
+		text-align: center;
+		background: var(--ink);
+		border-radius: 999px;
+		padding: 0.2rem 0.9rem;
+		color: var(--muted);
+		text-transform: none;
+		letter-spacing: 0;
+		font-size: 0.66rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* ---- store listing ---- */
+
+	.icon {
+		display: grid;
+		place-items: center;
+		inline-size: 2.1rem;
+		block-size: 2.1rem;
+		flex: none;
+		border-radius: 0.6rem;
+		background: var(--accent);
+		color: var(--ink);
+		font-weight: 900;
+		font-size: 1.1rem;
+		line-height: 1;
+	}
+
+	.store-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		margin-inline-end: auto;
+		min-inline-size: 0;
+	}
+
+	.store-name {
+		font-weight: 700;
+		font-size: 0.9rem;
+		line-height: 1.2;
+	}
+
+	.stars {
+		color: var(--accent);
+		font-size: 0.55rem;
+		letter-spacing: 0.1em;
+	}
+
+	.stars em {
+		color: var(--muted);
+		font-style: normal;
+	}
+
+	.get {
+		flex: none;
+		border: 1px solid var(--rule-strong);
+		border-radius: 999px;
+		padding: 0.22rem 0.75rem;
+		font-size: 0.6rem;
+		color: var(--bone);
+	}
+
+	/* ---- postcard ---- */
+
+	.frame--postcard .shot {
+		aspect-ratio: 21 / 9;
+	}
+
+	/* Physical inset properties: `inset-inline-*` follows the vertical writing
+	   mode, not the page direction, which stretches the stamp down the frame. */
+	.stamp {
+		position: absolute;
+		top: 0.9rem;
+		right: 0.9rem;
+		background: var(--bone);
+		color: var(--ink);
+		padding: 0.85rem 0.55rem;
+		font-size: 0.62rem;
+		font-weight: 600;
+		border-radius: 0.2rem;
+		writing-mode: vertical-rl;
+		box-shadow: 0 6px 24px -8px rgb(0 0 0 / 0.6);
+	}
+
+	:global([dir='rtl']) .stamp {
+		right: auto;
+		left: 0.9rem;
+	}
+
+	.caption {
+		padding: 0.7rem 0.95rem;
+		border-top: 1px solid var(--rule);
+		color: var(--muted);
+		font-size: 0.66rem;
+		text-transform: none;
+		letter-spacing: 0.02em;
+	}
+
+	/* ---- editor ---- */
+
+	.frame--editor {
+		background: #10122c;
+	}
+
+	.tab {
+		background: var(--ink-2);
+		border: 1px solid var(--rule);
+		border-bottom-color: transparent;
+		border-radius: 0.4rem 0.4rem 0 0;
+		padding: 0.3rem 0.8rem;
+		font-size: 0.6rem;
+		text-transform: none;
+		letter-spacing: 0;
+		color: var(--bone);
+	}
+
+	.code {
+		margin: 0;
+		padding: 1.4rem 1rem 1.6rem;
+		font-size: clamp(0.6rem, 1.15vw, 0.78rem);
+		line-height: 2.4;
+		letter-spacing: 0;
+		text-transform: none;
+		color: #a9b0e8;
+		overflow-x: auto;
+		aspect-ratio: 16 / 9;
+	}
+
+	.ln {
+		display: inline-block;
+		inline-size: 2.2ch;
+		color: color-mix(in oklab, var(--muted) 45%, transparent);
+		user-select: none;
+	}
+
+	.kw {
+		color: var(--accent);
+	}
+
+	.fn {
+		color: #f0c674;
+	}
+
+	/* Arabic literals inside an LTR code block: isolate them so the quotes stay
+	   where the author typed them. */
+	.str {
+		color: #8fd6b4;
+		unicode-bidi: isolate;
+	}
+
+	.cm {
+		color: color-mix(in oklab, var(--muted) 60%, transparent);
+	}
+
+	.status {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.5rem 0.95rem;
+		background: var(--accent);
+		color: var(--ink);
+	}
+
+	.status__dhikr {
+		font-weight: 700;
+		font-size: 0.95rem;
+	}
+
+	.status__meta {
+		font-size: 0.6rem;
+		opacity: 0.85;
+		text-transform: none;
+	}
+</style>

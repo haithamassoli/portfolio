@@ -1,65 +1,60 @@
-# Astro Starter Kit: Basics
+# Haitham Assoli — portfolio
+
+A bilingual (English / Arabic) portfolio built in Astro. The design idea is a
+seam: the page is an indigo field and a bone field pressed together, and the
+line between them is where the two scripts meet. Switching language mirrors the
+site rather than loading a different one.
+
+## Running it
 
 ```sh
-npm create astro@latest -- --template basics
+npm install
+astro dev --background     # astro dev stop | status | logs
+npm run build
+npm run preview
 ```
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run lint`            | Lint with ESLint                                 |
-| `npm run format`          | Format everything with Prettier                  |
-| `npm run format:check`    | Check formatting (what CI runs)                  |
-| `npm run typecheck`       | Type-check with `astro check`                    |
-| `npm test`                | Unit tests (Vitest, `src/**/*.test.ts`)          |
-| `npm run test:e2e`        | E2E tests (Playwright, `e2e/`)                   |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## ✅ CI
-
-`.github/workflows/ci.yml` runs on every push to `main` and every pull request:
-lint → format check → typecheck → unit tests → build.
-
-Run the same chain locally with:
 
 ```sh
-npm run lint && npm run format:check && npm run typecheck && npm test && npm run build
+npm run test        # unit — i18n routing, bilingual data, form validators
+npm run test:e2e    # Playwright — language flip, project pages, form guard
+npm run typecheck   # astro check
+npm run lint
 ```
 
-Playwright is not in CI — run `npm run test:e2e` locally (first time: `npx playwright install`).
+## How it fits together
+
+| Path                          | What it is                                                       |
+| ----------------------------- | ---------------------------------------------------------------- |
+| `src/i18n.ts`                 | Both dictionaries, `href`/`swapLangHref`, the option lists       |
+| `src/data/projects.ts`        | Every project, in both languages, with its `frame` and accent    |
+| `src/pages/[...slug].astro`   | The only route file: home, hire, and a page per project × 2      |
+| `src/components/Frame.astro`  | The four showcases — store listing, browser, postcard, editor    |
+| `src/components/HireForm.tsx` | TanStack Form island; the one piece of client JS on the site     |
+| `src/styles/global.css`       | Tokens, primitives, scroll reveals, the language-flip transition |
+
+### Adding a project
+
+Append an entry to `src/data/projects.ts`. Give it a `slug`, a `frame`, an
+`accent`, and both `en` and `ar` copy. Both routes and both listings follow —
+there is nothing else to wire up. `featured: true` puts it in the top grid;
+`false` puts it in the archive rows.
+
+`frame` is what makes each project look unlike the one beside it:
+
+- `phone` — an app-store listing header above the shot
+- `browser` — window chrome with the real hostname
+- `postcard` — wide crop, a date stamp, and the place it is from
+- `editor` — no screenshot; a live code pane with a status bar
+
+### Notes
+
+- No animation library. Entrances are CSS keyframes, scroll reveals are
+  `animation-timeline: view()`, and the language flip is a view transition.
+  Everything is off under `prefers-reduced-motion`.
+- No validation library either — the hire form's rules are four small functions
+  at the top of `HireForm.tsx`.
+- The form composes a `mailto:` in the reader's language. Nothing is sent from
+  the page.
+- Layout uses logical properties throughout, except where an element has its own
+  vertical `writing-mode` — there `inset-inline-*` follows the text, not the
+  page, so those few rules are physical on purpose and commented as such.

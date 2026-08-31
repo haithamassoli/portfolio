@@ -1,0 +1,138 @@
+---
+import HireForm from '../components/HireForm';
+import { deals, locations, techStack, ui, useT, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const strings = Object.fromEntries(
+	Object.entries(ui[lang]).filter(
+		([k]) => k.startsWith('hire.') || k.startsWith('err.'),
+	),
+) as Record<string, string>;
+
+const opts = <T extends readonly string[]>(prefix: string, keys: T) =>
+	keys.map((value) => ({ value, label: t(`${prefix}.${value}` as never) }));
+
+const skills = [
+	{ title: t('skill.web'), desc: t('skill.webDesc') },
+	{ title: t('skill.mobile'), desc: t('skill.mobileDesc') },
+	{ title: t('skill.backend'), desc: t('skill.backendDesc') },
+	{ title: t('skill.other'), desc: t('skill.otherDesc') },
+];
+---
+
+<section class="section hire">
+	<div class="wrap">
+		<header class="head">
+			<p class="mono eyebrow enter" style="--i:0">{t('hire.eyebrow')}</p>
+			<h1 class="head__title enter" style="--i:1">{t('hire.title')}</h1>
+			<p class="lede enter" style="--i:2">{t('hire.lede')}</p>
+		</header>
+
+		<div class="cols">
+			<div class="cols__form enter" style="--i:3">
+				<HireForm
+					client:load
+					lang={lang}
+					email={t('footer.contact')}
+					t={strings}
+					deals={opts('deal', deals)}
+					locations={opts('loc', locations)}
+					techStack={opts('tech', techStack)}
+				/>
+			</div>
+
+			<aside class="cols__aside enter" style="--i:4">
+				<h2 class="mono aside__title">{t('skills.title')}</h2>
+				<ul class="skills">
+					{
+						skills.map((s) => (
+							<li class="skill">
+								<h3 class="skill__title">{s.title}</h3>
+								<p class="skill__desc">{s.desc}</p>
+							</li>
+						))
+					}
+				</ul>
+			</aside>
+		</div>
+	</div>
+</section>
+
+<style>
+	.head {
+		display: grid;
+		gap: 1rem;
+		max-width: 46rem;
+		margin-block-end: clamp(2.5rem, 6vw, 4rem);
+	}
+
+	.head__title {
+		font-size: var(--step-3);
+	}
+
+	.cols {
+		display: grid;
+		gap: clamp(2.5rem, 6vw, 4rem);
+		align-items: start;
+	}
+
+	@media (min-width: 62rem) {
+		.cols {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+		}
+		.cols__aside {
+			position: sticky;
+			top: 6rem;
+		}
+	}
+
+	.aside__title {
+		color: var(--muted);
+		font-weight: 400;
+		margin: 0 0 0.5rem;
+	}
+
+	.skills {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.skill {
+		padding-block: 1.4rem;
+		border-top: 1px solid var(--rule);
+		position: relative;
+		padding-inline-start: 1.5rem;
+	}
+
+	/* a tick on the seam, not a decorative icon */
+	.skill::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 0;
+		top: 1.9rem;
+		inline-size: 0.6rem;
+		block-size: 1px;
+		background: var(--signal);
+	}
+
+	.skill__title {
+		font-size: var(--step-1);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		margin: 0 0 0.35rem;
+	}
+
+	.skill__desc {
+		color: var(--muted);
+		font-size: var(--step--1);
+		line-height: 1.6;
+		max-width: 40ch;
+	}
+</style>

@@ -1,0 +1,309 @@
+---
+import type { Project } from '../data/projects';
+import { href, useT, type Lang } from '../i18n';
+import Frame from '../components/Frame.astro';
+
+interface Props {
+	project: Project;
+	next: Project;
+	lang: Lang;
+}
+
+const { project: p, next, lang } = Astro.props;
+const t = useT(lang);
+const copy = p[lang];
+
+const links = [
+	{ key: 'project.live', url: p.links.live },
+	{ key: 'project.play', url: p.links.play },
+	{ key: 'project.apple', url: p.links.apple },
+	{ key: 'project.github', url: p.links.github },
+] as const;
+const shown = links.filter((l) => l.url);
+---
+
+<article class="project">
+	<div class="wrap">
+		<a class="back mono" href={href(lang, '#work')}>
+			<span class="arrow back__arrow">→</span>{t('project.back')}
+		</a>
+
+		<header class="head">
+			<p class="mono eyebrow enter" style="--i:0">{copy.role} · {p.year}</p>
+			<h1 class="head__title enter" style="--i:1">{copy.title}</h1>
+			<p class="head__tagline enter" style="--i:2">{copy.tagline}</p>
+		</header>
+	</div>
+
+	<div class="wrap stage">
+		<Frame
+			project={p}
+			lang={lang}
+			name={`shot-${p.slug}`}
+			loading="eager"
+			sizes="(min-width: 60rem) 90vw, 100vw"
+		/>
+	</div>
+
+	<div class="wrap body">
+		<div class="body__main">
+			<p class="lede reveal-fast">{copy.summary}</p>
+
+			{
+				copy.highlights && (
+					<section class="highlights reveal-fast">
+						<h2 class="sub mono">{t('project.highlights')}</h2>
+						<ul>
+							{copy.highlights.map((h) => (
+								<li>{h}</li>
+							))}
+						</ul>
+					</section>
+				)
+			}
+		</div>
+
+		<aside class="body__meta reveal-fast">
+			<dl>
+				<dt class="sub mono">{t('project.role')}</dt>
+				<dd>{copy.role}</dd>
+
+				<dt class="sub mono">{t('project.year')}</dt>
+				<dd>{p.year}</dd>
+
+				<dt class="sub mono">{t('project.stack')}</dt>
+				<dd>
+					<ul class="tags">{p.stack.map((s) => <li class="tag">{s}</li>)}</ul>
+				</dd>
+
+				{
+					shown.length > 0 && (
+						<>
+							<dt class="sub mono">{t('project.links')}</dt>
+							<dd>
+								<ul class="out">
+									{shown.map((l) => (
+										<li>
+											<a href={l.url} rel="noopener noreferrer" target="_blank">
+												{t(l.key)}
+												<span class="arrow">↗</span>
+											</a>
+										</li>
+									))}
+								</ul>
+							</dd>
+						</>
+					)
+				}
+			</dl>
+		</aside>
+	</div>
+
+	<a
+		class="next"
+		href={href(lang, `work/${next.slug}`)}
+		style={`--accent:${next.accent}`}
+	>
+		<div class="wrap next__inner">
+			<span class="mono next__label">{t('project.next')}</span>
+			<span class="next__title"
+				>{next[lang].title}<span class="arrow">→</span></span
+			>
+			<span class="next__tagline">{next[lang].tagline}</span>
+		</div>
+	</a>
+</article>
+
+<style>
+	.project {
+		padding-block-start: clamp(2rem, 5vw, 3.5rem);
+	}
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.7ch;
+		color: var(--muted);
+		text-decoration: none;
+		transition: color 0.25s;
+	}
+
+	.back:hover {
+		color: var(--accent);
+	}
+
+	/* points back the way the reader came from */
+	.back__arrow {
+		scale: -1 1;
+	}
+
+	:global([dir='rtl']) .back__arrow {
+		scale: 1 1;
+	}
+
+	.head {
+		display: grid;
+		gap: 1rem;
+		margin-block: clamp(1.75rem, 5vw, 3rem);
+		max-width: 42ch;
+	}
+
+	.head__title {
+		font-size: var(--step-4);
+		color: var(--accent);
+	}
+
+	.head__tagline {
+		font-size: var(--step-2);
+		font-weight: 300;
+		line-height: 1.25;
+		letter-spacing: -0.01em;
+		max-width: 28ch;
+	}
+
+	.stage {
+		margin-block-end: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.body {
+		display: grid;
+		gap: clamp(2.5rem, 6vw, 4rem);
+		padding-block-end: clamp(4rem, 9vw, 7rem);
+	}
+
+	@media (min-width: 62rem) {
+		.body {
+			grid-template-columns: 1fr 18rem;
+			align-items: start;
+		}
+	}
+
+	.body__main {
+		display: grid;
+		gap: clamp(2rem, 5vw, 3rem);
+	}
+
+	.sub {
+		color: var(--muted);
+		margin: 0;
+		font-weight: 400;
+	}
+
+	.highlights ul {
+		list-style: none;
+		margin: 1.25rem 0 0;
+		padding: 0;
+		display: grid;
+		gap: 0;
+		max-width: var(--measure);
+	}
+
+	.highlights li {
+		padding-block: 1rem;
+		border-top: 1px solid var(--rule);
+		display: grid;
+		grid-template-columns: 1.6rem 1fr;
+		gap: 0.5rem;
+		color: color-mix(in oklab, var(--bone) 88%, var(--muted));
+	}
+
+	.highlights li::before {
+		content: '';
+		inline-size: 0.45rem;
+		block-size: 0.45rem;
+		border-radius: 50%;
+		background: var(--accent);
+		margin-block-start: 0.6em;
+	}
+
+	.body__meta dl {
+		display: grid;
+		gap: 0.4rem;
+		margin: 0;
+		padding-block-start: 0.35rem;
+		border-top: 1px solid var(--rule);
+	}
+
+	.body__meta dt {
+		margin-block-start: 1.4rem;
+	}
+
+	.body__meta dd {
+		margin: 0;
+	}
+
+	.out {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.out a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5ch;
+		text-decoration: none;
+		border-bottom: 1px solid var(--rule-strong);
+		padding-block-end: 0.1em;
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.out a:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+
+	.out .arrow {
+		font-size: 0.8em;
+		color: var(--accent);
+	}
+
+	/* ---- next ---- */
+
+	.next {
+		display: block;
+		text-decoration: none;
+		border-top: 1px solid var(--rule);
+		padding-block: clamp(2.5rem, 6vw, 4rem);
+		transition: background 0.4s;
+	}
+
+	.next:hover {
+		background: color-mix(in oklab, var(--accent) 10%, transparent);
+	}
+
+	.next__inner {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.next__label {
+		color: var(--muted);
+	}
+
+	.next__title {
+		font-size: var(--step-3);
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		display: flex;
+		align-items: center;
+		gap: 0.5ch;
+		transition: color 0.3s;
+	}
+
+	.next:hover .next__title {
+		color: var(--accent);
+	}
+
+	.next:hover .arrow {
+		transform: translateX(0.35em);
+	}
+
+	.next__tagline {
+		color: var(--muted);
+	}
+</style>

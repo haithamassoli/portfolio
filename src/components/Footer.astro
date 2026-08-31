@@ -1,0 +1,98 @@
+---
+import { href, useT, type Lang } from '../i18n';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+	<div class="wrap foot__inner">
+		<div class="foot__names">
+			<span class="foot__name">{t('name.latin')}</span>
+			<span class="foot__slash" aria-hidden="true">/</span>
+			<span class="foot__name" lang="ar" dir="rtl">{t('name.arabic')}</span>
+		</div>
+
+		<a class="foot__mail" href={`mailto:${t('footer.contact')}`} dir="ltr">
+			{t('footer.contact')}<span class="arrow">→</span>
+		</a>
+
+		<nav class="foot__links mono" aria-label={t('nav.home')}>
+			<a href={href(lang, '#work')}>{t('nav.work')}</a>
+			<a href={href(lang, '#about')}>{t('nav.about')}</a>
+			<a href={href(lang, 'hire')}>{t('nav.hire')}</a>
+		</nav>
+
+		<p class="mono foot__note">
+			{t('footer.line')} · © {year} · {t('footer.rights')}
+		</p>
+	</div>
+</footer>
+
+<style>
+	.foot {
+		border-top: 1px solid var(--signal);
+		padding-block: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.foot__inner {
+		display: grid;
+		gap: 1.6rem;
+	}
+
+	.foot__names {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.6ch;
+		font-size: var(--step-3);
+		font-weight: 900;
+		letter-spacing: -0.03em;
+	}
+
+	.foot__slash {
+		color: var(--signal);
+		font-weight: 300;
+	}
+
+	.foot__mail {
+		font-size: var(--step-1);
+		text-decoration: none;
+		justify-self: start;
+		border-bottom: 1px solid var(--rule-strong);
+		padding-block-end: 0.15em;
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.foot__mail:hover {
+		color: var(--signal);
+		border-color: var(--signal);
+	}
+
+	.foot__links {
+		display: flex;
+		gap: 1.5rem;
+	}
+
+	.foot__links a {
+		color: var(--muted);
+		text-decoration: none;
+		transition: color 0.25s;
+	}
+
+	.foot__links a:hover {
+		color: var(--bone);
+	}
+
+	.foot__note {
+		color: color-mix(in oklab, var(--muted) 88%, transparent);
+		font-size: 0.65rem;
+	}
+</style>

@@ -5,6 +5,13 @@
 	"engines": {
 		"node": ">=22.12.0"
 	},
+	"agentSkills": {
+		"packages": [
+			"@tanstack/charts",
+			"@tanstack/devtools-event-client"
+		],
+		"exclude": []
+	},
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
@@ -13,13 +20,22 @@
 		"lint": "eslint .",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
+		"skills": "node scripts/sync-dep-skills.mjs",
 		"typecheck": "astro check",
 		"test": "vitest run",
 		"test:e2e": "playwright test"
 	},
 	"dependencies": {
+		"@astrojs/react": "^6.0.4",
 		"@tailwindcss/vite": "^4.3.3",
+		"@tanstack/charts": "^0.16.0",
+		"@tanstack/react-form": "^1.33.5",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
 		"astro": "^7.2.9",
+		"d3-scale": "^4.0.2",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
 		"tailwindcss": "^4.3.3"
 	},
 	"allowScripts": {
@@ -28,6 +44,7 @@
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
 		"@playwright/test": "^1.62.1",
+		"@types/d3-scale": "^4.0.9",
 		"@types/node": "^26.4.0",
 		"eslint": "^10.9.1",
 		"eslint-plugin-astro": "^3.1.0",

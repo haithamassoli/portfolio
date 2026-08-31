@@ -1,0 +1,64 @@
+---
+import { projects } from '../data/projects';
+import { languages, useT, type Lang } from '../i18n';
+import Base from '../layouts/Base.astro';
+import Home from '../sections/Home.astro';
+import HirePage from '../sections/HirePage.astro';
+import ProjectPage from '../sections/ProjectPage.astro';
+
+/* Every page in both languages comes from here. Adding a project adds two
+   routes; there is nothing else to wire up. */
+export function getStaticPaths() {
+	return (Object.keys(languages) as Lang[]).flatMap((lang) => {
+		const prefix = lang === 'en' ? '' : 'ar/';
+		return [
+			{
+				params: { slug: lang === 'en' ? undefined : 'ar' },
+				props: { lang, kind: 'home' as const, index: -1 },
+			},
+			{
+				params: { slug: `${prefix}hire` },
+				props: { lang, kind: 'hire' as const, index: -1 },
+			},
+			...projects.map((p, index) => ({
+				params: { slug: `${prefix}work/${p.slug}` },
+				props: { lang, kind: 'project' as const, index },
+			})),
+		];
+	});
+}
+
+const { lang, kind, index } = Astro.props;
+const t = useT(lang);
+const project = kind === 'project' ? projects[index] : undefined;
+const next = project ? projects[(index + 1) % projects.length] : undefined;
+---
+
+{
+	kind === 'home' && (
+		<Base lang={lang}>
+			<Home lang={lang} />
+		</Base>
+	)
+}
+
+{
+	kind === 'hire' && (
+		<Base lang={lang} title={t('hire.eyebrow')} description={t('hire.lede')}>
+			<HirePage lang={lang} />
+		</Base>
+	)
+}
+
+{
+	project && next && (
+		<Base
+			lang={lang}
+			title={project[lang].title}
+			description={project[lang].summary}
+			accent={project.accent}
+		>
+			<ProjectPage project={project} next={next} lang={lang} />
+		</Base>
+	)
+}
