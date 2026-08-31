@@ -57,6 +57,7 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 			title={project.title[lang]}
 			description={project.summary[lang]}
 			accent={project.accent}
+			image={project.image}
 		>
 			<ProjectPage project={project} next={next} lang={lang} />
 		</Base>

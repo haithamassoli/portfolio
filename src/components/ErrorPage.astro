@@ -1,0 +1,52 @@
+---
+import { href, useT } from '../i18n';
+import Base from '../layouts/Base.astro';
+
+interface Props {
+	code: '404' | '500' | '422';
+}
+
+const { code } = Astro.props;
+
+/* A static host serves one file for every locale, so the error pages say it
+   in both scripts rather than guessing which one you read. */
+const en = useT('en');
+const ar = useT('ar');
+---
+
+<Base
+	lang="en"
+	title={en(`${code}.title`)}
+	description={en(`${code}.lede`)}
+	noindex
+>
+	<section class="section wrap lost">
+		<p class="mono eyebrow enter" style="--i:0">{code}</p>
+		<h1 class="lost__title enter" style="--i:1">{en(`${code}.title`)}</h1>
+		<p class="lede enter" style="--i:2">{en(`${code}.lede`)}</p>
+		<p class="lede lost__ar enter" style="--i:3" lang="ar" dir="rtl">
+			{ar(`${code}.lede`)}
+		</p>
+		<a class="btn enter" style="--i:4" href={href('en')}>
+			{en('error.home')}<span class="arrow">→</span>
+		</a>
+	</section>
+</Base>
+
+<style>
+	.lost {
+		display: grid;
+		gap: 1.25rem;
+		justify-items: start;
+		align-content: center;
+		min-block-size: 60svh;
+	}
+
+	.lost__title {
+		font-size: var(--step-4);
+	}
+
+	.lost__ar {
+		color: var(--muted);
+	}
+</style>

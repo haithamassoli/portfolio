@@ -1,0 +1,106 @@
+<!doctype html>
+<!--
+  Source for public/og.png. Regenerate by opening this file at 1200x630 and
+  screenshotting it:
+    npx playwright screenshot --viewport-size=1200,630 \
+      "file://$PWD/scripts/og.html" public/og.png
+-->
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			@font-face {
+				font-family: 'Thmanyah Sans';
+				src: url('../src/assets/fonts/thmanyahsans-Black.woff2') format('woff2');
+				font-weight: 900;
+			}
+			@font-face {
+				font-family: 'Thmanyah Sans';
+				src: url('../src/assets/fonts/thmanyahsans-Light.woff2') format('woff2');
+				font-weight: 300;
+			}
+
+			* {
+				margin: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				width: 1200px;
+				height: 630px;
+				display: grid;
+				grid-template-columns: 1fr 26rem;
+				background: #16183a;
+				color: #f0ebe1;
+				font-family: 'Thmanyah Sans', system-ui, sans-serif;
+				overflow: hidden;
+			}
+
+			.left {
+				padding: 4.5rem;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+
+			.eyebrow {
+				font-family: ui-monospace, SFMono-Regular, monospace;
+				font-size: 1.15rem;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: #ff5a1f;
+			}
+
+			h1 {
+				font-size: 4.6rem;
+				font-weight: 900;
+				line-height: 1.02;
+				letter-spacing: -0.02em;
+			}
+
+			p {
+				font-weight: 300;
+				font-size: 1.5rem;
+				line-height: 1.45;
+				color: #9a9cbe;
+				max-width: 30ch;
+				margin-top: 1.25rem;
+			}
+
+			.url {
+				font-family: ui-monospace, SFMono-Regular, monospace;
+				font-size: 1.2rem;
+				color: #9a9cbe;
+			}
+
+			/* The bone panel is the seam — the same one the site is built on. */
+			.right {
+				background: #f0ebe1;
+				color: #16183a;
+				display: grid;
+				place-content: center;
+				padding: 3rem;
+				border-left: 6px solid #ff5a1f;
+			}
+
+			.right span {
+				font-size: 4rem;
+				font-weight: 900;
+				line-height: 1.35;
+				direction: rtl;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="left">
+			<span class="eyebrow">Mobile &amp; web engineer · Jordan</span>
+			<div>
+				<h1>Haitham Assoli</h1>
+				<p>Apps that ship in Arabic and English. Thirty-nine of them.</p>
+			</div>
+			<span class="url">assoli.site</span>
+		</div>
+		<div class="right"><span>هيثم العسولي</span></div>
+	</body>
+</html>
