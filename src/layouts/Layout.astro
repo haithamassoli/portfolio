@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 ---
 
@@ -11,6 +12,7 @@ import '../styles/global.css';
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
+		<Font cssVariable="--font-thmanyah" preload={[{ weight: 400 }, { weight: 700 }]} />
 	</head>
 	<body>
 		<slot />
