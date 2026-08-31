@@ -1,4 +1,5 @@
 ---
+import { profile } from '../../content/profile';
 import { href, useT, type Lang } from '../i18n';
 
 interface Props {
@@ -26,8 +27,20 @@ const year = new Date().getFullYear();
 			<a href={href(lang, 'work')}>{t('nav.work')}</a>
 			<a href={href(lang, '#about')}>{t('nav.about')}</a>
 			<a href={href(lang, 'hire')}>{t('nav.hire')}</a>
-			<a href="https://cv.assoli.site" target="_blank" rel="noopener"
+			<a href={profile.links.resume} target="_blank" rel="noopener"
 				>{t('nav.cv')}</a
+			>
+		</nav>
+
+		<nav class="foot__links mono" aria-label={t('footer.elsewhere')}>
+			<a href={profile.links.github} target="_blank" rel="noopener me"
+				>GitHub</a
+			>
+			<a href={profile.links.linkedin} target="_blank" rel="noopener me"
+				>LinkedIn</a
+			>
+			<a href={profile.links.playStore} target="_blank" rel="noopener me"
+				>Play Store</a
 			>
 		</nav>
 
