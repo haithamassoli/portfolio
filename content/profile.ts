@@ -14,12 +14,12 @@ export const profile = {
 
 	title: {
 		en: 'Web & Mobile Full-Stack Developer',
-		ar: 'مطوّر ويب وتطبيقات موبايل — full-stack',
+		ar: 'مطوّر ويب وتطبيقات موبايل full-stack',
 	} satisfies I18n,
 
 	tagline: {
-		en: 'I turn designs into fast, accessible products — and ship them.',
-		ar: 'أحوّل التصاميم إلى منتجات سريعة وسهلة الوصول — وأطلقها فعليًا.',
+		en: 'I turn designs into fast, accessible products, and ship them.',
+		ar: 'أحوّل التصاميم إلى منتجات سريعة وسهلة الوصول، وأطلقها فعليًا.',
 	} satisfies I18n,
 
 	location: { en: 'Amman, Jordan', ar: 'عمّان، الأردن' } satisfies I18n,
@@ -37,14 +37,14 @@ export const profile = {
 
 	about: {
 		en: [
-			'I build web and mobile products end to end — from the data model to the last pixel. Most of what I ship is bilingual and right-to-left first, because most of my users read Arabic.',
+			'I build web and mobile products end to end, from the data model to the last pixel. Most of what I ship is bilingual and right-to-left first, because most of my users read Arabic.',
 			'I like problems where the constraint is real: a model that has to run on the device instead of a server, a search index that has to answer in milliseconds without a backend, a booking flow that cannot double-sell the same hour. The interesting part is never the framework.',
-			"Lately most of my work has been on-device AI — video and audio processing that runs entirely on the user's phone or laptop, with no cloud and no telemetry.",
+			"Lately most of my work has been on-device AI: video and audio processing that runs entirely on the user's phone or laptop, with no cloud and no telemetry.",
 		],
 		ar: [
-			'أبني منتجات ويب وموبايل من طرف إلى طرف — من نموذج البيانات حتى آخر بكسل. معظم ما أطلقه ثنائي اللغة ومبني للاتجاه من اليمين إلى اليسار أولًا، لأن معظم مستخدميّ يقرؤون بالعربية.',
+			'أبني منتجات ويب وموبايل من طرف إلى طرف، من نموذج البيانات حتى آخر بكسل. معظم ما أطلقه ثنائي اللغة ومبني للاتجاه من اليمين إلى اليسار أولًا، لأن معظم مستخدميّ يقرؤون بالعربية.',
 			'تستهويني المشكلات ذات القيد الحقيقي: نموذج يجب أن يعمل على الجهاز لا على خادم، فهرس بحث يجب أن يجيب خلال أجزاء من الثانية بلا خادم خلفي، ومسار حجز لا يحتمل بيع الساعة نفسها مرتين. الجزء المثير للاهتمام ليس إطار العمل أبدًا.',
-			'معظم عملي مؤخرًا في الذكاء الاصطناعي على الجهاز — معالجة فيديو وصوت تعمل بالكامل على هاتف المستخدم أو حاسوبه، بلا سحابة وبلا تتبّع.',
+			'معظم عملي مؤخرًا في الذكاء الاصطناعي على الجهاز: معالجة فيديو وصوت تعمل بالكامل على هاتف المستخدم أو حاسوبه، بلا سحابة وبلا تتبّع.',
 		],
 	} satisfies I18nBlocks,
 
@@ -52,7 +52,7 @@ export const profile = {
 		{
 			company: { en: 'CartBuzz', ar: 'CartBuzz' },
 			role: { en: 'Software Engineer', ar: 'مهندس برمجيات' },
-			period: '2026 — Present',
+			period: 'Since 2026',
 			highlights: {
 				en: [
 					'Building multi-vendor e-commerce systems with NestJS, Next.js and React Native.',
@@ -69,7 +69,7 @@ export const profile = {
 		{
 			company: { en: 'Bionl.Ai', ar: 'Bionl.Ai' },
 			role: { en: 'Software Engineer', ar: 'مهندس برمجيات' },
-			period: '2025 — 2026',
+			period: '2025 to 2026',
 			location: { en: 'Remote', ar: 'عن بُعد' },
 			highlights: {
 				en: [
@@ -93,7 +93,7 @@ export const profile = {
 		{
 			company: { en: 'Malabji', ar: 'ملعبجي' },
 			role: { en: 'Founder & CEO', ar: 'مؤسس ومدير تنفيذي' },
-			period: '2025 — Present',
+			period: 'Since 2025',
 			highlights: {
 				en: [
 					'Founded and shipped a playground booking and matchmaking app on iOS and Android.',
@@ -111,7 +111,7 @@ export const profile = {
 				en: 'Web & Mobile Full-Stack Developer',
 				ar: 'مطوّر ويب وموبايل full-stack',
 			},
-			period: '2022 — Present',
+			period: 'Since 2022',
 			highlights: {
 				en: [
 					'Gathered requirements directly with clients, proposed the technical approach, and delivered to deadline.',
@@ -126,7 +126,7 @@ export const profile = {
 		{
 			company: { en: 'Repzo', ar: 'Repzo' },
 			role: { en: 'Software Engineer', ar: 'مهندس برمجيات' },
-			period: '2022 — 2023',
+			period: '2022 to 2023',
 			highlights: {
 				en: [
 					'Built and maintained a large operational dashboard in TypeScript and React.',
@@ -146,7 +146,7 @@ export const profile = {
 				en: 'Full-Stack Developer Trainee',
 				ar: 'متدرب تطوير full-stack',
 			},
-			period: '2021 — 2022',
+			period: '2021 to 2022',
 			location: { en: 'Internship', ar: 'تدريب' },
 			highlights: {
 				en: [
@@ -165,7 +165,7 @@ export const profile = {
 				en: 'Full-Stack Developer (Volunteer)',
 				ar: 'مطوّر full-stack (تطوّع)',
 			},
-			period: '2018 — Present',
+			period: 'Since 2018',
 			highlights: {
 				en: [
 					'Long-running volunteer work building tools that improve the academic experience for engineering students.',
@@ -183,7 +183,7 @@ export const profile = {
 		{
 			school: { en: 'Irbid National University', ar: 'جامعة إربد الأهلية' },
 			degree: { en: 'BSc, Computer Science', ar: 'بكالوريوس، علم الحاسوب' },
-			period: '2022 — 2024',
+			period: '2022 to 2024',
 			note: { en: 'Grade: Excellent', ar: 'التقدير: امتياز' },
 		},
 		{
@@ -195,10 +195,10 @@ export const profile = {
 				en: 'BSc, Electrical and Electronics Engineering',
 				ar: 'بكالوريوس، الهندسة الكهربائية والإلكترونية',
 			},
-			period: '2018 — 2022',
+			period: '2018 to 2022',
 			note: {
-				en: 'Incomplete — Grade: Very Good',
-				ar: 'غير مكتملة — التقدير: جيد جدًا',
+				en: 'Incomplete, grade Very Good',
+				ar: 'غير مكتملة، التقدير جيد جدًا',
 			},
 		},
 	] satisfies EducationItem[],
@@ -251,8 +251,8 @@ export const profile = {
 			issuer: { en: 'Udemy', ar: 'Udemy' },
 			date: 'Feb 2023',
 			description: {
-				en: '24 hours on indexing, partitioning, sharding, replication, B-trees, concurrency control, database engines and security — engineering, not SQL syntax.',
-				ar: '24 ساعة في الفهرسة والتقسيم والتجزئة والنسخ وأشجار B والتحكم بالتزامن ومحركات قواعد البيانات والأمان — هندسة لا صياغة SQL.',
+				en: '24 hours on indexing, partitioning, sharding, replication, B-trees, concurrency control, database engines and security, engineering, not SQL syntax.',
+				ar: '24 ساعة في الفهرسة والتقسيم والتجزئة والنسخ وأشجار B والتحكم بالتزامن ومحركات قواعد البيانات والأمان، هندسة لا صياغة SQL.',
 			},
 		},
 		{
@@ -269,8 +269,8 @@ export const profile = {
 		},
 		{
 			name: {
-				en: 'React Native — The Practical Guide',
-				ar: 'React Native — الدليل العملي',
+				en: 'React Native: The Practical Guide',
+				ar: 'React Native: الدليل العملي',
 			},
 			issuer: { en: 'Udemy', ar: 'Udemy' },
 			date: 'Apr 2022',

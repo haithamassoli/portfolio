@@ -21,7 +21,7 @@ export const SEGMENT_COLORS = ['#2563eb', '#f97316', '#15803d'] as const;
 
 /**
  * Revenue against retention, one dot per account. Seats are the third
- * quantity, mapped through a square-root scale so area — not radius — carries
+ * quantity, mapped through a square-root scale so area, not radius, carries
  * the magnitude. Every dot keeps its `Account` row in `point.datum`.
  */
 export function accountsScatter(accounts: readonly Account[]) {

@@ -3,9 +3,9 @@ import type { Project } from './types';
 /**
  * Every project, in English and Arabic.
  *
- * `sourced: true`  — the write-up comes from the project's own README / PRD / store listing.
- * `sourced: false` — the write-up is reconstructed from the stack and shape of the repo.
- *                    Read those once and correct anything that misremembers the work.
+ * `sourced: true` means the write-up comes from the project's own README, PRD or store listing.
+ * `sourced: false` means it is reconstructed from the stack and shape of the repo.
+ * Read those once and correct anything that misremembers the work.
  */
 export const projects: Project[] = [
 	{
@@ -24,8 +24,8 @@ export const projects: Project[] = [
 		featured: true,
 		year: '2026',
 		role: {
-			en: 'Solo — product, design and engineering',
-			ar: 'منفردًا — المنتج والتصميم والبرمجة',
+			en: 'Solo: product, design and engineering',
+			ar: 'منفردًا: المنتج والتصميم والبرمجة',
 		},
 		stack: [
 			'Next.js',
@@ -50,12 +50,12 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Jordanian students keep their course material scattered across WhatsApp groups, Google Drive folders shared once and never updated, and Telegram channels that vanish. Nothing is indexed, nothing is versioned, and every intake re-collects the same material from scratch.',
-				'Aoun is the boring fix: one catalogue, organised by university → faculty → course, where a summary or a past exam stays put and stays findable. On top of the archive sit the tools students actually open every week — a GPA calculator that knows the local grading rules, bookmarks, a study planner, and a focus timer.',
+				'Aoun is the boring fix: one catalogue, organised by university → faculty → course, where a summary or a past exam stays put and stays findable. On top of the archive sit the tools students actually open every week: a GPA calculator that knows the local grading rules, bookmarks, a study planner, and a focus timer.',
 				'The whole thing is a Next.js app on Convex, with the reading experience deliberately account-free: you only sign in when you want to save something.',
 			],
 			ar: [
 				'تتناثر المواد الدراسية عند طلاب الأردن بين مجموعات واتساب، ومجلدات درايف تُشارَك مرة ولا تُحدَّث، وقنوات تيليجرام تختفي. لا فهرسة، ولا إصدارات، وكل دفعة جديدة تعيد جمع المادة نفسها من الصفر.',
-				'«عون» هو الحل الممل والفعّال: فهرس واحد منظّم حسب الجامعة ← الكلية ← المساق، يبقى فيه الملخص أو الامتحان في مكانه وقابلًا للإيجاد. وفوق الأرشيف الأدوات التي يفتحها الطلاب أسبوعيًا فعلًا — حاسبة معدّل تعرف قواعد التقدير المحلية، ومحفوظات، ومنظّم دراسة، ومؤقّت تركيز.',
+				'«عون» هو الحل الممل والفعّال: فهرس واحد منظّم حسب الجامعة ← الكلية ← المساق، يبقى فيه الملخص أو الامتحان في مكانه وقابلًا للإيجاد. وفوق الأرشيف الأدوات التي يفتحها الطلاب أسبوعيًا فعلًا: حاسبة معدّل تعرف قواعد التقدير المحلية، ومحفوظات، ومنظّم دراسة، ومؤقّت تركيز.',
 				'المنصة تطبيق Next.js على Convex، وتجربة القراءة فيه بلا حساب عمدًا: لا تسجّل الدخول إلا حين تريد حفظ شيء.',
 			],
 		},
@@ -66,12 +66,12 @@ export const projects: Project[] = [
 					ar: 'نموذج محتوى واحد لجامعات متعددة',
 				},
 				problem: {
-					en: "Every university names things differently — faculties, credit hours, course codes, even what a 'year' means. Modelling one university and generalising later would have meant a migration for every new one added.",
-					ar: 'كل جامعة تسمّي الأشياء بطريقتها — الكليات والساعات المعتمدة ورموز المساقات، وحتى معنى «السنة». نمذجة جامعة واحدة ثم التعميم لاحقًا كانت ستعني ترحيل بيانات مع كل جامعة جديدة.',
+					en: "Every university names things differently: faculties, credit hours, course codes, even what a 'year' means. Modelling one university and generalising later would have meant a migration for every new one added.",
+					ar: 'كل جامعة تسمّي الأشياء بطريقتها: الكليات والساعات المعتمدة ورموز المساقات، وحتى معنى «السنة». نمذجة جامعة واحدة ثم التعميم لاحقًا كانت ستعني ترحيل بيانات مع كل جامعة جديدة.',
 				},
 				solution: {
-					en: 'I modelled the hierarchy as generic nodes with per-university configuration held as data, not code — grading scales, credit rules and naming all live in a config document. Adding a university became a content task instead of a schema change.',
-					ar: 'نمذجت التسلسل كعُقد عامة مع إعدادات لكل جامعة محفوظة كبيانات لا كشيفرة — سلالم التقدير وقواعد الساعات والتسميات كلها في مستند إعدادات. صارت إضافة جامعة مهمة محتوى بدل تغيير في المخطط.',
+					en: 'I modelled the hierarchy as generic nodes with per-university configuration held as data, not code. Grading scales, credit rules and naming all live in a config document. Adding a university became a content task instead of a schema change.',
+					ar: 'نمذجت التسلسل كعُقد عامة مع إعدادات لكل جامعة محفوظة كبيانات لا كشيفرة. سلالم التقدير وقواعد الساعات والتسميات كلها في مستند إعدادات. صارت إضافة جامعة مهمة محتوى بدل تغيير في المخطط.',
 				},
 			},
 			{
@@ -84,8 +84,8 @@ export const projects: Project[] = [
 					ar: 'يكتب الطلاب «احصاء» بدل «إحصاء»، ويحذفون التشكيل تمامًا، ويخلطون العربية والإنجليزية في استعلام واحد، ويستخدمون أسماء دارجة للمساقات. المطابقة الساذجة كانت تعيد لا شيء لمعظم الاستعلامات الحقيقية.',
 				},
 				solution: {
-					en: 'I normalise both the index and the query — unify hamza forms, strip diacritics and tatweel, fold Arabic-Indic digits — and store curated aliases per course so the nicknames resolve too.',
-					ar: 'أُطبّع الفهرس والاستعلام معًا — توحيد صور الهمزة، وحذف التشكيل والتطويل، وتوحيد الأرقام العربية الهندية — مع تخزين أسماء بديلة منسّقة لكل مساق حتى تُحَلّ التسميات الدارجة.',
+					en: 'I normalise both the index and the query: unify hamza forms, strip diacritics and tatweel, fold Arabic-Indic digits. I also store curated aliases per course so the nicknames resolve too.',
+					ar: 'أُطبّع الفهرس والاستعلام معًا: توحيد صور الهمزة، وحذف التشكيل والتطويل، وتوحيد الأرقام العربية الهندية. وأخزّن أسماء بديلة منسّقة لكل مساق حتى تُحَلّ التسميات الدارجة.',
 				},
 			},
 			{
@@ -94,8 +94,8 @@ export const projects: Project[] = [
 					ar: 'العمل دون اتصال على شبكة الحرم الجامعي',
 				},
 				problem: {
-					en: 'The place students most need the material — inside a lecture hall — is exactly where connectivity is worst. A normal SPA showed a spinner over an empty page.',
-					ar: 'المكان الذي يحتاج فيه الطالب المادة أكثر — داخل القاعة — هو أسوأ مكان في التغطية. التطبيق أحادي الصفحة العادي كان يعرض مؤشر تحميل فوق صفحة فارغة.',
+					en: 'The place students most need the material, inside a lecture hall, is exactly where connectivity is worst. A normal SPA showed a spinner over an empty page.',
+					ar: 'المكان الذي يحتاج فيه الطالب المادة أكثر، داخل القاعة، هو أسوأ مكان في التغطية. التطبيق أحادي الصفحة العادي كان يعرض مؤشر تحميل فوق صفحة فارغة.',
 				},
 				solution: {
 					en: 'The app is an installable PWA that caches viewed courses and their files, so anything you opened once opens again offline. Writes queue and replay when the connection returns.',
@@ -108,8 +108,8 @@ export const projects: Project[] = [
 					ar: 'ضبط قناة رفع مفتوحة',
 				},
 				problem: {
-					en: 'Letting anyone upload is what makes the archive grow — and also what fills it with duplicates, mislabelled files and the occasional thing that should not be there.',
-					ar: 'السماح للجميع بالرفع هو ما يُنمّي الأرشيف — وهو أيضًا ما يملؤه بالمكرّرات والملفات الموسومة خطأً وأحيانًا بما لا يجب أن يكون فيه.',
+					en: 'Letting anyone upload is what makes the archive grow, and also what fills it with duplicates, mislabelled files and the occasional thing that should not be there.',
+					ar: 'السماح للجميع بالرفع هو ما يُنمّي الأرشيف، وهو أيضًا ما يملؤه بالمكرّرات والملفات الموسومة خطأً وأحيانًا بما لا يجب أن يكون فيه.',
 				},
 				solution: {
 					en: 'Uploads land in a review queue rather than the catalogue. An admin view shows the file next to its metadata with approve/relabel/reject in one keystroke, and PostHog funnels tell me where contributors drop off.',
@@ -139,16 +139,16 @@ export const projects: Project[] = [
 			ar: 'ابحث عن ملعب، وابحث عن لاعبين، احجز، والعب.',
 		},
 		summary: {
-			en: 'Malabji makes booking a football pitch as simple as booking a table: search nearby grounds, see which slots are actually free, and reserve one. It also solves the other half of the problem — finding enough players — with team search, challenges and tournaments.',
-			ar: 'يجعل «ملعبجي» حجز ملعب كرة قدم بسهولة حجز طاولة: ابحث عن الملاعب القريبة، وشاهد الأوقات الشاغرة فعلًا، واحجز. ويحل النصف الآخر من المشكلة — إيجاد لاعبين كافين — عبر البحث عن فرق والتحديات والبطولات.',
+			en: 'Malabji makes booking a football pitch as simple as booking a table: search nearby grounds, see which slots are actually free, and reserve one. It also solves the other half of the problem, finding enough players, with team search, challenges and tournaments.',
+			ar: 'يجعل «ملعبجي» حجز ملعب كرة قدم بسهولة حجز طاولة: ابحث عن الملاعب القريبة، وشاهد الأوقات الشاغرة فعلًا، واحجز. ويحل النصف الآخر من المشكلة، إيجاد لاعبين كافين، عبر البحث عن فرق والتحديات والبطولات.',
 		},
 		category: 'mobile',
 		status: 'shipped',
 		featured: true,
-		year: '2025 — Present',
+		year: 'Since 2025',
 		role: {
-			en: 'Founder — product, design and full engineering',
-			ar: 'مؤسس — المنتج والتصميم والبرمجة كاملة',
+			en: 'Founder: product, design and full engineering',
+			ar: 'مؤسس: المنتج والتصميم والبرمجة كاملة',
 		},
 		stack: [
 			'React Native',
@@ -186,12 +186,12 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Booking a pitch in Jordan runs on phone calls and WhatsApp. You ring the ground, ask what is free on Thursday, get told a time that may or may not still be available by the time you have gathered the players, and pay in cash on arrival. Half the friction is the booking; the other half is that you need nine other people.',
-				'Malabji handles both. The booking side is a live availability calendar per pitch with instant reservation. The social side lets you look for a team, challenge another one, and run or join a tournament — plus a directory of sports academies.',
+				'Malabji handles both. The booking side is a live availability calendar per pitch with instant reservation. The social side lets you look for a team, challenge another one, and run or join a tournament, plus a directory of sports academies.',
 				'I founded it and built all of it: the Expo client for both stores, the Supabase backend, the store releases, and the support that follows a real product.',
 			],
 			ar: [
 				'حجز الملاعب في الأردن يجري بالمكالمات وواتساب. تتصل بالملعب، وتسأل عمّا هو شاغر يوم الخميس، فيُعطى لك وقت قد لا يبقى متاحًا حين تجمع اللاعبين، وتدفع نقدًا عند الوصول. نصف العناء في الحجز، والنصف الآخر أنك تحتاج تسعة أشخاص آخرين.',
-				'يعالج «ملعبجي» الأمرين. جانب الحجز تقويم إتاحة مباشر لكل ملعب مع حجز فوري. والجانب الاجتماعي يتيح البحث عن فريق، وتحدّي فريق آخر، وإنشاء بطولة أو المشاركة فيها — إضافة إلى دليل للأكاديميات الرياضية.',
+				'يعالج «ملعبجي» الأمرين. جانب الحجز تقويم إتاحة مباشر لكل ملعب مع حجز فوري. والجانب الاجتماعي يتيح البحث عن فريق، وتحدّي فريق آخر، وإنشاء بطولة أو المشاركة فيها، إضافة إلى دليل للأكاديميات الرياضية.',
 				'أسّسته وبنيته بالكامل: تطبيق Expo للمتجرين، وخادم Supabase، وإصدارات المتاجر، والدعم الذي يتبع أي منتج حقيقي.',
 			],
 		},
@@ -202,8 +202,8 @@ export const projects: Project[] = [
 					ar: 'ألا تُباع الساعة نفسها مرتين',
 				},
 				problem: {
-					en: 'Two people opening the same 7pm slot at the same time is not a rare edge case on a Thursday evening — it is the normal load. Checking availability and then writing the booking is two steps, and anything can happen between them.',
-					ar: 'أن يفتح شخصان الموعد نفسه في السابعة مساءً في اللحظة ذاتها ليس حالة نادرة مساء الخميس — بل هو الحمل الطبيعي. التحقق من الإتاحة ثم كتابة الحجز خطوتان، وأي شيء قد يقع بينهما.',
+					en: 'Two people opening the same 7pm slot at the same time is not a rare edge case on a Thursday evening. It is the normal load. Checking availability and then writing the booking is two steps, and anything can happen between them.',
+					ar: 'أن يفتح شخصان الموعد نفسه في السابعة مساءً في اللحظة ذاتها ليس حالة نادرة مساء الخميس، بل هو الحمل الطبيعي. التحقق من الإتاحة ثم كتابة الحجز خطوتان، وأي شيء قد يقع بينهما.',
 				},
 				solution: {
 					en: "Availability is never trusted from the client. The reservation is a single server-side transaction with a uniqueness constraint on (pitch, time range); the loser of a race gets a clean 'just taken' state and the calendar refreshes under them rather than a failed payment.",
@@ -234,8 +234,8 @@ export const projects: Project[] = [
 					ar: 'الحجز بلا فائدة إن نسيه اللاعب. لكن طلب إذن التقويم والإشعارات عند أول فتح، قبل أن يكسب التطبيق أي ثقة، يؤدي إلى رفض الإذنين.',
 				},
 				solution: {
-					en: 'Permissions are asked at the moment they pay off — the calendar prompt appears right after a successful booking, not before. Reminders are scheduled locally so they still fire if the device is offline.',
-					ar: 'تُطلب الأذونات في اللحظة التي تُثمر فيها — يظهر طلب التقويم بعد حجز ناجح مباشرة، لا قبله. وتُجدوَل التذكيرات محليًا لتعمل حتى لو كان الجهاز دون اتصال.',
+					en: 'Permissions are asked at the moment they pay off. The calendar prompt appears right after a successful booking, not before. Reminders are scheduled locally so they still fire if the device is offline.',
+					ar: 'تُطلب الأذونات في اللحظة التي تُثمر فيها. يظهر طلب التقويم بعد حجز ناجح مباشرة، لا قبله. وتُجدوَل التذكيرات محليًا لتعمل حتى لو كان الجهاز دون اتصال.',
 				},
 			},
 			{
@@ -248,8 +248,8 @@ export const projects: Project[] = [
 					ar: 'يحدث النمو حين يشارك أحدهم دعوة مباراة في محادثة جماعية. وإن فتحت النقرة صفحة المتجر وضاعت الدعوة بعد التثبيت، انكسرت الحلقة كلها.',
 				},
 				solution: {
-					en: 'Invite links carry their payload through the install, so a new user lands on the actual match after opening the app for the first time — not on a generic home screen.',
-					ar: 'تحمل روابط الدعوة حمولتها عبر التثبيت، فيصل المستخدم الجديد إلى المباراة نفسها بعد أول فتح للتطبيق — لا إلى شاشة رئيسية عامة.',
+					en: 'Invite links carry their payload through the install, so a new user lands on the actual match after opening the app for the first time, not on a generic home screen.',
+					ar: 'تحمل روابط الدعوة حمولتها عبر التثبيت، فيصل المستخدم الجديد إلى المباراة نفسها بعد أول فتح للتطبيق، لا إلى شاشة رئيسية عامة.',
 				},
 			},
 		],
@@ -269,10 +269,10 @@ export const projects: Project[] = [
 	},
 	{
 		slug: 'naqi',
-		title: { en: 'Naqi — Halal Video Filter', ar: 'نقيّ — مُرشِّح الفيديو' },
+		title: { en: 'Naqi: Halal Video Filter', ar: 'نقيّ: مُرشِّح الفيديو' },
 		tagline: {
-			en: 'Strips music and censors imagery in a video — entirely on your device.',
-			ar: 'يزيل الموسيقى ويحجب الصور في الفيديو — على جهازك بالكامل.',
+			en: 'Strips music and censors imagery in a video, entirely on your device.',
+			ar: 'يزيل الموسيقى ويحجب الصور في الفيديو، على جهازك بالكامل.',
 		},
 		summary: {
 			en: 'Naqi filters a video locally: stem separation removes the music while keeping dialogue, and a detector blurs faces or whole frames for the chosen strictness. No cloud, no account, no telemetry, and the original file is never modified. Shipped on Android; a full Swift rewrite targets iPhone, iPad and Mac.',
@@ -283,8 +283,8 @@ export const projects: Project[] = [
 		featured: true,
 		year: '2026',
 		role: {
-			en: 'Solo — architecture, ML pipeline and both platforms',
-			ar: 'منفردًا — المعمارية وخط المعالجة والمنصتان',
+			en: 'Solo: architecture, ML pipeline and both platforms',
+			ar: 'منفردًا: المعمارية وخط المعالجة والمنصتان',
 		},
 		stack: [
 			'Kotlin',
@@ -316,13 +316,13 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Plenty of tools will filter a video for you if you upload it somewhere. That trade is unacceptable for the people who want this most — the whole point is that nobody else sees what you are watching. So Naqi does everything on the device: models ship inside the app, and the only network call it ever makes is an optional model download.',
-				'Two operations run independently or together. Removing music runs htdemucs stem separation and keeps vocals — or vocals plus other — while drums and bass are never kept. Censoring blurs the faces of a chosen gender for their whole on-screen span, and censors the entire frame while an NSFW classifier gate is firing, with pre-roll so nothing slips through on the frame the detector fired.',
+				'Plenty of tools will filter a video for you if you upload it somewhere. That trade is unacceptable for the people who want this most. The whole point is that nobody else sees what you are watching. So Naqi does everything on the device: models ship inside the app, and the only network call it ever makes is an optional model download.',
+				'Two operations run independently or together. Removing music runs htdemucs stem separation and keeps vocals, or vocals plus other, while drums and bass are never kept. Censoring blurs the faces of a chosen gender for their whole on-screen span, and censors the entire frame while an NSFW classifier gate is firing, with pre-roll so nothing slips through on the frame the detector fired.',
 				'The Android app is the shipped reference implementation. The Apple version is a ground-up Swift rewrite rather than a port: the Android pipeline is bound to MediaCodec, GLES and ORT-Android, and none of that crosses over.',
 			],
 			ar: [
-				'كثير من الأدوات تُرشِّح الفيديو نيابةً عنك إن رفعته إلى مكان ما. هذه المقايضة مرفوضة تمامًا لمن يريدون هذا أكثر من غيرهم — فجوهر الفكرة ألا يرى أحد آخر ما تشاهده. لذلك يُنفّذ «نقيّ» كل شيء على الجهاز: النماذج داخل التطبيق، والاتصال الشبكي الوحيد تنزيل اختياري للنماذج.',
-				'تعمل عمليتان مستقلتين أو معًا. إزالة الموسيقى تُشغّل فصل المسارات htdemucs وتُبقي الأصوات البشرية — أو الأصوات مع «أخرى» — ولا تُبقي الطبول والبيس أبدًا. أما الحجب فيُشوّش وجوه الجنس المختار طوال ظهورها على الشاشة، ويحجب الإطار بأكمله ما دامت بوابة مصنّف المحتوى الإباحي مفعّلة، مع تمهيد زمني حتى لا يفلت شيء في الإطار الذي عمل فيه الكاشف.',
+				'كثير من الأدوات تُرشِّح الفيديو نيابةً عنك إن رفعته إلى مكان ما. هذه المقايضة مرفوضة تمامًا لمن يريدون هذا أكثر من غيرهم، فجوهر الفكرة ألا يرى أحد آخر ما تشاهده. لذلك يُنفّذ «نقيّ» كل شيء على الجهاز: النماذج داخل التطبيق، والاتصال الشبكي الوحيد تنزيل اختياري للنماذج.',
+				'تعمل عمليتان مستقلتين أو معًا. إزالة الموسيقى تُشغّل فصل المسارات htdemucs وتُبقي الأصوات البشرية، أو الأصوات مع «أخرى»، ولا تُبقي الطبول والبيس أبدًا. أما الحجب فيُشوّش وجوه الجنس المختار طوال ظهورها على الشاشة، ويحجب الإطار بأكمله ما دامت بوابة مصنّف المحتوى الإباحي مفعّلة، مع تمهيد زمني حتى لا يفلت شيء في الإطار الذي عمل فيه الكاشف.',
 				'تطبيق أندرويد هو التنفيذ المرجعي المُصدَر. أما نسخة Apple فإعادة كتابة كاملة بـ Swift لا نقل: خط المعالجة في أندرويد مرتبط بـ MediaCodec وGLES وORT-Android، ولا شيء من ذلك يعبر.',
 			],
 		},
@@ -365,8 +365,8 @@ export const projects: Project[] = [
 					ar: 'فصل المسارات والاستدلال على كل إطار في ملف مدته ساعتان يطول بما يكفي ليقتل النظام التطبيق، أو ينتقل المستخدم إلى غيره، أو تنفد البطارية في منتصف المهمة. والبدء من الصفر في كل مرة يجعل الميزة غير قابلة للاستخدام.',
 				},
 				solution: {
-					en: 'Jobs are checkpointed per segment and survive an app kill or a reboot — processing resumes where it stopped rather than restarting. Progress is reported per stage with a live estimate, so a long job at least looks like a long job instead of a frozen screen.',
-					ar: 'تُحفَظ نقاط تفتيش للمهام لكل مقطع، وتنجو من إغلاق التطبيق أو إعادة التشغيل — فتُستأنف المعالجة من حيث توقفت لا من البداية. ويُعرض التقدّم لكل مرحلة مع تقدير مباشر، فتبدو المهمة الطويلة مهمة طويلة لا شاشة متجمدة.',
+					en: 'Jobs are checkpointed per segment and survive an app kill or a reboot. Processing resumes where it stopped rather than restarting. Progress is reported per stage with a live estimate, so a long job at least looks like a long job instead of a frozen screen.',
+					ar: 'تُحفَظ نقاط تفتيش للمهام لكل مقطع، وتنجو من إغلاق التطبيق أو إعادة التشغيل، فتُستأنف المعالجة من حيث توقفت لا من البداية. ويُعرض التقدّم لكل مرحلة مع تقدير مباشر، فتبدو المهمة الطويلة مهمة طويلة لا شاشة متجمدة.',
 				},
 			},
 			{
@@ -387,12 +387,12 @@ export const projects: Project[] = [
 		outcomes: {
 			en: [
 				'Shipped on Google Play; Apple rewrite in progress against an Android parity suite.',
-				'Runs fully offline — models bundled, no accounts, no telemetry.',
+				'Runs fully offline: models bundled, no accounts, no telemetry.',
 				'Resumable jobs survive app kills and reboots.',
 			],
 			ar: [
 				'صدر على Google Play؛ وإعادة كتابة Apple جارية مقابل مجموعة تكافؤ أندرويد.',
-				'يعمل دون اتصال بالكامل — نماذج مضمّنة، بلا حسابات وبلا تتبّع.',
+				'يعمل دون اتصال بالكامل: نماذج مضمّنة، بلا حسابات وبلا تتبّع.',
 				'مهام قابلة للاستئناف تنجو من إغلاق التطبيق وإعادة التشغيل.',
 			],
 		},
@@ -414,8 +414,8 @@ export const projects: Project[] = [
 		featured: true,
 		year: '2026',
 		role: {
-			en: 'Solo — pipeline, search and interface',
-			ar: 'منفردًا — خط المعالجة والبحث والواجهة',
+			en: 'Solo: pipeline, search and interface',
+			ar: 'منفردًا: خط المعالجة والبحث والواجهة',
 		},
 		stack: [
 			'Astro',
@@ -434,12 +434,12 @@ export const projects: Project[] = [
 			en: [
 				'A scholar with years of recorded lessons has, in practice, an unsearchable archive. The knowledge is there, but finding the ten minutes where a specific question was answered means remembering which lesson it was in and scrubbing through it.',
 				'This site fixes that. Lessons from the YouTube channel are transcribed automatically, articles are collected from the blog, and everything is indexed in Meilisearch. A search returns transcript segments of roughly thirty seconds each; clicking one opens the player at that timestamp. Beside the player runs an interactive transcript that follows along, can be searched within the lesson, and lets you copy a link to any single line.',
-				'There is no backend for search and no database — the index is static and served directly, which is why it stays fast and costs nothing to run.',
+				'There is no backend for search and no database. The index is static and served directly, which is why it stays fast and costs nothing to run.',
 			],
 			ar: [
 				'الشيخ الذي لديه سنوات من الدروس المسجلة يملك عمليًا أرشيفًا غير قابل للبحث. المعرفة موجودة، لكن إيجاد العشر دقائق التي أُجيب فيها عن سؤال بعينه يتطلب تذكّر الدرس ثم التنقّل داخله.',
 				'يعالج الموقع ذلك. تُفرَّغ دروس قناة اليوتيوب آليًا، وتُجمَع المقالات من المدوّنة، ويُفهرس الكل في Meilisearch. يعيد البحث مقاطع تفريغ مدة كل منها نحو ثلاثين ثانية؛ والنقر على أحدها يفتح المشغّل عند تلك اللحظة. وبجانب المشغّل تفريغ تفاعلي يتابع تلقائيًا، ويمكن البحث داخله، ونسخ رابط لأي سطر.',
-				'لا خادم للبحث ولا قاعدة بيانات — الفهرس ثابت ويُقدَّم مباشرة، ولهذا يبقى سريعًا وبلا كلفة تشغيل.',
+				'لا خادم للبحث ولا قاعدة بيانات. الفهرس ثابت ويُقدَّم مباشرة، ولهذا يبقى سريعًا وبلا كلفة تشغيل.',
 			],
 		},
 		challenges: [
@@ -453,8 +453,8 @@ export const projects: Project[] = [
 					ar: 'تخرج التفريغات الخام كتدفق أسطر قصيرة. فهرسة كل سطر تجعل كل نتيجة شذرة بلا سياق؛ وفهرسة الدرس كاملًا تجعل كل نتيجة فيديو من ساعتين بلا لحظة مفيدة.',
 				},
 				solution: {
-					en: 'I chunk the transcript into roughly thirty-second passages that keep their start time. That is long enough to read as a thought and short enough that the timestamp is precise — the result is a readable quote that is also a jump target.',
-					ar: 'قسّمت التفريغ إلى مقاطع بنحو ثلاثين ثانية تحتفظ بوقت بدايتها. طويلة بما يكفي لتُقرأ كفكرة، وقصيرة بما يجعل اللحظة دقيقة — فتكون النتيجة اقتباسًا مقروءًا ونقطة انتقال في آن.',
+					en: 'I chunk the transcript into roughly thirty-second passages that keep their start time. That is long enough to read as a thought and short enough that the timestamp is precise. The result is a readable quote that is also a jump target.',
+					ar: 'قسّمت التفريغ إلى مقاطع بنحو ثلاثين ثانية تحتفظ بوقت بدايتها. طويلة بما يكفي لتُقرأ كفكرة، وقصيرة بما يجعل اللحظة دقيقة، فتكون النتيجة اقتباسًا مقروءًا ونقطة انتقال في آن.',
 				},
 			},
 			{
@@ -477,8 +477,8 @@ export const projects: Project[] = [
 					ar: 'التفريغ الآلي غير كامل',
 				},
 				problem: {
-					en: 'ASR misreads names, technical terms and classical vocabulary — exactly the words people search for. Presenting a wrong transcript as authoritative text would misrepresent the scholar, which matters far more here than a bad search result.',
-					ar: 'يخطئ التعرّف الآلي على الكلام في الأسماء والمصطلحات والألفاظ التراثية — وهي بالضبط ما يبحث عنه الناس. وتقديم تفريغ خاطئ كنصّ موثوق يُحرّف كلام الشيخ، وهو أخطر هنا بكثير من نتيجة بحث سيئة.',
+					en: 'ASR misreads names, technical terms and classical vocabulary, exactly the words people search for. Presenting a wrong transcript as authoritative text would misrepresent the scholar, which matters far more here than a bad search result.',
+					ar: 'يخطئ التعرّف الآلي على الكلام في الأسماء والمصطلحات والألفاظ التراثية، وهي بالضبط ما يبحث عنه الناس. وتقديم تفريغ خاطئ كنصّ موثوق يُحرّف كلام الشيخ، وهو أخطر هنا بكثير من نتيجة بحث سيئة.',
 				},
 				solution: {
 					en: 'The transcript is framed as an index into the audio, not as a quotable source. Every result leads back to the recording at that moment, so the video stays the authority and the text is only the way you find it.',
@@ -502,12 +502,12 @@ export const projects: Project[] = [
 		],
 		outcomes: {
 			en: [
-				'Two searchable corpora — lessons and articles — with per-tab result counts and playlist filtering.',
+				'Two searchable corpora, lessons and articles, with per-tab result counts and playlist filtering.',
 				'Every result is a deep link into the video at the second it was said.',
 				'Static, serverless search: no database, no login, no running cost.',
 			],
 			ar: [
-				'مدوّنتان قابلتان للبحث — الدروس والمقالات — مع عدّاد نتائج لكل تبويب وتصفية بقوائم التشغيل.',
+				'مدوّنتان قابلتان للبحث، الدروس والمقالات، مع عدّاد نتائج لكل تبويب وتصفية بقوائم التشغيل.',
 				'كل نتيجة رابط عميق إلى الفيديو عند الثانية التي قيلت فيها.',
 				'بحث ثابت بلا خادم: بلا قاعدة بيانات وبلا تسجيل دخول وبلا كلفة تشغيل.',
 			],
@@ -522,8 +522,8 @@ export const projects: Project[] = [
 			ar: 'أفلِت ملف HTML، واحصل على رابط عام على نطاق مستقل.',
 		},
 		summary: {
-			en: 'Publish a page in one step — drop a file, paste markup, curl it, or hand it to an agent over MCP. Markdown is rendered to a self-contained page on upload. No account, no build step.',
-			ar: 'انشر صفحة بخطوة واحدة — أفلِت ملفًا، أو الصق شيفرة، أو أرسلها بـ curl، أو مرّرها لوكيل عبر MCP. ويُحوَّل الـ Markdown إلى صفحة مكتفية بذاتها عند الرفع. بلا حساب وبلا خطوة بناء.',
+			en: 'Publish a page in one step: drop a file, paste markup, curl it, or hand it to an agent over MCP. Markdown is rendered to a self-contained page on upload. No account, no build step.',
+			ar: 'انشر صفحة بخطوة واحدة: أفلِت ملفًا، أو الصق شيفرة، أو أرسلها بـ curl، أو مرّرها لوكيل عبر MCP. ويُحوَّل الـ Markdown إلى صفحة مكتفية بذاتها عند الرفع. بلا حساب وبلا خطوة بناء.',
 		},
 		category: 'web',
 		status: 'live',
@@ -539,12 +539,12 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'I kept generating single-file HTML pages — reports, mockups, one-off tools — and having nowhere to put them. Every option was heavier than the artefact: a repo and a deploy for a page that exists to be looked at once.',
-				'pastehtml is the missing step. Every route — the drop zone, a paste, a curl, an MCP call from an agent — ends at the same function, and comes back with a URL. Markdown is converted to real HTML at upload time, so the stored paste is a page and every surface below it behaves identically: the live origin, the raw view, the sandboxed preview, the ETag.',
+				'I kept generating single-file HTML pages like reports, mockups and one-off tools, and having nowhere nowhere to put them. Every option was heavier than the artefact: a repo and a deploy for a page that exists to be looked at once.',
+				'pastehtml is the missing step. The drop zone, a paste, a curl and an MCP call from an agent all end at the same function and come back with a URL. Markdown is converted to real HTML at upload time, so the stored paste is a page and every view of it behaves identically: the live origin, the raw view, the sandboxed preview, the ETag.',
 			],
 			ar: [
-				'كنت أُولّد باستمرار صفحات HTML بملف واحد — تقارير ونماذج وأدوات لمرة واحدة — ولا أجد أين أضعها. كل الخيارات أثقل من الشيء نفسه: مستودع ونشر لصفحة وُجدت لتُرى مرة.',
-				'pastehtml هو الخطوة الناقصة. كل مسار — منطقة الإفلات، أو اللصق، أو curl، أو نداء MCP من وكيل — ينتهي عند الدالة نفسها، ويعود برابط. ويُحوَّل الـ Markdown إلى HTML حقيقي عند الرفع، فتكون النسخة المخزّنة صفحةً وتتصرّف كل الواجهات تحتها بالطريقة ذاتها: النطاق المباشر، والعرض الخام، والمعاينة المعزولة، وETag.',
+				'كنت أُولّد باستمرار صفحات HTML بملف واحد، من تقارير ونماذج وأدوات لمرة واحدة، ولا أجد أين أضعها. كل الخيارات أثقل من الشيء نفسه: مستودع ونشر لصفحة وُجدت لتُرى مرة.',
+				'pastehtml هو الخطوة الناقصة. منطقة الإفلات واللصق وcurl ونداء MCP من وكيل، كلها تنتهي عند الدالة نفسها وتعود برابط. ويُحوَّل الـ Markdown إلى HTML حقيقي عند الرفع، فتكون النسخة المخزّنة صفحةً وتتصرّف كل الواجهات تحتها بالطريقة ذاتها: النطاق المباشر، والعرض الخام، والمعاينة المعزولة، وETag.',
 			],
 		},
 		challenges: [
@@ -554,8 +554,8 @@ export const projects: Project[] = [
 					ar: 'استضافة HTML عشوائي هي استضافة JavaScript عشوائي',
 				},
 				problem: {
-					en: 'A paste is a full page with scripts in it. Serve all pastes from one domain and any one of them can read the cookies, storage and DOM of every other — the service becomes a hosted cross-site scripting platform.',
-					ar: 'كل نسخة صفحة كاملة تحوي شيفرات. ولو قُدّمت كل النسخ من نطاق واحد لأمكن لأيٍّ منها قراءة الكعكات والتخزين وDOM لكل النسخ الأخرى — فتتحول الخدمة إلى منصة استضافة لهجمات XSS.',
+					en: 'A paste is a full page with scripts in it. Serve all pastes from one domain and any one of them can read the cookies, storage and DOM of every other. The service becomes a hosted cross-site scripting platform.',
+					ar: 'كل نسخة صفحة كاملة تحوي شيفرات. ولو قُدّمت كل النسخ من نطاق واحد لأمكن لأيٍّ منها قراءة الكعكات والتخزين وDOM لكل النسخ الأخرى، فتتحول الخدمة إلى منصة استضافة لهجمات XSS.',
 				},
 				solution: {
 					en: "Each paste is served from its own origin, so the browser's own same-origin policy does the isolation rather than a sanitiser I would have to keep ahead of. Sanitising untrusted HTML is a losing race; giving it nothing worth stealing is not.",
@@ -572,8 +572,8 @@ export const projects: Project[] = [
 					ar: 'ينبغي أن يُعاين الرابط المشارَك بوصفه الصفحة التي يشير إليها. لكن الصفحة تخصّ المستخدم الذي لم يكتب وسوم Open Graph، وحقنها في شيفرته يعني إعادة كتابة مستنده.',
 				},
 				solution: {
-					en: "Crawlers are detected at the edge and rewritten to a separate function that renders OG tags for that paste, while human visitors get the untouched document. The user's HTML is never modified — the crawler simply gets a different response.",
-					ar: 'تُكتشف زواحف الفهرسة عند الحافة وتُحوَّل إلى دالة منفصلة تُنتج وسوم OG لتلك النسخة، بينما يحصل الزائر البشري على المستند كما هو. لا تُعدَّل شيفرة المستخدم أبدًا — الزاحف وحده يتلقى استجابة مختلفة.',
+					en: "Crawlers are detected at the edge and rewritten to a separate function that renders OG tags for that paste, while human visitors get the untouched document. The user's HTML is never modified. The crawler gets a different response.",
+					ar: 'تُكتشف زواحف الفهرسة عند الحافة وتُحوَّل إلى دالة منفصلة تُنتج وسوم OG لتلك النسخة، بينما يحصل الزائر البشري على المستند كما هو. لا تُعدَّل شيفرة المستخدم أبدًا. الزاحف وحده يتلقى استجابة مختلفة.',
 				},
 			},
 			{
@@ -582,8 +582,8 @@ export const projects: Project[] = [
 					ar: 'مسار نشر واحد وأربع نقاط دخول',
 				},
 				problem: {
-					en: 'A drop zone, a paste box, a REST call and an MCP tool are four different clients. Implementing publishing four times guarantees they drift apart, and the agent path — the one I most wanted — would be the least tested.',
-					ar: 'منطقة الإفلات وصندوق اللصق ونداء REST وأداة MCP أربعة عملاء مختلفين. وتنفيذ النشر أربع مرات يضمن تباعدها، ويكون مسار الوكيل — وهو أكثر ما أردته — أقلّها اختبارًا.',
+					en: 'A drop zone, a paste box, a REST call and an MCP tool are four different clients. Implementing publishing four times guarantees they drift apart, and the agent path, the one I most wanted, would be the least tested.',
+					ar: 'منطقة الإفلات وصندوق اللصق ونداء REST وأداة MCP أربعة عملاء مختلفين. وتنفيذ النشر أربع مرات يضمن تباعدها، ويكون مسار الوكيل، وهو أكثر ما أردته، أقلّها اختبارًا.',
 				},
 				solution: {
 					en: 'All four are thin shells over a single Convex function. Whatever works from the browser works identically from curl and from an agent, because it is the same code path.',
@@ -620,7 +620,7 @@ export const projects: Project[] = [
 		status: 'shipped',
 		featured: true,
 		year: '2025',
-		role: { en: 'Solo — mobile and backend', ar: 'منفردًا — الموبايل والخادم' },
+		role: { en: 'Solo: mobile and backend', ar: 'منفردًا: الموبايل والخادم' },
 		stack: [
 			'React Native',
 			'TypeScript',
@@ -650,12 +650,12 @@ export const projects: Project[] = [
 			en: [
 				'A memorisation centre runs on relationships that software usually flattens: a teacher knows where each student stopped, what they struggle with, and whether the family is following along. Most apps replace that with a progress bar.',
 				"This one models the actual structure. Circles mirror the real ones. During recitation the teacher sees the same page the student is reading, so they can follow and correct without asking the student to say where they are. Parents get visibility into their child's progress without having to phone the centre.",
-				'The competitive layer — tests, games and a leaderboard — exists because revision is the part students skip, and it is the part that decides whether memorisation holds.',
+				'The competitive layer, tests, games and a leaderboard, exists because revision is the part students skip, and it is the part that decides whether memorisation holds.',
 			],
 			ar: [
 				'يقوم مركز التحفيظ على علاقات تُسطّحها البرمجيات عادةً: المعلّم يعرف أين وقف كل طالب، وما يتعثّر فيه، وهل تتابع الأسرة أم لا. ومعظم التطبيقات تستبدل بذلك شريط تقدّم.',
 				'يُنمذج هذا التطبيق البنية الفعلية. الحلقات تحاكي الحلقات الحقيقية. وأثناء التلاوة يرى المعلّم الصفحة نفسها التي يقرؤها الطالب، فيتابع ويصحّح دون أن يسأله أين وصل. ويطّلع الأهل على تقدّم أبنائهم دون الاتصال بالمركز.',
-				'أما الطبقة التنافسية — الاختبارات والألعاب ولوحة المتصدرين — فموجودة لأن المراجعة هي ما يتجاوزه الطلاب، وهي ما يحدّد ثبات الحفظ.',
+				'أما الطبقة التنافسية، الاختبارات والألعاب ولوحة المتصدرين، فموجودة لأن المراجعة هي ما يتجاوزه الطلاب، وهي ما يحدّد ثبات الحفظ.',
 			],
 		},
 		challenges: [
@@ -665,8 +665,8 @@ export const projects: Project[] = [
 					ar: 'المصحف ليس عرض نصّ',
 				},
 				problem: {
-					en: 'Quranic text has to be laid out exactly — the page breaks, line breaks and word positions are fixed, and readers notice immediately when they are not. Standard text rendering reflows, which makes the page wrong.',
-					ar: 'يجب أن يُخرَج النص القرآني بدقة — فواصل الصفحات والأسطر ومواضع الكلمات ثابتة، ويلحظ القارئ الاختلاف فورًا. أما عرض النص المعتاد فيعيد التدفق، فتصير الصفحة خاطئة.',
+					en: 'Quranic text has to be laid out exactly. The page breaks, line breaks and word positions are fixed, and readers notice immediately when they are not. Standard text rendering reflows, which makes the page wrong.',
+					ar: 'يجب أن يُخرَج النص القرآني بدقة. فواصل الصفحات والأسطر ومواضع الكلمات ثابتة، ويلحظ القارئ الاختلاف فورًا. أما عرض النص المعتاد فيعيد التدفق، فتصير الصفحة خاطئة.',
 				},
 				solution: {
 					en: 'Pages are drawn on a Skia canvas with fixed geometry rather than laid out as flowing text, so a page looks the same on every device size and word-level positions stay addressable for highlighting.',
@@ -724,16 +724,16 @@ export const projects: Project[] = [
 			ar: 'كل ما يحتاجه طالب الهندسة الكهربائية، في مكان واحد.',
 		},
 		summary: {
-			en: 'Pick any subject from the study plan tree and get everything attached to it — material, recordings, staff contacts. Includes a GPA calculator, bilingual Arabic/English search, and a night mode. Volunteer work that has outlived several intakes of students.',
-			ar: 'اختر أي مادة من شجرة الخطة الدراسية واحصل على كل ما يتعلق بها — مواد وتسجيلات وبيانات الهيئة التدريسية. ويتضمن حاسبة معدّل، وبحثًا ثنائي اللغة بالعربية والإنجليزية، ووضعًا ليليًا. عمل تطوعي عاش أكثر من دفعة طلابية.',
+			en: 'Pick any subject from the study plan tree and get everything attached to it: material, recordings, staff contacts. Includes a GPA calculator, bilingual Arabic/English search, and a night mode. Volunteer work that has outlived several intakes of students.',
+			ar: 'اختر أي مادة من شجرة الخطة الدراسية واحصل على كل ما يتعلق بها: مواد وتسجيلات وبيانات الهيئة التدريسية. ويتضمن حاسبة معدّل، وبحثًا ثنائي اللغة بالعربية والإنجليزية، ووضعًا ليليًا. عمل تطوعي عاش أكثر من دفعة طلابية.',
 		},
 		category: 'mobile',
 		status: 'shipped',
 		featured: true,
-		year: '2022 — Present',
+		year: 'Since 2022',
 		role: {
-			en: 'Volunteer — mobile and backend',
-			ar: 'متطوّع — الموبايل والخادم',
+			en: 'Volunteer: mobile and backend',
+			ar: 'متطوّع: الموبايل والخادم',
 		},
 		stack: [
 			'React Native',
@@ -764,12 +764,12 @@ export const projects: Project[] = [
 			en: [
 				'The committee had been answering the same questions in the same Facebook group for years: which prerequisites does this subject have, who teaches it, where are the notes, what will my GPA be if this goes badly.',
 				'The app turns that into structure. The study plan is a navigable tree, so a subject is a destination with everything hanging off it. Staff details are searchable. The GPA box projects both semester and cumulative results before the semester ends.',
-				'It is the longest-running thing I maintain, and the constraint that shapes it is that I am not paid for it — anything that needs constant attention does not survive.',
+				'It is the longest-running thing I maintain, and the constraint that shapes it is that I am not paid for it. Anything that needs constant attention does not survive.',
 			],
 			ar: [
 				'ظلّت اللجنة تجيب عن الأسئلة نفسها في مجموعة فيسبوك نفسها سنوات: ما متطلبات هذه المادة، ومن يدرّسها، وأين الملخصات، وكم سيصير معدّلي إن ساءت الأمور.',
 				'يحوّل التطبيق ذلك إلى بنية. الخطة الدراسية شجرة قابلة للتنقّل، فتصير المادة وجهةً يتدلّى منها كل شيء. وبيانات الهيئة التدريسية قابلة للبحث. وتتوقّع حاسبة المعدّل نتيجة الفصل والتراكمي قبل انتهاء الفصل.',
-				'هو أطول ما أتولى صيانته عمرًا، والقيد الذي يشكّله أنني لا أتقاضى عليه أجرًا — فأي شيء يحتاج انتباهًا دائمًا لا ينجو.',
+				'هو أطول ما أتولى صيانته عمرًا، والقيد الذي يشكّله أنني لا أتقاضى عليه أجرًا، فأي شيء يحتاج انتباهًا دائمًا لا ينجو.',
 			],
 		},
 		challenges: [
@@ -846,8 +846,8 @@ export const projects: Project[] = [
 		featured: true,
 		year: '2025',
 		role: {
-			en: 'Client project — mobile development',
-			ar: 'مشروع لعميل — تطوير الموبايل',
+			en: 'Client project: mobile development',
+			ar: 'مشروع لعميل: تطوير الموبايل',
 		},
 		stack: [
 			'React Native',
@@ -876,11 +876,11 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Regional tourism apps usually fail in one of two ways: they are a brochure that never changes, or they are a map with pins and no reason to care about any of them. Al-Jouf has genuine depth — heritage sites, seasonal festivals, a food scene — and the client wanted all of it in one place.',
+				'Regional tourism apps usually fail in one of two ways: they are a brochure that never changes, or they are a map with pins and no reason to care about any of them. Al-Jouf has genuine depth in heritage sites, seasonal festivals and a food scene, and the client wanted all of it in one place.',
 				'The app covers sites, events, and places to eat, each with the historical and cultural context that makes a visit worth making. It is fully bilingual, which for a Saudi tourism product is not a nice-to-have.',
 			],
 			ar: [
-				'تفشل تطبيقات السياحة الإقليمية عادةً بإحدى طريقتين: إما كتيّب لا يتغير، وإما خريطة بدبابيس بلا سبب يجعلك تهتم بأيٍّ منها. وللجوف عمق حقيقي — مواقع تراثية ومهرجانات موسمية ومشهد طعام — وأراد العميل ذلك كله في مكان واحد.',
+				'تفشل تطبيقات السياحة الإقليمية عادةً بإحدى طريقتين: إما كتيّب لا يتغير، وإما خريطة بدبابيس بلا سبب يجعلك تهتم بأيٍّ منها. وللجوف عمق حقيقي في مواقعها التراثية ومهرجاناتها الموسمية ومشهد الطعام فيها، وأراد العميل ذلك كله في مكان واحد.',
 				'يغطي التطبيق المواقع والفعاليات وأماكن الطعام، ولكلٍّ سياقه التاريخي والثقافي الذي يجعل الزيارة تستحق. وهو ثنائي اللغة بالكامل، وهذا في منتج سياحي سعودي ليس ترفًا.',
 			],
 		},
@@ -919,8 +919,8 @@ export const projects: Project[] = [
 					ar: 'صور ثقيلة على اتصال سائح',
 				},
 				problem: {
-					en: "A guide is mostly photographs, and it is opened by people on roaming data at a heritage site with one bar of signal — the worst possible conditions for the app's heaviest content.",
-					ar: 'الدليل صور في معظمه، ويفتحه أناس على بيانات تجوال عند موقع تراثي بإشارة واحدة — أسوأ الظروف الممكنة لأثقل محتوى في التطبيق.',
+					en: "A guide is mostly photographs, and it is opened by people on roaming data at a heritage site with one bar of signal, the worst possible conditions for the app's heaviest content.",
+					ar: 'الدليل صور في معظمه، ويفتحه أناس على بيانات تجوال عند موقع تراثي بإشارة واحدة، أسوأ الظروف الممكنة لأثقل محتوى في التطبيق.',
 				},
 				solution: {
 					en: 'Images are served at the size they are displayed and cached on disk after first view, so browsing back through places already seen costs nothing.',
@@ -950,8 +950,8 @@ export const projects: Project[] = [
 			ar: 'منصة لتيسير الزواج الشرعي بإشراف إداري.',
 		},
 		summary: {
-			en: 'A platform that introduces people seeking marriage under explicit, published conditions with administrative supervision throughout — deliberately structured to keep the process within religious bounds rather than reproducing a dating app.',
-			ar: 'منصة تُعرِّف الراغبين والراغبات في الزواج وفق شروط واضحة معلنة مع إشراف إداري في كل مرحلة — مبنيّة عمدًا لإبقاء العملية ضمن الحدود الشرعية بدل استنساخ تطبيقات المواعدة.',
+			en: 'A platform that introduces people seeking marriage under explicit, published conditions with administrative supervision throughout, deliberately structured to keep the process within religious bounds rather than reproducing a dating app.',
+			ar: 'منصة تُعرِّف الراغبين والراغبات في الزواج وفق شروط واضحة معلنة مع إشراف إداري في كل مرحلة، مبنيّة عمدًا لإبقاء العملية ضمن الحدود الشرعية بدل استنساخ تطبيقات المواعدة.',
 		},
 		category: 'web',
 		status: 'live',
@@ -1021,8 +1021,8 @@ export const projects: Project[] = [
 					ar: 'نشر بيانات شخص لا رجعة فيه',
 				},
 				problem: {
-					en: "An accidental disclosure here is not a UI bug — it affects a real person's reputation and family, and it cannot be undone by deleting a record afterwards.",
-					ar: 'الإفشاء العارض هنا ليس خللًا في الواجهة — بل يمسّ سمعة شخص حقيقي وأسرته، ولا يُلغى بحذف سجل بعد وقوعه.',
+					en: "An accidental disclosure here is not a UI bug. It affects a real person's reputation and family, and it cannot be undone by deleting a record afterwards.",
+					ar: 'الإفشاء العارض هنا ليس خللًا في الواجهة، بل يمسّ سمعة شخص حقيقي وأسرته، ولا يُلغى بحذف سجل بعد وقوعه.',
 				},
 				solution: {
 					en: 'Nothing is visible by default. Publication requires explicit, recorded consent from the applicant plus administrative approval, so disclosure needs two deliberate acts rather than one missing check.',
@@ -1032,12 +1032,12 @@ export const projects: Project[] = [
 		],
 		outcomes: {
 			en: [
-				'Server-enforced visibility rules — the client cannot request what it may not see.',
+				'Server-enforced visibility rules. The client cannot request what it may not see.',
 				'Questions and religious copy editable by the product owner without a deploy.',
 				'Publication gated behind recorded consent plus admin approval.',
 			],
 			ar: [
-				'قواعد ظهور مفروضة على الخادم — لا يستطيع العميل طلب ما لا يحق له رؤيته.',
+				'قواعد ظهور مفروضة على الخادم. لا يستطيع العميل طلب ما لا يحق له رؤيته.',
 				'أسئلة ونصوص شرعية قابلة للتحرير من صاحب المنتج دون نشر.',
 				'النشر محكوم بموافقة موثّقة واعتماد إداري.',
 			],
@@ -1078,11 +1078,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'A greeting sent as a link is usually a static page with a name interpolated into it. This one is a real 3D scene: the gift sits there wrapped, and opening it is an animation rather than a page load.',
-				'Senders can attach a voice note, and get an email when the gift is actually opened — which turns out to be the part people care about most.',
+				'Senders can attach a voice note, and get an email when the gift is actually opened, which turns out to be the part people care about most.',
 			],
 			ar: [
 				'التهنئة المُرسَلة كرابط عادةً صفحة ثابتة أُدرج فيها اسم. أما هنا فمشهد ثلاثي الأبعاد حقيقي: الهدية موضوعة مغلَّفة، وفتحها حركة لا تحميل صفحة.',
-				'يستطيع المرسِل إرفاق رسالة صوتية، ويصله بريد حين تُفتح الهدية فعلًا — وتبيّن أن هذا أكثر ما يهتم به الناس.',
+				'يستطيع المرسِل إرفاق رسالة صوتية، ويصله بريد حين تُفتح الهدية فعلًا، وتبيّن أن هذا أكثر ما يهتم به الناس.',
 			],
 		},
 		challenges: [
@@ -1135,14 +1135,14 @@ export const projects: Project[] = [
 			ar: 'بطاقات مراجعة متباعدة للتحضير لمقابلات الهندسة.',
 		},
 		summary: {
-			en: 'Hundreds of multiple-choice questions across thirteen topics, each with a full explanation, scheduled by a Leitner system so the cards you get wrong keep coming back until they stick. Entirely frontend — no backend, no account, no network calls.',
-			ar: 'مئات الأسئلة متعددة الخيارات في ثلاثة عشر موضوعًا، لكل سؤال شرح كامل، مجدولة بنظام لايتنر بحيث تعود البطاقات التي تخطئ فيها حتى ترسخ. واجهة أمامية بالكامل — بلا خادم وبلا حساب وبلا اتصالات شبكية.',
+			en: 'Hundreds of multiple-choice questions across thirteen topics, each with a full explanation, scheduled by a Leitner system so the cards you get wrong keep coming back until they stick. Entirely frontend: no backend, no account, no network calls.',
+			ar: 'مئات الأسئلة متعددة الخيارات في ثلاثة عشر موضوعًا، لكل سؤال شرح كامل، مجدولة بنظام لايتنر بحيث تعود البطاقات التي تخطئ فيها حتى ترسخ. واجهة أمامية بالكامل: بلا خادم وبلا حساب وبلا اتصالات شبكية.',
 		},
 		category: 'web',
 		status: 'live',
 		featured: false,
 		year: '2026',
-		role: { en: 'Solo — content and app', ar: 'منفردًا — المحتوى والتطبيق' },
+		role: { en: 'Solo: content and app', ar: 'منفردًا: المحتوى والتطبيق' },
 		stack: [
 			'Next.js',
 			'TypeScript',
@@ -1159,12 +1159,12 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Interview prep material is either a list of questions with one-line answers you forget immediately, or a course you never finish. Neither does the thing that actually works, which is being asked the question again a few days after getting it wrong.',
-				"DevCards covers thirteen areas — software engineering, frontend, backend, system design, microservices, caching, databases, security, React, PHP, Laravel, Next.js and Node.js — at three difficulty levels. Every card is multiple choice and graded instantly, with a short answer and a deeper 'behind the scenes' explanation.",
+				"DevCards covers thirteen areas at three difficulty levels: software engineering, frontend, backend, system design, microservices, caching, databases, security, React, PHP, Laravel, Next.js and Node.js. Every card is multiple choice and graded instantly, with a short answer and a deeper 'behind the scenes' explanation.",
 				'There is no backend at all. Progress lives in the browser, which means it opens instantly and costs nothing to run.',
 			],
 			ar: [
 				'مواد التحضير للمقابلات إما قائمة أسئلة بإجابات من سطر تُنسى فورًا، وإما دورة لا تُنهيها أبدًا. ولا يفعل أيٌّ منهما ما ينفع فعلًا: أن يُطرح عليك السؤال ثانيةً بعد أيام من خطئك فيه.',
-				'تغطي DevCards ثلاثة عشر مجالًا — هندسة البرمجيات، والواجهات الأمامية والخلفية، وتصميم الأنظمة، والخدمات المصغّرة، والتخزين المؤقت، وقواعد البيانات، والأمان، وReact وPHP وLaravel وNext.js وNode.js — بثلاثة مستويات صعوبة. كل بطاقة متعددة الخيارات وتُصحَّح فورًا، مع إجابة قصيرة وشرح أعمق لما يجري خلف الكواليس.',
+				'تغطي DevCards ثلاثة عشر مجالًا بثلاثة مستويات صعوبة: هندسة البرمجيات، والواجهات الأمامية والخلفية، وتصميم الأنظمة، والخدمات المصغّرة، والتخزين المؤقت، وقواعد البيانات، والأمان، وReact وPHP وLaravel وNext.js وNode.js. كل بطاقة متعددة الخيارات وتُصحَّح فورًا، مع إجابة قصيرة وشرح أعمق لما يجري خلف الكواليس.',
 				'لا خادم إطلاقًا. يبقى التقدّم في المتصفح، فيُفتح فورًا وبلا كلفة تشغيل.',
 			],
 		},
@@ -1175,12 +1175,12 @@ export const projects: Project[] = [
 					ar: 'الإصابة مرة ليست تعلّمًا',
 				},
 				problem: {
-					en: 'A plain quiz shuffles and moves on, so a question you guessed correctly and a question you actually know are treated identically — and the ones you got wrong are the ones you never see again.',
-					ar: 'الاختبار العادي يخلط ويمضي، فيُعامَل السؤال الذي خمّنته صوابًا والسؤال الذي تعرفه فعلًا معاملةً واحدة — وتكون الأسئلة التي أخطأت فيها هي ما لا تراه ثانيةً أبدًا.',
+					en: 'A plain quiz shuffles and moves on, so a question you guessed correctly and a question you actually know are treated identically, and the ones you got wrong are the ones you never see again.',
+					ar: 'الاختبار العادي يخلط ويمضي، فيُعامَل السؤال الذي خمّنته صوابًا والسؤال الذي تعرفه فعلًا معاملةً واحدة، وتكون الأسئلة التي أخطأت فيها هي ما لا تراه ثانيةً أبدًا.',
 				},
 				solution: {
-					en: 'A Leitner system with self-rating. A missed card drops to box zero and returns almost immediately — both later in the same session and in future ones — while cards you know climb to longer intervals.',
-					ar: 'نظام لايتنر مع تقييم ذاتي. تهبط البطاقة المُخطأة إلى الصندوق صفر وتعود بعد قليل — في الجلسة نفسها وفي الجلسات اللاحقة — بينما تصعد البطاقات التي تعرفها إلى فواصل أطول.',
+					en: 'A Leitner system with self-rating. A missed card drops to box zero and returns almost immediately, both later in the same session and in future ones, while cards you know climb to longer intervals.',
+					ar: 'نظام لايتنر مع تقييم ذاتي. تهبط البطاقة المُخطأة إلى الصندوق صفر وتعود بعد قليل، في الجلسة نفسها وفي الجلسات اللاحقة، بينما تصعد البطاقات التي تعرفها إلى فواصل أطول.',
 				},
 			},
 			{
@@ -1242,11 +1242,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Auto-translated captions on YouTube mean your viewing history goes to a translation service. Sada does the same job without that: the model and runtime download once at install, and after that the engine runs with remote models disabled.',
-				'At runtime the only network traffic is YouTube itself — the video and its caption cues, fetched same-origin — plus extension-local asset loads. Any request to a third-party origin would be a bug, and the privacy claim is written to be falsifiable rather than reassuring.',
+				'At runtime the only network traffic is YouTube itself, meaning the video and its caption cues fetched same-origin, plus extension-local asset loads. Any request to a third-party origin would be a bug, and the privacy claim is written to be falsifiable rather than reassuring.',
 			],
 			ar: [
 				'الترجمة التلقائية للتسميات على يوتيوب تعني ذهاب سجل مشاهدتك إلى خدمة ترجمة. يؤدي «صدى» العمل نفسه بلا ذلك: يُنزَّل النموذج وبيئة التشغيل مرة واحدة عند التثبيت، وبعدها يعمل المحرّك والنماذج البعيدة معطّلة.',
-				'أثناء التشغيل، حركة الشبكة الوحيدة هي يوتيوب نفسه — الفيديو وتسمياته من الأصل ذاته — إضافة إلى تحميل أصول محلية للإضافة. وأي طلب إلى أصل خارجي يُعدّ خللًا، وصياغة ادعاء الخصوصية قابلة للتكذيب لا للطمأنة.',
+				'أثناء التشغيل، حركة الشبكة الوحيدة هي يوتيوب نفسه، أي الفيديو وتسمياته من الأصل ذاته، إضافة إلى تحميل أصول محلية للإضافة. وأي طلب إلى أصل خارجي خلل، وصياغة ادعاء الخصوصية قابلة للتكذيب لا للطمأنة.',
 			],
 		},
 		challenges: [
@@ -1270,8 +1270,8 @@ export const projects: Project[] = [
 					ar: 'على الترجمة أن تلاحق الفيديو',
 				},
 				problem: {
-					en: 'Translation takes time, and a subtitle that arrives after the line has been spoken is worse than none — the viewer reads one sentence while hearing the next.',
-					ar: 'تستغرق الترجمة وقتًا، والسطر الذي يصل بعد نطقه أسوأ من غيابه — إذ يقرأ المشاهد جملة بينما يسمع التالية.',
+					en: 'Translation takes time, and a subtitle that arrives after the line has been spoken is worse than none. The viewer reads one sentence while hearing the next.',
+					ar: 'تستغرق الترجمة وقتًا، والسطر الذي يصل بعد نطقه أسوأ من غيابه، إذ يقرأ المشاهد جملة بينما يسمع التالية.',
 				},
 				solution: {
 					en: 'Cues are translated ahead of the playhead rather than on demand, so the work happens during the gap before the line is needed instead of after it has passed.',
@@ -1338,8 +1338,8 @@ export const projects: Project[] = [
 					ar: 'إزالة الموسيقى دون إزالة الغناء',
 				},
 				problem: {
-					en: 'Stem separation splits audio into vocals, drums, bass and other. Dropping everything but vocals removes the instruments — but a sung vocal is still a vocal, so songs survive as a-cappella rather than disappearing.',
-					ar: 'يفصل النموذج الصوت إلى غناء وطبول وبيس وأخرى. وحذف كل شيء عدا الغناء يزيل الآلات — لكن الصوت المغنّى يبقى صوتًا، فتنجو الأغاني بلا موسيقى بدل أن تختفي.',
+					en: 'Stem separation splits audio into vocals, drums, bass and other. Dropping everything but vocals removes the instruments, but a sung vocal is still a vocal, so songs survive as a-cappella rather than disappearing.',
+					ar: 'يفصل النموذج الصوت إلى غناء وطبول وبيس وأخرى. وحذف كل شيء عدا الغناء يزيل الآلات، لكن الصوت المغنّى يبقى صوتًا، فتنجو الأغاني بلا موسيقى بدل أن تختفي.',
 				},
 				solution: {
 					en: 'Rather than pretend otherwise, this is documented as a known limitation at the top of the README with muting sung vocals on the roadmap. Overstating what a stem separator can do would have been the easier and worse option.',
@@ -1404,12 +1404,12 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Browser extensions solved this for the browser. Nothing solved it for the phone, where most of the problem now lives. A DOM-based filter cannot see CSS background images, iframes, picture-in-picture, ads or PDFs, and it only ever covers one app.',
-				'Ghadd reads the screen instead. Static images — the primary case — are covered before you can meaningfully look at them, checked, then cleared or blurred. Detection is NudeNet v3 at 320×320, running on-device with no cloud and no telemetry.',
+				'Ghadd reads the screen instead. Static images, the primary case, are covered before you can meaningfully look at them, checked, then cleared or blurred. Detection is NudeNet v3 at 320×320, running on-device with no cloud and no telemetry.',
 				'It is pre-1.0 and dogfood, developed against a single device, and the README says so rather than implying broader testing than exists.',
 			],
 			ar: [
 				'حلّت إضافات المتصفح هذا للمتصفح. ولم يحلّه شيء للهاتف حيث تعيش المشكلة اليوم في معظمها. فالمُرشِّح القائم على الـ DOM لا يرى صور خلفيات CSS ولا الإطارات المضمّنة ولا الصورة داخل الصورة ولا الإعلانات ولا ملفات PDF، ولا يغطي إلا تطبيقًا واحدًا.',
-				'أما «غَضّ» فيقرأ الشاشة نفسها. تُغطّى الصور الثابتة — وهي الحالة الأساسية — قبل أن تتمكن من النظر إليها فعليًا، ثم تُفحص فتُكشف أو تُشوَّش. والكشف بـ NudeNet v3 بدقة 320×320، يعمل على الجهاز بلا سحابة وبلا تتبّع.',
+				'أما «غَضّ» فيقرأ الشاشة نفسها. تُغطّى الصور الثابتة، وهي الحالة الأساسية، قبل أن تتمكن من النظر إليها فعليًا، ثم تُفحص فتُكشف أو تُشوَّش. والكشف بـ NudeNet v3 بدقة 320×320، يعمل على الجهاز بلا سحابة وبلا تتبّع.',
 				'المشروع قبل الإصدار 1.0 وقيد الاستخدام الشخصي، ومطوَّر على جهاز واحد، ويقول الـ README ذلك بدل الإيحاء باختبار أوسع مما جرى.',
 			],
 		},
@@ -1420,8 +1420,8 @@ export const projects: Project[] = [
 					ar: 'المنصة تحدّك بثلاث لقطات في الثانية',
 				},
 				problem: {
-					en: 'An accessibility service can capture roughly three frames per second. Video, reels and autoplay feeds move far faster than that, so frames between checks are never inspected at all — and no amount of model tuning changes it.',
-					ar: 'تستطيع خدمة الإتاحة التقاط نحو ثلاثة إطارات في الثانية. أما الفيديو والمقاطع القصيرة والتشغيل التلقائي فتتحرك أسرع من ذلك بكثير، فلا تُفحص الإطارات بين اللقطات إطلاقًا — ولا يغيّر ذلك أي ضبط للنموذج.',
+					en: 'An accessibility service can capture roughly three frames per second. Video, reels and autoplay feeds move far faster than that, so frames between checks are never inspected at all, and no amount of model tuning changes it.',
+					ar: 'تستطيع خدمة الإتاحة التقاط نحو ثلاثة إطارات في الثانية. أما الفيديو والمقاطع القصيرة والتشغيل التلقائي فتتحرك أسرع من ذلك بكثير، فلا تُفحص الإطارات بين اللقطات إطلاقًا، ولا يغيّر ذلك أي ضبط للنموذج.',
 				},
 				solution: {
 					en: "The ceiling is stated as a product boundary rather than hidden: static images are the supported experience, video is explicitly best-effort, and the README leads with 'substantially reduces exposure, does not guarantee zero exposure'. A tool in this category that overpromises causes the harm it claims to prevent.",
@@ -1468,8 +1468,8 @@ export const projects: Project[] = [
 		category: 'desktop',
 		status: 'shipped',
 		featured: false,
-		year: '2023 — 2026',
-		role: { en: 'Solo — five platforms', ar: 'منفردًا — خمس منصات' },
+		year: '2023 to 2026',
+		role: { en: 'Solo: five platforms', ar: 'منفردًا: خمس منصات' },
 		stack: [
 			'JavaScript',
 			'Swift',
@@ -1498,12 +1498,12 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'This started as a VS Code extension — a small notification during a coding session, dismissible with a keystroke, gone by itself after six seconds. It is the most-starred thing I have written, which says something about how many developers wanted exactly that and nothing more.',
+				'This started as a VS Code extension: a small notification during a coding session, dismissible with a keystroke, gone by itself after six seconds. It is the most-starred thing I have written, which says something about how many developers wanted exactly that and nothing more.',
 				'Since then it has gone everywhere I work: a macOS app, a Windows tray app in C# and WPF with zero NuGet dependencies, a standalone watchOS app that needs no iPhone companion, and a Wear OS version. The Windows build even ships a self-test flag that prints PASS/FAIL for its own logic.',
 				'The design constraint is the same on all five: it must never become an app you have to manage. Interval, list, and nothing else.',
 			],
 			ar: [
-				'بدأ هذا إضافةً لـ VS Code — إشعار صغير أثناء جلسة برمجة، يُغلق بضغطة، ويختفي وحده بعد ست ثوانٍ. وهو أكثر ما كتبته نجومًا، وفي ذلك دلالة على عدد المطورين الذين أرادوا هذا بالضبط ولا شيء أكثر.',
+				'بدأ هذا إضافةً لـ VS Code: إشعار صغير أثناء جلسة برمجة، يُغلق بضغطة، ويختفي وحده بعد ست ثوانٍ. وهو أكثر ما كتبته نجومًا، وفي ذلك دلالة على عدد المطورين الذين أرادوا هذا بالضبط ولا شيء أكثر.',
 				'ومنذ ذلك الحين ذهب إلى كل مكان أعمل فيه: تطبيق macOS، وتطبيق شريط مهام لويندوز بـ C# وWPF بلا أي اعتمادية NuGet، وتطبيق watchOS مستقل لا يحتاج رفيقًا على iPhone، ونسخة Wear OS. بل تأتي نسخة ويندوز براية اختبار ذاتي تطبع نجاح/فشل لمنطقها.',
 				'قيد التصميم واحد في الخمسة: يجب ألا يصير تطبيقًا مضطرًا لإدارته. فاصل زمني، وقائمة، ولا شيء غير ذلك.',
 			],
@@ -1519,8 +1519,8 @@ export const projects: Project[] = [
 					ar: 'القيمة كلها في التكرار، لكن ما يخطف التركيز أثناء الكتابة يُحذف خلال يوم. والإشعار النظامي الأصلي مقتحم أكثر مما ينبغي ويتراكم في سجل الإشعارات.',
 				},
 				solution: {
-					en: 'Each platform uses the least intrusive surface it has — a frameless transparent popup that fades in over all windows without taking focus or blocking clicks on desktop, a wrist tap on the watch, an editor notification in VS Code. It auto-dismisses, so ignoring it is a valid response.',
-					ar: 'تستخدم كل منصة أقل سطوحها اقتحامًا — نافذة منبثقة بلا إطار وشفافة تظهر فوق كل النوافذ دون أخذ التركيز أو حجب النقر على سطح المكتب، ونقرة على المعصم في الساعة، وإشعار محرر في VS Code. ويختفي تلقائيًا، فيكون التجاهل استجابة صحيحة.',
+					en: 'Each platform interrupts as little as it can: a frameless transparent popup that fades in over all windows without taking focus or blocking clicks on desktop, a wrist tap on the watch, an editor notification in VS Code. It auto-dismisses, so ignoring it is a valid response.',
+					ar: 'تقاطعك كل منصة بأقل ما تستطيع: نافذة منبثقة بلا إطار وشفافة تظهر فوق كل النوافذ دون أخذ التركيز أو حجب النقر على سطح المكتب، ونقرة على المعصم في الساعة، وإشعار محرر في VS Code. ويختفي تلقائيًا، فيكون التجاهل استجابة صحيحة.',
 				},
 			},
 			{
@@ -1533,8 +1533,8 @@ export const projects: Project[] = [
 					ar: 'تطبيق ساعة يطلق تذكيرات طوال اليوم ويستهلك بطارية ملحوظة يُحذف مهما كانت تذكيراته جيدة. وجلسات التشغيل الممتد والمضاعفات كانت الطريق البديهي والخاطئ.',
 				},
 				solution: {
-					en: 'The watchOS build uses only system-scheduled local notifications plus opportunistic background refresh — no workout sessions, no complication, no network at all. Reminders survive a reboot and an app update without the user doing anything.',
-					ar: 'تستخدم نسخة watchOS إشعارات محلية مجدولة من النظام فقط مع تحديث خلفي انتهازي — بلا جلسات تمرين ولا مضاعفات ولا شبكة إطلاقًا. وتنجو التذكيرات من إعادة التشغيل ومن تحديث التطبيق دون أن يفعل المستخدم شيئًا.',
+					en: 'The watchOS build uses only system-scheduled local notifications plus opportunistic background refresh: no workout sessions, no complication, no network at all. Reminders survive a reboot and an app update without the user doing anything.',
+					ar: 'تستخدم نسخة watchOS إشعارات محلية مجدولة من النظام فقط مع تحديث خلفي انتهازي: بلا جلسات تمرين ولا مضاعفات ولا شبكة إطلاقًا. وتنجو التذكيرات من إعادة التشغيل ومن تحديث التطبيق دون أن يفعل المستخدم شيئًا.',
 				},
 			},
 			{
@@ -1543,12 +1543,12 @@ export const projects: Project[] = [
 					ar: 'خمس منصات تعني صيانة خمسة أضعاف',
 				},
 				problem: {
-					en: 'Writing the same tiny app five times in five languages is how side projects die — every dependency upgrade multiplies by five.',
-					ar: 'كتابة التطبيق الصغير نفسه خمس مرات بخمس لغات هي كيف تموت المشاريع الجانبية — فكل ترقية اعتمادية تتضاعف خمس مرات.',
+					en: 'Writing the same tiny app five times in five languages is how side projects die. Every dependency upgrade multiplies by five.',
+					ar: 'كتابة التطبيق الصغير نفسه خمس مرات بخمس لغات هي كيف تموت المشاريع الجانبية، فكل ترقية اعتمادية تتضاعف خمس مرات.',
 				},
 				solution: {
-					en: 'Each build depends on almost nothing. The Windows version has zero NuGet packages — tray via in-box WinForms, JSON via System.Text.Json, startup via the registry, chime via SystemSounds. Nothing to upgrade means nothing to break.',
-					ar: 'لا تكاد كل نسخة تعتمد على شيء. فنسخة ويندوز بلا أي حزمة NuGet — شريط المهام عبر WinForms المدمج، وJSON عبر System.Text.Json، والإقلاع عبر السجل، والتنبيه عبر SystemSounds. ولا شيء يُرقّى يعني لا شيء ينكسر.',
+					en: 'Each build depends on almost nothing. The Windows version has zero NuGet packages: tray via in-box WinForms, JSON via System.Text.Json, startup via the registry, chime via SystemSounds. Nothing to upgrade means nothing to break.',
+					ar: 'لا تكاد كل نسخة تعتمد على شيء. فنسخة ويندوز بلا أي حزمة NuGet: شريط المهام عبر WinForms المدمج، وJSON عبر System.Text.Json، والإقلاع عبر السجل، والتنبيه عبر SystemSounds. ولا شيء يُرقّى يعني لا شيء ينكسر.',
 				},
 			},
 		],
@@ -1574,8 +1574,8 @@ export const projects: Project[] = [
 			ar: 'استراحات للعين تعرف متى تكون أمام الحاسوب فعلًا.',
 		},
 		summary: {
-			en: 'A macOS and Windows desktop app for 20-20-20 eye breaks. What makes it different is that it models presence — idle time, lock state, sleep and wake, fullscreen suppression — so it does not nag you about a break you were not there to miss.',
-			ar: 'تطبيق سطح مكتب لماك وويندوز لاستراحات العين وفق قاعدة 20-20-20. وما يميّزه أنه ينمذج الحضور — وقت الخمول وحالة القفل والنوم والاستيقاظ وكتم الشاشة الكاملة — فلا يزعجك باستراحة لم تكن موجودًا لتفوّتها.',
+			en: 'A macOS and Windows desktop app for 20-20-20 eye breaks. What makes it different is that it models presence, tracking idle time, lock state, sleep and wake, and fullscreen suppression, so it does not nag you about a break you were not there to miss.',
+			ar: 'تطبيق سطح مكتب لماك وويندوز لاستراحات العين وفق قاعدة 20-20-20. وما يميّزه أنه ينمذج الحضور من وقت خمول وحالة قفل ونوم واستيقاظ وكتم للشاشة الكاملة، فلا يزعجك باستراحة لم تكن موجودًا لتفوّتها.',
 		},
 		category: 'desktop',
 		status: 'wip',
@@ -1595,12 +1595,12 @@ export const projects: Project[] = [
 		links: { github: 'https://github.com/haithamassoli/horizon' },
 		overview: {
 			en: [
-				'We blink around 60% less at a screen, and the fix — every 20 minutes, look 20 feet away for 20 seconds — is well known and never remembered. The hard part of building the reminder is not the timer.',
-				"Horizon is the second attempt at this. The first, LookAway, established the shape: tray-resident, local-only, settings in a JSON file, no accounts and no backend. Horizon rebuilt it around an explicit domain model — a break loop, presence, suppression, an overlay, stats — because the first version's bugs were all really modelling problems wearing timer costumes.",
+				'We blink around 60% less at a screen, and the fix is well known and never remembered: every 20 minutes, look 20 feet away for 20 seconds. The hard part of building the reminder is not the timer.',
+				"Horizon is the second attempt at this. The first, LookAway, established the shape: tray-resident, local-only, settings in a JSON file, no accounts and no backend. Horizon rebuilt it around an explicit domain model of a break loop, presence, suppression, an overlay and stats, because the first version's bugs were all really modelling problems wearing timer costumes.",
 			],
 			ar: [
-				'نرمش أمام الشاشة أقل بنحو 60%، والعلاج — كل 20 دقيقة، انظر إلى مسافة 20 قدمًا لمدة 20 ثانية — معروف ولا يُتذكَّر أبدًا. والجزء الصعب في بناء التذكير ليس المؤقّت.',
-				'«هورايزن» هو المحاولة الثانية. أرست الأولى، LookAway، الشكل: مقيم في شريط المهام، محلي بالكامل، إعدادات في ملف JSON، بلا حسابات وبلا خادم. وأعاد «هورايزن» بناءه حول نموذج مجال صريح — حلقة استراحة، وحضور، وكتم، وطبقة عرض، وإحصاءات — لأن أخطاء النسخة الأولى كانت كلها مشكلات نمذجة متنكرة في زي مؤقّتات.',
+				'نرمش أمام الشاشة أقل بنحو 60%، والعلاج معروف ولا يُتذكَّر أبدًا: كل 20 دقيقة، انظر إلى مسافة 20 قدمًا لمدة 20 ثانية. والجزء الصعب في بناء التذكير ليس المؤقّت.',
+				'«هورايزن» هو المحاولة الثانية. أرست الأولى، LookAway، الشكل: مقيم في شريط المهام، محلي بالكامل، إعدادات في ملف JSON، بلا حسابات وبلا خادم. وأعاد «هورايزن» بناءه حول نموذج مجال صريح من حلقة استراحة وحضور وكتم وطبقة عرض وإحصاءات، لأن أخطاء النسخة الأولى كانت كلها مشكلات نمذجة متنكرة في زي مؤقّتات.',
 			],
 		},
 		challenges: [
@@ -1642,7 +1642,7 @@ export const projects: Project[] = [
 					ar: 'حالة القفل وكشف الخمول والوعي بالشاشة الكاملة تختلف بين الأنظمة وليست متاحة بالكامل عبر واجهات Electron العابرة للمنصات.',
 				},
 				solution: {
-					en: 'Minimal per-platform native bridges, used only where Electron genuinely falls short, with everything else staying in shared TypeScript. The bridge is deliberately the smallest surface that works rather than a full abstraction layer.',
+					en: 'Minimal per-platform native bridges, used only where Electron genuinely falls short, with everything else staying in shared TypeScript. The bridge is deliberately the smallest bridge that works rather than a full abstraction layer.',
 					ar: 'جسور أصلية صغرى لكل منصة، تُستخدم فقط حيث يقصّر Electron فعلًا، ويبقى كل ما عداها في TypeScript مشترك. والجسر عمدًا أصغر سطح يعمل لا طبقة تجريد كاملة.',
 				},
 			},
@@ -1677,8 +1677,8 @@ export const projects: Project[] = [
 		featured: false,
 		year: '2025',
 		role: {
-			en: 'Client project — mobile development',
-			ar: 'مشروع لعميل — تطوير الموبايل',
+			en: 'Client project: mobile development',
+			ar: 'مشروع لعميل: تطوير الموبايل',
 		},
 		stack: [
 			'React Native',
@@ -1709,11 +1709,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Amman has far more public green space than people use, mostly because nobody knows where it is. The municipality had the data; residents had no way to see it.',
-				'The app puts every park and facility on a detailed map with the practical information — where it is, what is there, whether it is open — and closes the loop by letting residents report problems directly instead of finding a phone number.',
+				'The app puts every park and facility on a detailed map with the practical information of where it is, what is there and whether it is open, and closes the loop by letting residents report problems directly instead of finding a phone number.',
 			],
 			ar: [
 				'في عمّان مساحات خضراء عامة أكثر بكثير مما يستخدمه الناس، والسبب أساسًا أن لا أحد يعرف أين هي. كانت البيانات لدى الأمانة، ولم يكن للسكان سبيل لرؤيتها.',
-				'يضع التطبيق كل حديقة ومرفق على خريطة مفصّلة مع المعلومات العملية — أين هو، وما فيه، وهل هو مفتوح — ويُغلق الحلقة بتمكين السكان من الإبلاغ عن المشكلات مباشرة بدل البحث عن رقم هاتف.',
+				'يضع التطبيق كل حديقة ومرفق على خريطة مفصّلة مع المعلومات العملية عن مكانه وما فيه وهل هو مفتوح، ويُغلق الحلقة بتمكين السكان من الإبلاغ عن المشكلات مباشرة بدل البحث عن رقم هاتف.',
 			],
 		},
 		challenges: [
@@ -1774,8 +1774,8 @@ export const projects: Project[] = [
 		featured: false,
 		year: '2025',
 		role: {
-			en: 'Client project — mobile development',
-			ar: 'مشروع لعميل — تطوير الموبايل',
+			en: 'Client project: mobile development',
+			ar: 'مشروع لعميل: تطوير الموبايل',
 		},
 		stack: [
 			'React Native',
@@ -1859,14 +1859,14 @@ export const projects: Project[] = [
 			ar: 'أتمتة العملية الانتخابية، من التصويت إلى النتائج.',
 		},
 		summary: {
-			en: 'An app that digitises the election process end to end — voter registration, identity-verified access, casting a vote, and announcing results — built for transparency at every stage.',
-			ar: 'تطبيق يُرقمن العملية الانتخابية من طرف إلى طرف — تسجيل الناخبين، والدخول بهوية مُتحقَّق منها، والإدلاء بالصوت، وإعلان النتائج — مبني للشفافية في كل مرحلة.',
+			en: 'An app that digitises the election process end to end: voter registration, identity-verified access, casting a vote and announcing results. Built for transparency at every stage.',
+			ar: 'تطبيق يُرقمن العملية الانتخابية من طرف إلى طرف: تسجيل الناخبين، والدخول بهوية مُتحقَّق منها، والإدلاء بالصوت، وإعلان النتائج. مبني للشفافية في كل مرحلة.',
 		},
 		category: 'mobile',
 		status: 'shipped',
 		featured: false,
 		year: '2025',
-		role: { en: 'Solo — mobile and backend', ar: 'منفردًا — الموبايل والخادم' },
+		role: { en: 'Solo: mobile and backend', ar: 'منفردًا: الموبايل والخادم' },
 		stack: [
 			'React Native',
 			'TypeScript',
@@ -1923,8 +1923,8 @@ export const projects: Project[] = [
 					ar: 'الجميع يصوّت في الساعة الأخيرة',
 				},
 				problem: {
-					en: 'Election traffic is not steady — it is nothing for days and then everything at once, right before closing. A system that works in testing can fold exactly when it matters.',
-					ar: 'حركة الانتخاب ليست منتظمة — لا شيء لأيام ثم كل شيء دفعة واحدة قبيل الإغلاق. والنظام الذي يعمل في الاختبار قد ينهار في اللحظة التي تهمّ بالضبط.',
+					en: 'Election traffic is not steady. It is nothing for days and then everything at once, right before closing. A system that works in testing can fold exactly when it matters.',
+					ar: 'حركة الانتخاب ليست منتظمة: لا شيء لأيام ثم كل شيء دفعة واحدة قبيل الإغلاق. والنظام الذي يعمل في الاختبار قد ينهار في اللحظة التي تهمّ بالضبط.',
 				},
 				solution: {
 					en: 'Writes are kept small and idempotent so a retried submission cannot double-count, and reads for results are served from aggregates rather than recomputed per request.',
@@ -1960,8 +1960,8 @@ export const projects: Project[] = [
 		featured: false,
 		year: '2026',
 		role: {
-			en: 'Client project — mobile development',
-			ar: 'مشروع لعميل — تطوير الموبايل',
+			en: 'Client project: mobile development',
+			ar: 'مشروع لعميل: تطوير الموبايل',
 		},
 		stack: [
 			'React Native',
@@ -2030,7 +2030,7 @@ export const projects: Project[] = [
 		status: 'delisted',
 		featured: false,
 		year: '2025',
-		role: { en: 'Solo — mobile and backend', ar: 'منفردًا — الموبايل والخادم' },
+		role: { en: 'Solo: mobile and backend', ar: 'منفردًا: الموبايل والخادم' },
 		stack: [
 			'React Native',
 			'Expo Router',
@@ -2094,7 +2094,7 @@ export const projects: Project[] = [
 		status: 'shipped',
 		featured: false,
 		year: '2025',
-		role: { en: 'Solo — both platforms', ar: 'منفردًا — المنصتان' },
+		role: { en: 'Solo: both platforms', ar: 'منفردًا: المنصتان' },
 		stack: [
 			'Kotlin',
 			'Swift',
@@ -2155,8 +2155,8 @@ export const projects: Project[] = [
 			ar: 'اعثر على حرفي موثوق في الأردن واحصل على عروض أسعار مجانية.',
 		},
 		summary: {
-			en: 'A marketplace for skilled trades across Jordan — plumbing, electrical, carpentry, metalwork, painting, air conditioning, tiling and general maintenance. Describe the job, receive quotes, choose.',
-			ar: 'سوق للحرف المهنية في الأردن — سباكة وكهرباء ونجارة وحدادة ودهان وتكييف وبلاط وصيانة عامة. صِف العمل، واستقبل العروض، واختر.',
+			en: 'A marketplace for skilled trades across Jordan: plumbing, electrical, carpentry, metalwork, painting, air conditioning, tiling and general maintenance. Describe the job, receive quotes, choose.',
+			ar: 'سوق للحرف المهنية في الأردن: سباكة وكهرباء ونجارة وحدادة ودهان وتكييف وبلاط وصيانة عامة. صِف العمل، واستقبل العروض، واختر.',
 		},
 		category: 'web',
 		status: 'live',
@@ -2212,8 +2212,8 @@ export const projects: Project[] = [
 		slug: 'hadanati',
 		title: { en: 'Hadanati', ar: 'حضانتي' },
 		tagline: {
-			en: 'Run a nursery — attendance, assessments, fees and a parent portal.',
-			ar: 'إدارة حضانة — حضور وتقييمات ورسوم وبوابة لأولياء الأمور.',
+			en: 'Run a nursery: attendance, assessments, fees and a parent portal.',
+			ar: 'إدارة حضانة: حضور وتقييمات ورسوم وبوابة لأولياء الأمور.',
 		},
 		summary: {
 			en: "An Arabic platform for nurseries in Jordan covering daily attendance, child assessments, fee tracking and a portal that lets parents see their child's day without phoning the nursery.",
@@ -2234,11 +2234,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Most nurseries here run on a paper register, a WhatsApp group and a notebook of who has paid. It works until a parent asks a question about last month.',
-				"Hadanati replaces the three of them with one system — attendance, assessments and fees on the staff side, and a parent portal on the other, so the answer to 'how was he today' does not require a phone call.",
+				"Hadanati replaces the three of them with one system: attendance, assessments and fees on the staff side, and a parent portal on the other, so the answer to 'how was he today' does not require a phone call.",
 			],
 			ar: [
 				'تدير معظم الحضانات هنا سجلًا ورقيًا ومجموعة واتساب ودفترًا لمن دفع. وهذا يصلح حتى يسأل ولي أمر عن الشهر الماضي.',
-				'تستبدل «حضانتي» الثلاثة بنظام واحد — حضور وتقييمات ورسوم من جهة الطاقم، وبوابة لأولياء الأمور من الجهة الأخرى، فلا يحتاج جواب «كيف كان اليوم» إلى مكالمة.',
+				'تستبدل «حضانتي» الثلاثة بنظام واحد: حضور وتقييمات ورسوم من جهة الطاقم، وبوابة لأولياء الأمور من الجهة الأخرى، فلا يحتاج جواب «كيف كان اليوم» إلى مكالمة.',
 			],
 		},
 		challenges: [
@@ -2295,8 +2295,8 @@ export const projects: Project[] = [
 		featured: false,
 		year: '2026',
 		role: {
-			en: 'Solo — content structure and build',
-			ar: 'منفردًا — بنية المحتوى والتطوير',
+			en: 'Solo: content structure and build',
+			ar: 'منفردًا: بنية المحتوى والتطوير',
 		},
 		stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'RTL', 'SEO'],
 		cover: '/projects/crochet.png',
@@ -2307,20 +2307,20 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Arabic crochet material exists, but it is scattered across videos with no ordering — a beginner has no way to know what to learn after the first stitch, or which of forty videos is the right next one.',
-				'This is the missing structure: a single ordered path where each lesson assumes only what came before it, with the reference material a learner keeps needing — yarn weights, hook sizes, tools — kept separate from the path itself.',
+				'Arabic crochet material exists, but it is scattered across videos with no ordering. A beginner has no way to know what to learn after the first stitch, or which of forty videos is the right next one.',
+				'This is the missing structure: a single ordered path where each lesson assumes only what came before it, with the reference material a learner keeps needing, like yarn weights, hook sizes and tools, kept separate from the path itself.',
 			],
 			ar: [
-				'المادة العربية عن الكروشيه موجودة، لكنها متناثرة في فيديوهات بلا ترتيب — فلا سبيل للمبتدئ ليعرف ما يتعلّمه بعد أول غرزة، ولا أيّ الأربعين فيديو هو التالي الصحيح.',
-				'هذه هي البنية الناقصة: مسار واحد مرتّب يفترض كل درس فيه ما سبقه فقط، مع إبقاء المادة المرجعية التي يظل المتعلم يحتاجها — أوزان الخيوط ومقاسات الإبر والأدوات — منفصلة عن المسار نفسه.',
+				'المادة العربية عن الكروشيه موجودة، لكنها متناثرة في فيديوهات بلا ترتيب، فلا سبيل للمبتدئ ليعرف ما يتعلّمه بعد أول غرزة، ولا أيّ الأربعين فيديو هو التالي الصحيح.',
+				'هذه هي البنية الناقصة: مسار واحد مرتّب يفترض كل درس فيه ما سبقه فقط، مع إبقاء المادة المرجعية التي يظل المتعلم يحتاجها، كأوزان الخيوط ومقاسات الإبر والأدوات، منفصلة عن المسار نفسه.',
 			],
 		},
 		challenges: [
 			{
 				title: { en: 'Ordering is the product', ar: 'الترتيب هو المنتج' },
 				problem: {
-					en: 'The content already exists on the internet. Publishing another list of it adds nothing — the reason beginners stall is that no source tells them what order to do things in.',
-					ar: 'المحتوى موجود أصلًا على الإنترنت. ونشر قائمة أخرى به لا يضيف شيئًا — فسبب تعثّر المبتدئين أن لا مصدر يخبرهم بأي ترتيب يفعلون الأشياء.',
+					en: 'The content already exists on the internet. Publishing another list of it adds nothing. The reason beginners stall is that no source tells them what order to do things in.',
+					ar: 'المحتوى موجود أصلًا على الإنترنت. ونشر قائمة أخرى به لا يضيف شيئًا، فسبب تعثّر المبتدئين أن لا مصدر يخبرهم بأي ترتيب يفعلون الأشياء.',
 				},
 				solution: {
 					en: 'The site is built around a strict prerequisite chain rather than a category listing, and the references are deliberately kept off that chain so they can be consulted at any point without breaking the sequence.',
@@ -2344,8 +2344,8 @@ export const projects: Project[] = [
 			ar: 'انشر رحلتك أو احجز مقعدك بين محافظات الأردن.',
 		},
 		summary: {
-			en: 'Intercity ride sharing for Jordan — Amman, Irbid, Zarqa, Aqaba and everywhere else. Drivers post the trip they are already making; passengers book a seat on it.',
-			ar: 'مشاركة رحلات بين مدن الأردن — عمّان وإربد والزرقاء والعقبة وسائر المحافظات. ينشر السائقون الرحلة التي سيقومون بها أصلًا، ويحجز الركاب مقعدًا فيها.',
+			en: 'Intercity ride sharing for Jordan: Amman, Irbid, Zarqa, Aqaba and everywhere else. Drivers post the trip they are already making; passengers book a seat on it.',
+			ar: 'مشاركة رحلات بين مدن الأردن: عمّان وإربد والزرقاء والعقبة وسائر المحافظات. ينشر السائقون الرحلة التي سيقومون بها أصلًا، ويحجز الركاب مقعدًا فيها.',
 		},
 		category: 'web',
 		status: 'live',
@@ -2424,11 +2424,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'The client sells through Instagram, where every order is a DM conversation and nothing is browsable. Customers cannot see the range, and the workshop retypes the same answers all day.',
-				'The site gives the catalogue a permanent home while leaving the ordering exactly where the customer is already comfortable — a tap opens WhatsApp with the item pre-filled, so nothing about the sales process had to change.',
+				'The site gives the catalogue a permanent home while leaving the ordering exactly where the customer is already comfortable. A tap opens WhatsApp with the item pre-filled, so nothing about the sales process had to change.',
 			],
 			ar: [
 				'تبيع صاحبة المشروع عبر إنستغرام، حيث كل طلب محادثة خاصة ولا شيء قابل للتصفح. لا يرى الزبائن التشكيلة، ويعيد المشغل كتابة الأجوبة نفسها طوال اليوم.',
-				'يمنح الموقع الكتالوج بيتًا دائمًا مع إبقاء الطلب حيث يرتاح الزبون أصلًا — نقرة تفتح واتساب والمنتج مُعبّأ مسبقًا، فلم يتغيّر شيء في عملية البيع.',
+				'يمنح الموقع الكتالوج بيتًا دائمًا مع إبقاء الطلب حيث يرتاح الزبون أصلًا. نقرة تفتح واتساب والمنتج مُعبّأ مسبقًا، فلم يتغيّر شيء في عملية البيع.',
 			],
 		},
 		challenges: [
@@ -2438,8 +2438,8 @@ export const projects: Project[] = [
 					ar: 'لا تستبدل عملية شراء ناجحة',
 				},
 				problem: {
-					en: 'The obvious move is a real cart and online payment. But the customers here expect cash on delivery and a conversation before buying — a card form would have lost sales, not added them.',
-					ar: 'الخطوة البديهية سلة حقيقية ودفع إلكتروني. لكن زبائن هنا يتوقعون الدفع عند الاستلام ومحادثة قبل الشراء — ونموذج بطاقة كان سيخسر مبيعات لا يضيفها.',
+					en: 'The obvious move is a real cart and online payment. But the customers here expect cash on delivery and a conversation before buying. A card form would have lost sales, not added them.',
+					ar: 'الخطوة البديهية سلة حقيقية ودفع إلكتروني. لكن زبائن هنا يتوقعون الدفع عند الاستلام ومحادثة قبل الشراء، ونموذج بطاقة كان سيخسر مبيعات لا يضيفها.',
 				},
 				solution: {
 					en: 'The site is a catalogue that hands off to WhatsApp with the item and size already written into the message. It removes the browsing friction and keeps the part that was already working.',
@@ -2496,12 +2496,12 @@ export const projects: Project[] = [
 					ar: '«فارغ» ليس «متاح»',
 				},
 				problem: {
-					en: 'A teacher with no class that period may still be unavailable — they may be on duty, at their daily limit, or already covering something else. A naive gap search returns names the office cannot actually use.',
-					ar: 'المعلّم الذي لا حصة له في تلك الفترة قد يكون غير متاح رغم ذلك — قد يكون في مناوبة، أو بلغ نصابه اليومي، أو يغطي شيئًا آخر أصلًا. والبحث الساذج عن الفراغات يعيد أسماء لا تستطيع الإدارة استخدامها.',
+					en: 'A teacher with no class that period may still be unavailable. They may be on duty, at their daily limit, or already covering something else. A naive gap search returns names the office cannot actually use.',
+					ar: 'المعلّم الذي لا حصة له في تلك الفترة قد يكون غير متاح رغم ذلك، فقد يكون في مناوبة، أو بلغ نصابه اليومي، أو يغطي شيئًا آخر أصلًا. والبحث الساذج عن الفراغات يعيد أسماء لا تستطيع الإدارة استخدامها.',
 				},
 				solution: {
-					en: 'Availability is computed from the full set of constraints rather than the timetable alone, and candidates are ranked so the fairest option — usually whoever has covered least — appears first.',
-					ar: 'تُحسب الإتاحة من مجموعة القيود كاملة لا من الجدول وحده، ويُرتَّب المرشحون بحيث يظهر الخيار الأعدل أولًا — وهو عادةً الأقل تغطيةً.',
+					en: 'Availability is computed from the full set of constraints rather than the timetable alone, and candidates are ranked so the fairest option, usually whoever has covered least, appears first.',
+					ar: 'تُحسب الإتاحة من مجموعة القيود كاملة لا من الجدول وحده، ويُرتَّب المرشحون بحيث يظهر الخيار الأعدل أولًا، وهو عادةً الأقل تغطيةً.',
 				},
 			},
 		],
@@ -2539,11 +2539,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Following a dozen Telegram channels means a dozen separate chats, each buffering unread counts, mixed in with actual conversations with people. There is no way to just read them.',
-				'These aggregate public channels into one chronological feed in the browser — a reader rather than a client. FeedGram is the second pass at the same problem.',
+				'These aggregate public channels into one chronological feed in the browser, a reader rather than a client. FeedGram is the second pass at the same problem.',
 			],
 			ar: [
 				'متابعة اثنتي عشرة قناة على تيليجرام تعني اثنتي عشرة محادثة منفصلة، كلٌّ تُراكم عدّادات غير مقروء، مختلطة بمحادثات حقيقية مع أشخاص. ولا سبيل لمجرّد قراءتها.',
-				'يجمع هذان قنوات عامة في خط زمني واحد مرتّب زمنيًا داخل المتصفح — قارئ لا عميل. وFeedGram هو المحاولة الثانية للمشكلة نفسها.',
+				'يجمع هذان قنوات عامة في خط زمني واحد مرتّب زمنيًا داخل المتصفح، قارئ لا عميل. وFeedGram هو المحاولة الثانية للمشكلة نفسها.',
 			],
 		},
 		challenges: [
@@ -2553,8 +2553,8 @@ export const projects: Project[] = [
 					ar: 'قراءة القنوات العامة بلا حساب',
 				},
 				problem: {
-					en: 'The obvious route is the bot API, which requires the bot to be a member of every channel — impossible for channels you do not control, and the whole point was to read without joining.',
-					ar: 'الطريق البديهي واجهة البوتات، وهي تتطلب أن يكون البوت عضوًا في كل قناة — وهذا مستحيل لقنوات لا تملكها، والغاية كلها كانت القراءة دون انضمام.',
+					en: 'The obvious route is the bot API, which requires the bot to be a member of every channel, impossible for channels you do not control, and the whole point was to read without joining.',
+					ar: 'الطريق البديهي واجهة البوتات، وهي تتطلب أن يكون البوت عضوًا في كل قناة، وهذا مستحيل لقنوات لا تملكها، والغاية كلها كانت القراءة دون انضمام.',
 				},
 				solution: {
 					en: 'The reader works from the public web preview each channel already exposes, so it only ever sees what is public anyway and needs no credentials at all.',
@@ -2576,8 +2576,8 @@ export const projects: Project[] = [
 			ar: 'دعوة زفاف تسكن رابطًا.',
 		},
 		summary: {
-			en: 'A digital wedding invitation — details, location, countdown and RSVP — sent as a link instead of printed and delivered by hand.',
-			ar: 'دعوة زفاف رقمية — تفاصيل وموقع وعدّاد تنازلي وتأكيد حضور — تُرسل كرابط بدل الطباعة والتسليم باليد.',
+			en: 'A digital wedding invitation with details, location, countdown and RSVP, sent as a link instead of printed and delivered by hand.',
+			ar: 'دعوة زفاف رقمية فيها التفاصيل والموقع وعدّاد تنازلي وتأكيد حضور، تُرسل كرابط بدل الطباعة والتسليم باليد.',
 		},
 		category: 'web',
 		status: 'live',
@@ -2608,8 +2608,8 @@ export const projects: Project[] = [
 					ar: 'تُفتح على هاتف، في محادثة جماعية، مرة واحدة',
 				},
 				problem: {
-					en: 'There is exactly one chance to make the impression, on whatever device the guest happens to hold, often on a slow connection — and a heavy animated page that loads badly is worse than a printed card.',
-					ar: 'هناك فرصة واحدة بالضبط لترك الانطباع، على أي جهاز يصادف أن يحمله الضيف، وغالبًا على اتصال بطيء — وصفحة متحركة ثقيلة تُحمَّل بسوء أسوأ من بطاقة مطبوعة.',
+					en: 'There is exactly one chance to make the impression, on whatever device the guest happens to hold, often on a slow connection, and a heavy animated page that loads badly is worse than a printed card.',
+					ar: 'هناك فرصة واحدة بالضبط لترك الانطباع، على أي جهاز يصادف أن يحمله الضيف، وغالبًا على اتصال بطيء، وصفحة متحركة ثقيلة تُحمَّل بسوء أسوأ من بطاقة مطبوعة.',
 				},
 				solution: {
 					en: 'The page is built mobile-first and kept light, with motion used sparingly enough that the invitation is readable before the animation finishes.',
@@ -2669,8 +2669,8 @@ export const projects: Project[] = [
 					ar: 'أي منصة تطلب من المعلّم إعادة هيكلة طريقة عمله الحالية تُستخدم أسبوعًا ثم تُهجَر. ويفشل التبنّي بسبب الجهد لا الميزات.',
 				},
 				solution: {
-					en: 'The model mirrors what a school already has — a course, its material, its students — so nothing needs to be rethought to start using it.',
-					ar: 'يحاكي النموذج ما لدى المدرسة أصلًا — مساق ومواده وطلابه — فلا يحتاج شيء إلى إعادة تفكير للبدء باستخدامه.',
+					en: 'The model mirrors what a school already has, a course with its material and its students, so nothing needs to be rethought to start using it.',
+					ar: 'يحاكي النموذج ما لدى المدرسة أصلًا، من مساق ومواده وطلابه، فلا يحتاج شيء إلى إعادة تفكير للبدء باستخدامه.',
 				},
 			},
 		],
@@ -2728,8 +2728,8 @@ export const projects: Project[] = [
 					ar: 'آلة الحالات هي آلية الأمان',
 				},
 				problem: {
-					en: 'A transaction that can be advanced out of order — released before delivery, cancelled after payment — loses someone real money. The failure is financial, not cosmetic.',
-					ar: 'الصفقة التي يمكن دفعها خارج الترتيب — الإفراج قبل التسليم، أو الإلغاء بعد الدفع — تخسر أحدهم مالًا حقيقيًا. والفشل مالي لا شكلي.',
+					en: 'A transaction that can be advanced out of order, released before delivery or cancelled after payment, loses someone real money. The failure is financial, not cosmetic.',
+					ar: 'الصفقة التي يمكن دفعها خارج الترتيب، كالإفراج قبل التسليم أو الإلغاء بعد الدفع، تخسر أحدهم مالًا حقيقيًا. والفشل مالي لا شكلي.',
 				},
 				solution: {
 					en: 'Every transition runs through server actions with the allowed transitions validated on the server and the payload checked with Zod, so an out-of-order request is rejected rather than reaching the state machine.',
@@ -2751,8 +2751,8 @@ export const projects: Project[] = [
 			ar: 'شاهد فيديوهات يوتيوب وفيسبوك بلا موسيقى.',
 		},
 		summary: {
-			en: 'A free tool that strips music from videos on YouTube, Facebook and other sites while dialogue, narration and other sound keep playing — running against a local audio-separation backend on your own machine.',
-			ar: 'أداة مجانية تزيل الموسيقى من فيديوهات يوتيوب وفيسبوك ومواقع أخرى مع استمرار الحوار والسرد وبقية الأصوات — تعمل مقابل خادم فصل صوتي محلي على جهازك.',
+			en: 'A free tool that strips music from videos on YouTube, Facebook and other sites while dialogue, narration and other sound keep playing, running against a local audio-separation backend on your own machine.',
+			ar: 'أداة مجانية تزيل الموسيقى من فيديوهات يوتيوب وفيسبوك ومواقع أخرى مع استمرار الحوار والسرد وبقية الأصوات، وتعمل مقابل خادم فصل صوتي محلي على جهازك.',
 		},
 		category: 'ai',
 		status: 'live',
@@ -2772,11 +2772,11 @@ export const projects: Project[] = [
 		overview: {
 			en: [
 				'Made for people who avoid music for religious or personal reasons, and who currently have to choose between skipping useful content entirely or muting it and losing the speech too.',
-				'It runs a local separation backend — Apple Silicon or an NVIDIA GPU, CPU as a fallback — so the audio never leaves the machine. First-time setup takes about twenty minutes; starting it afterwards takes ten seconds.',
+				'It runs a local separation backend on Apple Silicon or an NVIDIA GPU, with the CPU as a fallback, so the audio never leaves the machine. First-time setup takes about twenty minutes; starting it afterwards takes ten seconds.',
 			],
 			ar: [
 				'صُنع لمن يتجنبون الموسيقى لأسباب دينية أو شخصية، ويضطرون حاليًا للاختيار بين تفويت محتوى نافع كليًا أو كتمه وخسارة الكلام معه.',
-				'يشغّل خادم فصل محليًا — على Apple Silicon أو معالج NVIDIA رسومي، والمعالج المركزي كخيار احتياطي — فلا يغادر الصوت الجهاز. ويستغرق الإعداد الأول نحو عشرين دقيقة، ثم عشر ثوانٍ لتشغيله بعد ذلك.',
+				'يشغّل خادم فصل محليًا على Apple Silicon أو معالج NVIDIA رسومي، والمعالج المركزي كخيار احتياطي، فلا يغادر الصوت الجهاز. ويستغرق الإعداد الأول نحو عشرين دقيقة، ثم عشر ثوانٍ لتشغيله بعد ذلك.',
 			],
 		},
 		challenges: [
@@ -2790,8 +2790,8 @@ export const projects: Project[] = [
 					ar: 'أكثر الناس رغبةً في هذا هم الأقل ارتياحًا للطرفية، وأي README يفترض إلمامًا بسطر الأوامر يستبعد الجمهور كله تقريبًا.',
 				},
 				solution: {
-					en: 'The documentation assumes nothing — it explains where the Downloads folder is and what to click, step by step. Lowering the setup barrier mattered more here than any feature.',
-					ar: 'لا يفترض التوثيق شيئًا — يشرح أين مجلد التنزيلات وما الذي يُنقر عليه، خطوة بخطوة. وخفض حاجز الإعداد كان هنا أهم من أي ميزة.',
+					en: 'The documentation assumes nothing. It explains where the Downloads folder is and what to click, step by step. Lowering the setup barrier mattered more here than any feature.',
+					ar: 'لا يفترض التوثيق شيئًا. يشرح أين مجلد التنزيلات وما الذي يُنقر عليه، خطوة بخطوة. وخفض حاجز الإعداد كان هنا أهم من أي ميزة.',
 				},
 			},
 		],
@@ -2813,8 +2813,8 @@ export const projects: Project[] = [
 			ar: 'تفريغ عربي/إنجليزي عالي الإنتاجية، بمعالجة دفعية سليمة.',
 		},
 		summary: {
-			en: "A Python package for offline batch transcription with Cohere's 2B Arabic/English ASR model — optimised voice activity detection, multi-file GPU batching under bounded memory, subtitle output and optional word-level timestamps.",
-			ar: 'حزمة بايثون للتفريغ الدفعي دون اتصال بنموذج Cohere للتعرف على الكلام بحجم ملياري معامل للعربية والإنجليزية — كشف نشاط صوتي محسّن، ومعالجة دفعية لملفات متعددة على المعالج الرسومي بذاكرة محدودة، وإخراج ترجمات وطوابع زمنية اختيارية على مستوى الكلمة.',
+			en: "A Python package for offline batch transcription with Cohere's 2B Arabic/English ASR model: optimised voice activity detection, multi-file GPU batching under bounded memory, subtitle output and optional word-level timestamps.",
+			ar: 'حزمة بايثون للتفريغ الدفعي دون اتصال بنموذج Cohere للتعرف على الكلام بحجم ملياري معامل للعربية والإنجليزية: كشف نشاط صوتي محسّن، ومعالجة دفعية لملفات متعددة على المعالج الرسومي بذاكرة محدودة، وإخراج ترجمات وطوابع زمنية اختيارية على مستوى الكلمة.',
 		},
 		category: 'ai',
 		status: 'live',
@@ -2870,8 +2870,8 @@ export const projects: Project[] = [
 			ar: 'تحكّم بوكلاء البرمجة على جهازك، من أي مكان.',
 		},
 		summary: {
-			en: 'An agent harness control surface — a mobile, web and Electron desktop app for driving the coding agents running on your own computer. Works with Claude Code, Codex, Cursor, Grok and OpenCode.',
-			ar: 'سطح تحكم بمنظومة الوكلاء — تطبيق موبايل وويب وسطح مكتب بـ Electron لقيادة وكلاء البرمجة العاملين على حاسوبك. يعمل مع Claude Code وCodex وCursor وGrok وOpenCode.',
+			en: 'A control panel for coding agents: a mobile, web and Electron desktop app for driving the agents running on your own computer. Works with Claude Code, Codex, Cursor, Grok and OpenCode.',
+			ar: 'لوحة تحكم بوكلاء البرمجة: تطبيق موبايل وويب وسطح مكتب بـ Electron لقيادة الوكلاء العاملين على حاسوبك. يعمل مع Claude Code وCodex وCursor وGrok وOpenCode.',
 		},
 		category: 'client',
 		status: 'live',
@@ -2914,7 +2914,7 @@ export const projects: Project[] = [
 					ar: 'الفروق وأشجار الملفات ومخرجات الطرفية كلها مصممة لشاشة عريضة. وتصغيرها ينتج شيئًا موجودًا تقنيًا وغير قابل للاستخدام عمليًا.',
 				},
 				solution: {
-					en: 'The mobile surfaces are rebuilt for the form factor rather than scaled down, so reviewing a diff on a phone is a real workflow instead of a preview of one.',
+					en: 'The mobile screens are rebuilt for the phone rather than scaled down, so reviewing a diff on a phone is a real workflow instead of a preview of one.',
 					ar: 'أُعيد بناء واجهات الموبايل لهذا القياس بدل تصغيرها، فتصير مراجعة فرق على الهاتف مسار عمل حقيقيًا لا معاينة له.',
 				},
 			},
@@ -2947,8 +2947,8 @@ export const projects: Project[] = [
 		featured: false,
 		year: '2025',
 		role: {
-			en: 'Client project — mobile development',
-			ar: 'مشروع لعميل — تطوير الموبايل',
+			en: 'Client project: mobile development',
+			ar: 'مشروع لعميل: تطوير الموبايل',
 		},
 		stack: [
 			'React Native',
@@ -3014,8 +3014,8 @@ export const projects: Project[] = [
 			ar: 'معرض أعمالي وسيرتي الذاتية على الويب.',
 		},
 		summary: {
-			en: 'The previous portfolio and the standalone web résumé — an animated single-page portfolio with a command menu, and a print-friendly CV with a keyboard-driven interface.',
-			ar: 'معرض الأعمال السابق والسيرة الذاتية المستقلة على الويب — معرض أعمال أحادي الصفحة متحرك بقائمة أوامر، وسيرة ذاتية صالحة للطباعة بواجهة تُدار من لوحة المفاتيح.',
+			en: 'The previous portfolio and the standalone web résumé: an animated single-page portfolio with a command menu, and a print-friendly CV with a keyboard-driven interface.',
+			ar: 'معرض الأعمال السابق والسيرة الذاتية المستقلة على الويب: معرض أعمال أحادي الصفحة متحرك بقائمة أوامر، وسيرة ذاتية صالحة للطباعة بواجهة تُدار من لوحة المفاتيح.',
 		},
 		category: 'web',
 		status: 'live',
@@ -3038,11 +3038,11 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Two separate sites doing two different jobs. The portfolio is the pitch — animated, opinionated, built to be looked at. The résumé is the reference — dense, scannable, and something a recruiter can print.',
+				'Two separate sites doing two different jobs. The portfolio is the pitch, animated, opinionated, built to be looked at. The résumé is the reference, dense, scannable, and something a recruiter can print.',
 				'Keeping them apart meant neither had to compromise: the portfolio can be heavy on motion without hurting the CV, and the CV can be plain without making the portfolio look dull.',
 			],
 			ar: [
-				'موقعان منفصلان يؤديان مهمتين مختلفتين. المعرض هو العرض التقديمي — متحرك وذو رأي ومبني ليُنظر إليه. والسيرة هي المرجع — كثيفة وسهلة المسح، ويستطيع مسؤول التوظيف طباعتها.',
+				'موقعان منفصلان يؤديان مهمتين مختلفتين. المعرض هو العرض التقديمي، متحرك وذو رأي ومبني ليُنظر إليه. والسيرة هي المرجع، كثيفة وسهلة المسح، ويستطيع مسؤول التوظيف طباعتها.',
 				'وفصلهما عنى ألا يتنازل أيٌّ منهما: فيستطيع المعرض الإكثار من الحركة دون الإضرار بالسيرة، وتستطيع السيرة أن تكون بسيطة دون أن تجعل المعرض باهتًا.',
 			],
 		},
@@ -3099,11 +3099,11 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Arabic speech is under-served by transcription tooling, and the material that most needs it — lectures, lessons, recorded books — is exactly the material nobody has budget to transcribe by hand.',
+				'Arabic speech is under-served by transcription tooling, and the material that most needs it, lectures, lessons, recorded books, is exactly the material nobody has budget to transcribe by hand.',
 				"Tafrigh produces both plain text and timed subtitle files, which is what makes the output useful for search rather than just for reading. It is the same capability that Kashaf Abi Ja'far depends on.",
 			],
 			ar: [
-				'الكلام العربي ضعيف الحظ من أدوات التفريغ، والمادة التي تحتاجه أكثر — المحاضرات والدروس والكتب المسجلة — هي بالضبط المادة التي لا ميزانية لتفريغها يدويًا.',
+				'الكلام العربي ضعيف الحظ من أدوات التفريغ، والمادة التي تحتاجه أكثر، المحاضرات والدروس والكتب المسجلة، هي بالضبط المادة التي لا ميزانية لتفريغها يدويًا.',
 				'يُنتج «تفريغ» نصًا عاديًا وملفات ترجمة موقوتة معًا، وهذا ما يجعل المخرج نافعًا للبحث لا للقراءة فحسب. وهي القدرة نفسها التي يعتمد عليها «كشّاف أبي جعفر».',
 			],
 		},
@@ -3137,8 +3137,8 @@ export const projects: Project[] = [
 			ar: 'استرجاع صفحات لم تعد على الإنترنت.',
 		},
 		summary: {
-			en: 'A tool for pulling archived snapshots of a site out of the Wayback Machine and extracting structured data from them — built to recover content from a site that had gone offline.',
-			ar: 'أداة لسحب اللقطات المؤرشفة لموقع من Wayback Machine واستخراج بيانات منظّمة منها — بُنيت لاسترجاع محتوى موقع توقّف عن العمل.',
+			en: 'A tool for pulling archived snapshots of a site out of the Wayback Machine and extracting structured data from them, built to recover content from a site that had gone offline.',
+			ar: 'أداة لسحب اللقطات المؤرشفة لموقع من Wayback Machine واستخراج بيانات منظّمة منها، بُنيت لاسترجاع محتوى موقع توقّف عن العمل.',
 		},
 		category: 'web',
 		status: 'live',
@@ -3151,11 +3151,11 @@ export const projects: Project[] = [
 		links: { live: 'https://shahed-abu-hussein.vercel.app' },
 		overview: {
 			en: [
-				'When a site disappears, its content often still exists in the Internet Archive — but as thousands of individual snapshots that are painful to go through by hand.',
+				'When a site disappears, its content often still exists in the Internet Archive, but as thousands of individual snapshots that are painful to go through by hand.',
 				"This walks the archive's index for a domain, fetches the snapshots, and extracts the structured content out of them, turning a scattered archive back into usable data.",
 			],
 			ar: [
-				'حين يختفي موقع، يظل محتواه موجودًا غالبًا في أرشيف الإنترنت — لكن كآلاف اللقطات المفردة التي يشقّ المرور عليها يدويًا.',
+				'حين يختفي موقع، يظل محتواه موجودًا غالبًا في أرشيف الإنترنت، لكن كآلاف اللقطات المفردة التي يشقّ المرور عليها يدويًا.',
 				'تمرّ هذه الأداة على فهرس الأرشيف لنطاق ما، وتجلب اللقطات، وتستخرج المحتوى المنظّم منها، فتعيد أرشيفًا متناثرًا إلى بيانات قابلة للاستخدام.',
 			],
 		},

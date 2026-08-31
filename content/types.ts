@@ -5,7 +5,7 @@ export type Locale = 'en' | 'ar';
 /** Any string the site renders is stored in both languages. */
 export type I18n = { en: string; ar: string };
 
-/** A paragraph list — rendered as <p> blocks. */
+/** A paragraph list, rendered as <p> blocks. */
 export type I18nBlocks = { en: string[]; ar: string[] };
 
 export type ProjectCategory =
@@ -43,7 +43,7 @@ export type Project = {
 	category: ProjectCategory;
 	status: ProjectStatus;
 	featured: boolean;
-	/** Display string — "2026", "2025 — present", … */
+	/** Display string: "2026", "Since 2025", … */
 	year: string;
 	role: I18n;
 	stack: string[];
@@ -56,8 +56,8 @@ export type Project = {
 	challenges: Challenge[];
 	outcomes: I18nBlocks;
 	/**
-	 * true  — the write-up is grounded in this repo's own README/PRD/store listing.
-	 * false — the write-up is inferred from the stack and project shape; review before publishing.
+	 * true means the write-up is grounded in this repo's own README, PRD or store listing.
+	 * false means it is inferred from the stack and project shape. Review before publishing.
 	 */
 	sourced: boolean;
 };

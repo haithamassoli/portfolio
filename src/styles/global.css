@@ -85,7 +85,7 @@ h4 {
 	font-feature-settings: 'salt' 1;
 }
 
-/* Arabic has no capitals and sits taller in its box — it needs the extra
+/* Arabic has no capitals and sits taller in its box, so it needs the extra
    leading back and none of the Latin tracking. */
 :root[lang='ar'] h1,
 :root[lang='ar'] h2,
@@ -143,7 +143,7 @@ select {
 	padding-inline: var(--gutter);
 }
 
-/* Mono is the utility voice: eyebrows, tags, counts, form labels. Latin only —
+/* Mono is the utility voice: eyebrows, tags, counts, form labels. Latin only,
    Arabic in these slots falls back to the sans, which the stack handles. */
 .mono {
 	font-family: var(--font-mono);

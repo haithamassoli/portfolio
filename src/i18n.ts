@@ -4,7 +4,7 @@ export type Lang = keyof typeof languages;
 export const defaultLang: Lang = 'en';
 export const dirOf = (lang: Lang) => (lang === 'ar' ? 'rtl' : 'ltr');
 
-/** Absolute, no trailing slash — the one spelling of a page we advertise. */
+/** Absolute, no trailing slash. The one spelling of a page we advertise. */
 export const canonical = (path: string, site: URL | string) =>
 	new URL(path, site).href.replace(/(?<=[^/])\/$/, '');
 
@@ -14,7 +14,7 @@ export const href = (lang: Lang, path = '') =>
 
 export const ui = {
 	en: {
-		'meta.title': 'Haitham Assoli — apps in two scripts',
+		'meta.title': 'Haitham Assoli: apps in two scripts',
 		'meta.desc':
 			'Haitham Assoli builds mobile and web apps that ship in Arabic and English. Selected work, written up in full.',
 		'name.latin': 'Haitham Assoli',
@@ -29,7 +29,7 @@ export const ui = {
 		'nav.langShort': 'ع',
 		'hero.role': 'Mobile & web engineer · Jordan',
 		'hero.lede':
-			'I build apps people actually open — most of them in Arabic first, then in English. Thirty-nine shipped, thirteen of them on the app stores.',
+			'I build apps people actually open, most of them in Arabic first, then in English. Thirty-nine shipped, thirteen of them on the app stores.',
 		'hero.seam': 'Both directions',
 		'hero.cta': 'See the work',
 		'hero.cta2': 'Start a project',
@@ -39,7 +39,7 @@ export const ui = {
 		'work.eyebrow': 'Selected work',
 		'work.title': 'Eight built out in full',
 		'work.lede':
-			'Each one is framed the way it is actually used — a phone, a browser, an editor, a place.',
+			'Each one is framed the way it is actually used: a phone, a browser, an editor, a place.',
 		'work.archive': 'Everything else',
 		'work.archiveLede':
 			'Earlier builds and side projects. Each still has its own page.',
@@ -58,17 +58,17 @@ export const ui = {
 		'about.eyebrow': 'About',
 		'about.title': 'Two scripts, one codebase',
 		'about.p1':
-			'I am Haitham Assoli, a software engineer from Jordan. I have spent the last four years shipping React Native apps to the Play Store and the App Store, and Next.js apps to the web — for students, for mosques, for a governorate tourism board, for whoever needed the thing to exist.',
+			'I am Haitham Assoli, a software engineer from Jordan. I have spent the last four years shipping React Native apps to the Play Store and the App Store, and Next.js apps to the web, for students, for mosques, for a governorate tourism board, for whoever needed the thing to exist.',
 		'about.p2':
 			'Almost everything I build is bilingual, and I have learned that this is not a translation problem. An interface that mirrors properly is a different interface: the back button moves, the progress bar runs the other way, and the typography has to hold up in a script with no capitals and no italics. I design for that from the first screen rather than bolting it on.',
 		'about.p3':
-			'The rest of the job is the unglamorous half — caching for campus wifi that drops, reconciling bookings so two people cannot take the same hour, keeping a list at sixty frames per second on a four-year-old Android. That is the part I enjoy.',
+			'The rest of the job is the unglamorous half: caching for campus wifi that drops, reconciling bookings so two people cannot take the same hour, keeping a list at sixty frames per second on a four-year-old Android. That is the part I enjoy.',
 		'about.stackTitle': 'What I reach for',
 		'about.stackLede': 'Ordered by how often, not by how impressive.',
 		'hire.eyebrow': 'Hire me',
 		'hire.title': 'Tell me about the project',
 		'hire.lede':
-			'A few minutes of detail now saves a week of back and forth. Fill this in and it opens a pre-written email — nothing is sent until you press send in your own mail app.',
+			'A few minutes of detail now saves a week of back and forth. Fill this in and it opens a pre-written email. Nothing is sent until you press send in your own mail app.',
 		'hire.fullName': 'Full name',
 		'hire.email': 'Email',
 		'hire.phone': 'Phone',
@@ -142,14 +142,14 @@ export const ui = {
 		'404.lede': 'The page moved or never existed. The work is still here.',
 		'500.title': 'Something broke on my side',
 		'500.lede':
-			'Not your fault — the server tripped over itself. Try again in a moment, or go back to the work.',
+			'Not your fault. The server tripped over itself. Try again in a moment, or go back to the work.',
 		'422.title': 'That did not go through',
 		'422.lede':
 			'Something in what you sent did not check out. Go back, look over the fields, and send it again.',
 		'error.home': 'Back to the home page',
 	},
 	ar: {
-		'meta.title': 'هيثم العسولي — تطبيقات بلغتين',
+		'meta.title': 'هيثم العسولي: تطبيقات بلغتين',
 		'meta.desc':
 			'هيثم العسولي يبني تطبيقات جوال وويب تصدر بالعربية والإنجليزية. أعمال مختارة، مشروحة بالكامل.',
 		'name.latin': 'Haitham Assoli',
@@ -164,7 +164,7 @@ export const ui = {
 		'nav.langShort': 'EN',
 		'hero.role': 'مهندس تطبيقات جوال وويب · الأردن',
 		'hero.lede':
-			'أبني تطبيقات يفتحها الناس فعلًا — أكثرها بالعربية أولًا ثم بالإنجليزية. تسعة وثلاثون مشروعًا صدرت، ثلاثة عشر منها على متاجر التطبيقات.',
+			'أبني تطبيقات يفتحها الناس فعلًا، أكثرها بالعربية أولًا ثم بالإنجليزية. تسعة وثلاثون مشروعًا صدرت، ثلاثة عشر منها على متاجر التطبيقات.',
 		'hero.seam': 'في الاتجاهين',
 		'hero.cta': 'شاهد الأعمال',
 		'hero.cta2': 'ابدأ مشروعًا',
@@ -174,7 +174,7 @@ export const ui = {
 		'work.eyebrow': 'أعمال مختارة',
 		'work.title': 'ثمانية مشروحة بالكامل',
 		'work.lede':
-			'كل مشروع مؤطَّر بالشكل الذي يُستخدم فيه فعلًا — هاتف، أو متصفح، أو محرّر، أو مكان.',
+			'كل مشروع مؤطَّر بالشكل الذي يُستخدم فيه فعلًا: هاتف، أو متصفح، أو محرّر، أو مكان.',
 		'work.archive': 'بقية الأعمال',
 		'work.archiveLede': 'مشاريع أقدم وجانبية. لكل منها صفحته أيضًا.',
 		'work.read': 'اقرأ التفاصيل',
@@ -192,17 +192,17 @@ export const ui = {
 		'about.eyebrow': 'نبذة',
 		'about.title': 'لغتان، شيفرة واحدة',
 		'about.p1':
-			'أنا هيثم العسولي، مهندس برمجيات من الأردن. أمضيت السنوات الأربع الماضية في إصدار تطبيقات React Native على متجري جوجل وآبل، وتطبيقات Next.js على الويب — لطلبة، ولمساجد، ولهيئة سياحة في محافظة، ولكل من احتاج أن يوجد الشيء.',
+			'أنا هيثم العسولي، مهندس برمجيات من الأردن. أمضيت السنوات الأربع الماضية في إصدار تطبيقات React Native على متجري جوجل وآبل، وتطبيقات Next.js على الويب، لطلبة، ولمساجد، ولهيئة سياحة في محافظة، ولكل من احتاج أن يوجد الشيء.',
 		'about.p2':
 			'كل ما أبنيه تقريبًا ثنائي اللغة، وتعلّمت أن هذه ليست مسألة ترجمة. الواجهة التي تنعكس انعكاسًا صحيحًا واجهة أخرى: زر الرجوع ينتقل، وشريط التقدم يسير في الاتجاه المعاكس، والخط لا بد أن يصمد في كتابة بلا حروف كبيرة ولا مائلة. أصمّم لهذا من الشاشة الأولى بدل أن أضيفه لاحقًا.',
 		'about.p3':
-			'وبقية العمل هي نصفه غير اللامع — تخزين محلي لشبكة جامعة تنقطع، وتوفيق حجوزات كي لا يأخذ شخصان الساعة نفسها، وإبقاء قائمة تعمل بستين إطارًا في الثانية على هاتف أندرويد عمره أربع سنوات. وهذا هو الجزء الذي أستمتع به.',
+			'وبقية العمل هي نصفه غير اللامع: تخزين محلي لشبكة جامعة تنقطع، وتوفيق حجوزات كي لا يأخذ شخصان الساعة نفسها، وإبقاء قائمة تعمل بستين إطارًا في الثانية على هاتف أندرويد عمره أربع سنوات. وهذا هو الجزء الذي أستمتع به.',
 		'about.stackTitle': 'أدواتي',
 		'about.stackLede': 'مرتّبة بحسب كثرة الاستخدام، لا بحسب وقعها.',
 		'hire.eyebrow': 'وظّفني',
 		'hire.title': 'حدثني عن المشروع',
 		'hire.lede':
-			'دقائق من التفصيل الآن توفّر أسبوعًا من المراسلات. املأ النموذج فيفتح رسالة بريد مكتوبة مسبقًا — لا يُرسل شيء حتى تضغط إرسال في تطبيق بريدك.',
+			'دقائق من التفصيل الآن توفّر أسبوعًا من المراسلات. املأ النموذج فيفتح رسالة بريد مكتوبة مسبقًا. لا يُرسل شيء حتى تضغط إرسال في تطبيق بريدك.',
 		'hire.fullName': 'الاسم الكامل',
 		'hire.email': 'البريد الإلكتروني',
 		'hire.phone': 'رقم الهاتف',
@@ -275,7 +275,7 @@ export const ui = {
 		'404.lede': 'انتقلت الصفحة أو لم توجد أصلًا. الأعمال ما زالت هنا.',
 		'500.title': 'حدث خطأ من جهتي',
 		'500.lede':
-			'الخطأ ليس منك — تعثّر الخادم. جرّب بعد لحظات، أو عد إلى الأعمال.',
+			'الخطأ ليس منك. تعثّر الخادم. جرّب بعد لحظات، أو عد إلى الأعمال.',
 		'422.title': 'لم يمرّ الطلب',
 		'422.lede':
 			'شيء ممّا أرسلته لم يجتز التحقق. عد وراجع الحقول ثم أرسله من جديد.',

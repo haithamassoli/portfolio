@@ -12,7 +12,7 @@
 	overflow: hidden;
 }
 
-/* Completion meter — the seam, filling up as the brief gets answered. */
+/* Completion meter: the seam, filling up as the brief gets answered. */
 .hire-form .meter {
 	position: absolute;
 	inset-block-start: 0;

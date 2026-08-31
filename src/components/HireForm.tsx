@@ -73,7 +73,7 @@ export default function HireForm(props: HireFormProps) {
 			budget: '',
 			techStack: [] as string[],
 		} satisfies Values,
-		// onMount so the empty brief is invalid — the button starts disabled.
+		// onMount so the empty brief is invalid, so the button starts disabled.
 		validators: { onMount: hireSchema(t), onChange: hireSchema(t) },
 		onSubmit: ({ value }) => {
 			const label = (opts: Option[], v: string) =>
@@ -105,8 +105,8 @@ export default function HireForm(props: HireFormProps) {
 					];
 
 			const subject = ar
-				? `مشروع جديد — ${value.fullName}`
-				: `New project — ${value.fullName}`;
+				? `مشروع جديد: ${value.fullName}`
+				: `New project: ${value.fullName}`;
 			const greeting = ar
 				? `مرحبًا هيثم،\n\nأتواصل معك بخصوص مشروع. التفاصيل:\n\n`
 				: `Hi Haitham,\n\nI am getting in touch about a project. The details:\n\n`;

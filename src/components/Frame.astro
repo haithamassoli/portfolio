@@ -23,7 +23,7 @@ const title = p.title[lang];
 const site =
 	p.links.live ?? p.links.playGoogle ?? p.links.appStore ?? p.links.github;
 const host = site ? new URL(site).hostname.replace(/^www\./, '') : 'localhost';
-const alt = `${title} — ${p.tagline[lang]}`;
+const alt = `${title}: ${p.tagline[lang]}`;
 ---
 
 <div
@@ -162,7 +162,7 @@ const alt = `${title} — ${p.tagline[lang]}`;
 		transform: translateY(-4px);
 	}
 
-	/* ponytail: the archive projects have no screenshot — the frame keeps its
+	/* ponytail: the archive projects have no screenshot, so the frame keeps its
 	   chrome and an accent wash rather than collapsing to a bare bar.
 	   Drop this once every project has an image. */
 	.frame:not(:has(.shot)):not(.frame--editor) {

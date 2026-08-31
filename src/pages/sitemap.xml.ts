@@ -3,7 +3,7 @@ import { projects } from '../data/projects';
 import { canonical, languages, href, type Lang } from '../i18n';
 
 /* The route table lives in [...slug].astro; this mirrors it. Two languages of
-   home, hire, and every project — no dependency needed for eighty URLs. */
+   home, hire, and every project, no dependency needed for eighty URLs. */
 const paths = ['', 'work', 'hire', ...projects.map((p) => `work/${p.slug}`)];
 
 export const GET: APIRoute = ({ site }) => {

@@ -12,7 +12,7 @@ interface Props {
 	title?: string;
 	description?: string;
 	accent?: string;
-	/** Overrides the default share card — project pages pass their cover. */
+	/** Overrides the default share card. Project pages pass their cover. */
 	image?: ImageMetadata;
 	/** Error pages set this so they never turn up in a search result. */
 	noindex?: boolean;
@@ -22,7 +22,7 @@ const { lang, title, description, accent, image, noindex } = Astro.props;
 const t = useT(lang);
 const dir = dirOf(lang);
 const siteName = lang === 'ar' ? t('name.arabic') : t('name.latin');
-const pageTitle = title ? `${title} — ${siteName}` : t('meta.title');
+const pageTitle = title ? `${title} · ${siteName}` : t('meta.title');
 const desc = description ?? t('meta.desc');
 
 /* Crawlers and chat apps only accept absolute URLs, so everything below is
@@ -32,7 +32,7 @@ const site = Astro.site ?? Astro.url.origin;
 const abs = (path: string) => canonicalUrl(path, site);
 const bare = Astro.url.pathname.replace(/^\/ar(?=\/|$)/, '') || '/';
 const canonical = abs(Astro.url.pathname);
-/* Cropped to the 1.91:1 every social card assumes — a full-size cover is
+/* Cropped to the 1.91:1 every social card assumes. A full-size cover is
    megabytes of PNG that Twitter would crop badly anyway. */
 const card =
 	image &&
@@ -45,7 +45,7 @@ const card =
 	}));
 const ogImage = new URL(card?.src ?? '/og.png', site).href;
 
-/* One Person record, on the home page only — repeating it on eighty pages
+/* One Person record, on the home page only, because repeating it on eighty pages
    tells Google nothing it did not already know. */
 const person = {
 	'@context': 'https://schema.org',
