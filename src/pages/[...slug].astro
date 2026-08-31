@@ -54,8 +54,8 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 	project && next && (
 		<Base
 			lang={lang}
-			title={project[lang].title}
-			description={project[lang].summary}
+			title={project.title[lang]}
+			description={project.summary[lang]}
 			accent={project.accent}
 		>
 			<ProjectPage project={project} next={next} lang={lang} />

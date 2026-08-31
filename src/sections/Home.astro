@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import profile from '../assets/images/profile.png';
-import { archive, featured } from '../data/projects';
+import { featured, rest } from '../data/projects';
 import { href, toolbox, useT, type Lang } from '../i18n';
 import Hero from '../components/Hero.astro';
 import ProjectCard from '../components/ProjectCard.astro';
@@ -15,7 +15,7 @@ const t = useT(lang);
 
 /* The grid is deliberately uneven — a wide one, then a pair, then a wide one.
    Nothing here is a uniform three-up card wall. */
-const spans = [12, 7, 5, 12, 5, 7];
+const spans = [12, 7, 5, 12, 5, 7, 7, 5];
 ---
 
 <Hero lang={lang} />
@@ -41,31 +41,26 @@ const spans = [12, 7, 5, 12, 5, 7];
 			}
 		</div>
 	</div>
-</section>
 
-<section class="section section--archive">
 	<div class="wrap">
-		<header class="head reveal-fast">
-			<p class="mono eyebrow">{t('work.archive')}</p>
-			<p class="lede">{t('work.archiveLede')}</p>
-		</header>
+		<details class="more reveal-fast">
+			<summary class="mono more__btn">
+				<span
+					class="more__label"
+					data-more={t('work.more')}
+					data-less={t('work.less')}></span>
+				<span class="arrow more__arrow" aria-hidden="true">→</span>
+			</summary>
 
-		<ul class="rows">
-			{
-				archive.map((p) => (
-					<li class="row reveal-fast" style={`--accent:${p.accent}`}>
-						<a class="row__link" href={href(lang, `work/${p.slug}`)}>
-							<span class="row__title">{p[lang].title}</span>
-							<span class="row__tagline">{p[lang].tagline}</span>
-							<span class="mono row__year">{p.year}</span>
-							<span class="arrow row__arrow" aria-hidden="true">
-								→
-							</span>
-						</a>
-					</li>
-				))
-			}
-		</ul>
+			<header class="head more__head">
+				<p class="mono eyebrow">{t('work.archive')}</p>
+				<p class="lede">{t('work.archiveLede')}</p>
+			</header>
+
+			<div class="grid">
+				{rest.map((p) => <ProjectCard project={p} lang={lang} />)}
+			</div>
+		</details>
 	</div>
 </section>
 
@@ -148,72 +143,56 @@ const spans = [12, 7, 5, 12, 5, 7];
 		gap: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 3vw, 2.5rem);
 	}
 
-	/* ---- archive rows ---- */
+	/* ---- show more ---- */
+	/* <details> does the toggling; no JS, no state, no hydration. */
 
-	.section--archive {
-		border-block: 1px solid var(--rule);
-		background: color-mix(in oklab, var(--ink-2) 45%, var(--ink));
+	.more {
+		margin-block-start: clamp(2.5rem, 6vw, 4.5rem);
 	}
 
-	.rows {
+	.more__btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.7ch;
+		cursor: pointer;
 		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid var(--rule);
-	}
-
-	.row {
-		border-bottom: 1px solid var(--rule);
-	}
-
-	.row__link {
-		display: grid;
-		grid-template-columns: minmax(8rem, 1fr) 3fr auto auto;
-		align-items: baseline;
-		gap: clamp(0.75rem, 3vw, 2rem);
-		padding-block: 1.15rem;
-		text-decoration: none;
+		color: var(--muted);
+		padding: 0.8rem 1.4rem;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
 		transition:
-			padding-inline 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-			color 0.3s;
+			color 0.3s,
+			border-color 0.3s;
 	}
 
-	.row__link:hover {
-		padding-inline: 0.9rem;
-		color: var(--accent);
+	.more__btn::-webkit-details-marker {
+		display: none;
 	}
 
-	.row__title {
-		font-weight: 700;
-		font-size: var(--step-1);
+	.more__btn:hover,
+	.more__btn:focus-visible {
+		color: var(--bone);
+		border-color: var(--rule-strong);
 	}
 
-	.row__tagline {
-		color: var(--muted);
-		font-size: var(--step--1);
-		line-height: 1.5;
+	.more__label::after {
+		content: attr(data-more);
 	}
 
-	.row__year,
-	.row__arrow {
-		color: var(--muted);
+	.more[open] .more__label::after {
+		content: attr(data-less);
 	}
 
-	.row__link:hover .row__year,
-	.row__link:hover .row__arrow {
-		color: var(--accent);
+	.more__arrow {
+		transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	@media (max-width: 46rem) {
-		.row__link {
-			grid-template-columns: 1fr auto;
-		}
-		.row__tagline {
-			grid-column: 1 / -1;
-		}
-		.row__year {
-			display: none;
-		}
+	.more[open] .more__arrow {
+		transform: rotate(90deg);
+	}
+
+	.more__head {
+		margin-block: clamp(2rem, 5vw, 3rem);
 	}
 
 	/* ---- about ---- */

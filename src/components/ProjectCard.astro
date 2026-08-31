@@ -12,7 +12,6 @@ interface Props {
 
 const { project: p, lang, span = 6, loading } = Astro.props;
 const t = useT(lang);
-const copy = p[lang];
 ---
 
 <a
@@ -32,10 +31,10 @@ const copy = p[lang];
 
 	<div class="card__body">
 		<div class="card__head">
-			<h3 class="card__title">{copy.title}</h3>
+			<h3 class="card__title">{p.title[lang]}</h3>
 			<span class="mono card__year">{p.year}</span>
 		</div>
-		<p class="card__tagline">{copy.tagline}</p>
+		<p class="card__tagline">{p.tagline[lang]}</p>
 		<ul class="tags">
 			{p.stack.slice(0, 5).map((s) => <li class="tag">{s}</li>)}
 		</ul>

@@ -17,15 +17,38 @@ test('language switch lands on the same page in the other language', () => {
 test('every project ships in both languages', () => {
 	for (const p of projects) {
 		for (const lang of ['en', 'ar'] as const) {
-			expect(p[lang].title, `${p.slug}.${lang}.title`).toBeTruthy();
-			expect(p[lang].tagline, `${p.slug}.${lang}.tagline`).toBeTruthy();
+			expect(p.title[lang], `${p.slug}.${lang}.title`).toBeTruthy();
+			expect(p.tagline[lang], `${p.slug}.${lang}.tagline`).toBeTruthy();
 			expect(
-				p[lang].summary.length,
+				p.summary[lang].length,
 				`${p.slug}.${lang}.summary`,
 			).toBeGreaterThan(40);
+			// the detail page renders these, so an empty one is a blank section
+			expect(
+				p.overview[lang].length,
+				`${p.slug}.${lang}.overview`,
+			).toBeGreaterThan(0);
+			expect(
+				p.outcomes[lang].length,
+				`${p.slug}.${lang}.outcomes`,
+			).toBeGreaterThan(0);
+			for (const c of p.challenges) {
+				expect(c.title[lang], `${p.slug}.${lang}.challenge`).toBeTruthy();
+				expect(c.problem[lang], `${p.slug}.${lang}.problem`).toBeTruthy();
+				expect(c.solution[lang], `${p.slug}.${lang}.solution`).toBeTruthy();
+			}
 		}
 	}
 	expect(new Set(projects.map((p) => p.slug)).size).toBe(projects.length);
+});
+
+test('every cover path resolves to an image that exists', () => {
+	for (const p of projects) {
+		expect(Boolean(p.image), `${p.slug}.cover ${p.cover}`).toBe(
+			Boolean(p.cover),
+		);
+		expect(p.shots.length, `${p.slug}.gallery`).toBe(p.gallery.length);
+	}
 });
 
 test('the two dictionaries carry the same keys', () => {
