@@ -1,12 +1,16 @@
 ---
-/* Variant 5 — "Terminal". A tmux-flavoured session on warm amber phosphor.
-   The signature is the LANG switch: it mirrors the whole page with a CSS
-   checkbox, so the bilingual demo works with JavaScript switched off. */
+/* Variant 4 — "Terminal". The session page: MANIFEST, the eight opened
+   records, the project tree, and the man-page facts about the person.
+   Chrome, tokens and the command line come from ./4/_shell.astro. */
 import { Image } from 'astro:assets';
+import Shell from './4/_shell.astro';
+import T from '../components/T.astro';
+import { pair, s } from '../data/variant-ui';
+import { dateSpan } from './4/_dates';
+import type { I18n } from '../../content/types';
 import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
-import StyleSwitcher from '../components/StyleSwitcher.astro';
 import profilePhoto from '../assets/images/profile.png';
 
 /* The filesystem: 39 projects, grouped the way `tree` would group them. */
@@ -21,6 +25,7 @@ const catOrder = [
 
 const dirs = catOrder.map((c) => ({
 	name: c,
+	label: s(`cat.${c}` as 'cat.web'),
 	items: projects.filter((p) => p.category === c),
 }));
 
@@ -48,1069 +53,605 @@ const runsOn: Record<string, string> = {
 };
 
 const legend = [
-	{ key: 'native', label: 'on the phone' },
-	{ key: 'browser', label: 'in the browser' },
-	{ key: 'server', label: 'on the server' },
-	{ key: 'both', label: 'both ends' },
-	{ key: 'none', label: 'not shipped code' },
+	{ key: 'native', label: pair('on the phone', 'على الهاتف') },
+	{ key: 'browser', label: pair('in the browser', 'في المتصفح') },
+	{ key: 'server', label: pair('on the server', 'على الخادم') },
+	{ key: 'both', label: pair('both ends', 'على الطرفين') },
+	{ key: 'none', label: pair('not shipped code', 'ليست شيفرة تُشحن') },
 ];
 
 /* Static figures. dev-stats.ts is a network call at build time; not here. */
 const figures = [
-	{ k: 'projects shipped', v: '39', n: 'four years of them' },
-	{ k: 'on the app stores', v: '13', n: 'iOS, Android, or both' },
-	{ k: 'written up in full', v: '8', n: 'problem, decision, outcome' },
-	{ k: 'years building', v: '4', n: 'since 2022, freelance onward' },
-	{ k: 'scripts supported', v: '2', n: 'Arabic and Latin' },
-	{ k: 'writing directions', v: '2', n: 'RTL first, LTR second' },
+	{
+		v: '39',
+		k: pair('projects shipped', 'مشروعًا صدر'),
+		n: pair('over four years', 'على مدى أربع سنوات'),
+	},
+	{
+		v: '13',
+		k: pair('on the app stores', 'على متاجر التطبيقات'),
+		n: pair('iOS, Android, or both', 'iOS أو أندرويد أو كلاهما'),
+	},
+	{
+		v: '8',
+		k: pair('written up in full', 'مكتوبة بالكامل'),
+		n: pair('problem, decision, outcome', 'المشكلة، والقرار، والنتيجة'),
+	},
+	{
+		v: '4',
+		k: pair('years building', 'سنوات في البناء'),
+		n: pair('since 2022, freelance onward', 'منذ 2022، من العمل الحر فصاعدًا'),
+	},
+	{
+		v: '2',
+		k: pair('languages per release', 'لغتان في كل إصدار'),
+		n: pair(
+			'Arabic and English, from the first screen',
+			'العربية والإنجليزية، من الشاشة الأولى',
+		),
+	},
 ];
 
-const clock = new Intl.DateTimeFormat('en-GB', {
-	timeZone: 'Asia/Amman',
-	hour: '2-digit',
-	minute: '2-digit',
-}).format(new Date());
-
-const links = [
-	{ label: 'github', href: profile.links.github },
-	{ label: 'linkedin', href: profile.links.linkedin },
-	{ label: 'website', href: profile.links.website },
-	{ label: 'resume', href: profile.links.resume },
-	{ label: 'play store', href: profile.links.playStore },
+/* `fixed` is a proper noun: it is spelled the same in both languages and is
+   not tagged as Arabic, so a screen reader does not try to pronounce it as
+   Arabic. `label` is an ordinary word and translates. */
+const elsewhere: Array<{ fixed?: string; label?: I18n; href: string }> = [
+	{ fixed: 'github', href: profile.links.github },
+	{ fixed: 'linkedin', href: profile.links.linkedin },
+	{ label: pair('website', 'الموقع'), href: profile.links.website },
+	{ label: s('nav.cv'), href: profile.links.resume },
+	{ label: s('project.play'), href: profile.links.playStore },
 ];
 
-const linkOrder: Array<
-	['live' | 'github' | 'appStore' | 'playGoogle' | 'vscode', string]
-> = [
-	['live', 'open live'],
-	['appStore', 'app store'],
-	['playGoogle', 'play store'],
-	['github', 'source'],
-	['vscode', 'marketplace'],
-];
+const linkOrder = [
+	['live', s('project.live')],
+	['appStore', s('project.apple')],
+	['playGoogle', s('project.play')],
+	['github', s('project.github')],
+	['vscode', s('project.vscode')],
+] as const;
 ---
 
-<!doctype html>
-<html lang="en" dir="ltr">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>haitham@amman — session</title>
-		<meta
-			name="description"
-			content="Haitham Assoli, web and mobile full-stack engineer in Amman. Bilingual Arabic-first apps, 39 shipped, 13 on the app stores."
+<Shell
+	title="haitham@amman — session"
+	description="Haitham Assoli, web and mobile full-stack engineer in Amman. Bilingual Arabic-first apps, 39 shipped, 13 on the app stores."
+	path="~/portfolio"
+	tab="home"
+>
+	<!-- ── hero ───────────────────────────────────────────────── -->
+	<section class="block--hero block" aria-labelledby="thesis">
+		<p class="cmdline" data-type>
+			<span class="cmdline__q">cat</span> MANIFEST
+		</p>
+
+		<h1 class="thesis" id="thesis">
+			<T
+				v={pair(
+					'Every screen I ship has to survive being mirrored.',
+					'كل شاشة أطلقها لا بد أن تصمد وهي معكوسة.',
+				)}
+			/>
+		</h1>
+
+		<p class="quote" data-l="en" lang="en">
+			<span class="quote__hash" aria-hidden="true">#</span>
+			A mirrored interface is a different interface, not a translation.
+		</p>
+		<p class="quote" data-l="ar" lang="ar">
+			<span class="quote__hash" aria-hidden="true">#</span>
+			الواجهة المعكوسة واجهة أخرى، لا ترجمة.
+		</p>
+
+		<dl class="kv">
+			<div class="kv__row">
+				<T v={pair('name', 'الاسم')} as="dt" />
+				<dd><T v={profile.name} /></dd>
+			</div>
+			<div class="kv__row">
+				<T v={pair('role', 'العمل')} as="dt" />
+				<dd><T v={profile.title} /></dd>
+			</div>
+			<div class="kv__row">
+				<T v={pair('host', 'المكان')} as="dt" />
+				<dd><T v={profile.location} /></dd>
+			</div>
+			<div class="kv__row">
+				<T v={pair('stack', 'الأدوات')} as="dt" />
+				<dd>
+					<T
+						v={pair(
+							'React Native and Expo on both stores, Next.js and Astro on the web, NestJS or Convex or Supabase behind them.',
+							'React Native وExpo على المتجرين، وNext.js وAstro على الويب، وخلفها NestJS أو Convex أو Supabase.',
+						)}
+					/>
+				</dd>
+			</div>
+			<div class="kv__row">
+				<T v={pair('now', 'الآن')} as="dt" />
+				<dd>
+					<T
+						v={pair(
+							'On-device AI. Video and audio processed on the reader’s own phone: no upload, no cloud, no telemetry.',
+							'ذكاء اصطناعي على الجهاز. معالجة الفيديو والصوت على هاتف المستخدم نفسه: بلا رفع، وبلا سحابة، وبلا تتبّع.',
+						)}
+					/>
+				</dd>
+			</div>
+			<div class="kv__row">
+				<T v={pair('shipped', 'المُنجَز')} as="dt" />
+				<dd class="kv__tally">
+					<span
+						><span class="tty"><b>39</b></span>{' '}<T
+							v={pair('projects', 'مشروعًا')}
+						/></span
+					>
+					<span
+						><span class="tty"><b>13</b></span>{' '}<T
+							v={pair('on the app stores', 'على متاجر التطبيقات')}
+						/></span
+					>
+					<span
+						><span class="tty"><b>8</b></span>{' '}<T
+							v={pair('written up in full', 'مكتوبة بالكامل')}
+						/></span
+					>
+					<span
+						><span class="tty"><b>4</b></span>{' '}<T
+							v={pair('years', 'سنوات')}
+						/></span
+					>
+				</dd>
+			</div>
+		</dl>
+
+		<!-- The LANG control again, at length. The status bar carries the
+		     switch; this is the paragraph that explains why it is there. -->
+		<div class="env">
+			<p class="cmdline cmdline--tight">
+				<span class="cmdline__q">env</span> LANG=ar ./portfolio
+			</p>
+			<T
+				v={pair(
+					'Arabic is not a setting I add at the end. Set LANG and the session comes back in Arabic: the words, the alignment, the side the eye starts on. Paths, digits and the prompt stay exactly where they were, because a path is not prose.',
+					'العربية ليست إعدادًا أضيفه في آخر الطريق. اضبط LANG فتعود الجلسة بالعربية: الكلمات، والمحاذاة، والجهة التي تبدأ منها العين. أمّا المسارات والأرقام وسطر الأمر فتبقى حيث هي، لأنّ المسار ليس نصًّا.',
+				)}
+				as="p"
+				class="env__copy"
+			/>
+			<button class="env__btn tty" type="button" data-lang-toggle>
+				<span data-l="en" aria-hidden="true">export LANG=ar</span>
+				<span data-l="ar" aria-hidden="true">export LANG=en</span>
+				<span class="sr-only" data-l="en">Run the session in Arabic</span>
+				<span class="sr-only" data-l="ar" lang="ar"
+					>شغّل الجلسة بالإنجليزية</span
+				>
+			</button>
+			<T
+				v={pair(
+					'Both languages are already in the page. Nothing reloads, and nothing is fetched.',
+					'اللغتان كلتاهما في الصفحة أصلًا. لا شيء يُعاد تحميله، ولا شيء يُجلب.',
+				)}
+				as="p"
+				class="env__note"
+			/>
+		</div>
+	</section>
+
+	<!-- ── featured ───────────────────────────────────────────── -->
+	<section class="block" id="work" aria-labelledby="work-h">
+		<p class="cmdline">
+			<span class="cmdline__q">ls</span> -l ~/work --featured
+		</p>
+		<h2 class="h2" id="work-h">
+			<T v={pair('Eight records, opened', 'ثمانية سجلات، مفتوحة')} />
+			<span class="h2__dim">
+				<span class="tty" data-l="en">total 8</span>
+				<span data-l="ar" lang="ar">المجموع <span class="tty">8</span></span>
+			</span>
+		</h2>
+		<T
+			v={pair(
+				'These are the ones with a full write-up behind them: what the problem was, what I decided, what it cost. The other thirty-one are one section down.',
+				'هذه المشاريع التي وراء كل منها كتابة كاملة: ما كانت المشكلة، وما الذي قرّرته، وكم كلّف. والواحد والثلاثون الباقية في القسم الذي يليه.',
+			)}
+			as="p"
+			class="lede"
 		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Arabic:wght@400;600&family=IBM+Plex+Serif:ital,wght@1,400&display=swap"
+
+		<ol class="recs">
+			{
+				featured.map((p, i) => (
+					<li class="rec">
+						<p class="cmdline cmdline--tight">
+							<span class="cmdline__q">open</span> ~/work/{p.slug}
+						</p>
+
+						<h3 class="rec__title">
+							<a href={`/4/work/${p.slug}`}>
+								<T v={p.title} />
+							</a>
+							<T
+								v={s(`status.${p.status}` as 'status.live')}
+								class={`st st--${p.status}`}
+							/>
+						</h3>
+
+						<T v={p.tagline} as="p" class="rec__tag" />
+
+						<div class="rec__body">
+							{p.image && (
+								<figure
+									class={`pane${p.image.height > p.image.width ? ' pane--tall' : ''}`}
+								>
+									<figcaption class="pane__bar tty">
+										<span class="pane__name">{p.cover.replace(/^\//, '')}</span>
+										<span class="pane__meta">
+											{p.image.width}×{p.image.height}
+										</span>
+									</figcaption>
+									<div class="pane__view">
+										<Image
+											src={p.image}
+											alt={`${p.title.en} interface`}
+											widths={[360, 720]}
+											sizes="(min-width: 62rem) 20rem, 88vw"
+											loading={i === 0 ? 'eager' : 'lazy'}
+										/>
+									</div>
+								</figure>
+							)}
+
+							<div class="rec__text">
+								<T v={p.summary} as="p" class="rec__sum" />
+
+								<dl class="kv kv--tight">
+									<div class="kv__row">
+										<T v={s('project.year')} as="dt" />
+										<dd class="tty">{dateSpan(p.year)}</dd>
+									</div>
+									<div class="kv__row">
+										<T v={s('project.role')} as="dt" />
+										<dd>
+											<T v={p.role} />
+										</dd>
+									</div>
+									<div class="kv__row">
+										<T v={pair('type', 'الفئة')} as="dt" />
+										<dd>
+											<T v={s(`cat.${p.category}` as 'cat.web')} />
+										</dd>
+									</div>
+									<div class="kv__row">
+										<T v={s('project.stack')} as="dt" />
+										<dd class="chips">
+											{p.stack.slice(0, 8).map((t) => (
+												<span class="chip">{t}</span>
+											))}
+										</dd>
+									</div>
+								</dl>
+
+								<p class="rec__links">
+									<a class="go" href={`/4/work/${p.slug}`}>
+										<T v={s('work.read')} />
+									</a>
+									{linkOrder.map(([k, label]) =>
+										p.links[k] ? (
+											<a
+												class="go go--out"
+												href={p.links[k]}
+												rel="noopener noreferrer"
+												target="_blank"
+											>
+												<T v={label} />
+											</a>
+										) : null,
+									)}
+								</p>
+							</div>
+						</div>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
+	<!-- ── the filesystem ─────────────────────────────────────── -->
+	<section class="block" id="fs" aria-labelledby="fs-h">
+		<p class="cmdline"><span class="cmdline__q">tree</span> ~/projects</p>
+		<h2 class="h2" id="fs-h">
+			<T
+				v={pair(
+					'Thirty-nine, as a directory',
+					'تسعة وثلاثون، على هيئة مجلّدات',
+				)}
+			/>
+		</h2>
+		<T
+			v={pair(
+				'Grouped by what the thing runs on, not by how it looks in a grid. Every leaf has its own page. Colour here is status and nothing else.',
+				'مجموعة بحسب ما يعمل عليه المشروع، لا بحسب شكله في شبكة. ولكل ورقة صفحتها. واللون هنا حالة، لا شيء غيرها.',
+			)}
+			as="p"
+			class="lede"
 		/>
-	</head>
 
-	<body>
-		<a class="skip" href="#main">Skip to the content</a>
+		<ul class="tree">
+			{
+				dirs.map((d) => (
+					<li class="tree__dir">
+						<p class="tree__head">
+							<T v={d.label} class="tree__folder" />
+							<span class="tty">/</span>
+							<span class="tree__count tty">{d.items.length}</span>
+						</p>
+						<ul class="tree__kids">
+							{d.items.map((p) => (
+								<li class="tree__file">
+									<a class="tree__link" href={`/4/work/${p.slug}`}>
+										<T v={p.title} />
+									</a>
+									{p.featured && (
+										<span class="tree__star tty" aria-hidden="true">
+											*
+										</span>
+									)}
+									<span class="tree__year tty">{dateSpan(p.year)}</span>
+									<T
+										v={s(`status.${p.status}` as 'status.live')}
+										class={`st st--${p.status}`}
+									/>
+								</li>
+							))}
+						</ul>
+					</li>
+				))
+			}
+		</ul>
 
-		<header class="chrome">
-			<div class="chrome__inner">
-				<div class="status">
-					<span class="status__tag">haitham@amman</span>
-					<span class="status__path">~/portfolio</span>
-					<span class="status__sp"></span>
-					<span class="status__dir" data-dir>dir=ltr</span>
+		<p class="tree__total">
+			<span class="tty">6</span>{' '}<T v={pair('directories,', 'مجلدات،')} />{
+				' '
+			}
+			<span class="tty">39</span>{' '}<T v={pair('files ·', 'ملفًا ·')} />{' '}
+			<span class="tree__star tty">*</span>{' '}<T
+				v={pair('= written up in full', '= مكتوب بالكامل')}
+			/>
+		</p>
 
-					<input id="lang" class="langbox" type="checkbox" />
-					<label class="lang" for="lang">
-						<span class="lang__k">LANG=</span>
-						<span class="lang__v lang__v--en">en</span>
-						<span class="lang__v lang__v--ar">ar</span>
-					</label>
+		<p class="tree__more">
+			<a class="go" href="/4/projects">
+				<T v={pair('ls -la — the long listing', 'ls -la — القائمة الطويلة')} />
+			</a>
+		</p>
+	</section>
 
-					<span class="status__clock"><span data-clock>{clock}</span> +03</span>
+	<!-- ── whoami ─────────────────────────────────────────────── -->
+	<section class="block" id="who" aria-labelledby="who-h">
+		<p class="cmdline"><span class="cmdline__q">whoami</span> --long</p>
+		<h2 class="h2" id="who-h"><T v={profile.name} /></h2>
+
+		<div class="who">
+			<figure class="pane pane--me">
+				<figcaption class="pane__bar tty">
+					<span class="pane__name">profile.png</span>
+					<span class="pane__meta">uid 1000</span>
+				</figcaption>
+				<div class="pane__view">
+					<Image
+						src={profilePhoto}
+						alt="Haitham Assoli"
+						widths={[220, 440]}
+						sizes="14rem"
+						loading="lazy"
+					/>
 				</div>
+			</figure>
 
-				<div class="cmd" data-cmd hidden>
-					<form class="cmd__form" data-form>
-						<label class="sr-only" for="cmdline">Run a command</label>
-						<span class="cmd__caret" aria-hidden="true"></span>
-						<input
-							class="cmd__input"
-							id="cmdline"
-							type="text"
-							autocomplete="off"
-							autocapitalize="off"
-							spellcheck="false"
-							enterkeyhint="go"
-							placeholder="type help"
+			<div class="prose">
+				{
+					profile.about.en.map((_, i) => (
+						<T
+							v={{ en: profile.about.en[i], ar: profile.about.ar[i] }}
+							as="p"
 						/>
-					</form>
-					<div class="cmd__out" data-out role="status" aria-live="polite"></div>
-					<p class="cmd__hint">
-						<kbd>/</kbd> focuses this line · <kbd>Esc</kbd> leaves it · every command
-						below is real
-					</p>
+					))
+				}
+
+				<div class="prose__edu">
+					<T v={pair('education', 'الدراسة')} class="prose__lbl" />
+					{
+						profile.education.map((e) => (
+							<p class="prose__row">
+								<T v={e.degree} />
+								{', '}
+								<T v={e.school} />
+								<span class="prose__dim">
+									<span class="tty"> · {dateSpan(e.period)}</span>
+									{e.note && (
+										<>
+											{' · '}
+											<T v={e.note} />
+										</>
+									)}
+								</span>
+							</p>
+						))
+					}
 				</div>
 			</div>
-		</header>
+		</div>
+	</section>
 
-		<main class="session" id="main">
-			<!-- ── hero ───────────────────────────────────────────────── -->
-			<section class="block--hero block" aria-labelledby="thesis">
-				<p class="cmdline"><span class="cmdline__q">cat</span> MANIFEST</p>
+	<!-- ── history ────────────────────────────────────────────── -->
+	<section class="block" id="history" aria-labelledby="hist-h">
+		<p class="cmdline"><span class="cmdline__q">history</span> --roles</p>
+		<h2 class="h2" id="hist-h">
+			<T v={pair('Where the hours went', 'أين ذهبت الساعات')} />
+		</h2>
 
-				<h1 class="thesis" id="thesis">
-					Every screen I ship has to survive being mirrored.
-				</h1>
+		<ol class="hist">
+			{
+				profile.experience.map((e) => (
+					<li class="hist__row">
+						<span class="hist__when tty">{dateSpan(e.period)}</span>
+						<span class="hist__who">
+							<T v={e.company} />
+							<span class="hist__role">
+								{' — '}
+								<T v={e.role} />
+								{e.location && (
+									<>
+										{' ('}
+										<T v={e.location} />
+										{')'}
+									</>
+								)}
+							</span>
+						</span>
+						<T
+							v={{ en: e.highlights.en[0], ar: e.highlights.ar[0] }}
+							class="hist__what"
+						/>
+					</li>
+				))
+			}
+		</ol>
+	</section>
 
-				<p class="quote">
-					<span class="quote__hash" aria-hidden="true">#</span>
-					A mirrored UI is a different UI, not a translation.
-				</p>
+	<!-- ── toolbox ────────────────────────────────────────────── -->
+	<section class="block" id="stack" aria-labelledby="stack-h">
+		<p class="cmdline"><span class="cmdline__q">cat</span> ~/.toolbox</p>
+		<h2 class="h2" id="stack-h"><T v={s('about.stackTitle')} /></h2>
+		<T
+			v={pair(
+				'Highlighted by where the code actually executes, which is the only grouping that has ever helped me plan a build.',
+				'ملوّنة بحسب المكان الذي تُنفَّذ فيه الشيفرة فعلًا، وهو التصنيف الوحيد الذي أفادني في التخطيط لأي بناء.',
+			)}
+			as="p"
+			class="lede"
+		/>
 
-				<dl class="kv">
-					<div class="kv__row">
-						<dt>name</dt>
-						<dd>
-							<span class="bi"
-								><span class="bi__en">Haitham Assoli</span><span
-									class="bi__ar"
-									lang="ar"
-									dir="rtl">هيثم العسولي</span
-								></span
-							>
+		<ul class="tools tty">
+			{
+				toolbox.map((t) => (
+					<li class={`tool tool--${runsOn[t] ?? 'none'}`}>{t}</li>
+				))
+			}
+		</ul>
+
+		<ul class="legend">
+			{
+				legend.map((l) => (
+					<li class={`legend__i tool--${l.key}`}>
+						<span class="legend__sw" aria-hidden="true">
+							■
+						</span>
+						<T v={l.label} />
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<!-- ── figures ────────────────────────────────────────────── -->
+	<section class="block" id="stat" aria-labelledby="stat-h">
+		<p class="cmdline"><span class="cmdline__q">stat</span> ~/portfolio</p>
+		<h2 class="h2" id="stat-h">
+			<T v={pair('The counts, plainly', 'الأرقام، بلا زخرفة')} />
+		</h2>
+
+		<dl class="stat">
+			{
+				figures.map((f) => (
+					<div class="stat__row">
+						<T v={f.k} as="dt" class="stat__k" />
+						<dd class="stat__v">
+							<b class="tty">{f.v}</b>
+							<T v={f.n} class="stat__n" />
 						</dd>
 					</div>
-					<div class="kv__row">
-						<dt>role</dt>
-						<dd>Web &amp; mobile full-stack engineer</dd>
-					</div>
-					<div class="kv__row">
-						<dt>host</dt>
-						<dd>
-							<span class="bi"
-								><span class="bi__en">Amman, Jordan</span><span
-									class="bi__ar"
-									lang="ar"
-									dir="rtl">عمّان، الأردن</span
-								></span
-							>
-						</dd>
-					</div>
-					<div class="kv__row">
-						<dt>stack</dt>
-						<dd>
-							React Native and Expo on both stores, Next.js and Astro on the
-							web, NestJS or Convex or Supabase behind them.
-						</dd>
-					</div>
-					<div class="kv__row">
-						<dt>now</dt>
-						<dd>
-							On-device AI. Video and audio processed on the user's own phone:
-							no upload, no cloud, no telemetry.
-						</dd>
-					</div>
-					<div class="kv__row">
-						<dt>shipped</dt>
-						<dd>
-							<b>39</b> projects · <b>13</b> on the app stores · <b>8</b> written
-							up in full · <b>4</b> years
-						</dd>
-					</div>
-				</dl>
+				))
+			}
+		</dl>
+	</section>
 
-				<div class="flip">
-					<p class="cmdline cmdline--tight">
-						<span class="cmdline__q">env</span> LANG=ar ./portfolio
-					</p>
-					<p class="flip__copy">
-						Arabic is not a setting I add at the end. Flip the switch and the
-						page mirrors: the column order, the alignment, the side the eye
-						starts on. The commands stay left-to-right, because a command is not
-						prose.
-					</p>
-					<label class="flip__btn" for="lang">
-						<span class="flip__on">flip to ar · mirror the page</span>
-						<span class="flip__off">flip back to en</span>
-					</label>
-				</div>
+	<!-- ── hire ───────────────────────────────────────────────── -->
+	<section class="block" id="hire" aria-labelledby="hire-h">
+		<p class="cmdline"><span class="cmdline__q">hire</span> --brief</p>
+		<h2 class="h2" id="hire-h">
+			<T
+				v={pair(
+					'Send the brief, not the buzzwords',
+					'أرسل الفكرة، لا المصطلحات',
+				)}
+			/>
+		</h2>
+		<T
+			v={pair(
+				'Tell me what has to be true when it ships and which language it ships in first. I answer from Amman within two business days, in Arabic or English.',
+				'اكتب لي ما الذي يجب أن يتحقق يوم الإطلاق، وبأي لغة يصدر أولًا. أرد من عمّان خلال يومَي عمل، بالعربية أو بالإنجليزية.',
+			)}
+			as="p"
+			class="lede"
+		/>
 
-				<p class="rtl-note">
-					<span aria-hidden="true">▸</span> Mirrored. Layout, indentation and the
-					tree connectors all changed side. Project names switched script. The prompt,
-					the digits and the file paths did not, and that mixed run is the part most
-					sites get wrong.
-				</p>
-			</section>
+		<p class="hire">
+			<a class="hire__btn" href="/4/hire">
+				<T v={s('hire.title')} />
+			</a>
+			<a class="go tty" href={`mailto:${profile.email}`}>{profile.email}</a>
+			<a class="go tty" href={`tel:${profile.phone.replace(/\s/g, '')}`}
+				>{profile.phone}</a
+			>
+		</p>
 
-			<!-- ── featured ───────────────────────────────────────────── -->
-			<section class="block" id="work" aria-labelledby="work-h">
-				<p class="cmdline">
-					<span class="cmdline__q">ls</span> -l ~/work --featured
-				</p>
-				<h2 class="h2" id="work-h">
-					Eight records, opened <span class="h2__dim">total 8</span>
-				</h2>
-				<p class="lede">
-					These are the ones with a full write-up behind them: what the problem
-					was, what I decided, what it cost. The other 31 are one section down.
-				</p>
+		<ul class="dots">
+			{
+				elsewhere.map((l) => (
+					<li>
+						<a class="go go--out" href={l.href} rel="noopener noreferrer">
+							{l.fixed ? (
+								<span class="tty">{l.fixed}</span>
+							) : (
+								<T v={l.label!} />
+							)}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Shell>
 
-				<ol class="recs">
-					{
-						featured.map((p, i) => (
-							<li class="rec" id={`rec-${p.slug}`}>
-								<p class="cmdline cmdline--tight">
-									<span class="cmdline__q">open</span> ~/work/{p.slug}
-								</p>
-
-								<h3 class="rec__title">
-									<a href={`/work/${p.slug}`}>
-										<span class="bi">
-											<span class="bi__en">{p.title.en}</span>
-											<span class="bi__ar" lang="ar" dir="rtl">
-												{p.title.ar}
-											</span>
-										</span>
-									</a>
-									<span class={`st st--${p.status}`}>{p.status}</span>
-								</h3>
-
-								<p class="rec__tag">
-									<span class="bi">
-										<span class="bi__en">{p.tagline.en}</span>
-										<span class="bi__ar" lang="ar" dir="rtl">
-											{p.tagline.ar}
-										</span>
-									</span>
-								</p>
-
-								<div class="rec__body">
-									{p.image && (
-										<figure class="shot">
-											<figcaption class="shot__bar">
-												<span class="shot__name">
-													{p.cover.replace(/^\//, '')}
-												</span>
-												<span class="shot__dim">
-													{p.image.width}×{p.image.height}
-												</span>
-											</figcaption>
-											<div class="shot__view">
-												<Image
-													src={p.image}
-													alt={`${p.title.en} interface`}
-													widths={[360, 720]}
-													sizes="(min-width: 62rem) 20rem, 88vw"
-													loading={i === 0 ? 'eager' : 'lazy'}
-												/>
-											</div>
-										</figure>
-									)}
-
-									<div class="rec__text">
-										<p class="rec__sum">{p.summary.en}</p>
-
-										<dl class="kv kv--tight">
-											<div class="kv__row">
-												<dt>year</dt>
-												<dd>{p.year}</dd>
-											</div>
-											<div class="kv__row">
-												<dt>role</dt>
-												<dd>{p.role.en}</dd>
-											</div>
-											<div class="kv__row">
-												<dt>type</dt>
-												<dd>
-													{p.category} · {p.frame}
-												</dd>
-											</div>
-											<div class="kv__row">
-												<dt>stack</dt>
-												<dd class="chips">
-													{p.stack.slice(0, 8).map((s) => (
-														<span class="chip">{s}</span>
-													))}
-												</dd>
-											</div>
-										</dl>
-
-										<p class="rec__links">
-											<a class="go" href={`/work/${p.slug}`}>
-												read the case
-											</a>
-											{linkOrder.map(([k, label]) =>
-												p.links[k] ? (
-													<a
-														class="go go--out"
-														href={p.links[k]}
-														rel="noopener noreferrer"
-														target="_blank"
-													>
-														{label}
-													</a>
-												) : null,
-											)}
-										</p>
-									</div>
-								</div>
-							</li>
-						))
-					}
-				</ol>
-			</section>
-
-			<!-- ── the filesystem ─────────────────────────────────────── -->
-			<section class="block" id="fs" aria-labelledby="fs-h">
-				<p class="cmdline"><span class="cmdline__q">tree</span> ~/projects</p>
-				<h2 class="h2" id="fs-h">Thirty-nine, as a directory</h2>
-				<p class="lede">
-					Sorted by what the thing runs on, not by how it looks in a grid. Every
-					leaf is a real write-up. Colour is status, nothing else.
-				</p>
-
-				<ul class="tree">
-					{
-						dirs.map((d) => (
-							<li class="tree__dir">
-								<p class="tree__head">
-									<span class="tree__folder">{d.name}/</span>
-									<span class="tree__count">{d.items.length}</span>
-								</p>
-								<ul class="tree__kids">
-									{d.items.map((p) => (
-										<li class="tree__file" id={`f-${p.slug}`}>
-											<a class="tree__link" href={`/work/${p.slug}`}>
-												<span class="bi">
-													<span class="bi__en">{p.title.en}</span>
-													<span class="bi__ar" lang="ar" dir="rtl">
-														{p.title.ar}
-													</span>
-												</span>
-											</a>
-											{p.featured && (
-												<span class="tree__star" title="written up in full">
-													*
-												</span>
-											)}
-											<span class="tree__year">{p.year}</span>
-											<span class={`st st--${p.status}`}>{p.status}</span>
-										</li>
-									))}
-								</ul>
-							</li>
-						))
-					}
-				</ul>
-
-				<p class="tree__total">
-					6 directories, 39 files · <span class="tree__star">*</span> = written up
-					in full
-				</p>
-			</section>
-
-			<!-- ── whoami ─────────────────────────────────────────────── -->
-			<section class="block" id="who" aria-labelledby="who-h">
-				<p class="cmdline"><span class="cmdline__q">whoami</span> --long</p>
-				<h2 class="h2" id="who-h">Haitham Assoli</h2>
-
-				<div class="who">
-					<figure class="shot shot--me">
-						<figcaption class="shot__bar">
-							<span class="shot__name">profile.png</span>
-							<span class="shot__dim">uid 1000</span>
-						</figcaption>
-						<div class="shot__view">
-							<Image
-								src={profilePhoto}
-								alt="Haitham Assoli"
-								widths={[220, 440]}
-								sizes="14rem"
-								loading="lazy"
-							/>
-						</div>
-					</figure>
-
-					<div class="prose">
-						<p>
-							I build the whole product: the schema, the API, the app, the store
-							listing, the support replies afterwards. Most of it ships in
-							Arabic and English at once, because most of the people using it
-							read Arabic, and right-to-left is where I start rather than where
-							I patch.
-						</p>
-						<p>
-							The work I want is the kind with a hard constraint in it. A model
-							that has to fit on the device instead of a server. A search index
-							that answers in milliseconds with no backend behind it. A booking
-							flow that must never sell the same hour twice. The framework is
-							never the interesting part.
-						</p>
-						<p>
-							Right now that constraint is privacy. The recent apps do their
-							video and audio work entirely on the user's phone or laptop:
-							nothing uploaded, nothing logged, and the whole model running
-							where the file already is.
-						</p>
-						<p class="prose__edu">
-							<span class="prose__lbl">education</span>
-							{
-								profile.education.map((e) => (
-									<span class="prose__row">
-										{e.degree.en}, {e.school.en}
-										<span class="prose__dim">
-											{' '}
-											· {e.period} · {e.note?.en}
-										</span>
-									</span>
-								))
-							}
-						</p>
-					</div>
-				</div>
-			</section>
-
-			<!-- ── history ────────────────────────────────────────────── -->
-			<section class="block" id="history" aria-labelledby="hist-h">
-				<p class="cmdline"><span class="cmdline__q">history</span> --roles</p>
-				<h2 class="h2" id="hist-h">Where the hours went</h2>
-
-				<ol class="hist">
-					{
-						profile.experience.map((e) => (
-							<li class="hist__row">
-								<span class="hist__when">{e.period}</span>
-								<span class="hist__who">
-									{e.company.en}
-									<span class="hist__role">
-										{' '}
-										— {e.role.en}
-										{e.location ? ` (${e.location.en})` : ''}
-									</span>
-								</span>
-								<span class="hist__what">{e.highlights.en[0]}</span>
-							</li>
-						))
-					}
-				</ol>
-			</section>
-
-			<!-- ── toolbox ────────────────────────────────────────────── -->
-			<section class="block" id="stack" aria-labelledby="stack-h">
-				<p class="cmdline"><span class="cmdline__q">cat</span> ~/.toolbox</p>
-				<h2 class="h2" id="stack-h">What I reach for first</h2>
-				<p class="lede">
-					Highlighted by where the code actually executes, which is the only
-					grouping that has ever helped me plan a build.
-				</p>
-
-				<ul class="tools">
-					{
-						toolbox.map((t) => (
-							<li class={`tool tool--${runsOn[t] ?? 'none'}`}>{t}</li>
-						))
-					}
-				</ul>
-
-				<ul class="legend">
-					{
-						legend.map((l) => (
-							<li class={`legend__i tool--${l.key}`}>
-								<span class="legend__sw" aria-hidden="true">
-									■
-								</span>
-								{l.label}
-							</li>
-						))
-					}
-				</ul>
-			</section>
-
-			<!-- ── figures ────────────────────────────────────────────── -->
-			<section class="block" id="stat" aria-labelledby="stat-h">
-				<p class="cmdline"><span class="cmdline__q">stat</span> ~/portfolio</p>
-				<h2 class="h2" id="stat-h">The counts, plainly</h2>
-
-				<dl class="stat">
-					{
-						figures.map((f) => (
-							<div class="stat__row">
-								<dt class="stat__k">{f.k}</dt>
-								<dd class="stat__v">
-									<b>{f.v}</b>
-									<span class="stat__n">{f.n}</span>
-								</dd>
-							</div>
-						))
-					}
-				</dl>
-			</section>
-
-			<!-- ── hire ───────────────────────────────────────────────── -->
-			<section class="block" id="hire" aria-labelledby="hire-h">
-				<p class="cmdline">
-					<span class="cmdline__q">mail</span> -s "work" {profile.email}
-				</p>
-				<h2 class="h2" id="hire-h">Send the brief, not the buzzwords</h2>
-				<p class="lede">
-					Tell me what has to be true when it ships and which side the text
-					starts on. I answer from Amman, within a day, in Arabic or English.
-				</p>
-
-				<p class="hire">
-					<a
-						class="hire__btn"
-						href={`mailto:${profile.email}?subject=Project%20brief`}
-					>
-						{profile.email}
-					</a>
-					<a class="go" href={`tel:${profile.phone.replace(/\s/g, '')}`}>
-						{profile.phone}
-					</a>
-				</p>
-
-				<ul class="dots">
-					{
-						links.map((l) => (
-							<li>
-								<a class="go go--out" href={l.href} rel="noopener noreferrer">
-									{l.label}
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-
-		<footer class="foot">
-			<p class="cmdline cmdline--tight"><span class="cmdline__q">exit</span></p>
-			<p class="foot__line">
-				<span class="foot__code">[0]</span> session ended · built with Astro, no trackers,
-				no cookie wall · © {new Date().getFullYear()} Haitham Assoli
-			</p>
-		</footer>
-
-		<script is:inline>
-			(function () {
-				const body = document.body;
-				const box = document.getElementById('lang');
-				const dirTag = document.querySelector('[data-dir]');
-				const clockEl = document.querySelector('[data-clock]');
-				const wrap = document.querySelector('[data-cmd]');
-				const form = document.querySelector('[data-form]');
-				const input = document.getElementById('cmdline');
-				const out = document.querySelector('[data-out]');
-				const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-				/* language: keep the dir attribute honest for assistive tech. */
-				function syncLang() {
-					const ar = box.checked;
-					body.classList.toggle('is-ar', ar);
-					document.documentElement.setAttribute('dir', ar ? 'rtl' : 'ltr');
-					if (dirTag) dirTag.textContent = ar ? 'dir=rtl' : 'dir=ltr';
-				}
-				if (box) {
-					box.addEventListener('change', syncLang);
-					syncLang();
-				}
-
-				/* live clock in the status line */
-				if (clockEl) {
-					const fmt = new Intl.DateTimeFormat('en-GB', {
-						timeZone: 'Asia/Amman',
-						hour: '2-digit',
-						minute: '2-digit',
-					});
-					const tick = function () {
-						clockEl.textContent = fmt.format(new Date());
-					};
-					tick();
-					setInterval(tick, 20000);
-				}
-
-				if (!wrap || !form || !input || !out) return;
-				wrap.hidden = false;
-
-				const slugs = {};
-				document.querySelectorAll('[id^="f-"]').forEach(function (el) {
-					slugs[el.id.slice(2)] = el;
-				});
-				const featuredIds = {};
-				document.querySelectorAll('[id^="rec-"]').forEach(function (el) {
-					featuredIds[el.id.slice(4)] = el;
-				});
-
-				const routes = {
-					ls: '#work',
-					tree: '#fs',
-					whoami: '#who',
-					history: '#history',
-					stack: '#stack',
-					stat: '#stat',
-					hire: '#hire',
-				};
-
-				const HELP = [
-					'ls            the 8 featured records',
-					'tree          all 39 projects, by category',
-					'open <slug>   jump to a project (try: open naqi)',
-					'cat <slug>    go to its full write-up',
-					'whoami        who Haitham is',
-					'history       where he has worked',
-					'stack         the toolbox',
-					'stat          the figures',
-					'hire          email, phone, links',
-					'lang ar|en    mirror the page',
-					'clear         empty this output',
-				];
-
-				function print(cmd, lines, tone) {
-					const block = document.createElement('div');
-					block.className = 'echo';
-					const head = document.createElement('p');
-					head.className = 'echo__cmd';
-					head.textContent = '❯ ' + cmd;
-					block.appendChild(head);
-					lines.forEach(function (l) {
-						const p = document.createElement('p');
-						p.className = 'echo__line' + (tone ? ' echo__line--' + tone : '');
-						p.textContent = l;
-						block.appendChild(p);
-					});
-					out.appendChild(block);
-					out.scrollTop = out.scrollHeight;
-				}
-
-				function goto(el) {
-					/* the sticky header grows as output accumulates, so the
-					   scroll offset has to be measured, not guessed. */
-					const bar = document.querySelector('.chrome');
-					if (bar)
-						document.documentElement.style.setProperty(
-							'--head',
-							bar.offsetHeight + 16 + 'px',
-						);
-					el.scrollIntoView({
-						behavior: calm.matches ? 'auto' : 'smooth',
-						block: 'start',
-					});
-					el.classList.add('is-hit');
-					setTimeout(function () {
-						el.classList.remove('is-hit');
-					}, 2000);
-				}
-
-				function run(raw) {
-					const line = raw.trim().replace(/\s+/g, ' ');
-					if (!line) return;
-					const parts = line.split(' ');
-					const cmd = parts[0].toLowerCase();
-					const arg = (parts[1] || '').toLowerCase();
-
-					if (cmd === 'help' || cmd === '?') return print(line, HELP);
-					if (cmd === 'clear') {
-						out.textContent = '';
-						return;
-					}
-					if (cmd === 'lang') {
-						if (arg !== 'ar' && arg !== 'en')
-							return print(line, ['usage: lang ar | lang en'], 'err');
-						box.checked = arg === 'ar';
-						syncLang();
-						return print(line, [
-							arg === 'ar'
-								? 'direction mirrored. names switched script.'
-								: 'back to left-to-right.',
-						]);
-					}
-					if (cmd === 'open' || cmd === 'cat') {
-						if (!arg) return print(line, ['usage: ' + cmd + ' <slug>'], 'err');
-						if (!slugs[arg])
-							return print(line, ['no such file: ' + arg], 'err');
-						if (cmd === 'cat') {
-							print(line, ['opening /work/' + arg]);
-							window.location.href = '/work/' + arg;
-							return;
-						}
-						const target = featuredIds[arg] || slugs[arg];
-						print(line, [
-							featuredIds[arg]
-								? 'record found in ~/work'
-								: 'listed in ~/projects — cat ' + arg + ' for the write-up',
-						]);
-						goto(target);
-						return;
-					}
-					if (routes[cmd]) {
-						const sec = document.querySelector(routes[cmd]);
-						print(line, ['→ ' + routes[cmd].slice(1)]);
-						if (sec) goto(sec);
-						return;
-					}
-					print(line, [cmd + ': command not found. try help'], 'err');
-				}
-
-				form.addEventListener('submit', function (e) {
-					e.preventDefault();
-					run(input.value);
-					input.value = '';
-				});
-
-				/* "/" focuses the line, Esc leaves it. Nothing else is captured. */
-				document.addEventListener('keydown', function (e) {
-					const t = e.target;
-					const typing =
-						t &&
-						(t.tagName === 'INPUT' ||
-							t.tagName === 'TEXTAREA' ||
-							t.isContentEditable);
-					if (
-						e.key === '/' &&
-						!typing &&
-						!e.metaKey &&
-						!e.ctrlKey &&
-						!e.altKey
-					) {
-						e.preventDefault();
-						input.focus();
-					} else if (e.key === 'Escape' && t === input) {
-						input.blur();
-					}
-				});
-
-				/* one small piece of theatre: the hero types its own command. */
-				const hero = document.querySelector('.block--hero .cmdline');
-				if (hero && !calm.matches) {
-					const full = hero.textContent.trim();
-					const q = hero.querySelector('.cmdline__q');
-					const rest = full.slice(q ? q.textContent.length : 0);
-					hero.classList.add('is-typing');
-					const tail = document.createTextNode('');
-					hero.textContent = '';
-					if (q) hero.appendChild(q);
-					hero.appendChild(tail);
-					let i = 0;
-					const type = function () {
-						tail.textContent = rest.slice(0, ++i);
-						if (i < rest.length) setTimeout(type, 45);
-						else hero.classList.remove('is-typing');
-					};
-					setTimeout(type, 350);
-				}
-			})();
-		</script>
-
-		<StyleSwitcher n={4} />
-	</body>
-</html>
+<script is:inline>
+	/* One small piece of theatre: the first command types itself. */
+	(function () {
+		const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const hero = document.querySelector('[data-type]');
+		if (!hero || calm.matches) return;
+		const q = hero.querySelector('.cmdline__q');
+		const full = hero.textContent.trim();
+		const rest = full.slice(q ? q.textContent.length : 0);
+		hero.classList.add('is-typing');
+		const tail = document.createTextNode('');
+		hero.textContent = '';
+		if (q) hero.appendChild(q);
+		hero.appendChild(tail);
+		let i = 0;
+		const type = function () {
+			tail.textContent = rest.slice(0, ++i);
+			if (i < rest.length) setTimeout(type, 45);
+			else hero.classList.remove('is-typing');
+		};
+		setTimeout(type, 350);
+	})();
+</script>
 
 <style is:global>
-	/* ── tokens ─────────────────────────────────────────────────────── */
-	:root {
-		--void: #14110e;
-		--panel: #1c1913;
-		--panel-2: #242019;
-		--rule: #3a342c;
-		--ash: #9c9284;
-		--bone: #ede4d3;
-		--amber: #ffb454;
-		--jade: #8fc7a3;
-		--rose: #f08c7c;
-
-		--mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-		--ar: 'IBM Plex Sans Arabic', 'IBM Plex Mono', sans-serif;
-		--serif: 'IBM Plex Serif', Georgia, serif;
-
-		--gutter: clamp(1rem, 4vw, 2.75rem);
-		--measure: 74rem;
-		--head: 5.5rem;
-	}
-
-	*,
-	*::before,
-	*::after {
-		box-sizing: border-box;
-	}
-
-	html {
-		scroll-behavior: smooth;
-		background: var(--void);
-		-webkit-text-size-adjust: 100%;
-	}
-
-	body {
-		margin: 0;
-		padding-block-end: 7rem;
-		background:
-			radial-gradient(
-				120% 60% at 50% 0%,
-				rgba(255, 180, 84, 0.07),
-				transparent 60%
-			),
-			var(--void);
-		color: var(--bone);
-		font-family: var(--mono);
-		font-size: clamp(0.82rem, 0.76rem + 0.3vw, 0.93rem);
-		line-height: 1.7;
-		font-variant-ligatures: none;
-		overflow-x: hidden;
-	}
-
-	:where(a) {
-		color: inherit;
-	}
-
-	:focus-visible {
-		outline: 2px solid var(--amber);
-		outline-offset: 3px;
-		border-radius: 1px;
-	}
-
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
-	}
-
-	.skip {
-		position: fixed;
-		z-index: 60;
-		inset-block-start: 0.5rem;
-		inset-inline-start: 0.5rem;
-		padding: 0.5rem 0.9rem;
-		background: var(--amber);
-		color: var(--void);
-		text-decoration: none;
-		transform: translateY(-200%);
-	}
-
-	.skip:focus {
-		transform: none;
-	}
-
-	/* ── chrome: status line + command line ─────────────────────────── */
-	.chrome {
-		position: sticky;
-		inset-block-start: 0;
-		z-index: 40;
-		background: color-mix(in srgb, var(--void) 92%, transparent);
-		-webkit-backdrop-filter: blur(10px);
-		backdrop-filter: blur(10px);
-		border-block-end: 1px solid var(--rule);
-	}
-
-	.chrome__inner {
-		max-width: var(--measure);
-		margin-inline: auto;
-		padding-inline: var(--gutter);
-	}
-
-	.status {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 0.35rem 0.75rem;
-		padding-block: 0.4rem;
-		font-size: 0.74rem;
-		letter-spacing: 0.02em;
-	}
-
-	.status__tag {
-		background: var(--amber);
-		color: var(--void);
-		padding-inline: 0.5rem;
-		font-weight: 600;
-	}
-
-	.status__path {
-		color: var(--ash);
-	}
-
-	.status__sp {
-		flex: 1 1 auto;
-	}
-
-	.status__dir,
-	.status__clock {
-		color: var(--ash);
-		direction: ltr;
-		unicode-bidi: isolate;
-	}
-
-	.langbox {
-		position: absolute;
-		opacity: 0;
-		width: 1px;
-		height: 1px;
-		pointer-events: none;
-	}
-
-	.lang {
-		border: 1px solid var(--rule);
-		padding: 0.05rem 0.5rem;
-		cursor: pointer;
-		color: var(--bone);
-		white-space: nowrap;
-	}
-
-	.lang:hover {
-		border-color: var(--amber);
-	}
-
-	.langbox:focus-visible + .lang {
-		outline: 2px solid var(--amber);
-		outline-offset: 3px;
-	}
-
-	.lang__k {
-		color: var(--ash);
-	}
-
-	.lang__v {
-		color: var(--amber);
-		font-weight: 600;
-	}
-
-	.lang__v--ar {
-		display: none;
-		font-family: var(--ar);
-	}
-
-	.cmd {
-		padding-block-end: 0.5rem;
-	}
-
-	.cmd__form {
-		display: flex;
-		align-items: baseline;
-		gap: 0.5rem;
-		border: 1px solid var(--rule);
-		background: var(--panel);
-		padding: 0.35rem 0.6rem;
-	}
-
-	.cmd__form:focus-within {
-		border-color: var(--amber);
-	}
-
-	.cmd__caret::before {
-		content: '❯';
-		color: var(--amber);
-		text-shadow: 0 0 10px rgba(255, 180, 84, 0.5);
-	}
-
-	.cmd__input {
-		flex: 1 1 auto;
-		min-width: 0;
-		border: 0;
-		background: transparent;
-		color: var(--bone);
-		font: inherit;
-		padding: 0;
-	}
-
-	.cmd__input:focus {
-		outline: none;
-	}
-
-	.cmd__input::placeholder {
-		color: var(--ash);
-	}
-
-	.cmd__out:not(:empty) {
-		max-height: 8rem;
-		overflow: auto;
-		margin-block-start: 0.4rem;
-		padding: 0.35rem 0.6rem;
-		border: 1px solid var(--rule);
-		border-block-start: 0;
-		background: var(--panel);
-		font-size: 0.74rem;
-		line-height: 1.6;
-	}
-
-	.echo + .echo {
-		margin-block-start: 0.4rem;
-	}
-
-	.echo__cmd,
-	.echo__line {
-		margin: 0;
-		white-space: pre-wrap;
-	}
-
-	.echo__cmd {
-		color: var(--amber);
-	}
-
-	.echo__line {
-		color: var(--ash);
-	}
-
-	.echo__line--err {
-		color: var(--rose);
-	}
-
-	.cmd__hint {
-		margin: 0.35rem 0 0;
-		font-size: 0.7rem;
-		color: var(--ash);
-	}
-
-	kbd {
-		font: inherit;
-		border: 1px solid var(--rule);
-		padding: 0 0.25rem;
-		color: var(--bone);
-	}
-
-	/* ── layout ─────────────────────────────────────────────────────── */
-	.session {
-		max-width: var(--measure);
-		margin-inline: auto;
-		padding-inline: var(--gutter);
-	}
-
-	.block {
-		padding-block: clamp(2.5rem, 6vw, 4.5rem);
-		border-block-end: 1px solid var(--rule);
-		scroll-margin-block-start: var(--head);
-	}
-
+	/* ── hero ───────────────────────────────────────────────────────── */
 	.block--hero {
 		padding-block-start: clamp(2rem, 5vw, 3.5rem);
-	}
-
-	.cmdline {
-		margin: 0 0 0.9rem;
-		color: var(--bone);
-		font-size: 0.8rem;
-		letter-spacing: 0.02em;
-		word-break: break-word;
-	}
-
-	.cmdline::before {
-		content: '❯ ';
-		color: var(--amber);
-		text-shadow: 0 0 10px rgba(255, 180, 84, 0.45);
-	}
-
-	.cmdline--tight {
-		margin-block-end: 0.4rem;
-		font-size: 0.76rem;
-		color: var(--ash);
-	}
-
-	.cmdline__q {
-		color: var(--jade);
-		font-weight: 600;
 	}
 
 	.cmdline.is-typing::after {
@@ -1130,7 +671,12 @@ const linkOrder: Array<
 		}
 	}
 
-	/* ── hero ───────────────────────────────────────────────────────── */
+	@media (prefers-reduced-motion: reduce) {
+		.cmdline.is-typing::after {
+			display: none;
+		}
+	}
+
 	.thesis {
 		margin: 0 0 1.1rem;
 		font-size: clamp(1.65rem, 1rem + 3.6vw, 3.4rem);
@@ -1139,6 +685,12 @@ const linkOrder: Array<
 		letter-spacing: -0.03em;
 		max-width: 20ch;
 		text-wrap: balance;
+	}
+
+	html[lang='ar'] .thesis {
+		line-height: 1.35;
+		letter-spacing: normal;
+		max-width: 18ch;
 	}
 
 	.quote {
@@ -1151,49 +703,21 @@ const linkOrder: Array<
 		max-width: 34ch;
 	}
 
+	/* Arabic has no italic and no serif companion here, so the pull quote
+	   changes instrument rather than being faked into a slant. */
+	.quote[lang='ar'] {
+		font-family: var(--ar);
+		font-style: normal;
+		font-weight: 500;
+		line-height: 1.8;
+	}
+
 	.quote__hash {
 		color: var(--rule);
 		margin-inline-end: 0.4em;
 	}
 
-	.kv {
-		margin: 0;
-		max-width: 58rem;
-		border-block-start: 1px solid var(--rule);
-	}
-
-	.kv__row {
-		display: grid;
-		grid-template-columns: 7.5ch minmax(0, 1fr);
-		gap: 0 1.25ch;
-		padding-block: 0.5rem;
-		border-block-end: 1px solid var(--rule);
-	}
-
-	.kv dt {
-		color: var(--ash);
-		font-size: 0.74rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		padding-block-start: 0.18rem;
-	}
-
-	.kv dd {
-		margin: 0;
-		max-width: 62ch;
-	}
-
-	.kv b {
-		color: var(--amber);
-		font-weight: 600;
-	}
-
-	.kv--tight .kv__row {
-		padding-block: 0.35rem;
-	}
-
-	/* the flip */
-	.flip {
+	.env {
 		margin-block-start: 2.25rem;
 		border: 1px solid var(--rule);
 		border-inline-start: 3px solid var(--amber);
@@ -1201,59 +725,34 @@ const linkOrder: Array<
 		padding: 1rem 1.1rem;
 	}
 
-	.flip__copy {
+	.env__copy {
 		margin: 0 0 1rem;
 		color: var(--ash);
 		max-width: 58ch;
 	}
 
-	.flip__btn {
+	.env__btn {
+		appearance: none;
 		display: inline-block;
+		border: 0;
 		cursor: pointer;
 		background: var(--amber);
 		color: var(--void);
+		font: inherit;
+		font-family: var(--mono);
 		font-weight: 600;
 		padding: 0.4rem 0.9rem;
-		letter-spacing: 0.02em;
 	}
 
-	.flip__btn:hover {
+	.env__btn:hover {
 		background: var(--bone);
 	}
 
-	.flip__off,
-	.rtl-note {
-		display: none;
-	}
-
-	.rtl-note {
-		margin: 1.25rem 0 0;
-		padding: 0.75rem 1rem;
-		border: 1px dashed var(--rule);
+	.env__note {
+		margin: 1rem 0 0;
 		color: var(--jade);
-		font-size: 0.8rem;
-		max-width: 62ch;
-	}
-
-	/* ── headings shared ────────────────────────────────────────────── */
-	.h2 {
-		margin: 0 0 0.6rem;
-		font-size: clamp(1.15rem, 0.95rem + 1.1vw, 1.7rem);
-		font-weight: 600;
-		letter-spacing: -0.015em;
-		line-height: 1.25;
-	}
-
-	.h2__dim {
-		color: var(--ash);
-		font-weight: 400;
-		font-size: 0.75rem;
-	}
-
-	.lede {
-		margin: 0 0 2rem;
-		color: var(--ash);
-		max-width: 62ch;
+		font-size: 0.78rem;
+		max-width: 58ch;
 	}
 
 	/* ── featured records ───────────────────────────────────────────── */
@@ -1263,15 +762,6 @@ const linkOrder: Array<
 		padding: 0;
 		display: grid;
 		gap: 2.75rem;
-	}
-
-	.rec {
-		scroll-margin-block-start: var(--head);
-	}
-
-	.rec.is-hit {
-		outline: 1px solid var(--amber);
-		outline-offset: 0.85rem;
 	}
 
 	.rec__title {
@@ -1325,119 +815,6 @@ const linkOrder: Array<
 		gap: 0.4rem 1.25rem;
 	}
 
-	/* image preview pane */
-	.shot {
-		margin: 0;
-		border: 1px solid var(--rule);
-		background: var(--panel);
-	}
-
-	.shot__bar {
-		display: flex;
-		justify-content: space-between;
-		gap: 0.75rem;
-		padding: 0.25rem 0.6rem;
-		border-block-end: 1px solid var(--rule);
-		background: var(--panel-2);
-		font-size: 0.68rem;
-		color: var(--ash);
-		letter-spacing: 0.03em;
-	}
-
-	.shot__name {
-		color: var(--bone);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.shot__dim {
-		flex: none;
-		direction: ltr;
-		unicode-bidi: isolate;
-	}
-
-	.shot__view {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 0.6rem;
-		min-height: 8rem;
-	}
-
-	.shot__view img {
-		display: block;
-		max-width: 100%;
-		max-height: 19rem;
-		width: auto;
-		height: auto;
-		object-fit: contain;
-	}
-
-	.shot--me {
-		max-width: 14rem;
-	}
-
-	.chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.3rem 0.4rem;
-	}
-
-	.chip {
-		direction: ltr;
-		unicode-bidi: isolate;
-		border: 1px solid var(--rule);
-		padding: 0 0.4rem;
-		font-size: 0.72rem;
-		color: var(--ash);
-		white-space: nowrap;
-	}
-
-	.go {
-		color: var(--bone);
-		text-decoration: none;
-		border-block-end: 1px solid var(--rule);
-		white-space: nowrap;
-	}
-
-	.go::before {
-		content: '→ ';
-		color: var(--amber);
-	}
-
-	.go--out::before {
-		content: '↗ ';
-	}
-
-	.go:hover {
-		color: var(--amber);
-		border-block-end-color: var(--amber);
-	}
-
-	/* status colours: the only meaning colour carries here */
-	.st {
-		font-size: 0.68rem;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--ash);
-		flex: none;
-	}
-
-	.st--live,
-	.st--shipped {
-		color: var(--jade);
-	}
-
-	.st--wip {
-		color: var(--amber);
-	}
-
-	.st--delisted,
-	.st--archived {
-		color: var(--rose);
-	}
-
 	/* ── tree ───────────────────────────────────────────────────────── */
 	.tree,
 	.tree__kids {
@@ -1474,6 +851,11 @@ const linkOrder: Array<
 		margin-inline-start: 0.5rem;
 	}
 
+	html[dir='rtl'] .tree__count {
+		margin-inline-start: 0;
+		margin-inline-end: 0.5rem;
+	}
+
 	.tree__kids {
 		border-inline-start: 1px solid var(--rule);
 		padding-inline-start: 0.9rem;
@@ -1486,18 +868,13 @@ const linkOrder: Array<
 		align-items: baseline;
 		gap: 0 0.75rem;
 		padding-block: 0.12rem;
-		scroll-margin-block-start: var(--head);
 	}
 
 	.tree__file::before {
 		content: '──';
 		color: var(--rule);
 		margin-inline-end: 0.35rem;
-	}
-
-	.tree__file.is-hit {
-		background: var(--panel-2);
-		outline: 1px solid var(--amber);
+		font-family: var(--mono);
 	}
 
 	.tree__link {
@@ -1517,8 +894,14 @@ const linkOrder: Array<
 		color: var(--ash);
 		font-size: 0.72rem;
 		margin-inline-start: auto;
-		direction: ltr;
-		unicode-bidi: isolate;
+	}
+
+	/* The auto margin has to eat the free space on the page's side, not on
+	   the year's own. Without this the year is stranded beside the title and
+	   only the status travels to the end of the row. */
+	html[dir='rtl'] .tree__year {
+		margin-inline-start: 0;
+		margin-inline-end: auto;
 	}
 
 	.tree__total {
@@ -1528,6 +911,25 @@ const linkOrder: Array<
 		border-block-start: 1px solid var(--rule);
 		color: var(--ash);
 		font-size: 0.76rem;
+	}
+
+	.kv__tally {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 1.25ch;
+	}
+
+	.kv__tally > span::after {
+		content: ' ·';
+		color: var(--rule);
+	}
+
+	.kv__tally > span:last-child::after {
+		content: '';
+	}
+
+	.tree__more {
+		margin: 0.75rem 0 0;
 	}
 
 	/* ── whoami ─────────────────────────────────────────────────────── */
@@ -1544,28 +946,29 @@ const linkOrder: Array<
 		}
 	}
 
-	.prose p {
-		margin: 0 0 1rem;
-		max-width: 64ch;
+	.pane--me {
+		max-width: 14rem;
 	}
 
 	.prose__edu {
-		display: grid;
-		gap: 0.15rem;
 		margin-block-start: 1.5rem;
 		padding-block-start: 1rem;
 		border-block-start: 1px solid var(--rule);
 	}
 
 	.prose__lbl {
+		display: block;
 		color: var(--ash);
 		font-size: 0.72rem;
-		text-transform: uppercase;
 		letter-spacing: 0.08em;
 	}
 
+	.prose__lbl[data-l='en'] {
+		text-transform: uppercase;
+	}
+
 	.prose__row {
-		display: block;
+		margin: 0;
 	}
 
 	.prose__dim {
@@ -1588,11 +991,12 @@ const linkOrder: Array<
 		gap: 0.1rem 1.5rem;
 		padding-block: 0.75rem;
 		border-block-end: 1px solid var(--rule);
+		font-family: var(--mono);
 	}
 
 	@media (min-width: 48rem) {
 		.hist__row {
-			grid-template-columns: 11ch minmax(0, 22ch) minmax(0, 1fr);
+			grid-template-columns: 11ch minmax(0, 24ch) minmax(0, 1fr);
 			align-items: baseline;
 		}
 	}
@@ -1601,8 +1005,6 @@ const linkOrder: Array<
 		color: var(--amber);
 		font-size: 0.76rem;
 		white-space: nowrap;
-		direction: ltr;
-		unicode-bidi: isolate;
 	}
 
 	.hist__who {
@@ -1734,7 +1136,6 @@ const linkOrder: Array<
 		color: var(--amber);
 		font-size: clamp(1.2rem, 1rem + 1.4vw, 1.9rem);
 		font-weight: 600;
-		font-variant-numeric: tabular-nums;
 		min-width: 2.5ch;
 		text-align: end;
 	}
@@ -1760,7 +1161,6 @@ const linkOrder: Array<
 		text-decoration: none;
 		font-weight: 600;
 		padding: 0.45rem 1rem;
-		word-break: break-all;
 	}
 
 	.hire__btn:hover {
@@ -1776,116 +1176,9 @@ const linkOrder: Array<
 		gap: 0.4rem 1.5rem;
 	}
 
-	/* ── footer ─────────────────────────────────────────────────────── */
-	.foot {
-		max-width: var(--measure);
-		margin-inline: auto;
-		padding: 2rem var(--gutter) 0;
-		color: var(--ash);
-		font-size: 0.76rem;
-	}
-
-	.foot__line {
-		margin: 0;
-	}
-
-	.foot__code {
-		color: var(--jade);
-	}
-
-	/* ── the mirror ─────────────────────────────────────────────────── */
-	.bi__ar {
-		display: none;
-		font-family: var(--ar);
-	}
-
-	/* `:is()` is forgiving, so browsers without :has() still get the
-	   JavaScript path through .is-ar and nothing here breaks. */
-	:is(body.is-ar, body:has(#lang:checked))
-		:is(.session, .chrome__inner, .foot) {
-		direction: rtl;
-	}
-
-	/* A command is not prose. Paths, digits and the prompt stay LTR. */
-	:is(body.is-ar, body:has(#lang:checked))
-		:is(.cmd__form, .cmdline, .echo, .status__tag, .status__path) {
-		direction: ltr;
-		text-align: start;
-	}
-
-	/* English paragraphs keep their own reading order inside the mirror —
-	   only their alignment flips. Letting them inherit rtl would move the
-	   full stop to the front of the sentence, which is the classic bug. */
-	:is(body.is-ar, body:has(#lang:checked))
-		:is(
-			.thesis,
-			.quote,
-			.h2,
-			.lede,
-			.rec__sum,
-			.rec__tag,
-			.flip__copy,
-			.rtl-note,
-			.cmd__hint,
-			.foot__line,
-			.tree__total,
-			.hist__who,
-			.hist__what,
-			.stat__k,
-			.legend__i,
-			.prose p,
-			.prose__row,
-			.kv dd
-		) {
-		direction: ltr;
-		text-align: end;
-	}
-
-	:is(body.is-ar, body:has(#lang:checked))
-		:is(.bi__en, .lang__v--en, .flip__on) {
-		display: none;
-	}
-
-	:is(body.is-ar, body:has(#lang:checked)) :is(.bi__ar, .lang__v--ar) {
-		display: inline;
-	}
-
-	:is(body.is-ar, body:has(#lang:checked)) :is(.flip__off, .rtl-note) {
-		display: block;
-	}
-
-	/* ── reduced motion ─────────────────────────────────────────────── */
-	@media (prefers-reduced-motion: reduce) {
-		html {
-			scroll-behavior: auto;
-		}
-
-		*,
-		*::before,
-		*::after {
-			animation-duration: 0.001ms !important;
-			animation-iteration-count: 1 !important;
-			transition-duration: 0.001ms !important;
-		}
-
-		.cmdline.is-typing::after {
-			display: none;
-		}
-	}
-
-	/* ── narrow ─────────────────────────────────────────────────────── */
 	@media (max-width: 30rem) {
-		.kv__row {
-			grid-template-columns: minmax(0, 1fr);
-			gap: 0.1rem;
-		}
-
 		.tree__year {
 			margin-inline-start: 0;
-		}
-
-		.status {
-			font-size: 0.7rem;
 		}
 	}
 </style>

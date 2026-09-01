@@ -1,0 +1,809 @@
+---
+/* 依頼 — the brief form, set as a 願書: field names ruled down the gutter in
+   Japanese, the reader's own language beside them. Nothing is posted; the
+   shared composer opens a mail draft in whichever language is on screen. */
+import { profile } from '../../../content/profile';
+import { deals, locations, techStack } from '../../i18n';
+import type { Key } from '../../i18n';
+import type { I18n } from '../../../content/types';
+import { pair, s } from '../../data/variant-ui';
+import HireCompose from '../../components/HireCompose.astro';
+import T from '../../components/T.astro';
+import Shell from './_shell.astro';
+
+const dealT = (d: string): I18n => s(`deal.${d}` as Key);
+const locT = (l: string): I18n => s(`loc.${l}` as Key);
+const techT = (t: string): I18n => s(`tech.${t}` as Key);
+
+/* 心得 — four things worth knowing before you write. */
+const kokoroe = [
+	{
+		n: '一',
+		ja: '引受',
+		head: pair('What I take on', 'ما أتولّاه'),
+		body: pair(
+			'Bilingual web and mobile products, Arabic-first and right to left. React Native onto both stores, Next.js and Astro on the web, and the backend under either. On-device AI when the work is not allowed to leave the handset.',
+			'منتجات ويب وجوّال بلغتين، عربية أولًا ومن اليمين إلى اليسار. React Native إلى المتجرين، وNext.js وAstro على الويب، والخادم تحت أيٍّ منهما. وذكاء اصطناعي على الجهاز حين لا يجوز للعمل أن يغادر الهاتف.',
+		),
+	},
+	{
+		n: '二',
+		ja: '進め方',
+		head: pair('How it goes', 'كيف يجري العمل'),
+		body: pair(
+			'Requirements first, then a written approach with a scope and a date on it. I ship in slices you can actually use, and hand over the repository, the store listings and the runbook.',
+			'المتطلبات أولًا، ثم مقاربة مكتوبة بنطاق وموعد. أُصدر على دفعات قابلة للاستخدام فعلًا، وأسلّم المستودع وصفحات المتجر ودليل التشغيل.',
+		),
+	},
+	{
+		n: '三',
+		ja: '返信',
+		head: pair('Reply', 'الرد'),
+		body: pair(
+			'Two business days, in English or Arabic, with a straight yes, a straight no, or the one question that decides it.',
+			'خلال يومي عمل، بالعربية أو بالإنجليزية، بنعم صريحة أو لا صريحة أو بالسؤال الذي يحسم الأمر.',
+		),
+	},
+	{
+		n: '四',
+		ja: '費用',
+		head: pair('Money', 'الأجر'),
+		body: pair(
+			'A fixed price for a defined scope, a day rate for open-ended work. Tell me the budget and I will tell you what fits inside it.',
+			'سعر ثابت لنطاق محدّد، وأجر يومي للعمل المفتوح. أخبرني بالميزانية وأخبرك بما يتّسع لها.',
+		),
+	},
+];
+
+const notSent = pair(
+	'Nothing leaves this page. Pressing the button opens a draft in your own mail app, already written, and you send it yourself.',
+	'لا شيء يغادر هذه الصفحة. الضغط على الزر يفتح مسودة في تطبيق بريدك، مكتوبة سلفًا، وترسلها أنت.',
+);
+---
+
+<Shell
+	title="Tell me about the project — Haitham Assoli 依頼"
+	description="Send Haitham Assoli a project brief. The form writes the email for you and opens it in your own mail app; nothing is sent until you press send."
+	current="hire"
+>
+	<HireCompose />
+
+	<div class="wrap">
+		<div class="daisen">
+			<p class="daisen__ja tate" lang="ja">依頼</p>
+			<div>
+				<h1 class="daisen__h">
+					<T v={s('hire.title')} />
+					<span class="daisen__hja" lang="ja">依頼</span>
+				</h1>
+				<T as="p" class="daisen__lede" v={s('hire.lede')} />
+			</div>
+		</div>
+
+		<section class="kokoroe" aria-labelledby="kokoroe-h">
+			<h2 class="kokoroe__h" id="kokoroe-h">
+				<span lang="ja">心得</span>
+				<T v={pair('Before you write', 'قبل أن تكتب')} />
+			</h2>
+			<ol class="kokoroe__list">
+				{
+					kokoroe.map((k) => (
+						<li class="kokoroe__item rise">
+							<p class="kokoroe__mark tate" lang="ja" aria-hidden="true">
+								{k.n}
+								{k.ja}
+							</p>
+							<div>
+								<T v={k.head} class="kokoroe__head" />
+								<T as="p" class="kokoroe__body" v={k.body} />
+							</div>
+						</li>
+					))
+				}
+			</ol>
+		</section>
+
+		<section class="gansho" aria-labelledby="gansho-h">
+			<p class="marker tate" lang="ja" aria-hidden="true">願書</p>
+
+			<div class="gansho__body">
+				<h2 class="gansho__h" id="gansho-h">
+					<T v={pair('The brief', 'وصف المشروع')} />
+					<span class="gansho__hja" lang="ja">願書</span>
+				</h2>
+				<p class="gansho__key">
+					<span class="req" aria-hidden="true">※</span>
+					<T
+						v={pair('Marked fields are required.', 'الحقول المؤشَّرة مطلوبة.')}
+					/>
+				</p>
+
+				<form class="form" data-hire>
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">氏名</p>
+						<div class="fld__body">
+							<label class="fld__label" for="fullName">
+								<T v={s('hire.fullName')} />
+								<span class="req" aria-hidden="true">※</span>
+							</label>
+							<input
+								class="inp"
+								id="fullName"
+								name="fullName"
+								type="text"
+								autocomplete="name"
+								required
+							/>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">電郵</p>
+						<div class="fld__body">
+							<label class="fld__label" for="email">
+								<T v={s('hire.email')} />
+								<span class="req" aria-hidden="true">※</span>
+							</label>
+							<input
+								class="inp"
+								id="email"
+								name="email"
+								type="email"
+								autocomplete="email"
+								dir="ltr"
+								required
+							/>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">電話</p>
+						<div class="fld__body">
+							<label class="fld__label" for="phone">
+								<T v={s('hire.phone')} />
+								<span class="req" aria-hidden="true">※</span>
+							</label>
+							<input
+								class="inp"
+								id="phone"
+								name="phone"
+								type="tel"
+								autocomplete="tel"
+								dir="ltr"
+								required
+							/>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">形態</p>
+						<div class="fld__body">
+							<fieldset class="set">
+								<legend class="fld__label">
+									<T v={s('hire.deal')} />
+									<span class="req" aria-hidden="true">※</span>
+								</legend>
+								<div class="opts">
+									{
+										deals.map((d, i) => (
+											<label class="opt">
+												<input
+													type="radio"
+													name="deal"
+													value={d}
+													required={i === 0}
+												/>
+												<T v={dealT(d)} class="opt__t" />
+											</label>
+										))
+									}
+								</div>
+							</fieldset>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">場所</p>
+						<div class="fld__body">
+							<fieldset class="set">
+								<legend class="fld__label">
+									<T v={s('hire.location')} />
+									<span class="req" aria-hidden="true">※</span>
+								</legend>
+								<div class="opts">
+									{
+										locations.map((l, i) => (
+											<label class="opt">
+												<input
+													type="radio"
+													name="location"
+													value={l}
+													required={i === 0}
+												/>
+												<T v={locT(l)} class="opt__t" />
+											</label>
+										))
+									}
+								</div>
+							</fieldset>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">分野</p>
+						<div class="fld__body">
+							<fieldset class="set">
+								<legend class="fld__label"><T v={s('hire.techStack')} /></legend
+								>
+								<div class="opts">
+									{
+										techStack.map((t) => (
+											<label class="opt opt--box">
+												<input type="checkbox" name="techStack" value={t} />
+												<T v={techT(t)} class="opt__t" />
+											</label>
+										))
+									}
+								</div>
+							</fieldset>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">予算</p>
+						<div class="fld__body">
+							<label class="fld__label" for="budget">
+								<T v={s('hire.budget')} />
+								<span class="req" aria-hidden="true">※</span>
+							</label>
+							<p class="fld__hint" id="budget-hint">
+								<T v={s('hire.budgetPlaceholder')} />
+							</p>
+							<input
+								class="inp"
+								id="budget"
+								name="budget"
+								type="text"
+								aria-describedby="budget-hint"
+								required
+							/>
+						</div>
+					</div>
+
+					<div class="fld">
+						<p class="fld__ja tate" lang="ja" aria-hidden="true">概要</p>
+						<div class="fld__body">
+							<label class="fld__label" for="summary">
+								<T v={s('hire.summary')} />
+								<span class="req" aria-hidden="true">※</span>
+							</label>
+							<p class="fld__hint" id="summary-hint">
+								<T v={s('hire.summaryPlaceholder')} />
+							</p>
+							<textarea
+								class="inp inp--area"
+								id="summary"
+								name="summary"
+								rows="6"
+								aria-describedby="summary-hint"
+								required></textarea>
+						</div>
+					</div>
+
+					<div class="send">
+						<button class="send__btn" type="submit">
+							<span class="send__ja" lang="ja" aria-hidden="true">送</span>
+							<T v={s('hire.submit')} class="send__t" />
+						</button>
+						<div class="send__notes">
+							<T as="p" class="send__note" v={notSent} />
+							<T as="p" class="send__note" v={s('hire.note')} />
+						</div>
+					</div>
+
+					<div class="kakunin" role="status">
+						<p class="kakunin__ja" lang="ja" aria-hidden="true">受付</p>
+						<div>
+							<T as="p" class="kakunin__line" v={s('hire.sent')} />
+							<p class="kakunin__mail">
+								<a
+									class="lnk"
+									href={`mailto:${profile.email}`}
+									lang="en"
+									dir="ltr">{profile.email}</a
+								>
+							</p>
+						</div>
+					</div>
+				</form>
+			</div>
+		</section>
+	</div>
+
+	<style is:global>
+		/* ── 心得 ─────────────────────────────────────────── */
+
+		.kokoroe {
+			margin-top: clamp(2.5rem, 6vw, 4rem);
+			padding-block: clamp(1.75rem, 4vw, 2.5rem);
+			border-block: 1px solid var(--rule);
+		}
+
+		.kokoroe__h {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.75rem;
+			font-family: var(--jp);
+			font-size: 1rem;
+			font-weight: 400;
+			letter-spacing: 0.3em;
+			color: var(--ai);
+		}
+
+		.kokoroe__h [data-l] {
+			font-family: var(--gothic);
+			font-size: 0.66rem;
+			font-weight: 500;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			color: var(--usuzumi);
+		}
+
+		.kokoroe__h [data-l='ar'] {
+			font-family: var(--ar);
+			font-size: 0.9rem;
+			font-weight: 400;
+		}
+
+		.kokoroe__list {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+			gap: clamp(1.5rem, 4vw, 2.75rem);
+			margin-top: 1.75rem;
+		}
+
+		.kokoroe__item {
+			display: grid;
+			grid-template-columns: 2rem minmax(0, 1fr);
+			gap: 0.85rem;
+			align-items: start;
+		}
+
+		.kokoroe__mark {
+			margin: 0;
+			height: 6.5rem;
+			justify-self: center;
+			font-size: 0.95rem;
+			font-weight: 600;
+			letter-spacing: 0.28em;
+			color: var(--ai);
+		}
+
+		.kokoroe__head {
+			display: block;
+			margin-bottom: 0.45rem;
+			font-family: var(--gothic);
+			font-size: 0.68rem;
+			font-weight: 500;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			color: var(--usuzumi);
+		}
+
+		.kokoroe__head[lang='ar'] {
+			font-family: var(--ar);
+			font-size: 0.92rem;
+			font-weight: 400;
+		}
+
+		.kokoroe__body {
+			font-size: 0.94rem;
+			line-height: 1.7;
+			color: #3a4249;
+		}
+
+		.kokoroe__body[lang='ar'] {
+			line-height: 1.95;
+		}
+
+		/* ── 願書 ─────────────────────────────────────────── */
+
+		.gansho {
+			display: grid;
+			grid-template-columns: 3.5rem minmax(0, 1fr);
+			gap: clamp(1rem, 3vw, 2.5rem);
+			margin-top: clamp(2.5rem, 6vw, 4rem);
+		}
+
+		.gansho__body {
+			min-width: 0;
+		}
+
+		.gansho__h {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.8rem;
+			font-family: var(--body);
+			font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+			font-weight: 300;
+			line-height: 1.15;
+		}
+
+		.gansho__h [data-l='ar'] {
+			font-family: var(--ar);
+			font-size: 0.92em;
+			font-weight: 400;
+			line-height: 1.5;
+		}
+
+		.gansho__hja {
+			font-family: var(--jp);
+			font-size: 0.44em;
+			letter-spacing: 0.28em;
+			color: var(--usuzumi);
+		}
+
+		.gansho__key {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.5rem;
+			margin-top: 0.75rem;
+			font-family: var(--gothic);
+			font-size: 0.72rem;
+			letter-spacing: 0.08em;
+			color: var(--usuzumi);
+		}
+
+		.gansho__key [lang='ar'] {
+			font-family: var(--ar);
+			font-size: 0.92rem;
+		}
+
+		.req {
+			color: var(--ai);
+			font-family: var(--jp);
+			font-size: 0.8em;
+		}
+
+		.form {
+			margin-top: clamp(1.75rem, 4vw, 2.75rem);
+			max-width: 58rem;
+			padding: clamp(1.25rem, 4vw, 2.5rem);
+			background: var(--washi);
+			border: 1px solid var(--rule-soft);
+			box-shadow:
+				0 1px 0 rgba(255, 255, 255, 0.7) inset,
+				0 18px 34px -30px rgba(30, 37, 43, 0.6);
+		}
+
+		.fld {
+			display: grid;
+			grid-template-columns: 2.75rem minmax(0, 1fr);
+			gap: clamp(0.85rem, 2.5vw, 1.5rem);
+			padding-block: clamp(1rem, 2.5vw, 1.5rem);
+			border-bottom: 1px solid var(--rule-soft);
+		}
+
+		.fld:first-child {
+			padding-top: 0;
+		}
+
+		.fld__ja {
+			margin: 0;
+			height: 3.6rem;
+			justify-self: center;
+			font-size: 0.95rem;
+			letter-spacing: 0.24em;
+			color: var(--ai);
+		}
+
+		.fld__body {
+			min-width: 0;
+		}
+
+		.fld__label {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.4rem;
+			font-family: var(--gothic);
+			font-size: 0.74rem;
+			font-weight: 500;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--usuzumi);
+		}
+
+		.fld__label [data-l='ar'] {
+			font-family: var(--ar);
+			font-size: 0.95rem;
+			font-weight: 400;
+		}
+
+		.fld__hint {
+			margin-top: 0.3rem;
+			font-size: 0.86rem;
+			line-height: 1.6;
+			color: var(--usuzumi);
+		}
+
+		.fld__hint [lang='ar'] {
+			font-size: 0.95rem;
+			line-height: 1.9;
+		}
+
+		.inp {
+			display: block;
+			width: 100%;
+			margin-top: 0.55rem;
+			padding: 0.5rem 0;
+			border: 0;
+			border-bottom: 1px solid var(--rule);
+			border-radius: 0;
+			background: transparent;
+			color: var(--sumi);
+			font-family: var(--body);
+			font-size: 1.02rem;
+			font-weight: 300;
+			line-height: 1.6;
+			transition: border-color 0.25s;
+		}
+
+		html[lang='ar'] .inp {
+			font-family: var(--ar);
+			line-height: 1.9;
+		}
+
+		.inp:hover {
+			border-bottom-color: rgba(30, 37, 43, 0.32);
+		}
+
+		.inp:focus {
+			border-bottom-color: var(--ai);
+		}
+
+		.inp:focus-visible {
+			outline: 2px solid var(--ai);
+			outline-offset: 4px;
+		}
+
+		.inp--area {
+			resize: vertical;
+			min-height: 8rem;
+			border: 1px solid var(--rule);
+			padding: 0.7rem 0.8rem;
+			background: rgba(255, 255, 255, 0.4);
+		}
+
+		.inp--area:focus {
+			border-color: var(--ai);
+		}
+
+		/* :user-invalid, not :invalid — an empty required field the reader has
+		   not reached yet is not a mistake, and should not be inked as one. */
+		.inp:user-invalid {
+			border-bottom-color: rgba(200, 69, 44, 0.55);
+		}
+
+		.set {
+			display: block;
+		}
+
+		.opts {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem 1.5rem;
+			margin-top: 0.8rem;
+		}
+
+		.opt {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.55rem;
+			cursor: pointer;
+		}
+
+		.opt input {
+			appearance: none;
+			-webkit-appearance: none;
+			flex: 0 0 auto;
+			width: 0.95rem;
+			height: 0.95rem;
+			margin: 0;
+			border: 1px solid var(--rule);
+			border-radius: 50%; /* 〇 for a single choice */
+			background: #fff;
+			cursor: pointer;
+			transition:
+				background-color 0.2s,
+				border-color 0.2s;
+		}
+
+		.opt--box input {
+			border-radius: 0; /* □ where more than one may be ticked */
+		}
+
+		.opt input:checked {
+			background: var(--ai);
+			border-color: var(--ai);
+			box-shadow: inset 0 0 0 2px var(--washi);
+		}
+
+		.opt input:focus-visible {
+			outline: 2px solid var(--ai);
+			outline-offset: 3px;
+		}
+
+		.opt:hover input {
+			border-color: var(--ai);
+		}
+
+		.opt__t {
+			font-family: var(--body);
+			font-size: 0.98rem;
+		}
+
+		.opt__t[lang='ar'] {
+			font-size: 1.05rem;
+		}
+
+		/* ── 送 ───────────────────────────────────────────── */
+
+		.send {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 1.25rem clamp(1.25rem, 4vw, 2.25rem);
+			padding-top: clamp(1.5rem, 4vw, 2.25rem);
+		}
+
+		.send__btn {
+			display: inline-flex;
+			align-items: baseline;
+			gap: 0.6rem;
+			padding: 0.7rem 1.5rem;
+			border: 1px solid var(--sumi);
+			background: var(--sumi);
+			color: var(--kinari);
+			cursor: pointer;
+			transition:
+				background-color 0.25s,
+				color 0.25s;
+		}
+
+		.send__btn:hover {
+			background: var(--ai);
+			border-color: var(--ai);
+		}
+
+		.send__ja {
+			font-family: var(--jp);
+			font-size: 1rem;
+			font-weight: 600;
+			letter-spacing: 0.1em;
+		}
+
+		.send__t {
+			font-family: var(--gothic);
+			font-size: 0.78rem;
+			font-weight: 500;
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+		}
+
+		.send__t[lang='ar'] {
+			font-family: var(--ar);
+			font-size: 1rem;
+			font-weight: 400;
+		}
+
+		.send__notes {
+			flex: 1 1 18rem;
+			min-width: 0;
+		}
+
+		.send__note {
+			max-width: 34em;
+			font-size: 0.86rem;
+			line-height: 1.65;
+			color: var(--usuzumi);
+		}
+
+		.send__note[lang='ar'] {
+			font-size: 0.95rem;
+			line-height: 1.9;
+		}
+
+		.send__note + .send__note {
+			margin-top: 0.4rem;
+		}
+
+		/* ── 受付 — shown only once the draft has been opened ── */
+
+		.kakunin {
+			display: none;
+			grid-template-columns: 2.75rem minmax(0, 1fr);
+			gap: clamp(0.85rem, 2.5vw, 1.5rem);
+			margin-top: clamp(1.5rem, 4vw, 2.25rem);
+			padding-top: clamp(1.25rem, 3vw, 1.75rem);
+			border-top: 1px solid var(--rule);
+		}
+
+		.form[data-sent] .kakunin {
+			display: grid;
+		}
+
+		.kakunin__ja {
+			justify-self: center;
+			writing-mode: vertical-rl;
+			direction: ltr;
+			text-orientation: upright;
+			font-family: var(--jp);
+			font-size: 0.95rem;
+			font-weight: 600;
+			letter-spacing: 0.1em;
+			color: var(--ai);
+		}
+
+		.kakunin__line {
+			max-width: 36em;
+			font-size: 0.98rem;
+			line-height: 1.7;
+		}
+
+		.kakunin__line[lang='ar'] {
+			line-height: 1.95;
+		}
+
+		.kakunin__mail {
+			margin-top: 0.7rem;
+		}
+
+		/* ── narrower ─────────────────────────────────────── */
+
+		@media (max-width: 48rem) {
+			.gansho {
+				grid-template-columns: minmax(0, 1fr);
+			}
+
+			.marker {
+				writing-mode: horizontal-tb;
+				justify-self: start;
+				margin-bottom: 0.4rem;
+				font-size: 0.95rem;
+				letter-spacing: 0.45em;
+			}
+
+			.fld,
+			.kakunin {
+				grid-template-columns: minmax(0, 1fr);
+				gap: 0.5rem;
+			}
+
+			/* The gutter is gone, so the field name lies down above its row. */
+			.fld__ja,
+			.kakunin__ja {
+				writing-mode: horizontal-tb;
+				height: auto;
+				justify-self: start;
+				text-orientation: mixed;
+				letter-spacing: 0.35em;
+			}
+
+			.kokoroe__item {
+				grid-template-columns: minmax(0, 1fr);
+				gap: 0.5rem;
+			}
+
+			.kokoroe__mark {
+				writing-mode: horizontal-tb;
+				height: auto;
+				justify-self: start;
+				letter-spacing: 0.3em;
+			}
+		}
+	</style>
+</Shell>

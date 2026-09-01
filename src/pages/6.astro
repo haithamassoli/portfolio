@@ -3,34 +3,35 @@ import { Image } from 'astro:assets';
 import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
+import LangBoot from '../components/LangBoot.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
+import T from '../components/T.astro';
+import { s, pair, yearPair } from '../data/variant-ui';
 import profilePhoto from '../assets/images/profile.png';
+import type { I18n, ProjectCategory, ProjectStatus } from '../../content/types';
 
 /* Plain words for the data. The film language lives in the type, not in
-   euphemisms for what actually shipped. */
-const statusWord: Record<string, string> = {
-	live: 'Live',
-	shipped: 'Shipped',
-	delisted: 'Delisted',
-	wip: 'In production',
-	archived: 'Archived',
+   euphemisms for what actually shipped. The one exception earns it: a build
+   still in progress is "in production" in both languages, which is true twice
+   over. */
+const stateWord = (st: ProjectStatus): I18n =>
+	st === 'wip' ? pair('In production', 'قيد الإنتاج') : s(`status.${st}`);
+
+const catKey: Record<ProjectCategory, Parameters<typeof s>[0]> = {
+	web: 'cat.web',
+	mobile: 'cat.mobile',
+	ai: 'cat.ai',
+	desktop: 'cat.desktop',
+	extension: 'cat.extension',
+	client: 'cat.client',
 };
 
-const kindWord: Record<string, string> = {
-	web: 'Web',
-	mobile: 'Mobile',
-	desktop: 'Desktop',
-	extension: 'Extension',
-	ai: 'On-device AI',
-	client: 'Client work',
-};
-
-const linkWord: Record<string, string> = {
-	live: 'Open it',
-	github: 'Source',
-	appStore: 'App Store',
-	playGoogle: 'Google Play',
-	vscode: 'VS Code',
+const linkKey: Record<string, Parameters<typeof s>[0]> = {
+	live: 'project.live',
+	github: 'project.github',
+	appStore: 'project.apple',
+	playGoogle: 'project.play',
+	vscode: 'project.vscode',
 };
 
 /* Every still is framed by the same gate. Portrait phone captures stand
@@ -39,41 +40,64 @@ const isPortrait = (img?: ImageMetadata) => !!img && img.height > img.width;
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-const specs: [string, string][] = [
-	['Running time', 'About four years'],
-	['Titles', '39 shipped'],
-	['In distribution', '13 on the app stores'],
-	['Written up', '8 full cases'],
-	['Format', 'Arabic and English, RTL and LTR'],
-	['Sound', 'On-device. No cloud, no telemetry'],
-	['Shot in', profile.location.en],
+const specs: [I18n, I18n][] = [
+	[
+		pair('Running time', 'مدة العرض'),
+		pair('About four years', 'نحو أربع سنوات'),
+	],
+	[pair('Titles', 'الأعمال'), pair('39 shipped', '39 عملًا صدرت')],
+	[
+		pair('In distribution', 'في التوزيع'),
+		pair('13 on the app stores', '13 على متاجر التطبيقات'),
+	],
+	[
+		pair('Written up', 'التوثيق'),
+		pair('8 full cases', '8 مشاريع مشروحة بالكامل'),
+	],
+	[
+		pair('Format', 'الصيغة'),
+		pair('Arabic and English, RTL and LTR', 'عربية وإنجليزية، يمينًا ويسارًا'),
+	],
+	[
+		pair('Sound', 'الصوت'),
+		pair(
+			'On device. No cloud, no telemetry',
+			'على الجهاز. بلا سحابة وبلا تتبّع',
+		),
+	],
+	[pair('Shot in', 'موقع التصوير'), profile.location],
 ];
 
-const booking: [string, string, string][] = [
-	['Mail', profile.email, `mailto:${profile.email}`],
-	['Phone', profile.phone, `tel:${profile.phone.replace(/\s/g, '')}`],
-	['GitHub', 'haithamassoli', profile.links.github],
-	['LinkedIn', 'haithamassoli', profile.links.linkedin],
-	['Site', 'assoli.site', profile.links.website],
-	['CV', 'cv.assoli.site', profile.links.resume],
-	['Google Play', 'Developer page', profile.links.playStore],
+const booking: [I18n, string, string][] = [
+	[pair('Mail', 'البريد'), profile.email, `mailto:${profile.email}`],
+	[
+		pair('Phone', 'الهاتف'),
+		profile.phone,
+		`tel:${profile.phone.replace(/\s/g, '')}`,
+	],
+	[pair('GitHub', 'GitHub'), 'haithamassoli', profile.links.github],
+	[pair('LinkedIn', 'LinkedIn'), 'haithamassoli', profile.links.linkedin],
+	[pair('Site', 'الموقع'), 'assoli.site', profile.links.website],
+	[s('nav.cv'), 'cv.assoli.site', profile.links.resume],
+	[s('project.play'), 'Developer page', profile.links.playStore],
 ];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Haitham Assoli — Night Reel</title>
 		<meta
 			name="description"
-			content="Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products that work in two scripts and two directions."
+			content="Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products that work in two scripts and two directions. Readable in Arabic and English."
 		/>
+		<LangBoot />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
 			rel="stylesheet"
 		/>
 	</head>
@@ -82,6 +106,10 @@ const booking: [string, string, string][] = [
 		<script is:inline>
 			document.documentElement.classList.add('js');
 		</script>
+
+		<a class="skip" href="#reel">
+			<T v={s('nav.skip')} />
+		</a>
 
 		<div class="shutter" aria-hidden="true">
 			<span class="shutter__leaf shutter__leaf--top"></span>
@@ -92,46 +120,99 @@ const booking: [string, string, string][] = [
 		<div class="grain" aria-hidden="true"></div>
 		<div class="vignette" aria-hidden="true"></div>
 
-		<div class="gate gate--top" aria-hidden="true">
-			<span class="gate__mark">Haitham Assoli</span>
-			<span class="gate__mark gate__mark--end" data-tc>00:00:00:00</span>
+		<div class="gate gate--top">
+			<span class="gate__mark" aria-hidden="true">
+				<T v={pair('Haitham Assoli', 'هيثم العسولي')} />
+			</span>
+
+			<button class="slate" type="button" data-lang-toggle>
+				<span class="slate__sticks" aria-hidden="true"></span>
+				<span class="slate__fields" aria-hidden="true">
+					<span class="slate__field slate__field--en">EN</span>
+					<span class="slate__field slate__field--ar">ع</span>
+				</span>
+				<span class="vh" data-l="en" lang="en">Read this reel in Arabic</span>
+				<span class="vh" data-l="ar" lang="ar">اقرأ هذه البكرة بالإنجليزية</span
+				>
+			</button>
+
+			<span class="gate__mark gate__mark--end" aria-hidden="true" data-tc
+				>00:00:00:00</span
+			>
 		</div>
+
 		<div class="gate gate--bottom" aria-hidden="true">
-			<span class="gate__mark" data-now>Reel 2022 — 2026</span>
-			<span class="gate__mark gate__mark--end">Amman, Jordan</span>
+			<span class="gate__mark" data-now>
+				<span data-l="en" lang="en">Reel 2022 — 2026</span>
+				<span data-l="ar" lang="ar">بكرة 2022 — 2026</span>
+			</span>
+			<span class="gate__mark gate__mark--end">
+				<T v={profile.location} />
+			</span>
 		</div>
 
 		<main>
 			<section class="card" id="top">
 				<div class="wrap">
 					<p class="eyebrow rise" style="--d: 0.1s">
-						Reel 2022 — 2026 · Amman, Jordan
+						<T v={pair('Reel 2022 — 2026', 'بكرة 2022 — 2026')} />
+						<span aria-hidden="true"> · </span>
+						<T v={profile.location} />
 					</p>
-					<h1 class="card__title rise" style="--d: 0.2s">
+
+					<h1 class="card__title rise" style="--d: 0.2s" data-l="en" lang="en">
 						A mirrored UI is<br /> a different UI
 					</h1>
-					<p class="card__sub rise" style="--d: 0.35s">not a translation</p>
-					<p class="logline rise" style="--d: 0.45s">
+					<h1 class="card__title rise" style="--d: 0.2s" data-l="ar" lang="ar">
+						الواجهة المعكوسة<br /> واجهة أخرى
+					</h1>
+
+					<T
+						v={pair('not a translation', 'وليست ترجمة')}
+						as="p"
+						class="card__sub rise"
+					/>
+
+					<p class="logline rise" style="--d: 0.45s" data-l="en" lang="en">
 						Haitham Assoli builds web and mobile products that have to hold up
 						in two scripts and two directions. Arabic first, English beside it,
 						the whole layout flipped and re-lit. Same data, two different films.
 					</p>
+					<p class="logline rise" style="--d: 0.45s" data-l="ar" lang="ar">
+						يبني هيثم العسولي منتجات ويب وموبايل عليها أن تصمد في كتابتين
+						واتجاهين. العربية أولًا، والإنجليزية إلى جانبها، والتخطيط كله ينقلب
+						ويُضاء من جديد. البيانات نفسها، وفِلمان مختلفان.
+					</p>
 
 					<div class="billing rise" style="--d: 0.55s">
-						<p class="billing__role">Written, designed and shipped by</p>
-						<p class="billing__name">Haitham Assoli</p>
-						<p class="billing__role">
+						<T
+							v={pair(
+								'Written, designed and shipped by',
+								'كتابةً وتصميمًا وإطلاقًا',
+							)}
+							as="p"
+							class="billing__role"
+						/>
+						<T
+							v={pair('Haitham Assoli', 'هيثم العسولي')}
+							as="p"
+							class="billing__name"
+						/>
+						<p class="billing__role" data-l="en" lang="en">
 							{profile.title.en} · 39 titles · 13 on the app stores
+						</p>
+						<p class="billing__role" data-l="ar" lang="ar">
+							{profile.title.ar} · 39 عملًا · 13 على متاجر التطبيقات
 						</p>
 					</div>
 
 					<div class="cta rise" style="--d: 0.65s">
-						<a class="btn btn--key" href="#reel">Run the reel</a>
-						<a
-							class="btn"
-							href={`mailto:${profile.email}?subject=Project%20booking`}
-							>Book the work</a
-						>
+						<a class="btn btn--key" href="#reel">
+							<T v={pair('Run the reel', 'أدر البكرة')} />
+						</a>
+						<a class="btn" href="/6/hire">
+							<T v={s('hero.cta2')} />
+						</a>
 					</div>
 				</div>
 			</section>
@@ -139,12 +220,28 @@ const booking: [string, string, string][] = [
 			<section class="band" id="reel">
 				<div class="wrap">
 					<header class="head">
-						<p class="eyebrow">Reel one · selected work</p>
-						<h2 class="head__title">Eight shots, lit one at a time</h2>
-						<p class="head__lede">
+						<T
+							v={pair(
+								'Reel one · selected work',
+								'البكرة الأولى · أعمال مختارة',
+							)}
+							as="p"
+							class="eyebrow"
+						/>
+						<h2 class="head__title" data-l="en" lang="en">
+							Eight shots, lit one at a time
+						</h2>
+						<h2 class="head__title" data-l="ar" lang="ar">
+							ثماني لقطات، تُضاء واحدة تلو الأخرى
+						</h2>
+						<p class="head__lede" data-l="en" lang="en">
 							Eight of the thirty-nine, written up in full. Move the light over
 							a still to bring it up; the rest of the filmography runs after the
 							credits.
+						</p>
+						<p class="head__lede" data-l="ar" lang="ar">
+							ثمانية من التسعة والثلاثين، مشروحة بالكامل. حرّك الضوء فوق أي لقطة
+							لترفعها، وبقية الأعمال تمرّ بعد التترات.
 						</p>
 					</header>
 				</div>
@@ -152,14 +249,22 @@ const booking: [string, string, string][] = [
 				<ol class="reel">
 					{
 						featured.map((p, i) => (
-							<li class="shot" style={`--gel: ${p.accent}`} data-shot>
+							<li
+								class="shot"
+								style={`--gel: ${p.accent}`}
+								data-shot
+								data-title-en={p.title.en}
+								data-title-ar={p.title.ar}
+							>
 								<a
 									class={
 										isPortrait(p.image)
 											? 'shot__plate plate plate--stand'
 											: 'shot__plate plate'
 									}
-									href={`/work/${p.slug}`}
+									href={`/6/work/${p.slug}`}
+									tabindex="-1"
+									aria-hidden="true"
 								>
 									<span class="plate__gel" aria-hidden="true" />
 									{p.image ? (
@@ -170,7 +275,7 @@ const booking: [string, string, string][] = [
 													: 'plate__img'
 											}
 											src={p.image}
-											alt={`${p.title.en} — ${p.tagline.en}`}
+											alt=""
 											widths={
 												isPortrait(p.image) ? [320, 480, 720] : [560, 900, 1440]
 											}
@@ -183,7 +288,9 @@ const booking: [string, string, string][] = [
 											decoding="async"
 										/>
 									) : (
-										<span class="plate__empty">No still on file</span>
+										<span class="plate__empty">
+											<T v={pair('No still on file', 'لا لقطة محفوظة')} />
+										</span>
 									)}
 									<span class="plate__slate" aria-hidden="true">
 										{`${pad(i + 1)} / ${pad(featured.length)}`}
@@ -192,44 +299,54 @@ const booking: [string, string, string][] = [
 
 								<div class="shot__meta">
 									<p class="shot__slug">
-										<span class="shot__no">{`Shot ${pad(i + 1)}`}</span>
+										<span class="shot__no">
+											<T v={pair(`Shot ${pad(i + 1)}`, `لقطة ${pad(i + 1)}`)} />
+										</span>
 										<span class="shot__dot" aria-hidden="true">
 											·
 										</span>
-										<span>{p.year}</span>
+										<T v={yearPair(p.year)} />
 										<span class="shot__dot" aria-hidden="true">
 											·
 										</span>
 										<span class={`state state--${p.status}`}>
-											{statusWord[p.status] ?? p.status}
+											<T v={stateWord(p.status)} />
 										</span>
 									</p>
 
 									<h3 class="shot__title">
-										<a href={`/work/${p.slug}`}>{p.title.en}</a>
+										<a href={`/6/work/${p.slug}`}>
+											<T v={p.title} />
+										</a>
 									</h3>
-									<p class="shot__line">{p.tagline.en}</p>
-									<p class="shot__body">{p.summary.en}</p>
+									<T v={p.tagline} as="p" class="shot__line" />
+									<T v={p.summary} as="p" class="shot__body" />
 
 									<dl class="credits">
-										{p.role?.en && (
-											<>
-												<dt>Role</dt>
-												<dd>{p.role.en}</dd>
-											</>
-										)}
-										<dt>Kind</dt>
-										<dd>{kindWord[p.category] ?? p.category}</dd>
-										<dt>Built with</dt>
+										<dt>
+											<T v={s('project.role')} />
+										</dt>
+										<dd>
+											<T v={p.role} />
+										</dd>
+										<dt>
+											<T v={pair('Kind', 'النوع')} />
+										</dt>
+										<dd>
+											<T v={s(catKey[p.category])} />
+										</dd>
+										<dt>
+											<T v={s('project.stack')} />
+										</dt>
 										<dd class="credits__stack">{p.stack.join(' · ')}</dd>
 									</dl>
 
 									<p class="ends">
 										<a
 											class="ends__link ends__link--case"
-											href={`/work/${p.slug}`}
+											href={`/6/work/${p.slug}`}
 										>
-											Full case
+											<T v={s('work.read')} />
 										</a>
 										{Object.entries(p.links).map(([k, url]) =>
 											url ? (
@@ -239,7 +356,7 @@ const booking: [string, string, string][] = [
 													rel="noopener"
 													target="_blank"
 												>
-													{linkWord[k] ?? k}
+													<T v={linkKey[k] ? s(linkKey[k]) : pair(k, k)} />
 												</a>
 											) : null,
 										)}
@@ -259,28 +376,70 @@ const booking: [string, string, string][] = [
 							class="plate__img"
 							src={profilePhoto}
 							alt="Haitham Assoli"
+							data-l="en"
+							lang="en"
 							widths={[280, 420, 560]}
 							sizes="(min-width: 980px) 24vw, 60vw"
 							loading="lazy"
 							decoding="async"
 						/>
-						<span class="plate__slate" aria-hidden="true">Crew</span>
+						<Image
+							class="plate__img"
+							src={profilePhoto}
+							alt="هيثم العسولي"
+							data-l="ar"
+							lang="ar"
+							widths={[280, 420, 560]}
+							sizes="(min-width: 980px) 24vw, 60vw"
+							loading="lazy"
+							decoding="async"
+						/>
+						<span class="plate__slate" aria-hidden="true">
+							<T v={pair('Crew', 'الطاقم')} />
+						</span>
 					</div>
 
 					<div class="crew__text">
-						<p class="eyebrow">Behind the camera</p>
-						<h2 class="head__title">Crew of one, most days</h2>
-						{profile.about.en.map((para) => <p class="prose">{para}</p>)}
+						<T
+							v={pair('Behind the camera', 'خلف الكاميرا')}
+							as="p"
+							class="eyebrow"
+						/>
+						<h2 class="head__title" data-l="en" lang="en">
+							Crew of one, most days
+						</h2>
+						<h2 class="head__title" data-l="ar" lang="ar">
+							طاقم من شخص واحد، في أغلب الأيام
+						</h2>
+						{
+							profile.about.en.map((para, i) => (
+								<>
+									<p class="prose" data-l="en" lang="en">
+										{para}
+									</p>
+									<p class="prose" data-l="ar" lang="ar">
+										{profile.about.ar[i]}
+									</p>
+								</>
+							))
+						}
 
 						<dl class="credits credits--wide">
 							{
 								profile.experience.map((job) => (
 									<>
-										<dt>{job.period}</dt>
+										<T v={yearPair(job.period)} as="dt" />
 										<dd>
-											<span class="credits__lead">{job.role.en}</span>
-											<span class="credits__at"> at </span>
-											{job.company.en}
+											<span data-l="en" lang="en">
+												<span class="credits__lead">{job.role.en}</span>
+												<span class="credits__at"> at </span>
+												{job.company.en}
+											</span>
+											<span data-l="ar" lang="ar">
+												<span class="credits__lead">{job.role.ar}</span>
+												<span class="credits__at"> في </span>
+												{job.company.ar}
+											</span>
 										</dd>
 									</>
 								))
@@ -288,11 +447,18 @@ const booking: [string, string, string][] = [
 							{
 								profile.education.map((school) => (
 									<>
-										<dt>{school.period}</dt>
+										<T v={yearPair(school.period)} as="dt" />
 										<dd>
-											<span class="credits__lead">{school.degree.en}</span>
-											<span class="credits__at"> · </span>
-											{school.school.en}
+											<span data-l="en" lang="en">
+												<span class="credits__lead">{school.degree.en}</span>
+												<span class="credits__at"> · </span>
+												{school.school.en}
+											</span>
+											<span data-l="ar" lang="ar">
+												<span class="credits__lead">{school.degree.ar}</span>
+												<span class="credits__at"> · </span>
+												{school.school.ar}
+											</span>
 										</dd>
 									</>
 								))
@@ -305,18 +471,34 @@ const booking: [string, string, string][] = [
 			<section class="band" id="specs">
 				<div class="wrap specs">
 					<div class="specs__head">
-						<p class="eyebrow">Tech specs</p>
-						<h2 class="head__title">The print, in numbers</h2>
-						<p class="head__lede">
-							No dashboard, no gradient. Just what is on the can.
-						</p>
+						<T
+							v={pair('Tech specs', 'المواصفات الفنية')}
+							as="p"
+							class="eyebrow"
+						/>
+						<h2 class="head__title" data-l="en" lang="en">
+							The print, in numbers
+						</h2>
+						<h2 class="head__title" data-l="ar" lang="ar">النسخة، بالأرقام</h2>
+						<T
+							v={pair(
+								'No dashboard, no gradient. Just what is on the can.',
+								'لا لوحة مؤشرات ولا تدرّج ألوان. فقط ما هو مكتوب على العلبة.',
+							)}
+							as="p"
+							class="head__lede"
+						/>
 					</div>
 					<dl class="spec">
 						{
 							specs.map(([k, v]) => (
 								<div class="spec__row">
-									<dt>{k}</dt>
-									<dd>{v}</dd>
+									<dt>
+										<T v={k} />
+									</dt>
+									<dd>
+										<T v={v} />
+									</dd>
 								</div>
 							))
 						}
@@ -324,7 +506,11 @@ const booking: [string, string, string][] = [
 				</div>
 
 				<div class="wrap">
-					<p class="eyebrow gear__eyebrow">Gear list</p>
+					<T
+						v={pair('Gear list', 'قائمة المعدات')}
+						as="p"
+						class="eyebrow gear__eyebrow"
+					/>
 					<ul class="gear">
 						{toolbox.map((tool) => <li class="gear__item">{tool}</li>)}
 					</ul>
@@ -334,11 +520,30 @@ const booking: [string, string, string][] = [
 			<section class="band" id="filmography">
 				<div class="wrap">
 					<header class="head">
-						<p class="eyebrow">Filmography</p>
-						<h2 class="head__title">Thirty-nine titles</h2>
-						<p class="head__lede">
+						<T
+							v={pair('Filmography', 'قائمة الأعمال')}
+							as="p"
+							class="eyebrow"
+						/>
+						<h2 class="head__title" data-l="en" lang="en">
+							Thirty-nine titles
+						</h2>
+						<h2 class="head__title" data-l="ar" lang="ar">
+							تسعة وثلاثون عملًا
+						</h2>
+						<p class="head__lede" data-l="en" lang="en">
 							Everything shipped, in order, including the ones that were taken
-							down. Each one opens its own page.
+							down. Each one opens its own page, and the contact sheet prints
+							them all on one.
+						</p>
+						<p class="head__lede" data-l="ar" lang="ar">
+							كل ما صدر، بالترتيب، بما فيه ما أُزيل من المتاجر. لكل عمل صفحته،
+							وورقة اللقطات تطبعها كلها على ورقة واحدة.
+						</p>
+						<p class="head__more">
+							<a class="ends__link ends__link--case" href="/6/projects">
+								<T v={pair('Open the contact sheet', 'افتح ورقة اللقطات')} />
+							</a>
 						</p>
 					</header>
 
@@ -346,11 +551,15 @@ const booking: [string, string, string][] = [
 						{
 							projects.map((p) => (
 								<li class="film">
-									<a class="film__link" href={`/work/${p.slug}`}>
-										<span class="film__title">{p.title.en}</span>
+									<a class="film__link" href={`/6/work/${p.slug}`}>
+										<span class="film__title">
+											<T v={p.title} />
+										</span>
 										<span class="film__rule" aria-hidden="true" />
 										<span class="film__meta">
-											{kindWord[p.category] ?? p.category} · {p.year}
+											<T v={s(catKey[p.category])} />
+											<span aria-hidden="true"> · </span>
+											<T v={yearPair(p.year)} />
 										</span>
 									</a>
 								</li>
@@ -363,25 +572,38 @@ const booking: [string, string, string][] = [
 			<section class="band band--end" id="booking">
 				<div class="wrap booking">
 					<div class="booking__pitch">
-						<p class="eyebrow">Booking</p>
-						<h2 class="head__title">Next production</h2>
-						<p class="head__lede">
+						<T v={pair('Booking', 'الحجز')} as="p" class="eyebrow" />
+						<h2 class="head__title" data-l="en" lang="en">Next production</h2>
+						<h2 class="head__title" data-l="ar" lang="ar">الإنتاج القادم</h2>
+						<p class="head__lede" data-l="en" lang="en">
 							Open to work that has to ship in two languages and hold its frame
-							on both sides. Mail is the fastest route; the CV has the long
-							version.
+							on both sides. The call sheet is the fastest route; the CV has the
+							long version.
 						</p>
-						<a
-							class="btn btn--key"
-							href={`mailto:${profile.email}?subject=Project%20booking`}
-							>{profile.email}</a
-						>
+						<p class="head__lede" data-l="ar" lang="ar">
+							مستعدٌّ لعمل عليه أن يصدر بلغتين ويحفظ إطاره في الاتجاهين. ورقة
+							النداء أسرع طريق، والسيرة الذاتية فيها النسخة الطويلة.
+						</p>
+
+						<p class="cta">
+							<a class="btn btn--key" href="/6/hire">
+								<T v={pair('Fill the call sheet', 'املأ ورقة النداء')} />
+							</a>
+							<a
+								class="btn"
+								href={`mailto:${profile.email}?subject=Project%20booking`}
+								>{profile.email}</a
+							>
+						</p>
 					</div>
 
 					<dl class="credits credits--wide booking__list">
 						{
 							booking.map(([label, value, url]) => (
 								<>
-									<dt>{label}</dt>
+									<dt>
+										<T v={label} />
+									</dt>
 									<dd>
 										<a class="booking__link" href={url} rel="noopener">
 											{value}
@@ -397,12 +619,18 @@ const booking: [string, string, string][] = [
 
 		<footer class="tail" data-tail>
 			<div class="wrap">
-				<p class="tail__end">The end</p>
-				<p class="tail__line">
+				<T v={pair('The end', 'النهاية')} as="p" class="tail__end" />
+				<p class="tail__line" data-l="en" lang="en">
 					© 2026 Haitham Assoli. {profile.tagline.en}
 				</p>
-				<p class="tail__line tail__line--fine">
+				<p class="tail__line" data-l="ar" lang="ar">
+					© 2026 هيثم العسولي. {profile.tagline.ar}
+				</p>
+				<p class="tail__line tail__line--fine" data-l="en" lang="en">
 					Shot in Amman. Set in Archivo, Newsreader and Barlow Condensed.
+				</p>
+				<p class="tail__line tail__line--fine" data-l="ar" lang="ar">
+					صُوِّر في عمّان. صُفّ بخطوط Cairo وTajawal وAmiri.
 				</p>
 			</div>
 		</footer>
@@ -460,6 +688,8 @@ const booking: [string, string, string][] = [
 				/* The reveal: the gate opens on each shot as it reaches the light. */
 				const shots = Array.from(document.querySelectorAll('[data-shot]'));
 				const marker = document.querySelector('[data-now]');
+				const markEn = marker && marker.querySelector('[data-l="en"]');
+				const markAr = marker && marker.querySelector('[data-l="ar"]');
 				const plates = document.querySelectorAll('.plate');
 
 				if (!('IntersectionObserver' in window) || still.matches) {
@@ -485,17 +715,21 @@ const booking: [string, string, string][] = [
 					);
 					plates.forEach((el) => lighting.observe(el));
 
+					/* The bottom gate names the shot under the light, in both
+					   languages at once — the CSS decides which one is on screen, so
+					   the marker does not have to know what the reader is reading. */
 					const naming = new IntersectionObserver(
 						(entries) => {
 							entries.forEach((entry) => {
-								if (!entry.isIntersecting || !marker) return;
-								const i = shots.indexOf(entry.target);
-								const title = entry.target.querySelector('.shot__title');
-								marker.textContent =
-									'Shot ' +
-									String(i + 1).padStart(2, '0') +
-									' — ' +
-									(title ? title.textContent.trim() : '');
+								if (!entry.isIntersecting || !markEn || !markAr) return;
+								const no = String(shots.indexOf(entry.target) + 1).padStart(
+									2,
+									'0',
+								);
+								markEn.textContent =
+									'Shot ' + no + ' — ' + entry.target.dataset.titleEn;
+								markAr.textContent =
+									'لقطة ' + no + ' — ' + entry.target.dataset.titleAr;
 							});
 						},
 						{ rootMargin: '-45% 0px -45% 0px' },
@@ -542,6 +776,7 @@ const booking: [string, string, string][] = [
 		--bar: 2rem;
 		--mx: 50vw;
 		--my: 35vh;
+		--upos: 0%; /* underline growth origin; flipped under RTL */
 
 		--display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
 		--credit: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
@@ -605,12 +840,47 @@ const booking: [string, string, string][] = [
 		margin-inline: auto;
 	}
 
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.skip {
+		position: fixed;
+		z-index: 20;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		transform: translateY(-120%);
+		padding: 0.7rem 1.2rem;
+		background: var(--key);
+		color: var(--crush);
+		font-family: var(--credit);
+		font-size: 0.85rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-decoration: none;
+		transition: transform 0.2s;
+	}
+
+	.skip:focus-visible {
+		transform: none;
+	}
+
 	/* ── The light rig ─────────────────────────────────────────────────── */
 
 	.key {
 		position: fixed;
-		inset-block-start: 0;
-		inset-inline-start: 0;
+		/* physical, deliberately: --mx/--my are viewport coordinates and must
+		   not flip with the writing direction */
+		left: 0;
+		top: 0;
 		width: 62rem;
 		height: 62rem;
 		z-index: 4;
@@ -683,8 +953,8 @@ const booking: [string, string, string][] = [
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		padding-inline: clamp(0.9rem, 3vw, 2rem);
+		gap: 0.75rem;
+		padding-inline: clamp(0.6rem, 3vw, 2rem);
 		transition: height 0.9s cubic-bezier(0.22, 0.8, 0.24, 1);
 	}
 
@@ -696,6 +966,10 @@ const booking: [string, string, string][] = [
 	.gate--bottom {
 		inset-block-end: 0;
 		border-top: 1px solid rgba(255, 194, 122, 0.12);
+		/* The shared variant switcher is pinned to the physical bottom-right
+		   corner in both directions, so the bottom gate keeps that corner
+		   clear rather than printing a mark underneath it. */
+		padding-right: 4.25rem;
 	}
 
 	.gate__mark {
@@ -708,16 +982,104 @@ const booking: [string, string, string][] = [
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		min-width: 0;
 	}
 
 	.gate__mark--end {
 		color: rgba(255, 194, 122, 0.66);
 		font-variant-numeric: tabular-nums;
 		flex: none;
+		text-align: end;
 	}
 
 	body.is-end {
 		--bar: clamp(2.75rem, 8vh, 5rem);
+	}
+
+	/* ── The slate: the language switch ────────────────────────────────────
+	   Not a pill bolted onto a header. It is the clapperboard the gate would
+	   already be carrying: sticks on top, two fields below, and the one in
+	   use filled the way a loader chalks the take. It keeps the position and
+	   the prominence the timecode had, inside the same strip of furniture. */
+
+	.slate {
+		appearance: none;
+		flex: none;
+		display: inline-flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: 2px;
+		margin: 0;
+		border: 1px solid rgba(242, 232, 219, 0.36);
+		background: var(--crush);
+		cursor: pointer;
+		line-height: 1;
+		direction: ltr; /* a physical object: it does not mirror */
+	}
+
+	.slate__sticks {
+		display: block;
+		height: 0.42rem;
+		background: repeating-linear-gradient(
+			116deg,
+			rgba(242, 232, 219, 0.9) 0 0.3rem,
+			var(--crush) 0.3rem 0.6rem
+		);
+		transform-origin: left center;
+		transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+	}
+
+	.slate:hover .slate__sticks,
+	.slate:focus-visible .slate__sticks {
+		transform: rotate(-8deg);
+	}
+
+	.slate:active .slate__sticks {
+		transform: rotate(0deg);
+		transition-duration: 0.06s;
+	}
+
+	.slate__fields {
+		display: flex;
+		gap: 2px;
+	}
+
+	.slate__field {
+		min-width: 1.7rem;
+		padding: 0.16rem 0.3rem;
+		text-align: center;
+		font-family: var(--credit);
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: rgba(163, 171, 189, 0.5);
+		background: rgba(163, 171, 189, 0.08);
+		transition:
+			background-color 0.2s,
+			color 0.2s;
+	}
+
+	.slate__field--ar {
+		font-family: 'Tajawal', var(--credit);
+		letter-spacing: 0;
+		font-size: 0.8rem;
+	}
+
+	html[lang='en'] .slate__field--en,
+	html[lang='ar'] .slate__field--ar {
+		color: var(--crush);
+		background: var(--key);
+	}
+
+	.slate:hover .slate__field {
+		color: rgba(242, 232, 219, 0.8);
+	}
+
+	html[lang='en'] .slate:hover .slate__field--en,
+	html[lang='ar'] .slate:hover .slate__field--ar {
+		color: var(--crush);
+		background: var(--sodium);
 	}
 
 	.shutter {
@@ -792,6 +1154,10 @@ const booking: [string, string, string][] = [
 		color: var(--mist);
 	}
 
+	.head__more {
+		margin: 1.4rem 0 0;
+	}
+
 	.band {
 		padding-block: clamp(4.5rem, 12vh, 9rem);
 		position: relative;
@@ -813,7 +1179,8 @@ const booking: [string, string, string][] = [
 		content: '';
 		position: absolute;
 		inset-block-start: -18vh;
-		inset-inline-start: 50%;
+		/* physical centring: the glow is a lamp, not a layout */
+		left: 50%;
 		width: min(150vw, 90rem);
 		height: 130vh;
 		transform: translateX(-50%);
@@ -1009,6 +1376,7 @@ const booking: [string, string, string][] = [
 				rgba(42, 53, 87, 0.28)
 			),
 			radial-gradient(78% 74% at 50% 44%, transparent 34%, rgba(5, 6, 10, 0.62));
+		transition: opacity 0.6s ease;
 	}
 
 	.plate__gel {
@@ -1069,23 +1437,21 @@ const booking: [string, string, string][] = [
 	}
 
 	.plate:hover .plate__img,
-	.plate:focus-visible .plate__img,
+	.shot:hover .plate__img,
 	.shot:focus-within .plate__img {
 		filter: brightness(1) saturate(1.02) contrast(1);
 	}
 
 	.plate:hover .plate__gel,
+	.shot:hover .plate__gel,
 	.shot:focus-within .plate__gel {
 		opacity: 0.9;
 	}
 
 	.plate:hover::after,
+	.shot:hover .plate::after,
 	.shot:focus-within .plate::after {
 		opacity: 0.55;
-	}
-
-	.plate::after {
-		transition: opacity 0.6s ease;
 	}
 
 	.plate__slate {
@@ -1168,7 +1534,7 @@ const booking: [string, string, string][] = [
 		text-decoration: none;
 		background-image: linear-gradient(var(--gel), var(--gel));
 		background-repeat: no-repeat;
-		background-position: 0 100%;
+		background-position: var(--upos) 100%;
 		background-size: 0% 2px;
 		transition: background-size 0.4s ease;
 	}
@@ -1334,7 +1700,8 @@ const booking: [string, string, string][] = [
 	}
 
 	.spec dd {
-		margin: 0 0 0 auto;
+		margin: 0;
+		margin-inline-start: auto;
 		text-align: end;
 		font-family: var(--display);
 		font-stretch: 96%;
@@ -1439,8 +1806,7 @@ const booking: [string, string, string][] = [
 		gap: clamp(2rem, 5vw, 4rem);
 	}
 
-	.booking__pitch .btn {
-		margin-top: 1.75rem;
+	.booking__pitch .cta .btn {
 		word-break: break-word;
 	}
 
@@ -1498,6 +1864,144 @@ const booking: [string, string, string][] = [
 		color: rgba(163, 171, 189, 0.68);
 	}
 
+	/* ── The Arabic voice ──────────────────────────────────────────────────
+	   Archivo's `wdth` axis is the loudness ladder on the Latin side: 125 on
+	   the title card, 118 on a section head, 108 on a project title, 96 on a
+	   spec line. No Arabic face has a width axis, so the ladder is carried by
+	   two families instead of one axis — and the families really are different
+	   widths, which is the point.
+
+	   Tajawal is the default: narrow, geometric, the answer to Barlow
+	   Condensed, and it takes every credit, slug and gate mark on the page.
+	   Cairo, wider and heavier, is promoted onto anything that would have gone
+	   extended in Latin, and runs a weight ramp (900 → 600) where Latin ran a
+	   width ramp. Amiri, a naskh, answers Newsreader for the long read and
+	   stands in for the italic that Arabic does not have.
+
+	   No letterspacing anywhere: it breaks the joins. */
+
+	[lang='ar'] {
+		font-family: 'Tajawal', 'Segoe UI', sans-serif;
+		font-weight: 500;
+		line-height: 1.75;
+		letter-spacing: 0 !important;
+		font-style: normal !important;
+		font-variant: normal;
+	}
+
+	/* Promoted to Cairo: the loud voice. */
+	[lang='ar'].card__title,
+	[lang='ar'].head__title,
+	[lang='ar'].billing__name,
+	[lang='ar'].tail__end,
+	.shot__title [lang='ar'],
+	.film__title [lang='ar'],
+	.spec dd [lang='ar'] {
+		font-family: 'Cairo', 'Segoe UI', sans-serif;
+		font-variation-settings: 'wght' 700;
+		font-weight: 700;
+		font-stretch: normal;
+		word-spacing: 0.03em;
+	}
+
+	[lang='ar'].card__title {
+		font-variation-settings: 'wght' 900;
+		font-weight: 900;
+		font-size: clamp(1.8rem, 6.4vw, 4.6rem);
+		line-height: 1.24;
+		text-shadow: 0 0 60px rgba(255, 194, 122, 0.18);
+	}
+
+	[lang='ar'].head__title,
+	[lang='ar'].tail__end {
+		font-variation-settings: 'wght' 800;
+		font-weight: 800;
+		line-height: 1.32;
+	}
+
+	.shot__title [lang='ar'] {
+		font-variation-settings: 'wght' 800;
+		font-weight: 800;
+		line-height: 1.3;
+	}
+
+	[lang='ar'].billing__name {
+		font-size: clamp(1.15rem, 2.5vw, 1.6rem);
+	}
+
+	.film__title [lang='ar'] {
+		font-variation-settings: 'wght' 600;
+		font-weight: 600;
+		font-size: 1.02rem;
+	}
+
+	.spec dd [lang='ar'] {
+		font-variation-settings: 'wght' 600;
+		font-weight: 600;
+		font-size: clamp(1rem, 2.1vw, 1.25rem);
+	}
+
+	/* Promoted to Amiri: anything read for longer than a line. */
+	[lang='ar'].logline,
+	[lang='ar'].head__lede,
+	[lang='ar'].prose,
+	[lang='ar'].shot__body,
+	[lang='ar'].shot__line,
+	[lang='ar'].card__sub {
+		font-family: 'Amiri', 'Times New Roman', serif;
+		font-weight: 400;
+		line-height: 2;
+	}
+
+	[lang='ar'].card__sub {
+		font-size: clamp(1.2rem, 3.2vw, 2rem);
+		line-height: 1.5;
+	}
+
+	[lang='ar'].shot__line {
+		font-size: 1.22rem;
+		line-height: 1.75;
+	}
+
+	[lang='ar'].logline {
+		font-size: clamp(1.05rem, 1.7vw, 1.22rem);
+	}
+
+	[lang='ar'].eyebrow,
+	.eyebrow [lang='ar'] {
+		font-weight: 700;
+		font-size: 0.9rem;
+	}
+
+	[lang='ar'].billing__role,
+	[lang='ar'].tail__line,
+	[lang='ar'].btn,
+	.btn [lang='ar'],
+	.gate__mark [lang='ar'],
+	.shot__slug [lang='ar'],
+	.credits dt [lang='ar'],
+	.credits dd [lang='ar'],
+	.spec dt [lang='ar'],
+	.ends__link [lang='ar'],
+	.film__meta [lang='ar'],
+	.plate__slate [lang='ar'],
+	[lang='ar'].plate__empty {
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+	/* Arabic in the credits column would run into the rule at 0.75rem. */
+	.credits dt [lang='ar'],
+	.spec dt [lang='ar'] {
+		font-weight: 700;
+		font-size: 0.86rem;
+	}
+
+	/* Under RTL the underline has to grow from the right edge. */
+	html[dir='rtl'] {
+		--upos: 100%;
+	}
+
 	/* ── Load sequence ─────────────────────────────────────────────────── */
 
 	.js .rise {
@@ -1505,6 +2009,12 @@ const booking: [string, string, string][] = [
 		transform: translateY(1.1rem);
 		animation: rise 1s cubic-bezier(0.16, 0.84, 0.28, 1) forwards;
 		animation-delay: calc(0.55s + var(--d, 0s));
+	}
+
+	/* The subtitle has no inline --d of its own: it is rendered twice by <T>,
+	   and a style attribute on that component would land on both copies. */
+	.js .card__sub.rise {
+		animation-delay: 0.9s;
 	}
 
 	@keyframes rise {
@@ -1579,9 +2089,10 @@ const booking: [string, string, string][] = [
 		}
 	}
 
-	@media (max-width: 34rem) {
-		/* The switcher sits over the bottom bar on a phone; let the bar be
-		   plain matte there instead of a collision. */
+	@media (max-width: 40rem) {
+		/* The slate keeps the whole top bar on a narrow phone; the name mark
+		   and the reel label step out of its way. */
+		.gate--top .gate__mark:first-child,
 		.gate--bottom .gate__mark {
 			display: none;
 		}
@@ -1648,6 +2159,11 @@ const booking: [string, string, string][] = [
 				rgba(3, 4, 8, 0.6) 100%
 			);
 		}
+
+		/* No pointer to lift the sticks with, so they sit half-open for good. */
+		.slate__sticks {
+			transform: rotate(-6deg);
+		}
 	}
 
 	/* ── Stillness ─────────────────────────────────────────────────────── */
@@ -1675,8 +2191,12 @@ const booking: [string, string, string][] = [
 		.plate,
 		.plate__img,
 		.plate__gel,
+		.plate::after,
 		.gate,
+		.slate__sticks,
+		.slate__field,
 		.shot__title a,
+		.skip,
 		.btn,
 		.ends__link,
 		.film__link,

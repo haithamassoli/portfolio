@@ -1,0 +1,756 @@
+---
+/* /7/hire — the order pad.
+
+   The form is drawn as a pad of chunky keys: radios and checkboxes are things
+   you press in, and they stay pressed. Native `required` and `type="email"`
+   do all the validating; the shared composer turns the answers into a mail
+   draft in whichever language the page is reading. Nothing leaves the browser
+   until the visitor presses send themselves, and the page says so twice. */
+import Shell from './_shell.astro';
+import T from '../../components/T.astro';
+import HireCompose from '../../components/HireCompose.astro';
+import { profile } from '../../../content/profile';
+import { s, pair } from '../../data/variant-ui';
+
+const deals = [
+	{ v: 'part', label: s('deal.part') },
+	{ v: 'full', label: s('deal.full') },
+	{ v: 'contract', label: s('deal.contract') },
+	{ v: 'freelance', label: s('deal.freelance') },
+	{ v: 'hourly', label: s('deal.hourly') },
+];
+
+const locations = [
+	{ v: 'remote', label: s('loc.remote') },
+	{ v: 'onsite', label: s('loc.onsite') },
+];
+
+const stacks = [
+	{ v: 'frontend', label: s('tech.frontend') },
+	{ v: 'backend', label: s('tech.backend') },
+	{ v: 'mobile', label: s('tech.mobile') },
+	{ v: 'other', label: s('tech.other') },
+];
+
+const takes = [
+	{ title: s('skill.web'), body: s('skill.webDesc'), hue: 'sun' },
+	{ title: s('skill.mobile'), body: s('skill.mobileDesc'), hue: 'bubble' },
+	{ title: s('skill.backend'), body: s('skill.backendDesc'), hue: 'mint' },
+	{ title: s('skill.other'), body: s('skill.otherDesc'), hue: 'melon' },
+];
+
+/* A real sequence, so it earns its numbers. */
+const steps = [
+	{
+		title: pair('You send the brief', 'ترسل الطلب'),
+		body: pair(
+			'The form writes the email; you read it over and press send.',
+			'النموذج يكتب الرسالة، وأنت تقرؤها ثم تضغط إرسال.',
+		),
+	},
+	{
+		title: pair('I reply with a plan', 'أرد عليك بخطة'),
+		body: pair(
+			'What I would build, roughly how long it takes, and what I would leave out of the first version.',
+			'ما الذي سأبنيه، وكم يستغرق تقريبًا، وما الذي سأتركه خارج النسخة الأولى.',
+		),
+	},
+	{
+		title: pair('We start on a slice', 'نبدأ بجزء صغير'),
+		body: pair(
+			'One real piece of the product, running, inside a week or two. Then we decide what comes next.',
+			'جزء حقيقي واحد من المنتج، يعمل، خلال أسبوع أو أسبوعين. ثم نقرّر ما يليه.',
+		),
+	},
+];
+
+const nothingSent = pair(
+	'Nothing is sent until you press send in your own mail app.',
+	'لا يُرسل شيء حتى تضغط إرسال في تطبيق بريدك.',
+);
+---
+
+<Shell
+	title="Start a project — Haitham Assoli"
+	description="Tell Haitham Assoli what you are building. The brief form writes a pre-filled email you send yourself; replies come within two business days."
+	active="hire"
+>
+	<HireCompose />
+
+	<section class="field field--sun hire-head">
+		<div class="wrap">
+			<T v={s('hire.eyebrow')} as="p" class="eyebrow" />
+			<T v={s('hire.title')} as="h1" class="section__title" />
+			<T v={s('hire.lede')} as="p" class="section__lede hire-head__lede" />
+		</div>
+	</section>
+
+	<section class="field field--mint hire-body">
+		<div class="wrap hire-body__grid">
+			<!-- ============================== the pad ============================== -->
+			<form class="pad" data-hire>
+				<T v={pair('The brief', 'الطلب')} as="h2" class="pad__title" />
+
+				<div class="pad__rows">
+					<p class="pad__row">
+						<label class="pad__label" for="fullName">
+							<T v={s('hire.fullName')} />
+						</label>
+						<input
+							class="pad__in"
+							id="fullName"
+							name="fullName"
+							type="text"
+							autocomplete="name"
+							required
+						/>
+					</p>
+
+					<p class="pad__row">
+						<label class="pad__label" for="email">
+							<T v={s('hire.email')} />
+						</label>
+						<input
+							class="pad__in ltr"
+							id="email"
+							name="email"
+							type="email"
+							autocomplete="email"
+							required
+						/>
+					</p>
+
+					<p class="pad__row">
+						<label class="pad__label" for="phone">
+							<T v={s('hire.phone')} />
+						</label>
+						<input
+							class="pad__in ltr"
+							id="phone"
+							name="phone"
+							type="tel"
+							autocomplete="tel"
+							aria-describedby="phone-hint"
+						/>
+						<span class="pad__hint" id="phone-hint">
+							<T
+								v={pair(
+									'Optional. Only if you would rather talk.',
+									'اختياري. إن كنت تفضّل المكالمة.',
+								)}
+							/>
+						</span>
+					</p>
+
+					<p class="pad__row">
+						<label class="pad__label" for="budget">
+							<T v={s('hire.budget')} />
+						</label>
+						<input
+							class="pad__in"
+							id="budget"
+							name="budget"
+							type="text"
+							required
+							aria-describedby="budget-hint"
+						/>
+						<span class="pad__hint" id="budget-hint">
+							<T
+								v={pair(
+									'A number or a range is enough — 5,000 USD, or 3k to 6k.',
+									'رقم أو نطاق يكفي — 5,000 دولار، أو من 3 إلى 6 آلاف.',
+								)}
+							/>
+						</span>
+					</p>
+				</div>
+
+				<fieldset class="pad__set">
+					<legend class="pad__legend"><T v={s('hire.deal')} /></legend>
+					<div class="keys">
+						{
+							deals.map((d) => (
+								<label class="key">
+									<input
+										class="key__in"
+										type="radio"
+										name="deal"
+										value={d.v}
+										required
+									/>
+									<span class="key__face">
+										<T v={d.label} />
+									</span>
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<fieldset class="pad__set">
+					<legend class="pad__legend"><T v={s('hire.location')} /></legend>
+					<div class="keys">
+						{
+							locations.map((l) => (
+								<label class="key">
+									<input
+										class="key__in"
+										type="radio"
+										name="location"
+										value={l.v}
+										required
+									/>
+									<span class="key__face">
+										<T v={l.label} />
+									</span>
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<fieldset class="pad__set">
+					<legend class="pad__legend"><T v={s('hire.techStack')} /></legend>
+					<span class="pad__hint">
+						<T
+							v={pair(
+								'Tick as many as apply.',
+								'اختر ما ينطبق، ولو أكثر من واحد.',
+							)}
+						/>
+					</span>
+					<div class="keys keys--tiles">
+						{
+							stacks.map((t) => (
+								<label class="key key--tile">
+									<input
+										class="key__in"
+										type="checkbox"
+										name="techStack"
+										value={t.v}
+									/>
+									<span class="key__face">
+										<T v={t.label} />
+									</span>
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<p class="pad__row">
+					<label class="pad__label" for="summary">
+						<T v={s('hire.summary')} />
+					</label>
+					<textarea
+						class="pad__in pad__in--area"
+						id="summary"
+						name="summary"
+						rows="5"
+						required
+						aria-describedby="summary-hint"></textarea>
+					<span class="pad__hint" id="summary-hint">
+						<T v={s('hire.summaryPlaceholder')} />
+					</span>
+				</p>
+
+				<div class="pad__send">
+					<button class="btn btn--melon btn--big" type="submit">
+						<T v={s('hire.submit')} />
+					</button>
+					<T v={nothingSent} as="p" class="pad__small" />
+				</div>
+
+				<div class="receipt" role="status">
+					<span class="receipt__tick" aria-hidden="true">✓</span>
+					<span class="receipt__words">
+						<T v={s('hire.sent')} />
+						<a class="receipt__mail ltr" href={`mailto:${profile.email}`}>
+							{profile.email}
+						</a>
+					</span>
+				</div>
+			</form>
+
+			<!-- ============================== the aside ============================== -->
+			<aside class="side">
+				<section class="side__block">
+					<T v={s('skills.title')} as="h2" class="side__title" />
+					<ul class="takes">
+						{
+							takes.map((t) => (
+								<li class={`take take--${t.hue}`}>
+									<T v={t.title} as="h3" class="take__title" />
+									<T v={t.body} as="p" class="take__body" />
+								</li>
+							))
+						}
+					</ul>
+				</section>
+
+				<section class="side__block">
+					<T
+						v={pair('How it goes', 'كيف تسير الأمور')}
+						as="h2"
+						class="side__title"
+					/>
+					<ol class="steps">
+						{
+							steps.map((st, n) => (
+								<li class="step">
+									<span class="step__n" aria-hidden="true">
+										{n + 1}
+									</span>
+									<span class="step__words">
+										<T v={st.title} as="span" class="step__title" />
+										<T v={st.body} as="span" class="step__body" />
+									</span>
+								</li>
+							))
+						}
+					</ol>
+				</section>
+
+				<section class="side__block side__block--note">
+					<T
+						v={pair('Money and time', 'المال والوقت')}
+						as="h2"
+						class="side__title"
+					/>
+					<T
+						v={pair(
+							'Rates follow the scope, not the clock. Part time, contract and freelance all work; on-site means inside Amman, everything else is remote.',
+							'الأسعار تتبع حجم العمل لا عدّاد الساعات. الدوام الجزئي والعقد والعمل الحر كلها ممكنة، والعمل من الموقع داخل عمّان، وما عداه عن بُعد.',
+						)}
+						as="p"
+						class="side__body"
+					/>
+					<T v={s('hire.note')} as="p" class="side__stamp" />
+				</section>
+			</aside>
+		</div>
+	</section>
+
+	<section class="field field--ink hire-foot">
+		<div class="wrap hire-foot__grid">
+			<T
+				v={pair('Rather just write to me?', 'تفضّل أن تراسلني مباشرة؟')}
+				as="h2"
+				class="section__title hire-foot__title"
+			/>
+			<div class="cta-row hire-foot__row">
+				<a class="btn btn--sun btn--big ltr" href={`mailto:${profile.email}`}>
+					{profile.email}
+				</a>
+				<a
+					class="btn btn--ghost hire-foot__ghost ltr"
+					href={`tel:${profile.phone.replace(/\s/g, '')}`}
+				>
+					{profile.phone}
+				</a>
+			</div>
+		</div>
+	</section>
+</Shell>
+
+<style is:global>
+	.playroom .hire-head__lede {
+		max-width: 56ch;
+	}
+
+	.hire-body__grid {
+		display: grid;
+		gap: clamp(1.75rem, 4vw, 3rem);
+		align-items: start;
+	}
+
+	@media (min-width: 940px) {
+		.hire-body__grid {
+			grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+		}
+	}
+
+	/* ================================ the pad ================================ */
+
+	.pad {
+		display: grid;
+		gap: clamp(1.4rem, 3vw, 2rem);
+		padding: clamp(1.25rem, 4vw, 2.5rem);
+		background: var(--paper);
+		color: var(--ink);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r3);
+		box-shadow: var(--s3);
+		--focus: var(--ink);
+	}
+
+	.pad__title {
+		font-size: clamp(1.5rem, 3.6vw, 2.1rem);
+		font-variation-settings: 'wdth' 86;
+	}
+
+	.pad__rows {
+		display: grid;
+		gap: clamp(1rem, 2.5vw, 1.4rem);
+	}
+
+	@media (min-width: 640px) {
+		.pad__rows {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.pad__row {
+		display: grid;
+		gap: 0.4rem;
+		align-content: start;
+	}
+
+	.pad__label,
+	.pad__legend {
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 0.13em;
+		padding: 0;
+	}
+
+	/* A legend cuts the fieldset border; give the dashes somewhere to stop. */
+	.pad__legend {
+		padding-inline: 0.45rem;
+		margin-inline-start: -0.45rem;
+	}
+
+	.pad__label [lang='ar'],
+	.pad__legend [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.85rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.pad__in {
+		width: 100%;
+		padding: 0.7rem 0.9rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r1);
+		background: var(--paper);
+		box-shadow: var(--s1);
+		font-family: var(--body);
+		font-size: 1rem;
+		transition:
+			box-shadow 0.2s var(--spring),
+			transform 0.2s var(--spring);
+	}
+
+	.pad__in:focus {
+		box-shadow: var(--s2);
+		transform: translate(calc(var(--dx) * 2px), -2px);
+	}
+
+	.pad__in--area {
+		resize: vertical;
+		min-height: 8rem;
+		line-height: 1.6;
+	}
+
+	.pad__in:user-invalid {
+		border-color: var(--melon);
+		background: #fff4f2;
+	}
+
+	.pad__hint {
+		font-size: 0.82rem;
+		line-height: 1.5;
+		opacity: 0.78;
+	}
+
+	.pad__set {
+		display: grid;
+		gap: 0.6rem;
+		margin: 0;
+		padding: clamp(0.9rem, 2.5vw, 1.2rem);
+		border: 2px dashed var(--ink);
+		border-radius: var(--r2);
+	}
+
+	.keys {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.keys--tiles {
+		gap: 0.6rem;
+	}
+
+	.key {
+		position: relative;
+		display: inline-flex;
+	}
+
+	.key__in {
+		position: absolute;
+		opacity: 0;
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+
+	.key__face {
+		display: inline-block;
+		padding: 0.5rem 1rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--pill);
+		background: var(--paper);
+		box-shadow: var(--s2);
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: 0.95rem;
+		cursor: pointer;
+		transition:
+			transform 0.18s var(--spring),
+			box-shadow 0.18s var(--spring),
+			background-color 0.18s var(--snap);
+	}
+
+	.key__face [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+	}
+
+	.key:hover .key__face {
+		transform: translate(calc(var(--dx) * 2px), -2px);
+		box-shadow: var(--s3);
+	}
+
+	/* Pressed in, and it stays pressed. */
+	.key__in:checked + .key__face {
+		background: var(--sun);
+		transform: translate(calc(var(--dx) * -4px), 4px);
+		box-shadow: var(--s0);
+	}
+
+	.key__in:focus-visible + .key__face {
+		outline: 3px solid var(--ink);
+		outline-offset: 4px;
+	}
+
+	.key--tile .key__face {
+		border-radius: var(--r1);
+		min-width: 7rem;
+		text-align: center;
+	}
+
+	.key--tile .key__in:checked + .key__face {
+		background: var(--sky);
+		color: var(--paper);
+	}
+
+	.pad__send {
+		display: grid;
+		gap: 0.75rem;
+		justify-items: start;
+	}
+
+	.pad__small {
+		font-size: 0.85rem;
+		max-width: 42ch;
+	}
+
+	/* ------------------------------- receipt ------------------------------- */
+
+	.receipt {
+		display: none;
+		gap: 0.7rem;
+		align-items: flex-start;
+		padding: 1rem 1.1rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		background: var(--mint);
+		box-shadow: var(--s2);
+	}
+
+	.pad[data-sent] .receipt {
+		display: flex;
+	}
+
+	.receipt__tick {
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: 1.8rem;
+		height: 1.8rem;
+		border: 2px solid var(--ink);
+		border-radius: 6px;
+		background: var(--sun);
+		line-height: 1;
+	}
+
+	.receipt__words {
+		display: grid;
+		gap: 0.35rem;
+		font-size: 0.95rem;
+	}
+
+	.receipt__mail {
+		font-family: var(--mono);
+		font-size: 0.85rem;
+		justify-self: start;
+	}
+
+	/* =============================== the aside =============================== */
+
+	.side {
+		display: grid;
+		gap: clamp(1.25rem, 3vw, 1.75rem);
+	}
+
+	.side__block {
+		padding: clamp(1.1rem, 3vw, 1.6rem);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r3);
+		background: var(--paper);
+		box-shadow: var(--s2);
+	}
+
+	.side__block--note {
+		background: var(--ink);
+		color: var(--paper);
+		--focus: var(--sun);
+	}
+
+	.side__title {
+		font-size: clamp(1.2rem, 2.8vw, 1.5rem);
+		font-variation-settings: 'wdth' 88;
+		margin-bottom: 1rem;
+	}
+
+	.side__body {
+		font-size: 0.95rem;
+		line-height: 1.65;
+	}
+
+	.side__stamp {
+		display: inline-block;
+		margin-top: 1rem;
+		padding: 0.35rem 0.85rem;
+		background: var(--sun);
+		color: var(--ink);
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		transform: rotate(-1.5deg);
+	}
+
+	.side__stamp[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.82rem;
+	}
+
+	.takes {
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.take {
+		padding: 0.85rem 1rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+	}
+
+	.take--sun {
+		background: var(--sun);
+	}
+	.take--bubble {
+		background: var(--bubble);
+	}
+	.take--mint {
+		background: var(--mint);
+	}
+	.take--melon {
+		background: var(--melon);
+	}
+
+	.take__title {
+		font-size: 1.05rem;
+		font-variation-settings: 'wdth' 90;
+	}
+
+	.take__body {
+		margin-top: 0.3rem;
+		font-size: 0.88rem;
+		line-height: 1.55;
+	}
+
+	.steps {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.step {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.8rem;
+	}
+
+	.step__n {
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border: var(--b) solid var(--ink);
+		border-radius: 8px;
+		background: var(--sky);
+		color: var(--paper);
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: 1rem;
+	}
+
+	.step__words {
+		display: grid;
+		gap: 0.2rem;
+	}
+
+	.step__title {
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: 1.02rem;
+	}
+
+	.step__title[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+	}
+
+	.step__body {
+		font-size: 0.88rem;
+		line-height: 1.6;
+	}
+
+	/* ================================ the tail ================================ */
+
+	.playroom .hire-foot__title {
+		font-size: clamp(1.6rem, 4.2vw, 2.6rem);
+	}
+
+	.hire-foot__row {
+		margin-top: 1.5rem;
+	}
+
+	.hire-foot__ghost {
+		color: var(--paper);
+		border-color: var(--sun);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.playroom .key:hover .key__face,
+		.playroom .pad__in:focus {
+			transform: none;
+		}
+	}
+</style>

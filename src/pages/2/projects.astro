@@ -1,0 +1,625 @@
+---
+/* 目録 — the catalogue. Thirty-nine entries in six 部, each part opened by a
+   vertical rail, each entry carrying its catalogue number set 縦中横. The
+   eight written up in full are raised onto washi and marked 選. */
+import { Image } from 'astro:assets';
+import type { I18n } from '../../../content/types';
+import { projects } from '../../data/projects';
+import type { Key } from '../../i18n';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import T from '../../components/T.astro';
+import Shell from './_shell.astro';
+
+const categoryJa: Record<string, string> = {
+	web: 'ウェブ',
+	mobile: 'モバイル',
+	desktop: 'デスクトップ',
+	extension: '拡張機能',
+	ai: '端末内AI',
+	client: '受託',
+};
+
+const statusJa: Record<string, string> = {
+	live: '公開中',
+	shipped: '出荷済',
+	delisted: '掲載終了',
+	wip: '制作中',
+	archived: '保管',
+};
+
+const catT = (c: string): I18n => s(`cat.${c}` as Key);
+const statusT = (st: string): I18n => s(`status.${st}` as Key);
+
+/* Ordered by weight of the body of work, not alphabetically. */
+const order = ['web', 'mobile', 'ai', 'desktop', 'client', 'extension'];
+
+let running = 0;
+const parts = order
+	.map((cat) => ({
+		cat,
+		ja: categoryJa[cat],
+		items: projects.filter((p) => p.category === cat),
+	}))
+	.filter((part) => part.items.length > 0)
+	.map((part) => ({
+		...part,
+		entries: part.items.map((p) => {
+			running += 1;
+			return { p, no: String(running).padStart(2, '0') };
+		}),
+	}));
+
+/* A cover taller than it is wide is a handset screen: mount it, never crop. */
+const isTall = (img: ImageMetadata) => img.height / img.width > 1.2;
+---
+
+<Shell
+	title="Catalogue — 39 projects — Haitham Assoli 目録"
+	description="Every project Haitham Assoli has shipped, catalogued in six parts: web, mobile, on-device AI, desktop, client work and extensions. Thirty-nine entries, each with its own page."
+	current="projects"
+>
+	<div class="wrap">
+		<div class="daisen">
+			<p class="daisen__ja tate" lang="ja">目録</p>
+			<div>
+				<h1 class="daisen__h">
+					<T v={s('work.all')} />
+					<span class="daisen__hja" lang="ja">目録</span>
+				</h1>
+				<T as="p" class="daisen__lede" v={s('work.allLede')} />
+				<p class="daisen__count">
+					<span class="daisen__n">{projects.length}</span>
+					<T
+						v={pair('entries in six parts', 'مدخلًا في ستة أبواب')}
+						class="daisen__unit"
+					/>
+				</p>
+			</div>
+		</div>
+
+		<nav class="mokuji" aria-labelledby="mokuji-h">
+			<h2 class="mokuji__h" id="mokuji-h">
+				<span lang="ja">目次</span>
+				<T v={pair('Contents', 'المحتويات')} />
+			</h2>
+			<ul class="mokuji__list">
+				{
+					parts.map((part) => (
+						<li>
+							<a class="mokuji__a" href={`#part-${part.cat}`}>
+								<span class="mokuji__ja" lang="ja">
+									{part.ja}
+								</span>
+								<T v={catT(part.cat)} class="mokuji__lat" />
+								<span class="mokuji__n" aria-hidden="true">
+									{part.entries.length}
+								</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<p class="mokuji__key">
+				<span class="mokuji__keyja" lang="ja">選</span>
+				<T
+					v={pair(
+						'Marked entries are written up in full: problems, decisions and what came of them.',
+						'المداخل المؤشَّرة مشروحة بالكامل: المشكلات والقرارات وما نتج عنها.',
+					)}
+				/>
+			</p>
+		</nav>
+
+		{
+			parts.map((part) => (
+				<section
+					class="part"
+					id={`part-${part.cat}`}
+					aria-labelledby={`part-${part.cat}-h`}
+				>
+					<p class="part__rail tate" lang="ja" aria-hidden="true">
+						{part.ja}
+						<span class="part__sep">｜</span>
+						<span class="part__count">
+							<span class="tcy">{String(part.entries.length)}</span>件
+						</span>
+					</p>
+
+					<div class="part__body">
+						<h2 class="part__h" id={`part-${part.cat}-h`}>
+							<T v={catT(part.cat)} />
+							<span class="part__hja" lang="ja">
+								{part.ja}
+							</span>
+						</h2>
+
+						<ol class="entries">
+							{part.entries.map(({ p, no }) => (
+								<li class:list={['entry', p.featured && 'entry--sel']}>
+									<p class="entry__no tate" aria-hidden="true">
+										<span class="tcy">{no}</span>
+										{p.featured && <span class="entry__selmark">選</span>}
+									</p>
+
+									<div class="entry__plate">
+										{p.featured && p.image && (
+											<Image
+												class="entry__img"
+												src={p.image}
+												alt={`Cover of ${p.title.en}`}
+												widths={[220, 440]}
+												sizes="7rem"
+												loading="lazy"
+												decoding="async"
+												data-tall={isTall(p.image) ? '' : undefined}
+											/>
+										)}
+									</div>
+
+									<div class="entry__main">
+										<h3 class="entry__title">
+											<a class="entry__a" href={`/2/work/${p.slug}`}>
+												<span class="entry__hit" />
+												<T v={p.title} />
+											</a>
+										</h3>
+										<T as="p" class="entry__tag" v={p.tagline} />
+									</div>
+
+									<p class="entry__meta">
+										<T v={yearPair(p.year)} class="entry__yr" />
+										<span class="entry__stja" lang="ja">
+											{statusJa[p.status] ?? p.status}
+										</span>
+										<T v={statusT(p.status)} class="entry__st" />
+									</p>
+								</li>
+							))}
+						</ol>
+					</div>
+				</section>
+			))
+		}
+
+		<p class="tail">
+			<a class="lnk" href="/2/hire">
+				<span lang="ja">依頼</span>
+				<T v={s('hire.title')} />
+			</a>
+		</p>
+	</div>
+
+	<style is:global>
+		/* ── the title slip's tally ───────────────────────── */
+
+		.daisen__count {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.6rem;
+			margin-top: 1.25rem;
+			padding-top: 1rem;
+			border-top: 1px solid var(--rule-soft);
+		}
+
+		.daisen__n {
+			font-family: var(--body);
+			font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.3rem);
+			font-weight: 300;
+			line-height: 1;
+		}
+
+		.daisen__unit {
+			font-family: var(--gothic);
+			font-size: 0.7rem;
+			font-weight: 500;
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+			color: var(--usuzumi);
+		}
+
+		.daisen__unit[lang='ar'] {
+			font-family: var(--ar);
+			font-size: 0.95rem;
+			font-weight: 400;
+		}
+
+		/* ── 目次 ─────────────────────────────────────────── */
+
+		.mokuji {
+			margin-top: clamp(2.5rem, 6vw, 4rem);
+			padding-block: 1.5rem;
+			border-block: 1px solid var(--rule);
+		}
+
+		.mokuji__h {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.75rem;
+			font-family: var(--jp);
+			font-size: 1rem;
+			font-weight: 400;
+			letter-spacing: 0.3em;
+			color: var(--ai);
+		}
+
+		.mokuji__h [data-l] {
+			font-family: var(--gothic);
+			font-size: 0.66rem;
+			font-weight: 500;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			color: var(--usuzumi);
+		}
+
+		.mokuji__h [data-l='ar'] {
+			font-family: var(--ar);
+			font-size: 0.9rem;
+			font-weight: 400;
+		}
+
+		.mokuji__list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem 0.75rem;
+			margin-top: 1.1rem;
+		}
+
+		.mokuji__a {
+			display: inline-flex;
+			align-items: baseline;
+			gap: 0.55rem;
+			padding: 0.35rem 0.8rem;
+			background: var(--washi);
+			border: 1px solid var(--rule-soft);
+			text-decoration: none;
+			transition:
+				border-color 0.25s,
+				background-color 0.25s;
+		}
+
+		.mokuji__a:hover {
+			border-color: var(--ai);
+			background: var(--kinari);
+		}
+
+		.mokuji__ja {
+			font-family: var(--jp);
+			font-size: 0.92rem;
+			letter-spacing: 0.14em;
+			color: var(--ai);
+		}
+
+		.mokuji__lat {
+			font-family: var(--gothic);
+			font-size: 0.66rem;
+			font-weight: 500;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--usuzumi);
+		}
+
+		.mokuji__lat[lang='ar'] {
+			font-family: var(--ar);
+			font-size: 0.88rem;
+			font-weight: 400;
+		}
+
+		.mokuji__n {
+			font-family: var(--gothic);
+			font-size: 0.68rem;
+			color: var(--sumi);
+			opacity: 0.55;
+		}
+
+		.mokuji__key {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.6rem;
+			margin-top: 1.25rem;
+			font-size: 0.88rem;
+			color: var(--usuzumi);
+		}
+
+		.mokuji__keyja {
+			font-family: var(--jp);
+			font-size: 0.95rem;
+			letter-spacing: 0.2em;
+			color: var(--ai);
+		}
+
+		.mokuji__key [lang='ar'] {
+			font-size: 0.95rem;
+		}
+
+		/* ── 部 — one part, opened by its vertical rail ───── */
+
+		.part {
+			display: grid;
+			grid-template-columns: 3.5rem minmax(0, 1fr);
+			gap: clamp(1rem, 3vw, 2.5rem);
+			margin-top: clamp(2.5rem, 6vw, 4.5rem);
+			scroll-margin-top: 1.5rem;
+		}
+
+		.part__rail {
+			position: sticky;
+			top: 2.5rem;
+			align-self: start;
+			justify-self: center;
+			height: clamp(9rem, 22vw, 13rem);
+			margin: 0;
+			font-size: 1.05rem;
+			font-weight: 600;
+			letter-spacing: 0.28em;
+			color: var(--ai);
+		}
+
+		.part__sep {
+			color: var(--rule);
+		}
+
+		.part__count {
+			font-size: 0.8rem;
+			font-weight: 400;
+			letter-spacing: 0.16em;
+			color: var(--usuzumi);
+		}
+
+		.part__h {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.75rem;
+			padding-bottom: 0.9rem;
+			border-bottom: 1px solid var(--rule);
+			font-family: var(--body);
+			font-size: clamp(1.35rem, 1.1rem + 1vw, 1.8rem);
+			font-weight: 300;
+			line-height: 1.15;
+		}
+
+		.part__h [data-l='ar'] {
+			font-family: var(--ar);
+			font-size: 0.92em;
+			font-weight: 400;
+			line-height: 1.5;
+		}
+
+		.part__hja {
+			font-family: var(--jp);
+			font-size: 0.48em;
+			letter-spacing: 0.26em;
+			color: var(--usuzumi);
+		}
+
+		/* ── one entry ────────────────────────────────────── */
+
+		.entry {
+			position: relative;
+			display: grid;
+			grid-template-columns: 2.2rem 6.5rem minmax(0, 1fr) auto;
+			gap: 0 clamp(0.85rem, 2.2vw, 1.6rem);
+			align-items: start;
+			margin-inline: -0.9rem;
+			padding: 1.1rem 0.85rem;
+			border-inline-start: 2px solid transparent;
+			border-bottom: 1px solid var(--rule-soft);
+			transition:
+				background-color 0.3s,
+				border-color 0.3s;
+		}
+
+		.entry:hover {
+			background-color: var(--washi);
+		}
+
+		/* The eight written up in full sit on paper of their own. */
+		.entry--sel {
+			background-color: var(--washi);
+			border-inline-start-color: var(--ai);
+		}
+
+		.entry--sel:hover {
+			background-color: #eeece4;
+		}
+
+		.entry__no {
+			justify-self: center;
+			height: 3.6rem;
+			margin: 0;
+			font-size: 0.82rem;
+			letter-spacing: 0.26em;
+			color: var(--usuzumi);
+		}
+
+		.entry__selmark {
+			font-weight: 600;
+			color: var(--ai);
+		}
+
+		.entry__plate {
+			min-width: 0;
+		}
+
+		.entry__img {
+			width: 100%;
+			aspect-ratio: 4 / 3;
+			object-fit: cover;
+			object-position: top center;
+			background: #dedbd2;
+			border: 1px solid var(--rule-soft);
+			filter: saturate(0.86) contrast(1.02);
+		}
+
+		.entry__img[data-tall] {
+			aspect-ratio: 3 / 4;
+			object-fit: contain;
+			padding: 0.35rem;
+			background: linear-gradient(180deg, #e4e1d8, #dcd9d0);
+		}
+
+		.entry__main {
+			min-width: 0;
+		}
+
+		.entry__title {
+			font-family: var(--body);
+			font-size: 1.12rem;
+			font-weight: 400;
+			line-height: 1.25;
+		}
+
+		.entry--sel .entry__title {
+			font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.55rem);
+		}
+
+		.entry__title [lang='ar'] {
+			font-family: var(--ar);
+			line-height: 1.55;
+		}
+
+		.entry__a {
+			text-decoration: none;
+			background-image: linear-gradient(var(--sumi), var(--sumi));
+			background-size: 0% 1px;
+			background-repeat: no-repeat;
+			background-position: 0 100%;
+			transition: background-size 0.35s ease;
+		}
+
+		.entry__hit {
+			position: absolute;
+			inset: 0;
+		}
+
+		.entry:hover .entry__a {
+			background-size: 100% 1px;
+		}
+
+		.entry__a:focus-visible {
+			outline: 2px solid var(--ai);
+			outline-offset: 4px;
+		}
+
+		@media (hover: none) {
+			.entry__a {
+				background-size: 100% 1px;
+			}
+		}
+
+		.entry__tag {
+			margin-top: 0.35rem;
+			max-width: 44em;
+			font-size: 0.92rem;
+			line-height: 1.65;
+			color: #3d454c;
+		}
+
+		.entry__tag[lang='ar'] {
+			font-size: 1rem;
+			line-height: 1.9;
+		}
+
+		.entry__meta {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			justify-content: flex-end;
+			gap: 0.25rem 0.75rem;
+			padding-top: 0.15rem;
+			text-align: end;
+			font-family: var(--gothic);
+			font-size: 0.7rem;
+			font-weight: 500;
+			letter-spacing: 0.1em;
+			color: var(--usuzumi);
+			white-space: nowrap;
+		}
+
+		.entry__stja {
+			font-family: var(--jp);
+			font-size: 0.8rem;
+			letter-spacing: 0.16em;
+			color: var(--ai);
+		}
+
+		.entry__st[lang='ar'],
+		.entry__yr[lang='ar'] {
+			font-family: var(--ar);
+			font-size: 0.88rem;
+			font-weight: 400;
+		}
+
+		.tail {
+			margin-block: clamp(2.5rem, 6vw, 4rem) 0;
+			padding-top: 1.5rem;
+			border-top: 1px solid var(--rule);
+		}
+
+		/* ── narrower ─────────────────────────────────────── */
+
+		@media (max-width: 62rem) {
+			.entry {
+				grid-template-columns: 2.2rem 4.75rem minmax(0, 1fr);
+			}
+
+			.entry__meta {
+				grid-column: 2 / -1;
+				justify-content: flex-start;
+				margin-top: 0.6rem;
+				padding-top: 0;
+				text-align: start;
+			}
+		}
+
+		@media (max-width: 48rem) {
+			.part {
+				grid-template-columns: minmax(0, 1fr);
+			}
+
+			/* No gutter to stand the rail in: it lies down above the part. */
+			.part__rail {
+				position: static;
+				writing-mode: horizontal-tb;
+				height: auto;
+				justify-self: start;
+				margin-bottom: 0.4rem;
+				font-size: 0.95rem;
+				letter-spacing: 0.3em;
+			}
+		}
+
+		@media (max-width: 30rem) {
+			.entry {
+				grid-template-columns: 2rem minmax(0, 1fr);
+				gap: 0 0.75rem;
+			}
+
+			.entry__plate {
+				grid-column: 2;
+			}
+
+			.entry__plate:empty {
+				display: none;
+			}
+
+			.entry__img {
+				max-width: 7rem;
+				margin-bottom: 0.7rem;
+			}
+
+			.entry__main,
+			.entry__meta {
+				grid-column: 2;
+			}
+
+			.entry__no {
+				height: 3rem;
+				font-size: 0.75rem;
+			}
+		}
+	</style>
+</Shell>

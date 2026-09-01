@@ -1,0 +1,899 @@
+---
+/* /6/work/<slug> — the production write-up.
+
+   The home page is a poster and the index is a contact sheet; this is the
+   paperwork. The rig runs quiet here: one slate at the top carrying the
+   credits, a wide still, then a narrow column of type you can actually read
+   two thousand words in. Stills are wide, prose is narrow. */
+import { Image } from 'astro:assets';
+import Shell from '../_shell.astro';
+import T from '../../../components/T.astro';
+import { projects } from '../../../data/projects';
+import { s, pair, yearPair } from '../../../data/variant-ui';
+import type {
+	I18n,
+	ProjectCategory,
+	ProjectStatus,
+} from '../../../../content/types';
+
+export function getStaticPaths() {
+	return projects.map((project, i) => ({
+		params: { slug: project.slug },
+		props: { project, next: projects[(i + 1) % projects.length] },
+	}));
+}
+
+const { project: p, next } = Astro.props;
+
+const catKey: Record<ProjectCategory, Parameters<typeof s>[0]> = {
+	web: 'cat.web',
+	mobile: 'cat.mobile',
+	ai: 'cat.ai',
+	desktop: 'cat.desktop',
+	extension: 'cat.extension',
+	client: 'cat.client',
+};
+
+const stateWord = (st: ProjectStatus) =>
+	st === 'wip' ? pair('In production', 'قيد الإنتاج') : s(`status.${st}`);
+
+const linkKey: Record<string, Parameters<typeof s>[0]> = {
+	live: 'project.live',
+	github: 'project.github',
+	appStore: 'project.apple',
+	playGoogle: 'project.play',
+	vscode: 'project.vscode',
+};
+
+const isPortrait = (img: ImageMetadata) => img.height > img.width;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const links = Object.entries(p.links).filter(([, url]) => !!url) as [
+	string,
+	string,
+][];
+
+/* The slate fields, in the order a loader would chalk them. */
+const fields: [I18n, I18n][] = [
+	[pair('Production', 'الإنتاج'), p.title],
+	[s('project.role'), p.role],
+	[s('project.year'), yearPair(p.year)],
+	[s('project.status'), stateWord(p.status)],
+	[pair('Format', 'الصيغة'), s(catKey[p.category])],
+];
+---
+
+<Shell
+	title={`${p.title.en} — Night Reel — Haitham Assoli`}
+	description={p.summary.en}
+	mark={pair(
+		`Reel ${pad(projects.indexOf(p) + 1)}`,
+		`بكرة ${pad(projects.indexOf(p) + 1)}`,
+	)}
+	current="sheet"
+>
+	<article class="band work">
+		<div class="wrap">
+			<a class="back" href="/6/projects">
+				<span aria-hidden="true">←</span>
+				<T v={pair('Back to the sheet', 'عودة إلى ورقة اللقطات')} />
+			</a>
+
+			<header class="work__head">
+				<p class="eyebrow">
+					<T v={s(catKey[p.category])} />
+					<span aria-hidden="true"> · </span>
+					<T v={yearPair(p.year)} />
+				</p>
+				<h1 class="work__title">
+					<T v={p.title} />
+				</h1>
+				<T v={p.tagline} as="p" class="work__logline" />
+				<T v={p.summary} as="p" class="work__summary" />
+			</header>
+
+			<div class="slateblock">
+				<span class="slateblock__sticks" aria-hidden="true"></span>
+				<dl class="slateblock__fields">
+					{
+						fields.map(([label, value]) => (
+							<div class="slateblock__row">
+								<dt>
+									<T v={label} />
+								</dt>
+								<dd>
+									<T v={value} />
+								</dd>
+							</div>
+						))
+					}
+					<div class="slateblock__row slateblock__row--wide">
+						<dt><T v={s('project.stack')} /></dt>
+						<dd class="slateblock__gear">
+							{p.stack.map((tool) => <span class="gear__item">{tool}</span>)}
+						</dd>
+					</div>
+					{
+						links.length > 0 && (
+							<div class="slateblock__row slateblock__row--wide">
+								<dt>
+									<T v={s('project.links')} />
+								</dt>
+								<dd class="slateblock__links">
+									{links.map(([kind, url]) => (
+										<a
+											class="ends__link"
+											href={url}
+											rel="noopener"
+											target="_blank"
+										>
+											<T
+												v={linkKey[kind] ? s(linkKey[kind]) : pair(kind, kind)}
+											/>
+										</a>
+									))}
+								</dd>
+							</div>
+						)
+					}
+				</dl>
+			</div>
+		</div>
+
+		{
+			p.image && (
+				<div class="wrap">
+					<div
+						class={
+							isPortrait(p.image)
+								? 'plate work__cover work__cover--stand plate--stand'
+								: 'plate work__cover'
+						}
+						style={`--gel: ${p.accent}`}
+					>
+						<span class="plate__gel" aria-hidden="true" />
+						<Image
+							class={
+								isPortrait(p.image)
+									? 'plate__img plate__img--stand'
+									: 'plate__img'
+							}
+							src={p.image}
+							alt={`${p.title.en} — ${p.tagline.en}`}
+							data-l="en"
+							lang="en"
+							widths={isPortrait(p.image) ? [360, 540, 720] : [720, 1120, 1600]}
+							sizes={
+								isPortrait(p.image)
+									? '(min-width: 62rem) 26vw, 62vw'
+									: '(min-width: 62rem) 74vw, 94vw'
+							}
+							loading="eager"
+							decoding="async"
+						/>
+						<Image
+							class={
+								isPortrait(p.image)
+									? 'plate__img plate__img--stand'
+									: 'plate__img'
+							}
+							src={p.image}
+							alt={`${p.title.ar} — ${p.tagline.ar}`}
+							data-l="ar"
+							lang="ar"
+							widths={isPortrait(p.image) ? [360, 540, 720] : [720, 1120, 1600]}
+							sizes={
+								isPortrait(p.image)
+									? '(min-width: 62rem) 26vw, 62vw'
+									: '(min-width: 62rem) 74vw, 94vw'
+							}
+							loading="eager"
+							decoding="async"
+						/>
+					</div>
+				</div>
+			)
+		}
+
+		<div class="read">
+			<section class="sect">
+				<h2 class="sect__head">
+					<T v={pair('Treatment', 'المعالجة')} />
+				</h2>
+				{
+					p.overview.en.map((para, i) => (
+						<>
+							<p class="prose" data-l="en" lang="en">
+								{para}
+							</p>
+							<p class="prose" data-l="ar" lang="ar">
+								{p.overview.ar[i]}
+							</p>
+						</>
+					))
+				}
+			</section>
+
+			{
+				p.challenges.length > 0 && (
+					<section class="sect">
+						<h2 class="sect__head">
+							<T v={s('project.challenges')} />
+						</h2>
+						<ol class="setups">
+							{p.challenges.map((c, i) => (
+								<li class="setup">
+									<p class="setup__no" aria-hidden="true">
+										{pad(i + 1)}
+									</p>
+									<h3 class="setup__title">
+										<T v={c.title} />
+									</h3>
+									<div class="setup__side setup__side--problem">
+										<p class="setup__label">
+											<T v={pair('The problem', 'المشكلة')} />
+										</p>
+										<T v={c.problem} as="p" class="setup__body" />
+									</div>
+									<div class="setup__side setup__side--fix">
+										<p class="setup__label">
+											<T v={pair('What I did', 'ما فعلته')} />
+										</p>
+										<T v={c.solution} as="p" class="setup__body" />
+									</div>
+								</li>
+							))}
+						</ol>
+					</section>
+				)
+			}
+
+			{
+				p.outcomes.en.length > 0 && (
+					<section class="sect">
+						<h2 class="sect__head">
+							<T v={s('project.outcomes')} />
+						</h2>
+						<ul class="outcomes">
+							{p.outcomes.en.map((line, i) => (
+								<li class="outcome">
+									<span data-l="en" lang="en">
+										{line}
+									</span>
+									<span data-l="ar" lang="ar">
+										{p.outcomes.ar[i]}
+									</span>
+								</li>
+							))}
+						</ul>
+					</section>
+				)
+			}
+		</div>
+
+		{
+			p.shots.length > 1 && (
+				<section class="wrap sect sect--wide">
+					<h2 class="sect__head">
+						<T v={pair('Stills', 'لقطات من العمل')} />
+					</h2>
+					<div class="sprocket" aria-hidden="true" />
+					<ul class="strip">
+						{p.shots.map((shot, i) => (
+							<li
+								class={isPortrait(shot) ? 'still' : 'still still--wide'}
+								style={`--gel: ${p.accent}`}
+							>
+								<div class={isPortrait(shot) ? 'plate plate--stand' : 'plate'}>
+									<span class="plate__gel" aria-hidden="true" />
+									<Image
+										class={
+											isPortrait(shot)
+												? 'plate__img plate__img--stand'
+												: 'plate__img'
+										}
+										src={shot}
+										alt={`${p.title.en}, still ${i + 1} of ${p.shots.length}`}
+										data-l="en"
+										lang="en"
+										widths={[320, 520, 780]}
+										sizes="(min-width: 62rem) 24vw, 46vw"
+										loading="lazy"
+										decoding="async"
+									/>
+									<Image
+										class={
+											isPortrait(shot)
+												? 'plate__img plate__img--stand'
+												: 'plate__img'
+										}
+										src={shot}
+										alt={`${p.title.ar}، لقطة ${i + 1} من ${p.shots.length}`}
+										data-l="ar"
+										lang="ar"
+										widths={[320, 520, 780]}
+										sizes="(min-width: 62rem) 24vw, 46vw"
+										loading="lazy"
+										decoding="async"
+									/>
+									<span class="still__no" aria-hidden="true">
+										{pad(i + 1)}
+									</span>
+								</div>
+							</li>
+						))}
+					</ul>
+					<div class="sprocket" aria-hidden="true" />
+				</section>
+			)
+		}
+
+		<div class="wrap">
+			<a class="leader" href={`/6/work/${next.slug}`}>
+				<span class="leader__label">
+					<T v={pair('Next reel', 'البكرة التالية')} />
+				</span>
+				<span class="leader__title">
+					<T v={next.title} />
+				</span>
+				<T v={next.tagline} as="span" class="leader__line" />
+			</a>
+		</div>
+	</article>
+</Shell>
+
+<style is:global>
+	/* ── Head ──────────────────────────────────────────────────────────── */
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1.75rem;
+		font-family: var(--credit);
+		font-size: 0.78rem;
+		font-weight: 500;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--mist);
+		transition: color 0.25s;
+	}
+
+	.back:hover {
+		color: var(--key);
+	}
+
+	.back [aria-hidden] {
+		display: inline-block;
+	}
+
+	html[dir='rtl'] .back [aria-hidden] {
+		transform: scaleX(-1);
+	}
+
+	[lang='ar'].back,
+	.back [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.9rem;
+	}
+
+	.work__head {
+		max-width: 46rem;
+		margin-bottom: clamp(2rem, 5vw, 3rem);
+	}
+
+	.work__title {
+		margin: 0 0 0.9rem;
+		font-family: var(--display);
+		font-stretch: 122%;
+		font-variation-settings:
+			'wdth' 122,
+			'wght' 640;
+		font-weight: 640;
+		font-size: clamp(2rem, 6vw, 4rem);
+		line-height: 0.98;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+		color: var(--print);
+		text-shadow: 0 0 50px rgba(255, 194, 122, 0.14);
+	}
+
+	.work__title [lang='ar'] {
+		font-family: 'Cairo', sans-serif;
+		font-weight: 800;
+		font-variation-settings: 'wght' 800;
+		line-height: 1.3;
+		text-shadow: none;
+	}
+
+	.work__logline {
+		margin: 0 0 1.1rem;
+		font-style: italic;
+		font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+		line-height: 1.35;
+		color: var(--key);
+	}
+
+	[lang='ar'].work__logline {
+		font-family: 'Amiri', serif;
+		font-size: clamp(1.15rem, 2.8vw, 1.55rem);
+		line-height: 1.7;
+	}
+
+	.work__summary {
+		margin: 0;
+		max-width: 38rem;
+		color: rgba(242, 232, 219, 0.88);
+	}
+
+	[lang='ar'].work__summary {
+		font-family: 'Amiri', serif;
+		font-weight: 400;
+		font-size: 1.12rem;
+		line-height: 2;
+	}
+
+	/* ── The slate: the credits, chalked ───────────────────────────────── */
+
+	.slateblock {
+		border: 1px solid rgba(242, 232, 219, 0.22);
+		background: rgba(5, 6, 10, 0.55);
+		padding: 0 0 0.3rem;
+	}
+
+	.slateblock__sticks {
+		display: block;
+		height: 0.7rem;
+		background: repeating-linear-gradient(
+			116deg,
+			rgba(242, 232, 219, 0.8) 0 0.5rem,
+			var(--crush) 0.5rem 1rem
+		);
+	}
+
+	.slateblock__fields {
+		margin: 0;
+		padding: 0.5rem clamp(0.9rem, 3vw, 1.6rem) 0.9rem;
+		display: grid;
+		gap: 0 clamp(1rem, 3vw, 2.5rem);
+	}
+
+	.slateblock__row {
+		display: grid;
+		grid-template-columns: minmax(5.5rem, 7.5rem) 1fr;
+		gap: 0.4rem 1rem;
+		padding-block: 0.55rem;
+		border-bottom: 1px solid rgba(163, 171, 189, 0.14);
+	}
+
+	.slateblock__row dt {
+		font-family: var(--credit);
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(163, 171, 189, 0.75);
+		line-height: 1.9;
+	}
+
+	.slateblock__row dd {
+		margin: 0;
+		font-family: var(--display);
+		font-stretch: 96%;
+		font-variation-settings:
+			'wdth' 96,
+			'wght' 520;
+		font-size: 1rem;
+		line-height: 1.5;
+		color: var(--print);
+	}
+
+	.slateblock__row [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.98rem;
+		line-height: 1.85;
+	}
+
+	.slateblock__row dt [lang='ar'] {
+		font-weight: 700;
+		font-size: 0.85rem;
+	}
+
+	.slateblock__gear,
+	.slateblock__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 0.5rem;
+	}
+
+	.gear__item {
+		font-family: var(--credit);
+		font-size: 0.8rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: rgba(242, 232, 219, 0.82);
+		border: 1px solid rgba(163, 171, 189, 0.2);
+		padding: 0.2rem 0.6rem;
+		background: rgba(21, 25, 37, 0.5);
+	}
+
+	.ends__link {
+		font-family: var(--credit);
+		font-size: 0.82rem;
+		font-weight: 500;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--key);
+		text-decoration: none;
+		border-bottom: 1px solid rgba(255, 194, 122, 0.5);
+		padding-bottom: 0.1rem;
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.ends__link:hover {
+		color: var(--sodium);
+		border-color: var(--sodium);
+	}
+
+	.ends__link [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.92rem;
+	}
+
+	/* ── The cover still ───────────────────────────────────────────────── */
+
+	.work__cover {
+		margin-top: clamp(2rem, 5vw, 3rem);
+		aspect-ratio: 16 / 9;
+	}
+
+	.work__cover--stand {
+		aspect-ratio: 4 / 5;
+		max-width: 26rem;
+		margin-inline: auto;
+	}
+
+	@media (min-width: 62rem) {
+		.work__cover--stand {
+			aspect-ratio: 21 / 9;
+			max-width: none;
+		}
+	}
+
+	/* ── The read ──────────────────────────────────────────────────────── */
+
+	.read {
+		width: min(100% - 2.5rem, 44rem);
+		margin-inline: auto;
+	}
+
+	.sect {
+		margin-top: clamp(2.75rem, 8vh, 4.5rem);
+	}
+
+	.sect__head {
+		margin: 0 0 1.4rem;
+		font-family: var(--display);
+		font-stretch: 110%;
+		font-variation-settings:
+			'wdth' 110,
+			'wght' 600;
+		font-weight: 600;
+		font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+		line-height: 1.1;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: var(--key);
+		padding-bottom: 0.6rem;
+		border-bottom: 1px solid rgba(255, 194, 122, 0.28);
+	}
+
+	.sect__head [lang='ar'] {
+		font-family: 'Cairo', sans-serif;
+		font-weight: 700;
+		font-variation-settings: 'wght' 700;
+		line-height: 1.5;
+	}
+
+	.read .prose {
+		max-width: none;
+		font-size: 1.08rem;
+		line-height: 1.78;
+	}
+
+	.read [lang='ar'].prose {
+		font-size: 1.16rem;
+		line-height: 2.05;
+	}
+
+	/* ── Setups: problem → what I did ──────────────────────────────────── */
+
+	.setups {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: clamp(1.75rem, 4vh, 2.5rem);
+	}
+
+	.setup {
+		position: relative;
+		padding-top: 1.2rem;
+		border-top: 1px solid rgba(163, 171, 189, 0.18);
+	}
+
+	.setup__no {
+		margin: 0 0 0.35rem;
+		font-family: var(--credit);
+		font-size: 0.78rem;
+		font-weight: 600;
+		letter-spacing: 0.24em;
+		color: rgba(255, 194, 122, 0.7);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.setup__title {
+		margin: 0 0 1rem;
+		font-family: var(--display);
+		font-stretch: 104%;
+		font-variation-settings:
+			'wdth' 104,
+			'wght' 600;
+		font-weight: 600;
+		font-size: 1.2rem;
+		line-height: 1.25;
+		letter-spacing: -0.005em;
+		text-transform: uppercase;
+		color: var(--print);
+	}
+
+	.setup__title [lang='ar'] {
+		font-family: 'Cairo', sans-serif;
+		font-weight: 700;
+		font-variation-settings: 'wght' 700;
+		font-size: 1.24rem;
+		line-height: 1.6;
+	}
+
+	.setup__side {
+		padding-inline-start: 1rem;
+		border-inline-start: 2px solid rgba(163, 171, 189, 0.24);
+	}
+
+	.setup__side--fix {
+		margin-top: 1rem;
+		border-inline-start-color: var(--key);
+	}
+
+	.setup__label {
+		margin: 0 0 0.3rem;
+		font-family: var(--credit);
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.24em;
+		text-transform: uppercase;
+		color: var(--mist);
+	}
+
+	.setup__side--fix .setup__label {
+		color: var(--key);
+	}
+
+	.setup__label [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-weight: 700;
+		font-size: 0.86rem;
+	}
+
+	.setup__body {
+		margin: 0;
+		font-size: 1.02rem;
+		line-height: 1.72;
+		color: rgba(242, 232, 219, 0.86);
+	}
+
+	[lang='ar'].setup__body {
+		font-family: 'Amiri', serif;
+		font-weight: 400;
+		font-size: 1.12rem;
+		line-height: 2;
+	}
+
+	.setup__side--problem .setup__body {
+		color: var(--mist);
+	}
+
+	/* ── Outcomes ──────────────────────────────────────────────────────── */
+
+	.outcomes {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.85rem;
+	}
+
+	.outcome {
+		position: relative;
+		padding-inline-start: 1.5rem;
+		font-size: 1.02rem;
+		line-height: 1.7;
+		color: rgba(242, 232, 219, 0.9);
+	}
+
+	.outcome [lang='ar'] {
+		font-family: 'Amiri', serif;
+		font-weight: 400;
+		font-size: 1.12rem;
+		line-height: 2;
+	}
+
+	.outcome::before {
+		content: '';
+		position: absolute;
+		inset-block-start: 0.72em;
+		inset-inline-start: 0;
+		width: 0.55rem;
+		height: 1px;
+		background: var(--key);
+	}
+
+	/* ── The strip ─────────────────────────────────────────────────────── */
+
+	.sect--wide {
+		margin-top: clamp(3rem, 9vh, 5rem);
+	}
+
+	.strip {
+		list-style: none;
+		margin: 0;
+		padding-block: 1.1rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+		gap: 0.9rem;
+	}
+
+	.still {
+		min-width: 0;
+	}
+
+	.still .plate {
+		aspect-ratio: 3 / 4;
+		height: 100%;
+	}
+
+	.still--wide {
+		grid-column: span 2;
+	}
+
+	.still--wide .plate {
+		aspect-ratio: 16 / 10;
+	}
+
+	.still__no {
+		position: absolute;
+		z-index: 3;
+		inset-block-end: 0.4rem;
+		inset-inline-start: 0.5rem;
+		font-family: var(--credit);
+		font-size: 0.68rem;
+		letter-spacing: 0.2em;
+		color: rgba(242, 232, 219, 0.55);
+		font-variant-numeric: tabular-nums;
+	}
+
+	@media (min-width: 62rem) {
+		.strip {
+			grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+			gap: 1.2rem;
+		}
+	}
+
+	/* ── The leader ────────────────────────────────────────────────────── */
+
+	.leader {
+		display: block;
+		margin-top: clamp(3rem, 9vh, 5rem);
+		padding: clamp(1.5rem, 4vw, 2.5rem);
+		border: 1px solid rgba(163, 171, 189, 0.2);
+		background:
+			radial-gradient(
+				90% 140% at 100% 0%,
+				rgba(42, 53, 87, 0.5),
+				transparent 70%
+			),
+			rgba(5, 6, 10, 0.5);
+		text-decoration: none;
+		transition:
+			border-color 0.25s,
+			background-color 0.25s;
+	}
+
+	.leader:hover {
+		border-color: rgba(255, 194, 122, 0.5);
+	}
+
+	.leader__label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-family: var(--credit);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.26em;
+		text-transform: uppercase;
+		color: var(--key);
+	}
+
+	.leader__label [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-weight: 700;
+		font-size: 0.88rem;
+	}
+
+	.leader__title {
+		display: block;
+		font-family: var(--display);
+		font-stretch: 115%;
+		font-variation-settings:
+			'wdth' 115,
+			'wght' 620;
+		font-weight: 620;
+		font-size: clamp(1.5rem, 4vw, 2.4rem);
+		line-height: 1.02;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+		color: var(--print);
+	}
+
+	.leader__title [lang='ar'] {
+		font-family: 'Cairo', sans-serif;
+		font-weight: 800;
+		font-variation-settings: 'wght' 800;
+		line-height: 1.4;
+	}
+
+	.leader__line {
+		display: block;
+		margin-top: 0.5rem;
+		font-style: italic;
+		color: var(--mist);
+	}
+
+	[lang='ar'].leader__line {
+		font-family: 'Amiri', serif;
+		font-size: 1.1rem;
+		line-height: 1.8;
+	}
+
+	@media (min-width: 48rem) {
+		.slateblock__fields {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.slateblock__row--wide {
+			grid-column: 1 / -1;
+		}
+	}
+
+	@media (max-width: 26rem) {
+		.slateblock__row {
+			grid-template-columns: 1fr;
+			gap: 0.1rem;
+		}
+
+		.still--wide {
+			grid-column: span 2;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.back,
+		.ends__link,
+		.leader {
+			transition: none;
+		}
+	}
+</style>

@@ -3,7 +3,10 @@ import { Image } from 'astro:assets';
 import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
+import LangBoot from '../components/LangBoot.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
+import T from '../components/T.astro';
+import { s, pair, yearPair } from '../data/variant-ui';
 import profilePhoto from '../assets/images/profile.png';
 
 /* The grid is uneven on purpose, and the spans follow the covers: the three
@@ -11,42 +14,30 @@ import profilePhoto from '../assets/images/profile.png';
    ones, and the last row stands them side by side like a shelf. */
 const spans = [12, 6, 6, 7, 5, 4, 4, 4];
 
-const statusLabel: Record<string, string> = {
-	live: 'Live',
-	shipped: 'On the stores',
-	delisted: 'Delisted',
-	wip: 'In progress',
-	archived: 'Archived',
-};
+const statusKey = {
+	live: 'status.live',
+	shipped: 'status.shipped',
+	delisted: 'status.delisted',
+	wip: 'status.wip',
+	archived: 'status.archived',
+} as const;
 
-const linkLabel: Record<string, string> = {
-	live: 'Open it',
-	github: 'Source',
-	appStore: 'App Store',
-	playGoogle: 'Google Play',
-	vscode: 'VS Marketplace',
-};
+const catKey = {
+	web: 'cat.web',
+	mobile: 'cat.mobile',
+	ai: 'cat.ai',
+	client: 'cat.client',
+	desktop: 'cat.desktop',
+	extension: 'cat.extension',
+} as const;
 
-/* Static figures. dev-stats.ts fetches at build time and is deliberately not
-   imported here. */
-const figures = [
-	{
-		n: '39',
-		label: 'projects shipped',
-		note: 'web, mobile, desktop, extensions',
-	},
-	{
-		n: '13',
-		label: 'live on the app stores',
-		note: 'App Store and Google Play',
-	},
-	{ n: '08', label: 'written up in full', note: 'problem, decision, outcome' },
-	{
-		n: '04',
-		label: 'years building',
-		note: 'freelance, salaried and founder, since 2022',
-	},
-];
+const linkKey = {
+	live: 'project.live',
+	appStore: 'project.apple',
+	playGoogle: 'project.play',
+	github: 'project.github',
+	vscode: 'project.vscode',
+} as const;
 
 const orderedLinks = [
 	'live',
@@ -55,6 +46,46 @@ const orderedLinks = [
 	'github',
 	'vscode',
 ] as const;
+
+const rest = projects.length - featured.length;
+
+/* Static figures. dev-stats.ts fetches at build time and is deliberately not
+   imported here. */
+const figures = [
+	{
+		n: '39',
+		label: s('stat.shipped'),
+		note: pair(
+			'web, mobile, desktop, extensions',
+			'ويب، وجوّال، وسطح مكتب، وإضافات',
+		),
+	},
+	{
+		n: '13',
+		label: s('stat.stores'),
+		note: pair('App Store and Google Play', 'آب ستور وجوجل بلاي'),
+	},
+	{
+		n: '08',
+		label: pair('written up in full', 'مشروحة بالكامل'),
+		note: pair('problem, decision, outcome', 'المشكلة، ثم القرار، ثم النتيجة'),
+	},
+	{
+		n: '04',
+		label: s('stat.years'),
+		note: pair(
+			'freelance, salaried and founder, since 2022',
+			'عملًا حرًّا وبراتب ومؤسِّسًا، منذ 2022',
+		),
+	},
+];
+
+const ticks = [
+	{ n: '39', l: pair('shipped', 'صدرت') },
+	{ n: '13', l: pair('on the stores', 'على المتاجر') },
+	{ n: '8', l: pair('written up', 'مشروحة') },
+	{ n: '4', l: pair('years', 'سنوات') },
+];
 
 /* Five of the eight covers are phone screenshots. Cropping a 1080×2340 shot to
    a landscape card destroys it, so tall covers stand in the frame instead of
@@ -71,7 +102,7 @@ const widthsFor = (img: ImageMetadata) =>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — two scripts, two directions, one build</title>
+		<title>Haitham Assoli — two scripts, one build</title>
 		<meta
 			name="description"
 			content="Haitham Assoli builds bilingual Arabic-first web and mobile products from Amman, Jordan. 39 shipped, 13 on the app stores, recent work in on-device AI."
@@ -80,12 +111,14 @@ const widthsFor = (img: ImageMetadata) =>
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@500;600&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
 		/>
+		<LangBoot />
 	</head>
 	<body>
 		<!-- The refraction filter. One turbulence field, displaced gently, used
-		     by the hero lens only: it is expensive and it is the signature. -->
+		     by the hero lens and by the language switch: it is expensive and it
+		     is the signature. -->
 		<svg
 			class="filters"
 			aria-hidden="true"
@@ -123,18 +156,54 @@ const widthsFor = (img: ImageMetadata) =>
 		</div>
 		<div class="grain" aria-hidden="true"></div>
 
-		<a class="skip" href="#work">Skip to the work</a>
+		<a class="skip" href="#work"><T v={s('nav.skip')} /></a>
+
+		<!-- The switch is a lens on a rail: the glass slides to the other
+		     language and bends the letter it lands on. -->
+		<div class="dock">
+			<nav class="dock__nav" aria-label="Pages — الصفحات">
+				<a href="/3/projects"><T v={s('work.all')} /></a>
+				<a href="/3/hire"><T v={s('nav.hire')} /></a>
+			</nav>
+			<button type="button" class="lang" data-lang-toggle>
+				<span class="lang__slot" aria-hidden="true">
+					<span class="lang__side lang__side--en">EN</span>
+					<span class="lang__side lang__side--ar" lang="ar">ع</span>
+					<span class="lang__puck">
+						<span class="lang__glass"></span>
+						<span class="lang__rim"></span>
+					</span>
+				</span>
+				<span class="sr" data-l="en" lang="ar">اقرأ بالعربية</span>
+				<span class="sr" data-l="ar" lang="en">Read in English</span>
+			</button>
+		</div>
 
 		<main id="top">
 			<!-- ── HERO ─────────────────────────────────────────────────────── -->
 			<header class="hero" id="hero">
 				<p class="eyebrow">
-					<span class="dot"></span>Amman, Jordan — web &amp; mobile, full stack
+					<span class="dot"></span>
+					<T
+						v={pair(
+							'Amman, Jordan — web & mobile, full stack',
+							'عمّان، الأردن — ويب وتطبيقات، full stack',
+						)}
+					/>
 				</p>
 
+				<!-- The English block sizes the stage in both languages, so the
+				     second reading never overflows it. Everything visible is a
+				     layer on top of it. -->
 				<div class="stage" id="stage">
+					<p class="type type--en sizer" aria-hidden="true">
+						<span>Two scripts.</span>
+						<span>Two directions.</span>
+						<span>One build.</span>
+					</p>
+
 					<p
-						class="type type--ar type--ghost"
+						class="type type--ar layer echo echo--ar"
 						aria-hidden="true"
 						lang="ar"
 						dir="rtl"
@@ -143,13 +212,30 @@ const widthsFor = (img: ImageMetadata) =>
 						<span>اتجاهان.</span>
 						<span>بناءٌ واحد.</span>
 					</p>
-					<h1 class="type type--en">
+					<p
+						class="type type--en layer echo echo--en"
+						aria-hidden="true"
+						lang="en"
+						dir="ltr"
+					>
+						<span>Two scripts.</span>
+						<span>Two directions.</span>
+						<span>One build.</span>
+					</p>
+
+					<h1 class="type type--en layer head" data-l="en" lang="en" dir="ltr">
 						<span>Two scripts.</span>
 						<span>Two directions.</span>
 						<span>One build.</span>
 					</h1>
+					<h1 class="type type--ar layer head" data-l="ar" lang="ar" dir="rtl">
+						<span>لغتان.</span>
+						<span>اتجاهان.</span>
+						<span>بناءٌ واحد.</span>
+					</h1>
+
 					<p
-						class="type type--ar type--lit"
+						class="type type--ar layer lit lit--ar"
 						aria-hidden="true"
 						lang="ar"
 						dir="rtl"
@@ -158,6 +244,17 @@ const widthsFor = (img: ImageMetadata) =>
 						<span>اتجاهان.</span>
 						<span>بناءٌ واحد.</span>
 					</p>
+					<p
+						class="type type--en layer lit lit--en"
+						aria-hidden="true"
+						lang="en"
+						dir="ltr"
+					>
+						<span>Two scripts.</span>
+						<span>Two directions.</span>
+						<span>One build.</span>
+					</p>
+
 					<div class="lens" id="lens" aria-hidden="true">
 						<span class="lens__body"></span>
 						<span class="lens__rim"></span>
@@ -165,39 +262,63 @@ const widthsFor = (img: ImageMetadata) =>
 				</div>
 
 				<p class="stage__hint">
-					<span class="key" data-fine>Move the pointer</span><span
-						class="key"
-						data-coarse>Watch the glass travel</span
-					> across the sentence. It reads the same line right to left — and the whole
-					line moves to the other edge. That is the job.
+					<T
+						v={pair(
+							'Move the pointer across the sentence. The glass finds the other reading of it — the same line, the other script, running the other way. That is the job.',
+							'حرّك المؤشر فوق الجملة. يجد الزجاج قراءتها الأخرى — السطر نفسه، بالخط الآخر، وسائرًا في الاتجاه المعاكس. هذا هو العمل.',
+						)}
+						as="span"
+						class="hint hint--fine"
+					/>
+					<T
+						v={pair(
+							'The glass travels across the sentence on its own. It finds the other reading — the same line, the other script, running the other way. That is the job.',
+							'يعبر الزجاج الجملة من تلقاء نفسه فيجد قراءتها الأخرى — السطر نفسه، بالخط الآخر، وسائرًا في الاتجاه المعاكس. هذا هو العمل.',
+						)}
+						as="span"
+						class="hint hint--coarse"
+					/>
 				</p>
 
 				<div class="panel panel--thesis">
-					<p class="lede">
-						A mirrored interface is not a translated one. It is a second
-						interface, and it has to be as good as the first. I build products
-						that are bilingual from the first commit — React&nbsp;Native and
-						Expo on both app stores, Next.js and Astro on the web, NestJS,
-						Convex and Supabase underneath.
-					</p>
+					<T
+						v={pair(
+							'A mirrored interface is not a translated one. It is a second interface, and it has to be as good as the first. I build products that are bilingual from the first commit — React Native and Expo on both app stores, Next.js and Astro on the web, NestJS, Convex and Supabase underneath.',
+							'الواجهة المنعكسة ليست واجهة مترجمة. هي واجهة ثانية، ولا بد أن تكون بجودة الأولى. أبني منتجات ثنائية اللغة من أول commit — React Native وExpo على المتجرين، وNext.js وAstro على الويب، وNestJS وConvex وSupabase تحتها.',
+						)}
+						as="p"
+						class="lede"
+					/>
 					<ul class="ticks">
-						<li><b>39</b> shipped</li>
-						<li><b>13</b> on the stores</li>
-						<li><b>8</b> written up</li>
-						<li><b>4</b> years</li>
+						{
+							ticks.map((t) => (
+								<li>
+									<b>{t.n}</b>
+									<T v={t.l} />
+								</li>
+							))
+						}
 					</ul>
 				</div>
 			</header>
 
 			<!-- ── WORK ─────────────────────────────────────────────────────── -->
 			<section class="section" id="work" aria-labelledby="work-h">
-				<div class="head">
-					<p class="eyebrow">Eight of thirty-nine</p>
-					<h2 class="h2" id="work-h">The ones worth the walkthrough</h2>
-					<p class="sub">
-						Each of these has a full write-up behind it: what was actually hard,
-						what I chose, and what it did once real people used it.
+				<div class="head-block">
+					<p class="eyebrow">
+						<T v={pair('Eight of thirty-nine', 'ثمانية من تسعة وثلاثين')} />
 					</p>
+					<h2 class="h2" id="work-h">
+						<T v={pair('The ones worth the walkthrough', 'التي تستحق الشرح')} />
+					</h2>
+					<T
+						v={pair(
+							'Each of these has a full write-up behind it: what was actually hard, what I chose, and what it did once real people used it.',
+							'خلف كل واحد منها شرح كامل: ما كان صعبًا فعلًا، وما اخترته، وماذا فعل حين استخدمه الناس.',
+						)}
+						as="p"
+						class="sub"
+					/>
 				</div>
 
 				<div class="grid">
@@ -231,19 +352,28 @@ const widthsFor = (img: ImageMetadata) =>
 								<div class="card__body">
 									<p class="card__meta">
 										<span class="pip" />
-										{statusLabel[p.status] ?? p.status} · {p.year} ·{' '}
-										{p.category}
+										<T v={s(statusKey[p.status])} />
+										<span class="card__sep" aria-hidden="true">
+											·
+										</span>
+										<T v={yearPair(p.year)} />
+										<span class="card__sep" aria-hidden="true">
+											·
+										</span>
+										<T v={s(catKey[p.category])} />
 									</p>
 									<h3 class="card__title">
-										<a href={`/work/${p.slug}`}>{p.title.en}</a>
+										<a href={`/3/work/${p.slug}`}>
+											<T v={p.title} />
+										</a>
 									</h3>
-									<p class="card__tag">{p.tagline.en}</p>
-									<p class="card__sum">{p.summary.en}</p>
-									<p class="card__role">{p.role.en}</p>
+									<T v={p.tagline} as="p" class="card__tag" />
+									<T v={p.summary} as="p" class="card__sum" />
+									<T v={p.role} as="p" class="card__role" />
 
 									<ul class="chips">
-										{p.stack.slice(0, 5).map((s) => (
-											<li>{s}</li>
+										{p.stack.slice(0, 5).map((t) => (
+											<li>{t}</li>
 										))}
 										{p.stack.length > 5 && (
 											<li class="chips__more">+{p.stack.length - 5}</li>
@@ -251,8 +381,8 @@ const widthsFor = (img: ImageMetadata) =>
 									</ul>
 
 									<div class="card__links">
-										<a class="btn btn--go" href={`/work/${p.slug}`}>
-											Read the case
+										<a class="btn btn--go" href={`/3/work/${p.slug}`}>
+											<T v={s('work.read')} />
 										</a>
 										{orderedLinks.map((k) =>
 											p.links[k] ? (
@@ -262,7 +392,7 @@ const widthsFor = (img: ImageMetadata) =>
 													rel="noreferrer noopener"
 													target="_blank"
 												>
-													{linkLabel[k]}
+													<T v={s(linkKey[k])} />
 												</a>
 											) : null,
 										)}
@@ -274,17 +404,26 @@ const widthsFor = (img: ImageMetadata) =>
 				</div>
 
 				<p class="aside">
-					The other {projects.length - featured.length} live in the archive — municipal
-					portals, tourism guides, charity platforms, a few extensions and a handful
-					of things that only ever ran on my own machine.
+					<T
+						v={pair(
+							`The other ${rest} live in the archive — municipal portals, tourism guides, charity platforms, a few extensions and a handful of things that only ever ran on my own machine.`,
+							`الـ ${rest} الباقية في الأرشيف — بوابات بلدية، وأدلة سياحية، ومنصات خيرية، وبضع إضافات، وأشياء لم تعمل يومًا إلا على جهازي.`,
+						)}
+					/>
+					{' '}
+					<a class="aside__link" href="/3/projects">
+						<T v={s('work.all')} />
+					</a>
 				</p>
 			</section>
 
 			<!-- ── WHO ──────────────────────────────────────────────────────── -->
 			<section class="section" id="who" aria-labelledby="who-h">
-				<div class="head">
-					<p class="eyebrow">Amman, Jordan</p>
-					<h2 class="h2" id="who-h">Who is behind the glass</h2>
+				<div class="head-block">
+					<p class="eyebrow"><T v={profile.location} /></p>
+					<h2 class="h2" id="who-h">
+						<T v={pair('Who is behind the glass', 'مَن خلف الزجاج')} />
+					</h2>
 				</div>
 
 				<div class="who">
@@ -298,41 +437,30 @@ const widthsFor = (img: ImageMetadata) =>
 							decoding="async"
 						/>
 						<figcaption>
-							{profile.name.en} · <span lang="ar" dir="rtl"
-								>{profile.name.ar}</span
-							>
+							<span data-l="en" lang="en">Haitham Assoli</span>
+							<span data-l="ar" lang="ar">هيثم العسولي</span>
 						</figcaption>
 					</figure>
 
 					<div class="who__text">
-						<p>
-							I build web and mobile products end to end — the data model, the
-							API, the screens, the store listing. Most of what I ship is
-							bilingual and right-to-left first, because most of the people
-							using it read Arabic.
-						</p>
-						<p>
-							The problems I like have a hard constraint in them: a model that
-							has to run on the device instead of a server, a search index that
-							has to answer in milliseconds without a backend, a booking flow
-							that cannot sell the same hour twice. The framework is never the
-							interesting part.
-						</p>
-						<p>
-							Lately that constraint has been the phone itself. My recent work
-							is on-device AI — video and audio processed entirely on the user's
-							hardware, with no cloud, no account and no telemetry. The original
-							file never leaves the device.
-						</p>
+						{
+							(['en', 'ar'] as const).map((l) => (
+								<div class="who__prose" data-l={l} lang={l}>
+									{profile.about[l].map((para) => (
+										<p>{para}</p>
+									))}
+								</div>
+							))
+						}
 
 						<ul class="track">
 							{
 								profile.experience.slice(0, 4).map((e) => (
 									<li>
-										<span class="track__when">{e.period}</span>
+										<T v={yearPair(e.period)} class="track__when" />
 										<span class="track__what">
-											<b>{e.role.en}</b>
-											<i>{e.company.en}</i>
+											<T v={e.role} as="b" />
+											<T v={e.company} as="i" />
 										</span>
 									</li>
 								))
@@ -340,12 +468,18 @@ const widthsFor = (img: ImageMetadata) =>
 						</ul>
 
 						<p class="who__edu">
-							{profile.education[0].degree.en}, {
-								profile.education[0].school.en
-							},
-							{' '}{profile.education[0].period} ({
-								profile.education[0].note?.en
-							}).
+							<T v={profile.education[0].degree} />,{' '}
+							<T v={profile.education[0].school} />,{' '}
+							<T v={yearPair(profile.education[0].period)} />
+							{
+								profile.education[0].note && (
+									<>
+										{' ('}
+										<T v={profile.education[0].note} />
+										{')'}
+									</>
+								)
+							}.
 						</p>
 					</div>
 				</div>
@@ -353,13 +487,17 @@ const widthsFor = (img: ImageMetadata) =>
 
 			<!-- ── TOOLBOX ──────────────────────────────────────────────────── -->
 			<section class="section" id="stack" aria-labelledby="stack-h">
-				<div class="head">
-					<p class="eyebrow">{toolbox.length} tools, in order of how often</p>
-					<h2 class="h2" id="stack-h">What I actually reach for</h2>
-					<p class="sub">
-						Not a list of everything I have opened once. This is the order the
-						work is really made of.
+				<div class="head-block">
+					<p class="eyebrow">
+						<T
+							v={pair(
+								`${toolbox.length} tools, in order of how often`,
+								`${toolbox.length} أداة، مرتّبة بحسب كثرة الاستخدام`,
+							)}
+						/>
 					</p>
+					<h2 class="h2" id="stack-h"><T v={s('about.stackTitle')} /></h2>
+					<T v={s('about.stackLede')} as="p" class="sub" />
 				</div>
 
 				<ul class="tools">
@@ -376,9 +514,16 @@ const widthsFor = (img: ImageMetadata) =>
 
 			<!-- ── FIGURES ──────────────────────────────────────────────────── -->
 			<section class="section" id="count" aria-labelledby="count-h">
-				<div class="head">
-					<p class="eyebrow">The count</p>
-					<h2 class="h2" id="count-h">Four numbers, none of them rounded up</h2>
+				<div class="head-block">
+					<p class="eyebrow"><T v={pair('The count', 'العدّ')} /></p>
+					<h2 class="h2" id="count-h">
+						<T
+							v={pair(
+								'Four numbers, none of them rounded up',
+								'أربعة أرقام، لا واحد منها مُقرَّب',
+							)}
+						/>
+					</h2>
 				</div>
 
 				<div class="figures panel">
@@ -386,8 +531,8 @@ const widthsFor = (img: ImageMetadata) =>
 						figures.map((f) => (
 							<div class="fig">
 								<p class="fig__n">{f.n}</p>
-								<p class="fig__label">{f.label}</p>
-								<p class="fig__note">{f.note}</p>
+								<T v={f.label} as="p" class="fig__label" />
+								<T v={f.note} as="p" class="fig__note" />
 							</div>
 						))
 					}
@@ -397,19 +542,37 @@ const widthsFor = (img: ImageMetadata) =>
 			<!-- ── HIRE ─────────────────────────────────────────────────────── -->
 			<section class="section section--hire" id="hire" aria-labelledby="hire-h">
 				<div class="hire panel">
-					<p class="eyebrow">Hiring</p>
+					<p class="eyebrow"><T v={s('hire.eyebrow')} /></p>
 					<h2 class="h2 h2--hire" id="hire-h">
-						If it has to work in two directions, start here.
+						<T
+							v={pair(
+								'If it has to work in two directions, start here.',
+								'إن كان لا بد أن يعمل في الاتجاهين، فابدأ من هنا.',
+							)}
+						/>
 					</h2>
-					<p class="sub sub--hire">
-						Tell me the constraint and I will tell you whether I am the right
-						person for it. Usually within a day.
-					</p>
+					<T
+						v={pair(
+							'Tell me the constraint and I will tell you whether I am the right person for it. Usually within a day.',
+							'صِف لي القيد وسأخبرك إن كنت الشخص المناسب له. عادةً خلال يوم.',
+						)}
+						as="p"
+						class="sub sub--hire"
+					/>
 
-					<a class="mailto" href={`mailto:${profile.email}`}>
-						<span class="mailto__label">Write to</span>
-						<span class="mailto__addr">{profile.email}</span>
-					</a>
+					<div class="hire__acts">
+						<a class="btn btn--go btn--big" href="/3/hire">
+							<T v={pair('Fill in the brief', 'املأ الوصف')} />
+						</a>
+						<a class="mailto" href={`mailto:${profile.email}`}>
+							<T
+								v={pair('Or write to', 'أو راسلني على')}
+								as="span"
+								class="mailto__label"
+							/>
+							<span class="mailto__addr" dir="ltr">{profile.email}</span>
+						</a>
+					</div>
 
 					<ul class="rail">
 						<li>
@@ -437,18 +600,18 @@ const widthsFor = (img: ImageMetadata) =>
 							<a
 								href={profile.links.resume}
 								rel="noreferrer noopener"
-								target="_blank">CV</a
+								target="_blank"><T v={s('nav.cv')} /></a
 							>
 						</li>
 						<li>
 							<a
 								href={profile.links.playStore}
 								rel="noreferrer noopener"
-								target="_blank">Play Store</a
+								target="_blank"><T v={s('project.play')} /></a
 							>
 						</li>
 						<li>
-							<a href={`tel:${profile.phone.replace(/\s/g, '')}`}
+							<a href={`tel:${profile.phone.replace(/\s/g, '')}`} dir="ltr"
 								>{profile.phone}</a
 							>
 						</li>
@@ -459,12 +622,16 @@ const widthsFor = (img: ImageMetadata) =>
 
 		<footer class="foot">
 			<p class="foot__name">
-				Haitham Assoli — <span lang="ar" dir="rtl">هيثم العسولي</span>
+				<span data-l="en" lang="en">Haitham Assoli</span>
+				<span data-l="ar" lang="ar">هيثم العسولي</span>
 			</p>
 			<p class="foot__line">
-				{profile.title.en} · {profile.location.en} · variant 3, liquid glass
+				<T v={profile.title} /> · <T v={profile.location} /> ·{' '}
+				<T v={pair('variant 3, liquid glass', 'التصميم الثالث، زجاج سائل')} />
 			</p>
-			<p class="foot__back"><a href="#top">Back to the top</a></p>
+			<p class="foot__back">
+				<a href="#top"><T v={pair('Back to the top', 'عد إلى الأعلى')} /></a>
+			</p>
 		</footer>
 
 		<script>
@@ -480,6 +647,9 @@ const widthsFor = (img: ImageMetadata) =>
 					stage.style.setProperty('--ly', py + 'px');
 				};
 
+				/* Physical pixels from the box's left edge: the lens and the
+				   clip-path both read this coordinate space, in either
+				   direction. */
 				const onMove = (e: PointerEvent) => {
 					const r = stage.getBoundingClientRect();
 					px = e.clientX - r.left;
@@ -582,6 +752,17 @@ const widthsFor = (img: ImageMetadata) =>
 		outline: 2px solid var(--lagoon);
 		outline-offset: 3px;
 		border-radius: 6px;
+	}
+
+	.sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
 	}
 
 	.skip {
@@ -745,7 +926,8 @@ const widthsFor = (img: ImageMetadata) =>
 	) {
 		/* Polished stone instead of frosted glass: opaque, still lit from the
 		   top-left, still heavy. Nothing looks broken, it just stops being wet. */
-		.panel {
+		.panel,
+		.dock {
 			background: linear-gradient(
 				158deg,
 				rgba(28, 42, 72, 0.97),
@@ -764,6 +946,164 @@ const widthsFor = (img: ImageMetadata) =>
 		}
 	}
 
+	/* ══ the dock: nav and the language switch ═══════════════════════════ */
+	.dock {
+		position: fixed;
+		z-index: 60;
+		inset-block-start: max(0.75rem, env(safe-area-inset-top));
+		inset-inline-end: max(0.75rem, env(safe-area-inset-right));
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.35rem 0.35rem 0.35rem 0.9rem;
+		padding-inline: 0.9rem 0.35rem;
+		border-radius: 999px;
+		background: var(--glass-tint);
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+		box-shadow:
+			var(--glass-lift),
+			inset 0 1px 0 rgba(255, 255, 255, 0.22);
+	}
+
+	.dock__nav {
+		display: flex;
+		align-items: center;
+		gap: 0.15rem;
+		font-family: var(--mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.dock__nav a {
+		padding: 0.4rem 0.55rem;
+		border-radius: 999px;
+		text-decoration: none;
+		color: var(--haze);
+		white-space: nowrap;
+		transition:
+			color 0.2s,
+			background-color 0.2s;
+	}
+
+	.dock__nav a:hover {
+		color: var(--frost);
+		background: rgba(255, 255, 255, 0.09);
+	}
+
+	/* ══ the language switch — a lens on a rail ══════════════════════════ */
+	.lang {
+		all: unset;
+		flex: none;
+		cursor: pointer;
+		border-radius: 999px;
+	}
+
+	.lang__slot {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		direction: ltr;
+		width: 5.4rem;
+		height: 2.1rem;
+		border-radius: 999px;
+		background: rgba(4, 8, 18, 0.55);
+		box-shadow:
+			inset 0 1px 2px rgba(2, 5, 12, 0.9),
+			inset 0 0 0 1px rgba(200, 230, 255, 0.16);
+		overflow: hidden;
+	}
+
+	.lang__side {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.06em;
+		color: rgba(234, 242, 255, 0.4);
+		transition: color 0.45s ease;
+	}
+
+	.lang__side--ar {
+		font-family: var(--arabic);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0;
+	}
+
+	html[lang='en'] .lang__side--en,
+	html[lang='ar'] .lang__side--ar {
+		color: var(--frost);
+	}
+
+	.lang__puck {
+		position: absolute;
+		z-index: 2;
+		inset-block: 3px;
+		left: 3px;
+		width: calc(50% - 3px);
+		border-radius: 999px;
+		transform: translateX(0);
+		transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.2, 1);
+	}
+
+	html[lang='ar'] .lang__puck {
+		transform: translateX(100%);
+	}
+
+	/* the letter under the puck bends as the glass passes over it */
+	.lang__glass {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		-webkit-backdrop-filter: blur(0.6px) url(#liquid) saturate(1.8)
+			brightness(1.22);
+		backdrop-filter: blur(0.6px) url(#liquid) saturate(1.8) brightness(1.22);
+		background: radial-gradient(
+			120% 130% at 32% 20%,
+			rgba(255, 255, 255, 0.22),
+			rgba(255, 255, 255, 0.04) 46%,
+			rgba(6, 20, 34, 0.2)
+		);
+		box-shadow:
+			inset 0 1px 1px rgba(255, 255, 255, 0.6),
+			inset 0 -8px 14px -9px rgba(120, 210, 255, 0.6),
+			0 8px 18px -8px rgba(2, 6, 14, 0.9);
+	}
+
+	.lang__rim {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		padding: 1px;
+		background: conic-gradient(
+			from 210deg,
+			rgba(255, 255, 255, 0.95),
+			rgba(160, 230, 255, 0.35) 22%,
+			rgba(255, 255, 255, 0.04) 46%,
+			rgba(10, 26, 48, 0.6) 68%,
+			rgba(255, 190, 130, 0.45) 86%,
+			rgba(255, 255, 255, 0.95)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+	}
+
+	.lang:focus-visible .lang__slot {
+		outline: 2px solid var(--lagoon);
+		outline-offset: 3px;
+	}
+
 	/* ══ shared type ═════════════════════════════════════════════════════ */
 	.eyebrow {
 		margin: 0 0 0.9rem;
@@ -776,6 +1116,7 @@ const widthsFor = (img: ImageMetadata) =>
 		display: flex;
 		align-items: center;
 		gap: 0.55rem;
+		flex-wrap: wrap;
 	}
 
 	.dot {
@@ -811,7 +1152,7 @@ const widthsFor = (img: ImageMetadata) =>
 		padding: clamp(3.5rem, 9vw, 7rem) var(--gut) 0;
 	}
 
-	.head {
+	.head-block {
 		margin-block-end: clamp(1.75rem, 4vw, 2.75rem);
 	}
 
@@ -819,18 +1160,20 @@ const widthsFor = (img: ImageMetadata) =>
 	.hero {
 		max-width: var(--maxw);
 		margin-inline: auto;
-		padding: clamp(3.5rem, 12vh, 7rem) var(--gut) 0;
+		padding: clamp(4.5rem, 12vh, 7rem) var(--gut) 0;
 	}
 
-	/* fit-content, so the Arabic block right-aligns to the same column the
-	   English fills. The two readings overlap; the lens sits in the overlap. */
+	/* fit-content, sized by the English block in both languages, so the second
+	   reading is always inside the box the lens travels across. */
 	.stage {
 		position: relative;
 		isolation: isolate;
 		width: fit-content;
 		max-width: 100%;
 		margin-block: clamp(1rem, 3vw, 2rem) 0;
+		padding-block-end: 0.6rem;
 		animation: roam 34s linear infinite;
+		--lens-r: clamp(72px, 11vw, 150px);
 	}
 
 	.stage.manual {
@@ -875,43 +1218,68 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	.type--en {
-		position: relative;
+		direction: ltr;
+		text-align: left;
+	}
+
+	.type--ar {
+		direction: rtl;
+		text-align: right;
+		font-family: var(--arabic);
+		font-weight: 700;
+		font-size: clamp(2.2rem, 0.9rem + 7.8vw, 6.2rem);
+		line-height: 1.14;
+		letter-spacing: 0;
+		font-variation-settings: normal;
+	}
+
+	/* the invisible English block that gives the stage its box */
+	.sizer {
+		visibility: hidden;
+	}
+
+	.layer {
+		position: absolute;
+		inset-block-start: 0;
+		left: 0;
+		right: 0;
+	}
+
+	.head {
 		z-index: 1;
 		color: var(--frost);
 		text-shadow: 0 2px 30px rgba(4, 8, 18, 0.6);
 	}
 
-	.type--ar {
-		position: absolute;
-		inset: 0;
-		direction: rtl;
-		text-align: right;
-		font-family: var(--arabic);
-		font-weight: 600;
-		font-size: clamp(2.2rem, 0.9rem + 7.8vw, 6.2rem);
-		line-height: 1.12;
-		letter-spacing: 0;
+	/* the second reading is always there, just not lit */
+	.echo {
+		z-index: 0;
+		opacity: 0.17;
 		color: #c8f4fb;
 		pointer-events: none;
 	}
 
-	/* the second reading is always there, just not lit */
-	.type--ghost {
-		z-index: 0;
-		opacity: 0.17;
-	}
-
 	/* …until the glass finds it */
-	.type--lit {
+	.lit {
 		z-index: 2;
+		color: #c8f4fb;
+		pointer-events: none;
 		text-shadow: 0 2px 24px rgba(4, 22, 34, 0.85);
 		clip-path: circle(calc(var(--lens-r, 120px) - 2px) at var(--lx) var(--ly));
 	}
 
+	/* Whichever language the page is in, the disc reveals the other one. */
+	html[lang='en'] .echo--en,
+	html[lang='en'] .lit--en,
+	html[lang='ar'] .echo--ar,
+	html[lang='ar'] .lit--ar {
+		display: none;
+	}
+
 	.lens {
 		position: absolute;
-		inset-block-start: var(--ly);
-		inset-inline-start: var(--lx);
+		top: var(--ly);
+		left: var(--lx);
 		width: calc(var(--lens-r, 120px) * 2);
 		height: calc(var(--lens-r, 120px) * 2);
 		margin: calc(var(--lens-r, 120px) * -1) 0 0 calc(var(--lens-r, 120px) * -1);
@@ -963,13 +1331,9 @@ const widthsFor = (img: ImageMetadata) =>
 		mask-composite: exclude;
 	}
 
-	.stage {
-		--lens-r: clamp(72px, 11vw, 150px);
-	}
-
 	.stage__hint {
 		margin: clamp(1.4rem, 3vw, 2.2rem) 0 0;
-		max-width: 44ch;
+		max-width: 48ch;
 		font-family: var(--mono);
 		font-size: 0.78rem;
 		line-height: 1.75;
@@ -977,19 +1341,15 @@ const widthsFor = (img: ImageMetadata) =>
 		color: var(--mute);
 	}
 
-	.key {
-		color: rgba(160, 232, 242, 0.95);
-	}
-
-	.key[data-coarse] {
+	.hint--coarse {
 		display: none;
 	}
 
 	@media (pointer: coarse) {
-		.key[data-fine] {
+		.hint--fine {
 			display: none;
 		}
-		.key[data-coarse] {
+		.hint--coarse {
 			display: inline;
 		}
 	}
@@ -1150,12 +1510,17 @@ const widthsFor = (img: ImageMetadata) =>
 		margin: 0 0 0.7rem;
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		flex-wrap: wrap;
+		gap: 0.4rem;
 		font-family: var(--mono);
 		font-size: 0.68rem;
 		letter-spacing: 0.13em;
 		text-transform: uppercase;
 		color: rgba(234, 242, 255, 0.72);
+	}
+
+	.card__sep {
+		color: rgba(234, 242, 255, 0.38);
 	}
 
 	.pip {
@@ -1285,11 +1650,21 @@ const widthsFor = (img: ImageMetadata) =>
 		background: #ffffff;
 	}
 
+	.btn--big {
+		padding: 0.85rem 1.6rem;
+		font-size: 0.8rem;
+	}
+
 	.aside {
 		margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
 		max-width: 60ch;
 		color: var(--haze);
 		font-size: 1rem;
+	}
+
+	.aside__link {
+		color: rgba(160, 232, 242, 0.95);
+		text-underline-offset: 4px;
 	}
 
 	/* ══ who ═════════════════════════════════════════════════════════════ */
@@ -1325,7 +1700,7 @@ const widthsFor = (img: ImageMetadata) =>
 		text-align: center;
 	}
 
-	.who__text p {
+	.who__prose p {
 		margin: 0 0 1.15rem;
 		max-width: 62ch;
 		font-size: clamp(1.02rem, 0.96rem + 0.35vw, 1.18rem);
@@ -1366,6 +1741,7 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	.track__what i {
+		display: block;
 		font-style: normal;
 		font-family: var(--mono);
 		font-size: 0.74rem;
@@ -1373,10 +1749,10 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	.who__edu {
-		font-family: var(--mono) !important;
-		font-size: 0.76rem !important;
+		font-family: var(--mono);
+		font-size: 0.76rem;
 		line-height: 1.7;
-		color: var(--mute) !important;
+		color: var(--mute);
 	}
 
 	/* ══ toolbox ═════════════════════════════════════════════════════════ */
@@ -1475,11 +1851,18 @@ const widthsFor = (img: ImageMetadata) =>
 		margin-block-start: 1.1rem;
 	}
 
+	.hire__acts {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+		margin-block-start: clamp(1.75rem, 4vw, 2.5rem);
+	}
+
 	.mailto {
 		display: inline-flex;
 		flex-direction: column;
 		gap: 0.35rem;
-		margin-block-start: clamp(1.75rem, 4vw, 2.5rem);
 		padding: 1.05rem 1.5rem;
 		border-radius: 16px;
 		border: 1px solid rgba(200, 230, 255, 0.28);
@@ -1573,6 +1956,59 @@ const widthsFor = (img: ImageMetadata) =>
 		color: rgba(160, 232, 242, 0.9);
 	}
 
+	/* ══ Arabic ══════════════════════════════════════════════════════════ */
+	/* <T> puts lang on the element itself, so this catches the copy exactly.
+	   Arabic gets air, keeps Western numerals, and is never letter-spaced,
+	   uppercased or italicised. */
+	[lang='ar'] {
+		font-family: var(--arabic);
+		font-style: normal;
+		letter-spacing: 0;
+		font-variation-settings: normal;
+		text-transform: none;
+	}
+
+	[lang='ar'] em,
+	[lang='ar'] i,
+	[lang='ar'] b {
+		font-style: normal;
+	}
+
+	p[lang='ar']:not(.type),
+	div[lang='ar'] p,
+	li[lang='ar'] {
+		line-height: 1.85;
+	}
+
+	.h2[lang='ar'] {
+		font-weight: 700;
+		line-height: 1.34;
+		font-size: clamp(1.55rem, 1rem + 2.6vw, 2.9rem);
+	}
+
+	.card__title [lang='ar'] {
+		font-weight: 700;
+		line-height: 1.3;
+	}
+
+	.eyebrow [lang='ar'],
+	.ticks [lang='ar'],
+	.card__meta [lang='ar'],
+	.fig__label[lang='ar'],
+	.track__when[lang='ar'],
+	.foot [lang='ar'],
+	.mailto__label[lang='ar'],
+	.rail [lang='ar'],
+	.dock__nav [lang='ar'] {
+		font-size: 0.8rem;
+	}
+
+	.card__tag[lang='ar'],
+	.card__role[lang='ar'],
+	.who__edu [lang='ar'] {
+		font-family: var(--arabic);
+	}
+
 	/* ══ responsive ══════════════════════════════════════════════════════ */
 	@media (max-width: 1040px) {
 		.card {
@@ -1616,6 +2052,22 @@ const widthsFor = (img: ImageMetadata) =>
 		}
 	}
 
+	@media (max-width: 640px) {
+		.dock {
+			inset-block-start: auto;
+			inset-block-end: max(
+				4.25rem,
+				calc(env(safe-area-inset-bottom) + 4.25rem)
+			);
+			inset-inline: max(0.75rem, env(safe-area-inset-left))
+				max(0.75rem, env(safe-area-inset-right));
+			justify-content: space-between;
+		}
+		.hero {
+			padding-block-start: clamp(2.5rem, 8vh, 4rem);
+		}
+	}
+
 	@media (max-width: 520px) {
 		.eyebrow {
 			font-size: 0.64rem;
@@ -1650,7 +2102,10 @@ const widthsFor = (img: ImageMetadata) =>
 		}
 		.card__img,
 		.tool,
-		.btn {
+		.btn,
+		.lang__puck,
+		.lang__side,
+		.dock__nav a {
 			transition: none !important;
 		}
 		.stage {

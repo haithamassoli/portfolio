@@ -1,14 +1,21 @@
 ---
 import { Image } from 'astro:assets';
 import { profile } from '../../content/profile';
+import type { I18n } from '../../content/types';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
+import type { Key } from '../i18n';
+import { pair, s, yearPair } from '../data/variant-ui';
+import LangBoot from '../components/LangBoot.astro';
+import T from '../components/T.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import profilePhoto from '../assets/images/profile.png';
 
 /* Category and status, said properly in Japanese rather than transliterated.
    受託 is the ordinary word for contract work; 端末内 means "inside the
-   handset", which is exactly what the on-device work is. */
+   handset", which is exactly what the on-device work is. The Japanese is
+   decoration that stays in both language modes; the reader's own language
+   sits beside it, never instead of it. */
 const categoryJa: Record<string, string> = {
 	web: 'ウェブ',
 	mobile: 'モバイル',
@@ -26,6 +33,19 @@ const statusJa: Record<string, string> = {
 	archived: '保管',
 };
 
+const catT = (c: string): I18n => s(`cat.${c}` as Key);
+const statusT = (st: string): I18n => s(`status.${st}` as Key);
+
+/* The card rail is Japanese, so its year stays bare numerals: 2025〜 for an
+   open span, 2023〜2026 for a closed one. 波ダッシュ carries the sense without
+   a word in it, and the digits rotate with the rail the way 算用数字 do in
+   any 縦組み. Not 縦中横: a four-digit year squeezed into one em at this size
+   is unreadable, and 縦中横 is for two digits. "Since" and «منذ» are said in
+   .card__cat instead, horizontally, where Arabic can be set the right way
+   round rather than dragged into a rail pinned ltr for the Japanese. */
+const railYear = (y: string): string =>
+	y.replace(/^Since (\d+)$/, '$1〜').replace(/^(\d+) to (\d+)$/, '$1〜$2');
+
 /* Uneven on purpose: the empty half of a row is 間, not a gap to be filled. */
 const spans = [7, 5, 5, 7, 6, 6, 7, 5];
 
@@ -36,33 +56,69 @@ const ledger = [
 		ja: '作品',
 		n: String(projects.length),
 		unit: '件',
-		en: 'Products taken from data model to store listing.',
+		label: s('nav.work'),
+		line: pair(
+			'Products taken from data model to store listing.',
+			'منتجات من نموذج البيانات حتى صفحة المتجر.',
+		),
 	},
 	{
 		ja: '公開',
 		n: '13',
 		unit: '本',
-		en: 'Of them live on the App Store or Google Play.',
+		label: pair('Released', 'منشور'),
+		line: pair(
+			'Of them live on the App Store or Google Play.',
+			'منها يعمل الآن على آب ستور أو جوجل بلاي.',
+		),
 	},
 	{
 		ja: '事例',
 		n: '8',
 		unit: '編',
-		en: 'Written up in full, decisions and all.',
+		label: pair('Case studies', 'دراسات حالة'),
+		line: pair(
+			'Written up in full, decisions and all.',
+			'مشروحة بالكامل، بقراراتها كلها.',
+		),
 	},
 	{
 		ja: '経験',
 		n: '4',
 		unit: '年',
-		en: 'Roughly, building for the web and phones.',
+		label: pair('Years', 'سنوات'),
+		line: pair(
+			'Roughly, building for the web and phones.',
+			'تقريبًا، في البناء للويب والهواتف.',
+		),
 	},
 ];
 
 const nav = [
-	{ href: '#sakuhin', ja: '作品', en: 'Work' },
-	{ href: '#keireki', ja: '経歴', en: 'About' },
-	{ href: '#dogu', ja: '道具', en: 'Tools' },
-	{ href: '#renraku', ja: '連絡', en: 'Contact' },
+	{ href: '#sakuhin', ja: '作品', t: s('nav.work') },
+	{ href: '#keireki', ja: '経歴', t: s('nav.about') },
+	{ href: '#dogu', ja: '道具', t: pair('Tools', 'الأدوات') },
+	{ href: '#renraku', ja: '連絡', t: pair('Contact', 'التواصل') },
+];
+
+const pages = [
+	{ href: '/2/projects', ja: '目録', t: pair('Catalogue', 'الفهرس') },
+	{ href: '/2/hire', ja: '依頼', t: s('nav.hire') },
+];
+
+const about = [
+	pair(
+		'I work end to end: schema, service, screen, store listing. Most of what I ship is Arabic-first and right-to-left, because most of the people using it read Arabic, and doing that properly is a discipline rather than a config flag.',
+		'أعمل من طرف إلى طرف: المخطط، والخدمة، والشاشة، وصفحة المتجر. معظم ما أطلقه عربي أولًا ومن اليمين إلى اليسار، لأن معظم من يستخدمه يقرأ بالعربية، وإتقان ذلك انضباط لا خانة في ملف إعدادات.',
+	),
+	pair(
+		'The work I want is the work with a hard edge on it. A model that has to run on the handset instead of a server. A search index that has to answer in milliseconds with no backend behind it. A booking flow that must never sell the same hour twice. The framework is never the interesting part.',
+		'العمل الذي أريده هو ما له حدّ صلب. نموذج عليه أن يعمل على الهاتف لا على خادم. فهرس بحث عليه أن يجيب في أجزاء من الثانية بلا خادم خلفه. مسار حجز لا يبيع الساعة نفسها مرتين أبدًا. الجزء المثير للاهتمام ليس إطار العمل أبدًا.',
+	),
+	pair(
+		"Lately that has meant on-device AI: video and audio processing that finishes entirely on the user's phone or laptop, with no cloud leg and no telemetry. Before that, four years of client work, a founded product, and a volunteer app that has outlived several intakes of students.",
+		'وصار ذلك مؤخرًا ذكاءً اصطناعيًا على الجهاز: معالجة فيديو وصوت تنتهي بالكامل على هاتف المستخدم أو حاسوبه، بلا مرور بالسحابة وبلا تتبّع. وقبله أربع سنوات من عمل العملاء، ومنتج أسّسته، وتطبيق تطوّعي عمّر أكثر من عدة دفعات من الطلبة.',
+	),
 ];
 
 const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project enquiry')}`;
@@ -76,31 +132,41 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 		<title>Haitham Assoli — 一つの画面、二つの方向。</title>
 		<meta
 			name="description"
-			content="Haitham Assoli builds bilingual web and mobile products in Amman. Every screen ships twice: once left to right, once right to left."
+			content="Haitham Assoli builds bilingual web and mobile products in Amman. Every screen ships twice: once left to right, once right to left. Read the site in English or Arabic."
 		/>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
 		/>
+		<LangBoot />
 	</head>
 
 	<body>
-		<a class="skip" href="#main">Skip to content</a>
+		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
 
 		<header class="topbar">
 			<div class="wrap topbar__in">
 				<a class="mark" href="#main">
 					<span class="mark__ja" lang="ja">ハイサム</span>
-					<span class="mark__en">Haitham Assoli</span>
+					<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="mark__en" />
 				</a>
 				<nav class="nav" aria-label="Sections">
 					{
 						nav.map((item) => (
 							<a class="nav__a" href={item.href}>
 								<span lang="ja">{item.ja}</span>
-								<span class="nav__en">{item.en}</span>
+								<T v={item.t} class="nav__lat" />
+							</a>
+						))
+					}
+					<span class="nav__sep" aria-hidden="true"></span>
+					{
+						pages.map((item) => (
+							<a class="nav__a nav__a--page" href={item.href}>
+								<span lang="ja">{item.ja}</span>
+								<T v={item.t} class="nav__lat" />
 							</a>
 						))
 					}
@@ -117,51 +183,113 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 					<div class="hero__body">
 						<p class="eyebrow">
 							<span lang="ja">職業</span>
-							<span>Web &amp; mobile engineer · Amman, Jordan</span>
+							<T
+								v={pair(
+									'Web & mobile engineer · Amman, Jordan',
+									'مهندس ويب وتطبيقات جوّال · عمّان، الأردن',
+								)}
+							/>
 						</p>
 
 						<h1 class="hero__name" id="h1">
-							Haitham Assoli
+							<T
+								v={pair('Haitham Assoli', 'هيثم العسولي')}
+								class="hero__nameline"
+							/>
 							<span class="hero__kana" lang="ja">ハイサム・アッソーリ</span>
 						</h1>
 
-						<p class="hero__deck">
-							I build products that exist twice. Every screen ships once reading
-							left to right and once reading right to left, and the second one
-							is never a translation of the first — mirrored, a layout becomes a
-							different layout, with its own reading order and its own mistakes.
-							That constraint is most of my work.
-						</p>
+						<T
+							as="p"
+							class="hero__deck"
+							v={pair(
+								'I build products that exist twice. Every screen ships once reading left to right and once reading right to left, and the second one is never a translation of the first — mirrored, a layout becomes a different layout, with its own reading order and its own mistakes. That constraint is most of my work.',
+								'أبني منتجات توجد مرتين. كل شاشة تصدر مرة تُقرأ من اليسار إلى اليمين ومرة من اليمين إلى اليسار، والثانية ليست ترجمة للأولى أبدًا: التخطيط حين ينعكس يصير تخطيطًا آخر، له ترتيب قراءته وأخطاؤه الخاصة. هذا القيد هو معظم عملي.',
+							)}
+						/>
 
+						<!-- 三方 — one sentence, three voices. The two horizontal
+						     voices are the language switch: whichever one you are not
+						     reading in offers itself. The vertical Japanese is the
+						     constant third voice and never moves. -->
 						<div class="sanpo rise">
 							<p class="sanpo__label">
 								<span lang="ja">三方</span>
-								<span>One sentence, three directions</span>
+								<T
+									v={pair(
+										'One sentence, three voices. Take the one you read in.',
+										'جملة واحدة بثلاثة أصوات. خذ الصوت الذي تقرأ به.',
+									)}
+								/>
 							</p>
 
 							<div class="sanpo__rows">
-								<div class="spec">
+								<div class="spec spec--en" dir="ltr">
 									<span class="spec__axis" aria-hidden="true">→</span>
-									<p class="spec__line spec__line--en">
+									<p class="spec__line spec__line--en" lang="en">
 										Every screen has to hold up in both directions.
 									</p>
-									<span class="spec__note">left to right</span>
+									<p class="spec__note">
+										<span class="spec__script" lang="en"
+											>English · left to right</span
+										>
+										<span class="spec__state" data-l="en" lang="en"
+											>reading now</span
+										>
+										<button
+											class="voice"
+											type="button"
+											data-lang-toggle
+											data-l="ar"
+											lang="en"
+											dir="ltr"
+										>
+											<span class="voice__ja" lang="ja" aria-hidden="true"
+												>語</span
+											>
+											Read in English
+										</button>
+									</p>
 								</div>
 
-								<div class="spec spec--rtl">
+								<div class="spec spec--ar" dir="rtl">
 									<span class="spec__axis" aria-hidden="true">←</span>
-									<p class="spec__line spec__line--ar" lang="ar" dir="rtl">
+									<p class="spec__line spec__line--ar" lang="ar">
 										كل شاشة يجب أن تصمد في كلا الاتجاهين.
 									</p>
-									<span class="spec__note">right to left</span>
+									<p class="spec__note">
+										<span class="spec__script" lang="ar"
+											>العربية · من اليمين إلى اليسار</span
+										>
+										<span class="spec__state" data-l="ar" lang="ar"
+											>تقرأ الآن</span
+										>
+										<button
+											class="voice"
+											type="button"
+											data-lang-toggle
+											data-l="en"
+											lang="ar"
+											dir="rtl"
+										>
+											<span class="voice__ja" lang="ja" aria-hidden="true"
+												>語</span
+											>
+											اقرأ بالعربية
+										</button>
+									</p>
 								</div>
 
-								<div class="spec spec--tate">
+								<div class="spec spec--tate" dir="ltr">
 									<span class="spec__axis" aria-hidden="true">↓</span>
 									<p class="spec__line spec__line--ja tate" lang="ja">
 										すべての画面は、両方の方向で成立しなければならない。
 									</p>
-									<span class="spec__note">top to bottom</span>
+									<p class="spec__note">
+										<span class="spec__script" lang="ja"
+											>日本語 · 上から下へ</span
+										>
+									</p>
 								</div>
 							</div>
 						</div>
@@ -183,14 +311,17 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 						<p class="marker tate" lang="ja" aria-hidden="true">作品</p>
 						<div class="head__text">
 							<h2 class="head__title" id="sakuhin-h">
-								Work
+								<T v={s('nav.work')} />
 								<span class="head__ja" lang="ja">作品</span>
 							</h2>
-							<p class="head__lede">
-								Eight of {projects.length}, chosen because each one had a
-								constraint worth solving. Every card opens onto the long
-								version.
-							</p>
+							<T
+								as="p"
+								class="head__lede"
+								v={pair(
+									`Eight of ${projects.length}, chosen because each one had a constraint worth solving. Every card opens onto the long version.`,
+									`ثمانية من ${projects.length}، اخترتها لأن في كل واحد منها قيدًا يستحق الحل. كل بطاقة تفتح على النسخة الطويلة.`,
+								)}
+							/>
 						</div>
 					</div>
 
@@ -198,19 +329,22 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 						{
 							featured.map((p, i) => (
 								<li class="card rise" style={`--span:${spans[i] ?? 6}`}>
-									<a class="card__link" href={`/work/${p.slug}`}>
+									<a class="card__link" href={`/2/work/${p.slug}`}>
 										<span class="card__hit" />
 										<span class="card__titles">
-											<span class="card__title">{p.title.en}</span>
+											<span class="card__title">
+												<T v={p.title} />
+											</span>
 											<span class="card__more" aria-hidden="true">
-												<span lang="ja">詳しく見る</span> →
+												<span lang="ja">詳しく見る</span>
+												<T v={s('work.read')} />
 											</span>
 										</span>
 									</a>
 
 									<div class="card__paper">
 										<p class="card__rail tate" lang="ja">
-											<span class="card__year">{p.year}</span>
+											<span class="card__year">{railYear(p.year)}</span>
 											<span class="card__dot" aria-hidden="true">
 												・
 											</span>
@@ -241,17 +375,19 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 										<span lang="ja">
 											{categoryJa[p.category] ?? p.category}
 										</span>
-										<span class="card__role">{p.role.en}</span>
+										<T v={catT(p.category)} />
+										<T v={statusT(p.status)} class="card__st" />
+										<T v={yearPair(p.year)} class="card__yr" />
 									</p>
 
-									<p class="card__tagline">{p.tagline.en}</p>
-									<p class="card__summary">{p.summary.en}</p>
+									<T as="p" class="card__tagline" v={p.tagline} />
+									<T as="p" class="card__summary" v={p.summary} />
 
-									<p class="card__stack" lang="ja">
-										{p.stack.slice(0, 7).map((s, j) => (
+									<p class="card__stack" lang="en" dir="ltr">
+										{p.stack.slice(0, 7).map((tool, j) => (
 											<>
 												{j > 0 && <span class="sep">、</span>}
-												<span class="tool">{s}</span>
+												<span class="tool">{tool}</span>
 											</>
 										))}
 									</p>
@@ -263,12 +399,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 										<p class="card__links">
 											{p.links.live && (
 												<a class="lnk" href={p.links.live} rel="noreferrer">
-													Live
+													<T v={s('project.live')} />
 												</a>
 											)}
 											{p.links.appStore && (
 												<a class="lnk" href={p.links.appStore} rel="noreferrer">
-													App Store
+													<T v={s('project.apple')} />
 												</a>
 											)}
 											{p.links.playGoogle && (
@@ -277,12 +413,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 													href={p.links.playGoogle}
 													rel="noreferrer"
 												>
-													Google Play
+													<T v={s('project.play')} />
 												</a>
 											)}
 											{p.links.github && (
 												<a class="lnk" href={p.links.github} rel="noreferrer">
-													Source
+													<T v={s('project.github')} />
 												</a>
 											)}
 										</p>
@@ -291,6 +427,15 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 							))
 						}
 					</ol>
+
+					<p class="allwork">
+						<a class="allwork__a" href="/2/projects">
+							<span class="allwork__ja" lang="ja"
+								>目録 — 全{projects.length}件</span
+							>
+							<T v={s('work.all')} class="allwork__lat" />
+						</a>
+					</p>
 				</div>
 			</section>
 
@@ -303,7 +448,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 						<p class="marker tate" lang="ja" aria-hidden="true">経歴</p>
 						<div class="head__text">
 							<h2 class="head__title" id="keireki-h">
-								About
+								<T v={s('nav.about')} />
 								<span class="head__ja" lang="ja">経歴</span>
 							</h2>
 						</div>
@@ -320,39 +465,25 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 							/>
 							<figcaption>
 								<span lang="ja">ハイサム・アッソーリ</span>
-								<span>{profile.location.en}</span>
+								<T v={profile.location} />
 							</figcaption>
 						</figure>
 
 						<div class="prose rise">
-							<p>
-								I work end to end: schema, service, screen, store listing. Most
-								of what I ship is Arabic-first and right-to-left, because most
-								of the people using it read Arabic, and doing that properly is a
-								discipline rather than a config flag.
-							</p>
-							<p>
-								The work I want is the work with a hard edge on it. A model that
-								has to run on the handset instead of a server. A search index
-								that has to answer in milliseconds with no backend behind it. A
-								booking flow that must never sell the same hour twice. The
-								framework is never the interesting part.
-							</p>
-							<p>
-								Lately that has meant on-device AI: video and audio processing
-								that finishes entirely on the user's phone or laptop, with no
-								cloud leg and no telemetry. Before that, four years of client
-								work, a founded product, and a volunteer app that has outlived
-								several intakes of students.
-							</p>
+							{about.map((p) => <T as="p" v={p} />)}
 
 							<blockquote class="pull">
 								<p class="pull__ja tate" lang="ja">
 									制約のない仕事に、面白さはない。
 								</p>
-								<p class="pull__en">
-									Work without a constraint holds nothing worth doing.
-								</p>
+								<T
+									as="p"
+									class="pull__en"
+									v={pair(
+										'Work without a constraint holds nothing worth doing.',
+										'العمل بلا قيد لا يحمل ما يستحق.',
+									)}
+								/>
 							</blockquote>
 						</div>
 
@@ -360,10 +491,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 							{
 								profile.experience.slice(0, 5).map((job) => (
 									<div class="track__row">
-										<dt class="track__co">{job.company.en}</dt>
+										<dt class="track__co">
+											<T v={job.company} />
+										</dt>
 										<dd class="track__meta">
-											<span>{job.role.en}</span>
-											<span class="track__yr">{job.period}</span>
+											<T v={job.role} />
+											<T v={yearPair(job.period)} class="track__yr" />
 										</dd>
 									</div>
 								))
@@ -371,10 +504,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 							{
 								profile.education.slice(0, 1).map((ed) => (
 									<div class="track__row">
-										<dt class="track__co">{ed.school.en}</dt>
+										<dt class="track__co">
+											<T v={ed.school} />
+										</dt>
 										<dd class="track__meta">
-											<span>{ed.degree.en}</span>
-											<span class="track__yr">{ed.period}</span>
+											<T v={ed.degree} />
+											<T v={yearPair(ed.period)} class="track__yr" />
 										</dd>
 									</div>
 								))
@@ -393,18 +528,21 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 						<p class="marker tate" lang="ja" aria-hidden="true">道具</p>
 						<div class="head__text">
 							<h2 class="head__title" id="dogu-h">
-								Tools
+								<T v={pair('Tools', 'الأدوات')} />
 								<span class="head__ja" lang="ja">道具</span>
 							</h2>
-							<p class="head__lede">
-								Set the way a craftsman lays out a bench: the things reached for
-								daily, in the order they get reached for. Nothing here is on the
-								list because it looked good on a list.
-							</p>
+							<T
+								as="p"
+								class="head__lede"
+								v={pair(
+									'Set the way a craftsman lays out a bench: the things reached for daily, in the order they get reached for. Nothing here is on the list because it looked good on a list.',
+									'مرتّبة كما يرتّب الحرفيّ عدّته: ما تمتد إليه اليد يوميًا، بالترتيب الذي تمتد به. لا شيء هنا لأنه يبدو حسنًا في قائمة.',
+								)}
+							/>
 						</div>
 					</div>
 
-					<ul class="dogu rise" lang="ja">
+					<ul class="dogu rise" lang="en" dir="ltr">
 						{
 							toolbox.map((tool) => (
 								<li class="dogu__item tate">
@@ -415,7 +553,9 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 					</ul>
 
 					<div class="ledger">
-						<h3 class="sr-only" id="suji-h">Figures</h3>
+						<h3 class="sr-only" id="suji-h">
+							<T v={pair('Figures', 'أرقام')} />
+						</h3>
 						<p class="marker marker--inline tate" lang="ja" aria-hidden="true">
 							数字
 						</p>
@@ -430,7 +570,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 												{row.unit}
 											</span>
 										</dt>
-										<dd class="ledger__en">{row.en}</dd>
+										<dd class="ledger__body">
+											<T v={row.label} class="ledger__label" />
+											<T as="p" class="ledger__en" v={row.line} />
+										</dd>
 									</div>
 								))
 							}
@@ -444,30 +587,59 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				<div class="wrap renraku__in">
 					<div class="renraku__left">
 						<h2 class="head__title" id="renraku-h">
-							Contact
+							<T v={pair('Contact', 'التواصل')} />
 							<span class="head__ja" lang="ja">連絡</span>
 						</h2>
-						<p class="renraku__lede">
-							Bilingual product, a mobile build that has to reach both stores,
-							or something that has to run without a server behind it — send the
-							brief and what it has to do by when. I answer in English or
-							Arabic.
-						</p>
+						<T
+							as="p"
+							class="renraku__lede"
+							v={pair(
+								'A bilingual product, a mobile build that has to reach both stores, or something that has to run without a server behind it — send the brief, and what it has to do by when. I answer in English or Arabic.',
+								'منتج بلغتين، أو تطبيق جوّال عليه أن يصل إلى المتجرين، أو شيء عليه أن يعمل بلا خادم خلفه — أرسل الوصف، وما المطلوب إنجازه ومتى. أرد بالعربية أو بالإنجليزية.',
+							)}
+						/>
 
 						<a class="cta" href={mailto}>
-							<span class="cta__en">{profile.email}</span>
+							<span class="cta__en" lang="en" dir="ltr">{profile.email}</span>
 							<span class="cta__ja" lang="ja">仕事のご依頼はこちらへ</span>
+							<T v={pair('Write to me', 'راسلني')} class="cta__lat" />
 						</a>
 
+						<p class="renraku__form">
+							<a class="lnk" href="/2/hire">
+								<span lang="ja">依頼書</span>
+								<T v={s('hire.title')} />
+							</a>
+						</p>
+
 						<ul class="elsewhere">
-							<li><a class="lnk" href={profile.links.github}>GitHub</a></li>
-							<li><a class="lnk" href={profile.links.linkedin}>LinkedIn</a></li>
 							<li>
-								<a class="lnk" href={profile.links.playStore}>Play Store</a>
+								<a class="lnk" href={profile.links.github} lang="en" dir="ltr"
+									>GitHub</a
+								>
 							</li>
-							<li><a class="lnk" href={profile.links.resume}>Résumé</a></li>
 							<li>
-								<a class="lnk" href={`tel:${profile.phone.replace(/\s/g, '')}`}>
+								<a class="lnk" href={profile.links.linkedin} lang="en" dir="ltr"
+									>LinkedIn</a
+								>
+							</li>
+							<li>
+								<a class="lnk" href={profile.links.playStore}>
+									<T v={s('project.play')} />
+								</a>
+							</li>
+							<li>
+								<a class="lnk" href={profile.links.resume}>
+									<T v={s('nav.cv')} />
+								</a>
+							</li>
+							<li>
+								<a
+									class="lnk"
+									lang="en"
+									dir="ltr"
+									href={`tel:${profile.phone.replace(/\s/g, '')}`}
+								>
 									{profile.phone}
 								</a>
 							</li>
@@ -488,9 +660,40 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			<div class="wrap foot__in">
 				<p class="foot__ja" lang="ja">以上</p>
 				<p class="foot__en">
-					<span lang="ja">作</span> Haitham Assoli · {profile.location.en} · Set in
-					Shippori Mincho and Newsreader
+					<span lang="ja">作</span>
+					<T v={pair('Haitham Assoli', 'هيثم العسولي')} />
+					<span aria-hidden="true">·</span>
+					<T v={profile.location} />
+					<span aria-hidden="true">·</span>
+					<T
+						v={pair(
+							'Set in Shippori Mincho, Newsreader and Amiri',
+							'بخطوط Shippori Mincho وNewsreader وAmiri',
+						)}
+					/>
 				</p>
+				<button
+					class="voice voice--foot"
+					type="button"
+					data-lang-toggle
+					data-l="en"
+					lang="ar"
+					dir="rtl"
+				>
+					<span class="voice__ja" lang="ja" aria-hidden="true">語</span>
+					اقرأ بالعربية
+				</button>
+				<button
+					class="voice voice--foot"
+					type="button"
+					data-lang-toggle
+					data-l="ar"
+					lang="en"
+					dir="ltr"
+				>
+					<span class="voice__ja" lang="ja" aria-hidden="true">語</span>
+					Read in English
+				</button>
 			</div>
 		</footer>
 
@@ -536,6 +739,9 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				--body:
 					'Newsreader', 'Shippori Mincho', 'Iowan Old Style', Georgia, serif;
 				--gothic: 'Zen Kaku Gothic New', 'Hiragino Sans', system-ui, sans-serif;
+				/* Amiri is a Naskh cut from the Bulaq press: the same unhurried,
+				   pen-made stillness as a Mincho, and no geometry anywhere in it. */
+				--ar: 'Amiri', 'Noto Naskh Arabic', 'Al Bayan', serif;
 
 				--gap: clamp(1.5rem, 4vw, 3.25rem);
 			}
@@ -593,6 +799,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			p,
 			h1,
 			h2,
+			h3,
 			figure,
 			blockquote,
 			dl,
@@ -633,21 +840,24 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				white-space: nowrap;
 			}
 
+			/* Clipped rather than parked at -9999px: under dir=rtl an
+			   off-canvas element on the left is scrollable, and the whole page
+			   gains eleven thousand pixels of nothing. */
 			.skip {
 				position: absolute;
-				left: -9999px;
-				top: 0;
+				inset-block-start: 0.75rem;
+				inset-inline-start: 0.75rem;
 				z-index: 40;
 				padding: 0.6rem 1rem;
 				background: var(--sumi);
 				color: var(--washi);
 				font-family: var(--gothic);
 				font-size: 0.8rem;
+				clip-path: inset(50%);
 			}
 
 			.skip:focus {
-				left: 0.75rem;
-				top: 0.75rem;
+				clip-path: none;
 			}
 
 			.wrap {
@@ -657,10 +867,33 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				padding-inline: clamp(1.15rem, 5vw, 4rem);
 			}
 
-			/* ── vertical setting ─────────────────────────────── */
+			/* ── the Arabic voice ─────────────────────────────────
+			   Naskh needs air, joins that no tracking can prise apart, and
+			   nothing italic or capitalised anywhere near it. Marking the
+			   element itself (not :lang) keeps the reset off Latin children. */
+
+			[lang='ar'] {
+				font-family: var(--ar);
+				font-style: normal;
+				font-variant: normal;
+				letter-spacing: normal;
+				text-transform: none;
+				line-height: 1.95;
+			}
+
+			[lang='ar'] em,
+			[lang='ar'] i {
+				font-style: normal;
+			}
+
+			/* ── vertical setting ─────────────────────────────────
+			   In a vertical writing mode `direction` sets the *inline*
+			   progression: rtl would run the Japanese bottom-to-top. Every
+			   .tate is Japanese, so it is pinned ltr and survives dir=rtl. */
 
 			.tate {
 				writing-mode: vertical-rl;
+				direction: ltr;
 				text-orientation: mixed; /* kanji upright, Latin rotates — correct */
 				font-family: var(--jp);
 				font-feature-settings:
@@ -674,6 +907,58 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				text-combine-upright: all; /* 縦中横 — two digits sit upright as one */
 			}
 
+			/* ── the language switch ──────────────────────────────
+			   A 短冊: a paper slip offered by the voice you are not reading
+			   in. It only exists in the other language's row, so there is
+			   never a control asking you to switch to where you already are. */
+
+			.voice {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.45rem;
+				margin: 0;
+				padding: 0.32rem 0.75rem;
+				border: 1px solid var(--rule);
+				background: var(--washi);
+				color: var(--ai);
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				font-weight: 500;
+				letter-spacing: 0.08em;
+				line-height: 1.4;
+				cursor: pointer;
+				transition:
+					border-color 0.25s,
+					background-color 0.25s,
+					color 0.25s;
+			}
+
+			.voice[lang='ar'] {
+				font-size: 0.92rem;
+				font-weight: 400;
+				line-height: 1.6;
+			}
+
+			.voice__ja {
+				font-family: var(--jp);
+				font-size: 0.85em;
+				letter-spacing: 0.1em;
+				color: var(--usuzumi);
+			}
+
+			.voice:hover {
+				border-color: var(--ai);
+				background: var(--kinari);
+			}
+
+			.voice:hover .voice__ja {
+				color: var(--ai);
+			}
+
+			.voice--foot {
+				align-self: center;
+			}
+
 			/* ── top bar ──────────────────────────────────────── */
 
 			.topbar {
@@ -682,10 +967,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 
 			.topbar__in {
 				display: flex;
+				flex-wrap: wrap;
 				align-items: center;
 				justify-content: space-between;
-				gap: 1rem;
+				gap: 0.5rem 1rem;
 				min-height: 3.75rem;
+				padding-block: 0.5rem;
 			}
 
 			.mark {
@@ -710,9 +997,23 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				white-space: nowrap;
 			}
 
+			.mark__en[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.95rem;
+				font-weight: 400;
+			}
+
 			.nav {
 				display: flex;
-				gap: clamp(0.9rem, 3vw, 2rem);
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.35rem clamp(0.8rem, 2.6vw, 1.85rem);
+			}
+
+			.nav__sep {
+				width: 1px;
+				height: 1rem;
+				background: var(--rule);
 			}
 
 			.nav__a {
@@ -735,13 +1036,23 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				border-bottom-color: var(--ai);
 			}
 
-			.nav__en {
+			.nav__a--page {
+				color: var(--ai);
+			}
+
+			.nav__lat {
 				font-family: var(--gothic);
 				font-size: 0.66rem;
 				font-weight: 500;
 				letter-spacing: 0.12em;
 				text-transform: uppercase;
 				color: var(--usuzumi);
+			}
+
+			.nav__lat[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.85rem;
+				font-weight: 400;
 			}
 
 			/* ── hero ─────────────────────────────────────────── */
@@ -796,6 +1107,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				color: var(--ai);
 			}
 
+			.eyebrow [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.95rem;
+				font-weight: 400;
+			}
+
 			.hero__name {
 				margin-block: 1.1rem 0;
 				font-family: var(--body);
@@ -803,6 +1120,13 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-weight: 300;
 				line-height: 1;
 				letter-spacing: -0.015em;
+			}
+
+			.hero__nameline[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.86em;
+				font-weight: 400;
+				line-height: 1.3;
 			}
 
 			.hero__kana {
@@ -822,7 +1146,12 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				line-height: 1.68;
 			}
 
-			/* ── 三方 — the signature: one sentence on three axes ── */
+			.hero__deck[lang='ar'] {
+				max-width: 32em;
+				line-height: 2.05;
+			}
+
+			/* ── 三方 — one sentence, three voices, and the switch ── */
 
 			.sanpo {
 				margin-top: clamp(2.5rem, 6vw, 4.5rem);
@@ -845,13 +1174,19 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				color: var(--ai);
 			}
 
-			.sanpo__label span + span {
+			.sanpo__label [data-l] {
 				font-family: var(--gothic);
 				font-size: 0.7rem;
 				font-weight: 500;
 				letter-spacing: 0.13em;
 				text-transform: uppercase;
 				color: var(--usuzumi);
+			}
+
+			.sanpo__label [data-l='ar'] {
+				font-family: var(--ar);
+				font-size: 0.92rem;
+				font-weight: 400;
 			}
 
 			.sanpo__rows {
@@ -872,6 +1207,27 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				align-items: baseline;
 			}
 
+			/* The two horizontal voices carry the switch. The one you are
+			   reading in is inked and ruled; the other one waits. */
+			.spec--en,
+			.spec--ar {
+				padding-inline-start: 0.85rem;
+				border-inline-start: 2px solid transparent;
+				transition:
+					border-color 0.3s,
+					opacity 0.3s;
+			}
+
+			html[lang='en'] .spec--en,
+			html[lang='ar'] .spec--ar {
+				border-inline-start-color: var(--ai);
+			}
+
+			html[lang='ar'] .spec--en,
+			html[lang='en'] .spec--ar {
+				opacity: 0.58;
+			}
+
 			.spec__axis {
 				font-family: var(--gothic);
 				font-size: 0.95rem;
@@ -884,28 +1240,49 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			}
 
 			.spec__line--ar {
-				font-family: var(--body);
+				font-family: var(--ar);
 				font-size: clamp(1.05rem, 1rem + 0.35vw, 1.25rem);
-				line-height: 1.9;
-			}
-
-			.spec--rtl {
-				direction: rtl;
-			}
-
-			.spec--rtl .spec__note {
-				direction: ltr;
-				text-align: right;
+				line-height: 2;
 			}
 
 			.spec__note {
 				grid-column: 2;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.5rem 0.9rem;
+				margin-top: 0.7rem;
 				font-family: var(--gothic);
 				font-size: 0.63rem;
 				font-weight: 500;
 				letter-spacing: 0.14em;
 				text-transform: uppercase;
 				color: var(--usuzumi);
+			}
+
+			.spec__script[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.85rem;
+				font-weight: 400;
+			}
+
+			.spec__script[lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.8rem;
+				letter-spacing: 0.18em;
+				text-transform: none;
+			}
+
+			.spec__state {
+				color: var(--ai);
+				border-bottom: 1px solid rgba(46, 66, 87, 0.4);
+				padding-bottom: 0.1rem;
+			}
+
+			.spec__state[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.85rem;
+				font-weight: 400;
 			}
 
 			.spec--tate {
@@ -935,6 +1312,8 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			.spec--tate .spec__note {
 				grid-column: 1 / -1;
 				grid-row: 2;
+				justify-content: center;
+				margin-top: 0;
 			}
 
 			/* ── 判子 — the seal, stamped once ────────────────── */
@@ -945,6 +1324,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				inset-block-start: 4.5rem;
 				display: flex;
 				flex-direction: row-reverse; /* right column first, as a seal reads */
+				direction: ltr;
 				gap: 0.1rem;
 				padding: 0.5rem 0.45rem;
 				background: var(--shu);
@@ -958,11 +1338,20 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 
 			.hanko__col {
 				writing-mode: vertical-rl;
+				direction: ltr;
 				text-orientation: upright;
 				font-family: var(--jp);
 				font-size: 0.95rem;
 				font-weight: 600;
 				letter-spacing: 0.06em;
+			}
+
+			/* .hanko is direction:ltr so its two columns keep seal order, which
+			   also pins its own inline axis to ltr. Under a right-to-left page
+			   the seal therefore has to be told, in so many words, to move. */
+			html[dir='rtl'] .hanko {
+				inset-inline-end: auto;
+				inset-inline-start: 0.5rem;
 			}
 
 			@keyframes stamp {
@@ -1018,6 +1407,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 
 			.head__title {
 				display: flex;
+				flex-wrap: wrap;
 				align-items: baseline;
 				gap: 0.9rem;
 				font-family: var(--body);
@@ -1025,6 +1415,13 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-weight: 300;
 				line-height: 1.1;
 				letter-spacing: -0.01em;
+			}
+
+			.head__title [data-l='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9em;
+				font-weight: 400;
+				line-height: 1.5;
 			}
 
 			.head__ja {
@@ -1039,6 +1436,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				margin-top: 1.1rem;
 				max-width: 36em;
 				color: #3a4249;
+			}
+
+			.head__lede[lang='ar'] {
+				max-width: 34em;
 			}
 
 			/* ── 作品 grid ────────────────────────────────────── */
@@ -1095,12 +1496,20 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				transition: background-size 0.35s ease;
 			}
 
+			.card__title [lang='ar'] {
+				font-family: var(--ar);
+				line-height: 1.5;
+			}
+
 			.card:hover .card__title,
 			.card__link:focus-visible .card__title {
 				background-size: 100% 1px;
 			}
 
 			.card__more {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.45rem;
 				font-family: var(--gothic);
 				font-size: 0.7rem;
 				font-weight: 500;
@@ -1115,9 +1524,26 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				letter-spacing: 0.16em;
 			}
 
+			.card__more [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+				font-weight: 400;
+			}
+
 			.card:hover .card__more,
 			.card__link:focus-visible .card__more {
 				opacity: 1;
+			}
+
+			/* Nothing to hover on a touch screen: the affordance is just on. */
+			@media (hover: none) {
+				.card__more {
+					opacity: 1;
+				}
+
+				.card__title {
+					background-size: 100% 1px;
+				}
 			}
 
 			.card__link:focus-visible {
@@ -1210,7 +1636,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				display: flex;
 				flex-wrap: wrap;
 				align-items: baseline;
-				gap: 0.7rem;
+				gap: 0.4rem 0.7rem;
 				margin-top: 0.7rem;
 				font-family: var(--gothic);
 				font-size: 0.72rem;
@@ -1224,6 +1650,24 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-size: 0.82rem;
 				letter-spacing: 0.18em;
 				color: var(--ai);
+			}
+
+			.card__cat [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.88rem;
+				font-weight: 400;
+			}
+
+			.card__st {
+				color: var(--ai);
+			}
+
+			/* The rail says the year in bare numerals; this says it in the
+			   reader's own language, horizontally, so Arabic is never set
+			   vertically inside a rail pinned ltr for the Japanese. */
+			.card__yr {
+				margin-inline-start: auto;
+				font-variant-numeric: tabular-nums;
 			}
 
 			.card__tagline {
@@ -1240,6 +1684,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-size: 0.96rem;
 				line-height: 1.7;
 				color: #3d454c;
+			}
+
+			.card__summary[lang='ar'] {
+				line-height: 1.95;
 			}
 
 			.card__stack {
@@ -1267,6 +1715,9 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			}
 
 			.lnk {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.4rem;
 				font-family: var(--gothic);
 				font-size: 0.74rem;
 				font-weight: 500;
@@ -1278,8 +1729,63 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				transition: border-color 0.25s;
 			}
 
+			.lnk [lang='ja'] {
+				font-family: var(--jp);
+				letter-spacing: 0.16em;
+				color: var(--usuzumi);
+			}
+
+			.lnk [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+				font-weight: 400;
+			}
+
 			.lnk:hover {
 				border-bottom-color: var(--ai);
+			}
+
+			/* The catalogue, offered once the eight are read */
+			.allwork {
+				margin-top: clamp(2.5rem, 6vw, 4rem);
+				padding-top: 1.5rem;
+				border-top: 1px solid var(--rule);
+			}
+
+			.allwork__a {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.9rem;
+				text-decoration: none;
+			}
+
+			.allwork__ja {
+				font-family: var(--jp);
+				font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem);
+				letter-spacing: 0.14em;
+				color: var(--ai);
+				border-bottom: 1px solid transparent;
+				transition: border-color 0.25s;
+			}
+
+			.allwork__a:hover .allwork__ja {
+				border-bottom-color: var(--ai);
+			}
+
+			.allwork__lat {
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.allwork__lat[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.95rem;
+				font-weight: 400;
 			}
 
 			/* ── 経歴 ─────────────────────────────────────────── */
@@ -1348,8 +1854,17 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				color: var(--sumi);
 			}
 
+			.portrait figcaption [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+			}
+
 			.prose p {
 				max-width: 38em;
+			}
+
+			.prose p[lang='ar'] {
+				max-width: 36em;
 			}
 
 			.prose p + p {
@@ -1381,6 +1896,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				color: #3d454c;
 			}
 
+			.pull__en[lang='ar'] {
+				font-size: 1.15rem;
+			}
+
 			.track {
 				grid-column: 2;
 				margin-top: clamp(2.5rem, 5vw, 3.5rem);
@@ -1408,6 +1927,11 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-size: 0.76rem;
 				letter-spacing: 0.05em;
 				color: var(--usuzumi);
+			}
+
+			.track__meta [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.92rem;
 			}
 
 			.track__yr {
@@ -1487,11 +2011,35 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				letter-spacing: 0.04em;
 			}
 
-			.ledger__en {
+			.ledger__body {
 				flex: 1 1 auto;
+			}
+
+			.ledger__label {
+				display: block;
+				margin-bottom: 0.35rem;
+				font-family: var(--gothic);
+				font-size: 0.66rem;
+				font-weight: 500;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: var(--ai);
+			}
+
+			.ledger__label[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+				font-weight: 400;
+			}
+
+			.ledger__en {
 				font-size: 0.94rem;
 				line-height: 1.65;
 				color: #3d454c;
+			}
+
+			.ledger__en[lang='ar'] {
+				line-height: 1.95;
 			}
 
 			/* ── 連絡 ─────────────────────────────────────────── */
@@ -1536,6 +2084,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-size: clamp(1.02rem, 0.98rem + 0.3vw, 1.15rem);
 			}
 
+			.renraku__lede[lang='ar'] {
+				max-width: 32em;
+			}
+
 			.cta {
 				display: inline-flex;
 				flex-direction: column;
@@ -1562,8 +2114,27 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				transition: color 0.25s;
 			}
 
+			.cta__lat {
+				font-family: var(--gothic);
+				font-size: 0.68rem;
+				font-weight: 500;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.cta__lat[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.92rem;
+				font-weight: 400;
+			}
+
 			.cta:hover .cta__ja {
 				color: var(--shu);
+			}
+
+			.renraku__form {
+				margin-top: 1.5rem;
 			}
 
 			.elsewhere {
@@ -1614,6 +2185,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			}
 
 			.foot__en {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.4rem;
 				font-family: var(--gothic);
 				font-size: 0.72rem;
 				letter-spacing: 0.06em;
@@ -1624,6 +2199,11 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				font-family: var(--jp);
 				letter-spacing: 0.2em;
 				color: var(--sumi);
+			}
+
+			.foot__en [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
 			}
 
 			/* ── entrances ────────────────────────────────────── */
@@ -1669,7 +2249,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			}
 
 			@media (max-width: 48rem) {
-				.nav__en,
+				.nav__lat,
 				.mark__ja {
 					display: none;
 				}
@@ -1701,6 +2281,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 					padding-top: 1.25rem;
 					border-inline-start: 0;
 					border-top: 1px solid var(--rule-soft);
+				}
+
+				.spec--tate .spec__note {
+					justify-content: flex-start;
 				}
 
 				.spec__line--ja {
@@ -1765,9 +2349,13 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				}
 
 				.hanko {
-					inset-inline-end: 0;
+					inset-inline: auto 0;
 					inset-block-start: auto;
 					inset-block-end: -1.5rem;
+				}
+
+				html[dir='rtl'] .hanko {
+					inset-inline: 0 auto;
 				}
 			}
 

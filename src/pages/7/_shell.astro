@@ -1,0 +1,820 @@
+---
+/* PLAYROOM — the shell every page of variant 7 is built on.
+
+   Six colours, one radius scale, one hard-offset shadow scale, one spring.
+   The light source lives in `--dx`: it is on the left in LTR and on the right
+   in RTL, so every shadow and every hover nudge crosses sides with the
+   language. That is the whole argument of the page, spent once in a variable.
+
+   All shared CSS lives here so the four pages stay thin. Every reset is
+   wrapped in `:where()` — a bare `p { margin: 0 }` outranks a class rule and
+   quietly eats section spacing. */
+import LangBoot from '../../components/LangBoot.astro';
+import T from '../../components/T.astro';
+import StyleSwitcher from '../../components/StyleSwitcher.astro';
+import { profile } from '../../../content/profile';
+import { s, pair } from '../../data/variant-ui';
+
+interface Props {
+	title: string;
+	description: string;
+	/** Which rail link reads as the current page. */
+	active?: 'home' | 'work' | 'hire';
+}
+
+const { title, description, active } = Astro.props;
+
+const nav = [
+	{ key: 'home', href: '/7', label: s('nav.home') },
+	{ key: 'work', href: '/7/projects', label: s('nav.work') },
+	{ key: 'hire', href: '/7/hire', label: s('nav.hire') },
+] as const;
+
+const footLinks = [
+	{ href: '/7', label: s('nav.home') },
+	{ href: '/7/projects', label: s('work.all') },
+	{ href: '/7/hire', label: s('nav.hire') },
+	{ href: profile.links.github, label: pair('GitHub', 'GitHub') },
+	{ href: profile.links.resume, label: s('nav.cv') },
+];
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Cairo:wght@400;600;800&family=Lalezar&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@700&display=swap"
+			rel="stylesheet"
+		/>
+		<LangBoot />
+		<script is:inline>
+			document.documentElement.classList.add('js');
+		</script>
+	</head>
+
+	<body class="playroom">
+		<a class="skip" href="#main">
+			<T v={s('nav.skip')} />
+		</a>
+
+		<!-- ============================== THE RAIL ============================== -->
+		<header class="rail">
+			<div class="wrap rail__inner">
+				<a class="rail__name" href="/7">
+					<T
+						v={pair('Haitham Assoli', 'هيثم العسولي')}
+						class="rail__nameText"
+					/>
+				</a>
+
+				<nav class="rail__nav" aria-label="Playroom">
+					{
+						nav.map((n) => (
+							<a
+								class="rail__link"
+								href={n.href}
+								aria-current={n.key === active ? 'page' : undefined}
+							>
+								<T v={n.label} />
+							</a>
+						))
+					}
+				</nav>
+
+				<button type="button" class="lever" data-lang-toggle>
+					<span class="vh" data-l="en" lang="en">Read this page in Arabic</span>
+					<span class="vh" data-l="ar" lang="ar"
+						>اقرأ هذه الصفحة بالإنجليزية</span
+					>
+					<span class="lever__track" aria-hidden="true">
+						<span class="lever__knob"></span>
+						<span class="lever__side lever__side--en">EN</span>
+						<span class="lever__side lever__side--ar">ع</span>
+					</span>
+				</button>
+			</div>
+		</header>
+
+		<main id="main">
+			<slot />
+		</main>
+
+		<!-- =============================== FOOTER =============================== -->
+		<footer class="field field--ink foot">
+			<div class="wrap foot__grid">
+				<p class="foot__name">
+					<span class="latin" dir="ltr">Haitham Assoli</span>
+					<span class="arabic" lang="ar" dir="rtl">هيثم العسولي</span>
+				</p>
+
+				<T
+					v={pair(
+						'Built in Amman with Astro and hand-written CSS. Six colours, one shadow, one spring.',
+						'مبنيّ في عمّان بـ Astro وCSS مكتوب يدويًا. ستة ألوان، وظلّ واحد، ونابض واحد.',
+					)}
+					as="p"
+					class="foot__note"
+				/>
+
+				<ul class="foot__links">
+					{
+						footLinks.map((l) => (
+							<li>
+								<a href={l.href}>
+									<T v={l.label} />
+								</a>
+							</li>
+						))
+					}
+					<li>
+						<a href={`mailto:${profile.email}`} dir="ltr">{profile.email}</a>
+					</li>
+				</ul>
+
+				<p class="foot__rights">
+					<span dir="ltr">© {new Date().getFullYear()}</span>
+					<T v={s('footer.rights')} />
+				</p>
+			</div>
+		</footer>
+
+		<StyleSwitcher n={7} />
+	</body>
+</html>
+
+<style is:global>
+	/* ==========================================================================
+	   TOKENS
+	   ========================================================================== */
+
+	.playroom {
+		--ink: #171033;
+		--sun: #ffcf2d;
+		--mint: #9befd0;
+		--melon: #ff4b34;
+		--sky: #2d5bff;
+		--bubble: #ff6fb5;
+		--paper: #ffffff;
+
+		--r1: 10px;
+		--r2: 20px;
+		--r3: 34px;
+		--pill: 999px;
+		--b: 3px;
+
+		/* Where the light is standing. Flipped by direction, below. */
+		--dx: -1;
+		--s1: calc(var(--dx) * -3px) 3px 0 var(--ink);
+		--s2: calc(var(--dx) * -6px) 6px 0 var(--ink);
+		--s3: calc(var(--dx) * -10px) 10px 0 var(--ink);
+		--s4: calc(var(--dx) * -14px) 14px 0 var(--ink);
+		--s0: 0 0 0 var(--ink);
+
+		--spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+		--snap: cubic-bezier(0.2, 0.9, 0.25, 1);
+
+		--display: 'Bricolage Grotesque', system-ui, sans-serif;
+		--body: 'Space Grotesk', system-ui, sans-serif;
+		--mono: 'Space Mono', ui-monospace, monospace;
+		/* Lalezar is a poster face: headline sizes only, one weight, no italics.
+		   Cairo carries every Arabic sentence longer than a heading. */
+		--arabicDisplay: 'Lalezar', 'Cairo', system-ui, sans-serif;
+		--arabicBody: 'Cairo', system-ui, sans-serif;
+
+		--focus: var(--ink);
+	}
+
+	html[dir='rtl'] .playroom {
+		--dx: 1;
+	}
+
+	.playroom *,
+	.playroom *::before,
+	.playroom *::after {
+		box-sizing: border-box;
+	}
+
+	html:has(.playroom),
+	.playroom {
+		overflow-x: clip;
+	}
+
+	.playroom {
+		margin: 0;
+		padding: 0;
+		background: var(--ink);
+		color: var(--ink);
+		font-family: var(--body);
+		font-size: clamp(1rem, 0.96rem + 0.2vw, 1.075rem);
+		line-height: 1.55;
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+	}
+
+	/* Resets stay at zero specificity so every class rule below wins outright. */
+	.playroom :where(h1, h2, h3, h4) {
+		font-family: var(--display);
+		font-weight: 800;
+		line-height: 0.95;
+		letter-spacing: -0.02em;
+		margin: 0;
+		text-wrap: balance;
+	}
+
+	.playroom :where(p) {
+		margin: 0;
+	}
+
+	.playroom :where(ul, ol) {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.playroom :where(img) {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	.playroom :where(a) {
+		color: inherit;
+	}
+
+	.playroom :where(button, input, select, textarea) {
+		font: inherit;
+		color: inherit;
+	}
+
+	/* The rail is sticky, so anchors must not land under it. */
+	.playroom :where([id]) {
+		scroll-margin-top: 5.5rem;
+	}
+
+	.playroom
+		:is(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+		outline: 3px solid var(--focus);
+		outline-offset: 4px;
+		border-radius: var(--r1);
+	}
+
+	/* ==========================================================================
+	   ARABIC
+	   Only elements that actually carry lang="ar" change face, so Latin stack
+	   names sitting inside an Arabic sentence keep their own.
+	   ========================================================================== */
+
+	.playroom [lang='ar'] {
+		font-family: var(--arabicBody);
+		line-height: 1.95;
+		letter-spacing: 0;
+		font-synthesis: none;
+	}
+
+	.playroom :is(h1, h2, h3, h4)[lang='ar'],
+	.playroom :is(h1, h2, h3, h4) [lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
+		line-height: 1.3;
+		font-variation-settings: normal;
+		letter-spacing: 0;
+	}
+
+	/* Latin fragments that survive an RTL page keep their own direction, so
+	   full stops and brackets stay where the sentence put them. */
+	.playroom :where(.ltr, code, kbd) {
+		direction: ltr;
+		unicode-bidi: isolate;
+		text-align: start;
+	}
+
+	/* ==========================================================================
+	   FURNITURE
+	   ========================================================================== */
+
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.skip {
+		position: absolute;
+		inset-inline-start: -9999px;
+		top: 0.5rem;
+		z-index: 60;
+		padding: 0.7rem 1.1rem;
+		background: var(--ink);
+		color: var(--sun);
+		font-family: var(--mono);
+		border-radius: var(--pill);
+	}
+
+	.skip:focus-visible {
+		inset-inline-start: 0.75rem;
+	}
+
+	.field {
+		position: relative;
+		padding-block: clamp(3rem, 7vw, 5.5rem);
+	}
+
+	.field--sun {
+		background: var(--sun);
+	}
+	.field--mint {
+		background: var(--mint);
+	}
+	.field--bubble {
+		background: var(--bubble);
+	}
+	.field--melon {
+		background: var(--melon);
+	}
+	.field--paper {
+		background: var(--paper);
+	}
+	.field--sky {
+		background: var(--sky);
+		color: var(--paper);
+		--focus: var(--sun);
+	}
+	.field--ink {
+		background: var(--ink);
+		color: var(--paper);
+		--focus: var(--sun);
+	}
+
+	.field + .field {
+		border-top: var(--b) solid var(--ink);
+	}
+
+	.wrap {
+		width: min(1180px, 100% - clamp(1.25rem, 5vw, 4rem));
+		margin-inline: auto;
+	}
+
+	.eyebrow {
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		margin-bottom: 0.85rem;
+	}
+
+	.eyebrow[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.85rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.section__title {
+		font-size: clamp(2rem, 5.4vw, 3.6rem);
+		font-variation-settings: 'wdth' 92;
+	}
+
+	.section__head {
+		max-width: 46ch;
+		margin-bottom: clamp(2rem, 4vw, 3rem);
+	}
+
+	.section__lede {
+		margin-top: 1rem;
+		font-size: 1.05rem;
+		max-width: 54ch;
+	}
+
+	.mini-title {
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		margin: 0 0 0.9rem;
+	}
+
+	.mini-title[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.85rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	/* ------------------------------- buttons ------------------------------- */
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.85rem 1.4rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--pill);
+		background: var(--paper);
+		color: var(--ink);
+		box-shadow: var(--s2);
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: 1.05rem;
+		letter-spacing: -0.01em;
+		text-decoration: none;
+		cursor: pointer;
+		transition:
+			transform 0.22s var(--spring),
+			box-shadow 0.22s var(--spring);
+	}
+
+	.btn[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+	}
+
+	.btn:hover {
+		transform: translate(calc(var(--dx) * 2px), -2px);
+		box-shadow: var(--s3);
+	}
+
+	.btn:active {
+		transform: translate(calc(var(--dx) * -6px), 6px);
+		box-shadow: var(--s0);
+	}
+
+	.btn--melon {
+		background: var(--melon);
+	}
+	.btn--sun {
+		background: var(--sun);
+	}
+	.btn--mint {
+		background: var(--mint);
+	}
+	.btn--ink {
+		background: var(--ink);
+		color: var(--sun);
+	}
+	.btn--ghost {
+		background: transparent;
+		box-shadow: var(--s1);
+	}
+	.btn--ghost:hover {
+		box-shadow: var(--s2);
+	}
+	.btn--big {
+		font-size: clamp(1rem, 2.6vw, 1.35rem);
+		padding: 1rem 1.6rem;
+		word-break: break-word;
+	}
+
+	.cta-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.85rem;
+		margin-top: 1.9rem;
+	}
+
+	/* ----------------------------- small parts ----------------------------- */
+
+	.sticker {
+		display: inline-block;
+		padding: 0.25rem 0.7rem;
+		background: var(--sun);
+		color: var(--ink);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		transform: rotate(-2deg);
+		box-shadow: 0 0 0 3px var(--paper);
+	}
+
+	.sticker[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.75rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.sticker--plain {
+		background: var(--paper);
+		transform: rotate(1.5deg);
+	}
+	.sticker--mint {
+		background: var(--mint);
+	}
+	.sticker--bubble {
+		background: var(--bubble);
+	}
+	.sticker--sky {
+		background: var(--sky);
+		color: var(--paper);
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.chip {
+		padding: 0.2rem 0.55rem;
+		border: 2px solid var(--ink);
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
+
+	.link-pill {
+		position: relative;
+		z-index: 1;
+		padding: 0.25rem 0.7rem;
+		border: 2px solid var(--ink);
+		border-radius: var(--pill);
+		background: var(--ink);
+		color: var(--sun);
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		text-decoration: none;
+		transition: transform 0.2s var(--spring);
+	}
+
+	.link-pill[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.72rem;
+	}
+
+	.link-pill:hover {
+		transform: translateY(-2px) rotate(-2deg);
+	}
+
+	/* ==========================================================================
+	   THE RAIL — header, and the lever that changes the language
+	   ========================================================================== */
+
+	.rail {
+		position: sticky;
+		top: 0;
+		z-index: 40;
+		background: var(--ink);
+		color: var(--paper);
+		border-bottom: var(--b) solid var(--ink);
+		--focus: var(--sun);
+	}
+
+	.rail__inner {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1rem;
+		padding-block: 0.7rem;
+	}
+
+	.rail__name {
+		text-decoration: none;
+	}
+
+	.rail__nameText {
+		display: inline-block;
+		padding: 0.3rem 0.85rem;
+		background: var(--sun);
+		color: var(--ink);
+		border-radius: var(--pill);
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: 0.95rem;
+		font-variation-settings: 'wdth' 84;
+		transform: rotate(-2deg);
+	}
+
+	.rail__nameText[lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
+		font-size: 1.15rem;
+		font-variation-settings: normal;
+	}
+
+	.rail__nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-inline-end: auto;
+	}
+
+	.rail__link {
+		padding: 0.3rem 0.8rem;
+		border: 2px solid rgba(255, 255, 255, 0.35);
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		text-decoration: none;
+		transition:
+			background-color 0.2s var(--snap),
+			color 0.2s var(--snap);
+	}
+
+	.rail__link [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.85rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.rail__link:hover {
+		background: rgba(255, 255, 255, 0.14);
+	}
+
+	.rail__link[aria-current='page'] {
+		background: var(--mint);
+		border-color: var(--mint);
+		color: var(--ink);
+	}
+
+	/* ------------------------------ the lever ------------------------------ */
+
+	html:not(.js) .lever {
+		display: none;
+	}
+
+	.lever {
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: pointer;
+		line-height: 1;
+	}
+
+	.lever__track {
+		/* The track never mirrors: EN stays on one end, ع on the other, so the
+		   throw is the same physical movement in either language. */
+		direction: ltr;
+		position: relative;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		width: 5.4rem;
+		padding: 3px;
+		border: var(--b) solid var(--sun);
+		border-radius: var(--pill);
+		background: var(--ink);
+	}
+
+	.lever__knob {
+		position: absolute;
+		top: 3px;
+		bottom: 3px;
+		left: 3px;
+		width: calc(50% - 3px);
+		border-radius: var(--pill);
+		background: var(--sun);
+		transition: transform 0.4s var(--spring);
+	}
+
+	html[lang='ar'] .lever__knob {
+		transform: translateX(100%);
+	}
+
+	.lever__side {
+		position: relative;
+		z-index: 1;
+		padding-block: 0.32rem;
+		text-align: center;
+		font-family: var(--mono);
+		font-size: 0.76rem;
+		color: var(--sun);
+		transition: color 0.3s var(--snap);
+	}
+
+	.lever__side--ar {
+		font-family: var(--arabicDisplay);
+		font-size: 1.05rem;
+	}
+
+	html[lang='en'] .lever__side--en,
+	html[lang='ar'] .lever__side--ar {
+		color: var(--ink);
+	}
+
+	.lever:hover .lever__track {
+		background: #241a4d;
+	}
+
+	/* ==========================================================================
+	   FOOTER
+	   ========================================================================== */
+
+	.foot {
+		padding-block: clamp(3rem, 6vw, 4.5rem) 7rem;
+	}
+
+	.foot__grid {
+		display: grid;
+		gap: 1.1rem;
+	}
+
+	.foot__name {
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 0.9rem;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.6rem, 4vw, 2.4rem);
+		color: var(--sun);
+		font-variation-settings: 'wdth' 85;
+	}
+
+	.foot__name .arabic {
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
+		font-size: 1.15em;
+		line-height: 1;
+		font-variation-settings: normal;
+	}
+
+	.foot__note {
+		max-width: 46ch;
+		font-size: 0.9rem;
+		color: rgba(255, 255, 255, 0.82);
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.1rem;
+		font-family: var(--mono);
+		font-size: 0.76rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	.foot__links [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.88rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.foot__links a {
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+
+	.foot__links a:hover {
+		color: var(--sun);
+	}
+
+	.foot__rights {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.foot__rights [lang='ar'] {
+		font-family: var(--arabicBody);
+	}
+
+	/* ==========================================================================
+	   MOTION
+	   ========================================================================== */
+
+	@media (prefers-reduced-motion: reduce) {
+		.playroom *,
+		.playroom *::before,
+		.playroom *::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+			transition-delay: 0ms !important;
+			scroll-behavior: auto !important;
+		}
+
+		.playroom :is(.btn, .link-pill):hover {
+			transform: none;
+		}
+	}
+</style>

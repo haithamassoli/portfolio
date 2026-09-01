@@ -1,0 +1,560 @@
+---
+/* /4/projects — the long listing. Thirty-nine entries as `ls -la` output,
+   where the mode string is not decoration: every flag in it is read off the
+   project's real data, and the legend says which. */
+import Shell from './_shell.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+import { dateSpan } from './_dates';
+import { projects } from '../../data/projects';
+
+const cats = ['web', 'mobile', 'ai', 'desktop', 'extension', 'client'] as const;
+
+/* "Since 2025" and "2022 to 2023" both sort on the number they end on. */
+const yearOf = (y: string) => Number((y.match(/\d{4}/g) ?? ['0']).pop());
+
+const reachable = (p: (typeof projects)[number]) =>
+	Boolean(
+		p.links.live || p.links.appStore || p.links.playGoogle || p.links.vscode,
+	);
+
+/* d  written up in full — there is more inside
+   w  still maintained (live or in progress)
+   x  you can open the running thing right now
+   r  in the last triple, the source is public */
+const mode = (p: (typeof projects)[number]) =>
+	(p.featured ? 'd' : '-') +
+	'rwx' +
+	'r' +
+	(p.status === 'live' || p.status === 'wip' ? 'w' : '-') +
+	(reachable(p) ? 'x' : '-') +
+	(p.links.github ? 'r' : '-') +
+	'--';
+
+const rows = [...projects].sort(
+	(a, b) =>
+		yearOf(b.year) - yearOf(a.year) ||
+		Number(b.featured) - Number(a.featured) ||
+		a.title.en.localeCompare(b.title.en),
+);
+
+const counts = {
+	total: projects.length,
+	full: projects.filter((p) => p.featured).length,
+	open: projects.filter(reachable).length,
+	source: projects.filter((p) => p.links.github).length,
+};
+
+const flags = [
+	{
+		f: 'd',
+		v: pair('written up in full', 'مكتوب بالكامل'),
+		n: pair('there is more inside', 'في داخله المزيد'),
+	},
+	{
+		f: 'w',
+		v: pair('still maintained', 'ما زال يُصان'),
+		n: pair('live or in progress', 'يعمل الآن أو قيد التطوير'),
+	},
+	{
+		f: 'x',
+		v: pair('you can open it', 'يمكنك فتحه'),
+		n: pair('a site or a store listing', 'موقع أو صفحة في متجر'),
+	},
+	{
+		f: 'r',
+		v: pair('the source is public', 'الشيفرة مفتوحة'),
+		n: pair('on GitHub', 'على GitHub'),
+	},
+];
+---
+
+<Shell
+	title="ls -la ~/projects — haitham@amman"
+	description="All thirty-nine projects by Haitham Assoli as a long directory listing: year, category, status, stack size and a write-up for each."
+	path="~/portfolio/projects"
+	tab="projects"
+>
+	<section class="block" aria-labelledby="ls-h">
+		<p class="cmdline"><span class="cmdline__q">ls</span> -la ~/projects</p>
+		<h1 class="h2" id="ls-h">
+			<T
+				v={pair(
+					'Thirty-nine entries, newest first',
+					'تسعة وثلاثون مدخلًا، الأحدث أولًا',
+				)}
+			/>
+		</h1>
+		<T
+			v={pair(
+				'The whole directory, not the eight I framed on the session page. The permission bits are read off the projects themselves, so a row tells you what you can do with the thing before you open it.',
+				'المجلّد كاملًا، لا الثمانية التي أطّرتها في صفحة الجلسة. وبتات الصلاحيات مقروءة من المشاريع نفسها، فيقول لك السطر ما الذي تستطيع فعله بالمشروع قبل أن تفتحه.',
+			)}
+			as="p"
+			class="lede"
+		/>
+
+		<dl class="flags">
+			{
+				flags.map((fl) => (
+					<div class="flags__row">
+						<dt class="flags__f tty">{fl.f}</dt>
+						<dd class="flags__d">
+							<T v={fl.v} class="flags__v" />
+							<T v={fl.n} class="flags__n" />
+						</dd>
+					</div>
+				))
+			}
+		</dl>
+
+		<T
+			v={pair(
+				'The date field is a span, not a sentence: 2026 is the year it shipped, 2023–2026 ran and finished, and a trailing dash — 2025– — means it started then and has not stopped.',
+				'حقل التاريخ مدى لا جملة: 2026 سنة الإصدار، و2023–2026 بدأ وانتهى، والشرطة في آخره — 2025– — تعني أنه بدأ عندها ولم يتوقف.',
+			)}
+			as="p"
+			class="ls__legend"
+		/>
+
+		<div class="filters" role="group" aria-labelledby="filters-h">
+			<h2 class="sr-only" id="filters-h">
+				<span data-l="en">Filter the listing</span>
+				<span data-l="ar" lang="ar">تصفية القائمة</span>
+			</h2>
+			<button class="filt" type="button" data-cat="" aria-pressed="true">
+				<T v={pair('all', 'الكل')} />
+			</button>
+			{
+				cats.map((c) => (
+					<button class="filt" type="button" data-cat={c} aria-pressed="false">
+						<T v={s(`cat.${c}` as 'cat.web')} />
+					</button>
+				))
+			}
+			<button
+				class="filt filt--star"
+				type="button"
+				data-featured
+				aria-pressed="false"
+			>
+				<span class="filt__f tty" aria-hidden="true">d</span>
+				<T v={pair('written up in full', 'المكتوبة بالكامل')} />
+			</button>
+		</div>
+
+		<p class="ls__pipe tty" data-pipe>ls -la ~/projects</p>
+
+		<div class="ls">
+			<p class="ls__total">
+				<span class="tty" data-shown>{counts.total}</span>{' '}<T
+					v={pair('entries', 'مدخلًا')}
+				/>
+			</p>
+
+			<div class="ls__head" aria-hidden="true">
+				<T v={pair('mode', 'الصلاحيات')} class="ls__h" />
+				<T v={pair('lnk', 'روابط')} class="ls__h" />
+				<T v={pair('sz', 'حجم')} class="ls__h" />
+				<T v={pair('date', 'التاريخ')} class="ls__h" />
+				<T v={pair('name', 'الاسم')} class="ls__h" />
+			</div>
+
+			<ol class="ls__list">
+				{
+					rows.map((p) => (
+						<li
+							class={`ls__row${p.featured ? ' ls__row--full' : ''}`}
+							data-row
+							data-cat={p.category}
+							data-featured={p.featured ? '' : undefined}
+						>
+							<span class="ls__mode tty">{mode(p)}</span>
+							<span class="ls__lnk tty">{Object.keys(p.links).length}</span>
+							<span class="ls__sz tty">{p.stack.length}</span>
+							<span class="ls__date tty">{dateSpan(p.year)}</span>
+							<span class="ls__name">
+								<a class="ls__link" href={`/4/work/${p.slug}`}>
+									<T v={p.title} />
+								</a>
+								{p.title.en.toLowerCase().replace(/[^a-z0-9]/g, '') !==
+									p.slug.replace(/[^a-z0-9]/g, '') && (
+									<span class="ls__slug tty">{p.slug}</span>
+								)}
+								{p.featured && (
+									<span class="ls__slug tty" aria-hidden="true">
+										/
+									</span>
+								)}
+								<T
+									v={s(`status.${p.status}` as 'status.live')}
+									class={`st st--${p.status}`}
+								/>
+							</span>
+							<T v={p.tagline} as="p" class="ls__tag" />
+						</li>
+					))
+				}
+			</ol>
+
+			<p class="ls__empty" data-empty hidden>
+				<T
+					v={pair(
+						'Nothing matches that filter. Clear it and the directory comes back.',
+						'لا شيء يطابق هذه التصفية. أزلها فيعود المجلّد كاملًا.',
+					)}
+				/>
+			</p>
+
+			<p class="ls__foot">
+				<span class="tty">{counts.total}</span>{' '}<T
+					v={pair('entries ·', 'مدخلًا ·')}
+				/>{' '}
+				<span class="tty">{counts.full}</span>{' '}<T
+					v={pair('written up in full ·', 'مكتوبة بالكامل ·')}
+				/>{' '}
+				<span class="tty">{counts.open}</span>{' '}<T
+					v={pair('you can open ·', 'يمكن فتحها ·')}
+				/>{' '}
+				<span class="tty">{counts.source}</span>{' '}<T
+					v={pair('with public source', 'شيفرتها مفتوحة')}
+				/>
+			</p>
+		</div>
+	</section>
+</Shell>
+
+<script is:inline>
+	(function () {
+		const rows = Array.prototype.slice.call(
+			document.querySelectorAll('[data-row]'),
+		);
+		const cats = Array.prototype.slice.call(
+			document.querySelectorAll('[data-cat][aria-pressed]'),
+		);
+		const star = document.querySelector('[data-featured][aria-pressed]');
+		const shown = document.querySelector('[data-shown]');
+		const empty = document.querySelector('[data-empty]');
+		const pipe = document.querySelector('[data-pipe]');
+		if (!rows.length || !shown || !pipe) return;
+
+		let cat = '';
+		let only = false;
+
+		function apply() {
+			let n = 0;
+			rows.forEach(function (r) {
+				const ok =
+					(!cat || r.getAttribute('data-cat') === cat) &&
+					(!only || r.hasAttribute('data-featured'));
+				r.hidden = !ok;
+				if (ok) n++;
+			});
+			shown.textContent = String(n);
+			if (empty) empty.hidden = n > 0;
+			cats.forEach(function (b) {
+				b.setAttribute(
+					'aria-pressed',
+					String(b.getAttribute('data-cat') === cat),
+				);
+			});
+			if (star) star.setAttribute('aria-pressed', String(only));
+			pipe.textContent =
+				'ls -la ~/projects' +
+				(cat ? ' | grep -w ' + cat : '') +
+				(only ? ' | grep "^d"' : '');
+		}
+
+		cats.forEach(function (b) {
+			b.addEventListener('click', function () {
+				cat = b.getAttribute('data-cat') || '';
+				apply();
+			});
+		});
+
+		if (star)
+			star.addEventListener('click', function () {
+				only = !only;
+				apply();
+			});
+
+		apply();
+	})();
+</script>
+
+<style is:global>
+	/* ── the mode legend ────────────────────────────────────────────── */
+	.flags {
+		margin: 0 0 2rem;
+		max-width: 46rem;
+		border-block-start: 1px solid var(--rule);
+		font-family: var(--mono);
+	}
+
+	.flags__row {
+		display: grid;
+		grid-template-columns: 3ch minmax(0, 1fr);
+		gap: 0 1ch;
+		padding-block: 0.35rem;
+		border-block-end: 1px solid var(--rule);
+	}
+
+	.flags__f {
+		color: var(--amber);
+		font-weight: 600;
+	}
+
+	.flags__d {
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.75ch;
+		align-items: baseline;
+	}
+
+	.flags__n {
+		color: var(--ash);
+		font-size: 0.74rem;
+	}
+
+	/* ── filters, drawn as the pipeline they are ────────────────────── */
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		margin-block-end: 0.85rem;
+	}
+
+	.filt {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5ch;
+		appearance: none;
+		border: 1px solid var(--rule);
+		background: transparent;
+		color: var(--ash);
+		font: inherit;
+		font-size: 0.76rem;
+		padding: 0.1rem 0.6rem;
+		cursor: pointer;
+	}
+
+	.filt:hover {
+		color: var(--bone);
+		border-color: var(--ash);
+	}
+
+	/* The one filter that is a mode bit rather than a group carries the bit,
+	   so the button, the legend and the `grep "^d"` readout all say the
+	   same thing. */
+	.filt__f {
+		color: var(--amber);
+		font-weight: 600;
+	}
+
+	.filt[aria-pressed='true'] .filt__f {
+		color: var(--void);
+	}
+
+	.filt[aria-pressed='true'] {
+		background: var(--amber);
+		border-color: var(--amber);
+		color: var(--void);
+		font-weight: 600;
+	}
+
+	.ls__legend {
+		margin: 0 0 1.25rem;
+		max-width: 60ch;
+		color: var(--ash);
+		font-size: 0.8rem;
+	}
+
+	.ls__pipe {
+		margin: 0 0 1.25rem;
+		color: var(--ash);
+		font-size: 0.76rem;
+		word-break: break-word;
+	}
+
+	html[dir='rtl'] .ls__pipe {
+		text-align: right;
+	}
+
+	.ls__pipe::before {
+		content: '❯ ';
+		color: var(--amber);
+	}
+
+	/* ── the listing ────────────────────────────────────────────────── */
+	.ls {
+		font-family: var(--mono);
+	}
+
+	.ls__total {
+		margin: 0 0 0.35rem;
+		color: var(--ash);
+		font-size: 0.76rem;
+	}
+
+	.ls__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	/* Every row carries the same track list, so the machine columns line
+	   up down the page whichever language the names are in. They are `ch`
+	   on a container that never leaves the mono face. */
+	.ls__head,
+	.ls__row {
+		display: grid;
+		grid-template-columns: 11ch 5ch 4ch 10ch minmax(0, 1fr);
+		gap: 0 1ch;
+		align-items: baseline;
+	}
+
+	/* The header keeps the rows' font-size, because `ch` resolves against the
+	   grid container's own font and the two templates have to agree. The
+	   labels shrink, the tracks do not. */
+	.ls__head {
+		padding-block: 0.3rem;
+		border-block-end: 1px solid var(--rule);
+		color: var(--rule);
+	}
+
+	.ls__h {
+		font-size: 0.7rem;
+		letter-spacing: 0.08em;
+	}
+
+	.ls__h[data-l='en'] {
+		font-family: var(--mono);
+		text-transform: uppercase;
+	}
+
+	.ls__row {
+		position: relative;
+		padding-block: 0.55rem;
+		border-block-end: 1px solid var(--rule);
+	}
+
+	.ls__row:hover,
+	.ls__row:focus-within {
+		background: var(--panel);
+	}
+
+	/* The write-up marker sits in the page gutter rather than inside the row.
+	   An inset shadow would be painted over the first glyph of whichever cell
+	   starts the row, which on a phone is the project's own name. */
+	.ls__row--full::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: -0.6rem;
+		width: 2px;
+		background: var(--amber);
+	}
+
+	.ls__mode {
+		color: var(--ash);
+		font-size: 0.76rem;
+	}
+
+	.ls__row--full .ls__mode {
+		color: var(--amber);
+	}
+
+	.ls__lnk,
+	.ls__sz {
+		color: var(--rule);
+		font-size: 0.76rem;
+		text-align: end;
+	}
+
+	.ls__date {
+		color: var(--ash);
+		font-size: 0.76rem;
+		white-space: nowrap;
+	}
+
+	.ls__name {
+		max-width: 44rem;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0 0.75ch;
+		min-width: 0;
+	}
+
+	.ls__link {
+		text-decoration-color: var(--rule);
+		text-underline-offset: 0.25em;
+		font-weight: 500;
+	}
+
+	.ls__row--full .ls__link {
+		color: var(--amber);
+	}
+
+	.ls__link:hover {
+		color: var(--amber);
+	}
+
+	.ls__slug {
+		color: var(--rule);
+		font-size: 0.72rem;
+	}
+
+	.ls__name .st {
+		margin-inline-start: auto;
+	}
+
+	.ls__tag {
+		grid-column: 5 / -1;
+		margin: 0.1rem 0 0;
+		color: var(--ash);
+		font-size: 0.78rem;
+		max-width: 60ch;
+	}
+
+	.ls__empty {
+		margin: 1.5rem 0 0;
+		color: var(--rose);
+	}
+
+	.ls__foot {
+		margin: 1.5rem 0 0;
+		padding-block-start: 0.75rem;
+		border-block-start: 1px solid var(--rule);
+		color: var(--ash);
+		font-size: 0.76rem;
+	}
+
+	/* Under a phone the machine columns fold onto one line above the name;
+	   they keep their order and their meaning, they just stop being a grid. */
+	@media (max-width: 44rem) {
+		.ls__head {
+			display: none;
+		}
+
+		.ls__row {
+			grid-template-columns: 11ch 5ch 4ch minmax(0, 1fr);
+		}
+
+		.ls__date {
+			grid-column: 4;
+			text-align: end;
+		}
+
+		.ls__name,
+		.ls__tag {
+			grid-column: 1 / -1;
+		}
+
+		.ls__name {
+			margin-block-start: 0.15rem;
+		}
+	}
+</style>

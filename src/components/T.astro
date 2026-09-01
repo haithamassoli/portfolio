@@ -1,0 +1,19 @@
+---
+/* One bilingual string, written twice. LangBoot's CSS shows the current one.
+   Do not pass `id`: the element is rendered twice. */
+import type { I18n } from '../../content/types';
+
+interface Props {
+	v: I18n;
+	/** Tag to render. Defaults to a span. */
+	as?: string;
+	class?: string;
+	[key: string]: unknown;
+}
+
+const { v, as = 'span', ...rest } = Astro.props;
+const Tag = as;
+---
+
+<Tag {...rest} data-l="en" lang="en">{v.en}</Tag>
+<Tag {...rest} data-l="ar" lang="ar">{v.ar}</Tag>

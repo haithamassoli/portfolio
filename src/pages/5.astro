@@ -3,6 +3,10 @@ import { Image } from 'astro:assets';
 import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
+import type { Key } from '../i18n';
+import { pair, s } from '../data/variant-ui';
+import LangBoot from '../components/LangBoot.astro';
+import T from '../components/T.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import profilePhoto from '../assets/images/profile.png';
 
@@ -28,28 +32,18 @@ const work = [
 	{ p: bySlug('rooh-al-jouf'), w: 'w5', h: 'h3', shape: 'wide', tone: 'bone' },
 ];
 
-const category: Record<string, string> = {
-	web: 'Web',
-	mobile: 'Mobile',
-	desktop: 'Desktop',
-	extension: 'Extension',
-	ai: 'On-device AI',
-	client: 'Client',
-};
+/* Category and status are already written in both languages in the site's own
+   dictionary; the tray does not get a second one. */
+const cat = (c: string) => s(`cat.${c}` as Key);
+const stat = (st: string) => s(`status.${st}` as Key);
 
-const status: Record<string, string> = {
-	live: 'Live',
-	shipped: 'On the stores',
-	delisted: 'Delisted',
-	wip: 'In progress',
-	archived: 'Archived',
-};
+/* Periods are one string in the data — "Since 2025", "2022 to 2023" — so the
+   only Arabic they need is the joining word. Digits stay Western. */
+const per = (v: string) =>
+	pair(v, v.replace(/^Since /, 'منذ ').replace(/ to /, ' إلى '));
 
 /* The archive tile names real projects and links to their write-ups. */
-const archive = projects
-	.filter((p) => !p.featured)
-	.slice(0, 10)
-	.map((p) => ({ slug: p.slug, title: p.title.en }));
+const archive = projects.filter((p) => !p.featured).slice(0, 10);
 
 const restCount = projects.length - featured.length;
 
@@ -70,56 +64,80 @@ const nowISO = new Date().toISOString();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — two scripts, two directions, one build</title>
+		<title>Haitham Assoli — Arabic-first apps, laid out as a tray</title>
 		<meta
 			name="description"
-			content="Haitham Assoli builds Arabic-first web and mobile products from Amman: React Native on both app stores, Next.js and Astro on the web, and AI that runs on the phone."
+			content="Haitham Assoli builds Arabic-first web and mobile products from Amman: React Native on both app stores, Next.js and Astro on the web, and AI that runs on the phone. Readable in Arabic or English."
 		/>
 		<meta name="color-scheme" content="light" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
 		/>
+		<LangBoot />
 	</head>
 
 	<body>
+		<a class="skip" href="#main">
+			<T v={s('nav.skip')} />
+		</a>
+
 		<div class="tray">
 			<header class="topbar">
 				<p class="topbar__name">
-					Haitham Assoli <span class="topbar__ar" lang="ar" dir="rtl"
+					<span data-l="en" lang="en">Haitham Assoli</span>
+					<span data-l="ar" lang="ar">هيثم العسولي</span>
+					<span class="topbar__alt" data-l="en" lang="ar" dir="rtl"
 						>هيثم العسولي</span
 					>
+					<span class="topbar__alt" data-l="ar" lang="en" dir="ltr"
+						>Haitham Assoli</span
+					>
 				</p>
-				<p class="mono topbar__meta">
-					Amman · UTC+3 · <a class="ilink" href="#hire">open to work</a>
-				</p>
+				<nav class="topbar__nav mono">
+					<a class="ilink" href="/5/projects"><T v={s('work.all')} /></a>
+					<a class="ilink" href="/5/hire"><T v={s('nav.hire')} /></a>
+					<span class="topbar__meta"
+						><T v={pair('Amman · UTC+3', 'عمّان · UTC+3')} /></span
+					>
+				</nav>
 			</header>
 
-			<main>
+			<main id="main">
 				<!-- ===================== BOARD ONE: THE POINT ===================== -->
-				<section class="board board--hero" aria-label="Introduction">
+				<section class="board board--hero">
 					<!-- thesis -->
 					<article class="tile tile--bone w8 h3 thesis" style="--i: 0">
-						<p class="mono lbl">The point</p>
+						<p class="mono lbl"><T v={pair('The point', 'الخلاصة')} /></p>
 						<h1 class="thesis__h">
-							A mirrored interface is <em>a different interface</em>, not a
-							translation. I build both halves.
-						</h1>
-						<p class="thesis__sub">
-							Four years of Arabic-first products out of Amman: React Native and
-							Expo on both app stores, Next.js and Astro on the web, NestJS,
-							Convex and Supabase underneath. Thirty-nine of them shipped.
-						</p>
-						<p class="mono thesis__tags">
-							<span>Web</span><span>Mobile</span><span>On-device AI</span><span
-								>RTL</span
+							<span data-l="en" lang="en"
+								>A mirrored interface is <em>a different interface</em>, not a
+								translation. I build both halves.</span
 							>
+							<span data-l="ar" lang="ar"
+								>الواجهة المعكوسة <em>واجهة أخرى</em>، لا ترجمة. وأنا أبني
+								نصفيها.</span
+							>
+						</h1>
+						<T
+							v={pair(
+								'Four years of Arabic-first products out of Amman: React Native and Expo on both app stores, Next.js and Astro on the web, NestJS, Convex and Supabase underneath. Thirty-nine of them shipped.',
+								'أربع سنوات من منتجات تبدأ بالعربية، من عمّان: React Native وExpo على المتجرين، وNext.js وAstro على الويب، وتحتها NestJS وConvex وSupabase. تسعة وثلاثون منها صدرت.',
+							)}
+							as="p"
+							class="thesis__sub"
+						/>
+						<p class="mono thesis__tags">
+							<T v={pair('Web', 'ويب')} as="span" />
+							<T v={pair('Mobile', 'جوّال')} as="span" />
+							<T v={pair('On-device AI', 'ذكاء على الجهاز')} as="span" />
+							<T v={pair('Arabic first', 'العربية أولًا')} as="span" />
 						</p>
 					</article>
 
@@ -135,34 +153,28 @@ const nowISO = new Date().toISOString();
 							/>
 						</div>
 						<div class="who__plate">
-							<p class="mono lbl lbl--on-dark">Who</p>
-							<p class="who__name">Haitham Assoli</p>
-							<p class="who__role">{profile.title.en}</p>
+							<p class="mono lbl lbl--on-dark">
+								<T v={pair('Who', 'من')} />
+							</p>
+							<p class="who__name">
+								<span data-l="en" lang="en">Haitham Assoli</span>
+								<span data-l="ar" lang="ar">هيثم العسولي</span>
+							</p>
+							<T v={profile.title} as="p" class="who__role" />
 						</div>
 					</article>
 
 					<!-- signature: the mirror -->
 					<article class="tile tile--bone w5 h4 mirror" style="--i: 2">
 						<div class="mirror__head">
-							<p class="mono lbl">Try it</p>
-							<div class="mtoggle" role="group" aria-label="Interface language">
-								<button
-									type="button"
-									class="mtoggle__btn is-on"
-									data-set-lang="en"
-									aria-pressed="true">EN · LTR</button
-								>
-								<button
-									type="button"
-									class="mtoggle__btn"
-									data-set-lang="ar"
-									lang="ar"
-									aria-pressed="false">ع · RTL</button
-								>
-							</div>
+							<p class="mono lbl">
+								<T
+									v={pair('One component, both ways', 'مكوّن واحد باتجاهين')}
+								/>
+							</p>
 						</div>
 
-						<div class="mcard" id="mcard" dir="ltr" lang="en">
+						<div class="mcard" id="mcard">
 							<div class="mcard__bar">
 								<span class="mcard__back" aria-hidden="true">
 									<svg viewBox="0 0 24 24" width="16" height="16" fill="none"
@@ -175,8 +187,9 @@ const nowISO = new Date().toISOString();
 									>
 								</span>
 								<span class="mcard__title"
-									><span class="en">Book a pitch</span><span class="ar"
-										>احجز ملعبًا</span
+									><span data-l="en" lang="en">Book a pitch</span><span
+										data-l="ar"
+										lang="ar">احجز ملعبًا</span
 									></span
 								>
 								<span class="mcard__dots" aria-hidden="true"></span>
@@ -184,39 +197,47 @@ const nowISO = new Date().toISOString();
 
 							<div class="mcard__pitch" aria-hidden="true">
 								<span class="mcard__badge">
-									<span class="en">5-a-side</span><span class="ar">خماسي</span>
+									<span data-l="en" lang="en">5-a-side</span><span
+										data-l="ar"
+										lang="ar">خماسي</span
+									>
 								</span>
 								<span class="mcard__crew">
 									<span class="mcard__face">HA</span>
 									<span class="mcard__face">M</span>
 									<span class="mcard__face">Z</span>
 									<span class="mcard__face"
-										><span class="en">+3</span><span class="ar">٣+</span></span
+										><span data-l="en" lang="en">+3</span><span
+											data-l="ar"
+											lang="ar">٣+</span
+										></span
 									>
 								</span>
 							</div>
 
 							<div class="mcard__body">
 								<p class="mcard__venue">
-									<span class="en">Al-Hussein Pitch, Amman</span><span
-										class="ar">ملعب الحسين، عمّان</span
-									>
+									<span data-l="en" lang="en">Al-Hussein Pitch, Amman</span
+									><span data-l="ar" lang="ar">ملعب الحسين، عمّان</span>
 								</p>
 								<p class="mcard__slot mono">
-									<span class="en">Today 18:00 – 19:00</span><span class="ar"
-										>اليوم ٦:٠٠ – ٧:٠٠ م</span
+									<span data-l="en" lang="en">Today 18:00 – 19:00</span><span
+										data-l="ar"
+										lang="ar">اليوم ٦:٠٠ – ٧:٠٠ م</span
 									>
 								</p>
 
 								<div class="mcard__row">
 									<span class="mcard__players">
-										<span class="en">6 of 10 players in</span><span class="ar"
-											>٦ من ١٠ لاعبين</span
+										<span data-l="en" lang="en">6 of 10 players in</span><span
+											data-l="ar"
+											lang="ar">٦ من ١٠ لاعبين</span
 										>
 									</span>
 									<span class="mcard__price mono">
-										<span class="en">12 JOD</span><span class="ar"
-											>١٢ دينارًا</span
+										<span data-l="en" lang="en">12 JOD</span><span
+											data-l="ar"
+											lang="ar">١٢ دينارًا</span
 										>
 									</span>
 								</div>
@@ -226,8 +247,9 @@ const nowISO = new Date().toISOString();
 								</div>
 
 								<span class="mcard__cta">
-									<span class="en">Book the slot</span><span class="ar"
-										>احجز الموعد</span
+									<span data-l="en" lang="en">Book the slot</span><span
+										data-l="ar"
+										lang="ar">احجز الموعد</span
 									>
 									<span class="mcard__arrow" aria-hidden="true">
 										<svg viewBox="0 0 24 24" width="15" height="15" fill="none"
@@ -243,16 +265,54 @@ const nowISO = new Date().toISOString();
 							</div>
 						</div>
 
-						<p class="mirror__note">
-							Nothing was translated by this button. The row order reverses, the
-							chevron points the other way, the progress fills from the other
-							edge, the numerals change system. That is the work.
+						<T
+							v={pair(
+								'Nothing here was translated by the switch beside it. The row order reverses, the chevron points the other way, the progress fills from the other edge, the numerals change system. That is the work.',
+								'لم يترجم المفتاح المجاور شيئًا من هذا. ترتيب الصفوف ينقلب، والسهم يشير إلى الجهة الأخرى، وشريط التقدم يمتلئ من الحافة المقابلة، والأرقام تغيّر نظامها. هذا هو العمل.',
+							)}
+							as="p"
+							class="mirror__note"
+						/>
+					</article>
+
+					<!-- the language switch: its own compartment -->
+					<article class="tile tile--ink w3 h4 lang" style="--i: 3">
+						<p class="mono lbl lbl--on-dark">
+							<span dir="ltr">EN</span> / <span lang="ar">ع</span>
 						</p>
+
+						<button type="button" class="lidsw" data-lang-toggle>
+							<span class="lidsw__slot" aria-hidden="true">
+								<span class="lidsw__lid"></span>
+								<span class="lidsw__opt"
+									>EN<small lang="en">English</small></span
+								>
+								<span class="lidsw__opt" lang="ar">ع<small>العربية</small></span
+								>
+							</span>
+							<span class="sr-only" data-l="en" lang="en"
+								>Read this page in Arabic</span
+							>
+							<span class="sr-only" data-l="ar" lang="ar"
+								>اقرأ هذه الصفحة بالإنجليزية</span
+							>
+						</button>
+
+						<T
+							v={pair(
+								'Pull the lid. The whole tray turns over — every tile, every line, the grid itself.',
+								'اسحب الغطاء. تنقلب الصينية كلها — كل بلاطة، وكل سطر، والشبكة نفسها.',
+							)}
+							as="p"
+							class="lang__note"
+						/>
 					</article>
 
 					<!-- ledger -->
-					<article class="tile tile--ink w4 h2 ledger" style="--i: 3">
-						<p class="mono lbl lbl--on-dark">Ledger</p>
+					<article class="tile tile--ink w4 h2 ledger" style="--i: 4">
+						<p class="mono lbl lbl--on-dark">
+							<T v={pair('Ledger', 'السجل')} />
+						</p>
 						<div class="matrix" aria-hidden="true">
 							{
 								squares.map((filled) => (
@@ -261,22 +321,28 @@ const nowISO = new Date().toISOString();
 							}
 						</div>
 						<dl class="ledger__list">
-							<div><dt>39</dt><dd>shipped</dd></div>
-							<div><dt>13</dt><dd>on the stores</dd></div>
-							<div><dt>8</dt><dd>written up</dd></div>
-							<div><dt>~4</dt><dd>years</dd></div>
+							<div>
+								<dt>39</dt><T v={pair('shipped', 'صدرت')} as="dd" />
+							</div>
+							<div>
+								<dt>13</dt><T
+									v={pair('on the stores', 'على المتاجر')}
+									as="dd"
+								/>
+							</div>
+							<div>
+								<dt>8</dt><T v={pair('written up', 'مشروحة')} as="dd" />
+							</div>
+							<div>
+								<dt dir="ltr">~4</dt><T v={pair('years', 'سنوات')} as="dd" />
+							</div>
 						</dl>
 					</article>
 
 					<!-- amman -->
-					<article class="tile tile--marigold w3 h2 amman" style="--i: 4">
-						<p class="mono lbl">Amman</p>
-						<svg
-							class="amman__map"
-							viewBox="0 0 140 96"
-							role="img"
-							aria-label="Contour sketch of the hills Amman is built on"
-						>
+					<article class="tile tile--marigold w4 h2 amman" style="--i: 5">
+						<p class="mono lbl"><T v={pair('Amman', 'عمّان')} /></p>
+						<svg class="amman__map" viewBox="0 0 140 96" aria-hidden="true">
 							<g class="amman__rings">
 								<ellipse cx="44" cy="34" rx="34" ry="22"></ellipse>
 								<ellipse cx="44" cy="34" rx="24" ry="15"></ellipse>
@@ -294,17 +360,28 @@ const nowISO = new Date().toISOString();
 								<circle cx="71" cy="49" r="3.4"></circle>
 							</g>
 						</svg>
+						<T
+							v={pair(
+								'A contour sketch of the hills Amman is built on.',
+								'رسم كنتوري لتلال عمّان التي بُنيت عليها المدينة.',
+							)}
+							as="span"
+							class="sr-only"
+						/>
 						<p class="amman__clock mono">
 							<time id="clock" datetime={nowISO}>{ammanTime}</time>
-							<span>31.95° N, 35.93° E</span>
+							<T
+								v={pair('31.95° N, 35.93° E', '31.95° شمالًا، 35.93° شرقًا')}
+								as="span"
+							/>
 						</p>
 					</article>
 
 					<!-- on-device -->
 					<a
-						class="tile tile--ink w7 h2 device"
-						href="/work/naqi"
-						style="--i: 5; --accent: #C6A02C"
+						class="tile tile--ink w12 h2 device"
+						href="/5/work/naqi"
+						style="--i: 6; --accent: #C6A02C"
 					>
 						<div class="device__phone" aria-hidden="true">
 							<div class="device__screen">
@@ -320,14 +397,29 @@ const nowISO = new Date().toISOString();
 							</div>
 						</div>
 						<div class="device__copy">
-							<p class="mono lbl lbl--on-dark">On-device</p>
-							<h2 class="device__h">The model runs on the phone.</h2>
-							<p class="device__p">
-								Naqi pulls the music out of a video and blurs what it must —
-								separation and detection, both local. No upload, no account, no
-								telemetry, and the original file is never touched.
+							<p class="mono lbl lbl--on-dark">
+								<T v={pair('On-device', 'على الجهاز')} />
 							</p>
-							<p class="mono device__go">Read the write-up →</p>
+							<h2 class="device__h">
+								<T
+									v={pair(
+										'The model runs on the phone.',
+										'النموذج يعمل على الهاتف نفسه.',
+									)}
+								/>
+							</h2>
+							<T
+								v={pair(
+									'Naqi pulls the music out of a video and blurs what it must — separation and detection, both local. No upload, no account, no telemetry, and the original file is never touched.',
+									'يستخرج «نقي» الموسيقى من الفيديو ويطمس ما يجب طمسه — الفصل والكشف كلاهما على الجهاز. بلا رفع، وبلا حساب، وبلا تتبّع، والملف الأصلي لا يُمسّ.',
+								)}
+								as="p"
+								class="device__p"
+							/>
+							<p class="mono device__go">
+								<span data-l="en" lang="en">Read the write-up →</span>
+								<span data-l="ar" lang="ar">اقرأ التفاصيل ←</span>
+							</p>
 						</div>
 					</a>
 				</section>
@@ -335,11 +427,22 @@ const nowISO = new Date().toISOString();
 				<!-- ===================== BOARD TWO: THE WORK ===================== -->
 				<section class="board board--work" aria-labelledby="work-h">
 					<div class="board__head">
-						<h2 class="board__h" id="work-h">Eight I would show first</h2>
-						<p class="board__lede">
-							Each one shipped, each one still standing. Full write-ups behind
-							every tile.
-						</p>
+						<h2 class="board__h" id="work-h">
+							<span data-l="en" lang="en">Eight I would show first</span>
+							<span data-l="ar" lang="ar">ثمانية أعرضها أولًا</span>
+						</h2>
+						<T
+							v={pair(
+								'Each one shipped, each one still standing. A full write-up sits behind every tile.',
+								'كلها صدرت، وكلها ما زالت قائمة. خلف كل بلاطة صفحة كاملة.',
+							)}
+							as="p"
+							class="board__lede"
+						/>
+						<a class="mono board__more" href="/5/projects">
+							<span data-l="en" lang="en">All 39 →</span>
+							<span data-l="ar" lang="ar">كل الـ 39 ←</span>
+						</a>
 					</div>
 
 					{
@@ -353,8 +456,8 @@ const nowISO = new Date().toISOString();
 									'work',
 									`work--${shape}`,
 								]}
-								href={`/work/${p.slug}`}
-								style={`--i:${i + 6}; --accent:${p.accent}`}
+								href={`/5/work/${p.slug}`}
+								style={`--i:${i}; --accent:${p.accent}`}
 							>
 								<span class="work__shot">
 									{p.image ? (
@@ -371,14 +474,14 @@ const nowISO = new Date().toISOString();
 								</span>
 								<span class="work__meta">
 									<span class="mono work__top">
-										<span class="work__year">{p.year}</span>
-										<span class="work__cat">{category[p.category]}</span>
+										<T v={per(p.year)} as="span" class="work__year" />
+										<T v={cat(p.category)} as="span" class="work__cat" />
 									</span>
-									<span class="work__title">{p.title.en}</span>
-									<span class="work__line">{p.tagline.en}</span>
+									<T v={p.title} as="span" class="work__title" />
+									<T v={p.tagline} as="span" class="work__line" />
 									<span class="mono work__foot">
-										<span class="work__status">{status[p.status]}</span>
-										<span class="work__stack">
+										<T v={stat(p.status)} as="span" class="work__status" />
+										<span class="work__stack" lang="en" dir="ltr">
 											{p.stack.slice(0, 3).join(' · ')}
 										</span>
 									</span>
@@ -387,69 +490,92 @@ const nowISO = new Date().toISOString();
 						))
 					}
 
-					<article class="tile tile--cobalt w4 h3 archive" style="--i: 14">
-						<p class="mono lbl lbl--on-dark">The rest</p>
-						<p class="archive__count">
-							{restCount} more, from municipal apps to a five-platform desktop build.
+					<article class="tile tile--cobalt w4 h3 archive" style="--i: 8">
+						<p class="mono lbl lbl--on-dark">
+							<T v={pair('The rest', 'البقية')} />
 						</p>
+						<T
+							v={pair(
+								`${restCount} more, from municipal apps to a five-platform desktop build.`,
+								`${restCount} مشروعًا آخر، من تطبيقات بلدية إلى برنامج سطح مكتب على خمس منصات.`,
+							)}
+							as="p"
+							class="archive__count"
+						/>
 						<ul class="archive__list mono">
 							{
 								archive.map((a) => (
 									<li>
-										<a href={`/work/${a.slug}`}>{a.title}</a>
+										<a href={`/5/work/${a.slug}`}>
+											<T v={a.title} />
+										</a>
 									</li>
 								))
 							}
+							<li>
+								<a class="archive__all" href="/5/projects">
+									<span data-l="en" lang="en">See all 39 →</span>
+									<span data-l="ar" lang="ar">شاهد الـ 39 كلها ←</span>
+								</a>
+							</li>
 						</ul>
 					</article>
 				</section>
 
 				<!-- ===================== BOARD THREE: THE PERSON ===================== -->
 				<section class="board board--about" aria-labelledby="about-h">
-					<article class="tile tile--bone w7 h2 about" style="--i: 15">
-						<p class="mono lbl">Working method</p>
+					<article class="tile tile--bone w7 h2 about" style="--i: 0">
+						<p class="mono lbl">
+							<T v={pair('Working method', 'طريقة العمل')} />
+						</p>
 						<h2 class="about__h" id="about-h">
-							The interesting part is never the framework.
+							<span data-l="en" lang="en"
+								>The interesting part is never the framework.</span
+							>
+							<span data-l="ar" lang="ar"
+								>الجزء المثير للاهتمام ليس إطار العمل أبدًا.</span
+							>
 						</h2>
-						<p>
-							I build products end to end, from the data model to the last
-							pixel, and most of them read right to left first, because most of
-							the people using them read Arabic.
-						</p>
-						<p>
-							What I look for is a constraint that is actually real: a model
-							that has to fit on the device instead of a server, a search index
-							that has to answer in milliseconds with no backend, a booking flow
-							that can never sell the same hour twice.
-						</p>
+						<T v={pair(profile.about.en[0], profile.about.ar[0])} as="p" />
+						<T v={pair(profile.about.en[2], profile.about.ar[2])} as="p" />
 					</article>
 
-					<article class="tile tile--bone w5 h2 record" style="--i: 16">
-						<p class="mono lbl">Record</p>
+					<article class="tile tile--bone w5 h2 record" style="--i: 1">
+						<p class="mono lbl"><T v={pair('Record', 'المسار')} /></p>
 						<ol class="record__list">
 							{
 								profile.experience.slice(0, 5).map((job) => (
 									<li>
-										<span class="mono record__when">{job.period}</span>
+										<T
+											v={per(job.period)}
+											as="span"
+											class="mono record__when"
+										/>
 										<span class="record__what">
-											{job.role.en}, <b>{job.company.en}</b>
+											<T v={job.role} as="span" />
+											<span aria-hidden="true">, </span>
+											<T v={job.company} as="b" />
 										</span>
 									</li>
 								))
 							}
 						</ol>
 						<p class="record__edu mono">
-							BSc Computer Science, Irbid National University — excellent.
+							<T v={profile.education[0].degree} as="span" />
+							<span aria-hidden="true"> — </span>
+							<T v={profile.education[0].school} as="span" />
 						</p>
 					</article>
 
-					<article class="tile tile--ink w12 h1 stack" style="--i: 17">
-						<p class="mono lbl lbl--on-dark stack__lbl">Toolbox</p>
-						<div class="ticker" aria-hidden="true">
+					<article class="tile tile--ink w12 h1 stack" style="--i: 2">
+						<p class="mono lbl lbl--on-dark stack__lbl">
+							<T v={pair('Toolbox', 'الأدوات')} />
+						</p>
+						<div class="ticker" dir="ltr" aria-hidden="true">
 							<div class="ticker__track">
 								{
 									[0, 1].map(() => (
-										<ul class="ticker__list mono">
+										<ul class="ticker__list mono" lang="en" dir="ltr">
 											{toolbox.map((item) => (
 												<li>
 													{item}
@@ -461,36 +587,63 @@ const nowISO = new Date().toISOString();
 								}
 							</div>
 						</div>
-						<ul class="sr-only">{toolbox.map((item) => <li>{item}</li>)}</ul>
+						<ul class="sr-only" lang="en">
+							{toolbox.map((item) => <li>{item}</li>)}
+						</ul>
 					</article>
 
 					<article
 						class="tile tile--marigold w8 h2 hire"
 						id="hire"
-						style="--i: 18"
+						style="--i: 3"
 					>
-						<p class="mono lbl">Hire</p>
-						<h2 class="hire__h">Tell me what you are shipping.</h2>
-						<p class="hire__p">
-							Contract or full-time, web or mobile, English or Arabic first.
-							Fastest way in is email.
-						</p>
-						<a class="hire__mail" href={`mailto:${profile.email}`}
-							>{profile.email}</a
-						>
-						<a class="mono hire__tel" href="tel:+962776193666"
-							>{profile.phone}</a
+						<p class="mono lbl"><T v={s('hire.eyebrow')} /></p>
+						<h2 class="hire__h">
+							<T
+								v={pair('Tell me what you are shipping.', 'حدّثني عمّا تطلقه.')}
+							/>
+						</h2>
+						<T
+							v={pair(
+								'Contract or full time, web or mobile, Arabic or English first. The brief form is the fastest way in; email works too.',
+								'عقد أو دوام كامل، ويب أو جوّال، بالعربية أو بالإنجليزية أولًا. أسرع طريق إليّ نموذج المشروع، والبريد يفي بالغرض أيضًا.',
+							)}
+							as="p"
+							class="hire__p"
+						/>
+						<a class="hire__cta" href="/5/hire">
+							<span data-l="en" lang="en">Fill in the brief →</span>
+							<span data-l="ar" lang="ar">املأ نموذج المشروع ←</span>
+						</a>
+						<a
+							class="hire__mail"
+							href={`mailto:${profile.email}`}
+							lang="en"
+							dir="ltr">{profile.email}</a
 						>
 					</article>
 
-					<article class="tile tile--ink w4 h2 links" style="--i: 19">
-						<p class="mono lbl lbl--on-dark">Elsewhere</p>
+					<article class="tile tile--ink w4 h2 links" style="--i: 4">
+						<p class="mono lbl lbl--on-dark"><T v={s('footer.elsewhere')} /></p>
 						<ul class="links__list">
-							<li><a href={profile.links.github}>GitHub</a></li>
-							<li><a href={profile.links.linkedin}>LinkedIn</a></li>
-							<li><a href={profile.links.resume}>CV</a></li>
-							<li><a href={profile.links.playStore}>Google Play</a></li>
-							<li><a href={profile.links.website}>assoli.site</a></li>
+							<li>
+								<a href={profile.links.github}><span lang="en">GitHub</span></a>
+							</li>
+							<li>
+								<a href={profile.links.linkedin}
+									><span lang="en">LinkedIn</span></a
+								>
+							</li>
+							<li><a href={profile.links.resume}><T v={s('nav.cv')} /></a></li>
+							<li>
+								<a href={profile.links.playStore}><T v={s('project.play')} /></a
+								>
+							</li>
+							<li>
+								<a href={profile.links.website}
+									><span lang="en" dir="ltr">assoli.site</span></a
+								>
+							</li>
 						</ul>
 					</article>
 				</section>
@@ -498,11 +651,10 @@ const nowISO = new Date().toISOString();
 
 			<footer class="foot">
 				<p class="mono">
-					Haitham Assoli — Amman, Jordan. Built in two directions.
+					<span data-l="en" lang="en">Haitham Assoli — Amman, Jordan.</span>
+					<span data-l="ar" lang="ar">هيثم العسولي — عمّان، الأردن.</span>
 				</p>
-				<p class="mono foot__ar" lang="ar" dir="rtl">
-					هيثم العسولي — عمّان، الأردن.
-				</p>
+				<T v={s('footer.line')} as="p" class="mono" />
 			</footer>
 		</div>
 
@@ -519,23 +671,16 @@ const nowISO = new Date().toISOString();
 				tile.style.setProperty('--my', `${e.clientY - r.top}px`);
 			});
 
-			/* The mirror. Direction is a property of the card, not of the words. */
+			/* The mirror. LangBoot owns the language; the card only reacts to it,
+			   so it flips whichever control was pulled. */
 			const card = document.getElementById('mcard');
-			const buttons = document.querySelectorAll('[data-set-lang]');
-			buttons.forEach((btn) => {
-				btn.addEventListener('click', () => {
-					const lang = btn.dataset.setLang;
-					card.setAttribute('lang', lang);
-					card.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-					card.classList.remove('is-flipping');
-					void card.offsetWidth;
-					card.classList.add('is-flipping');
-					buttons.forEach((b) => {
-						const on = b === btn;
-						b.classList.toggle('is-on', on);
-						b.setAttribute('aria-pressed', String(on));
-					});
-				});
+			new MutationObserver(() => {
+				card.classList.remove('is-flipping');
+				void card.offsetWidth;
+				card.classList.add('is-flipping');
+			}).observe(document.documentElement, {
+				attributes: true,
+				attributeFilter: ['lang'],
 			});
 
 			/* Amman on the clock, corrected on load and kept honest each minute. */
@@ -664,6 +809,26 @@ const nowISO = new Date().toISOString();
 		border-radius: 6px;
 	}
 
+	.skip {
+		position: absolute;
+		z-index: 20;
+		inset-inline-start: 0.75rem;
+		top: 0.75rem;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bone);
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		text-decoration: none;
+		transform: translateY(-160%);
+		transition: transform 0.18s ease;
+	}
+
+	.skip:focus-visible {
+		transform: none;
+	}
+
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -706,16 +871,25 @@ const nowISO = new Date().toISOString();
 		letter-spacing: -0.02em;
 	}
 
-	.topbar__ar {
+	.topbar__alt {
 		font-weight: 500;
-		opacity: 0.55;
-		margin-inline-start: 0.4rem;
+		opacity: 0.5;
+		margin-inline-start: 0.45rem;
+	}
+
+	.topbar__nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.35rem 1rem;
+		font-size: 0.76rem;
+		letter-spacing: 0.02em;
 	}
 
 	.topbar__meta {
 		font-size: 0.76rem;
 		letter-spacing: 0.02em;
-		color: rgba(30, 23, 19, 0.72);
+		color: rgba(30, 23, 19, 0.55);
 	}
 
 	.ilink {
@@ -769,6 +943,19 @@ const nowISO = new Date().toISOString();
 		font-size: 0.86rem;
 		color: rgba(30, 23, 19, 0.7);
 		max-width: 34ch;
+	}
+
+	.board__more {
+		margin-inline-start: auto;
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 4px;
+		white-space: nowrap;
+	}
+
+	.board__more:hover {
+		color: var(--pomegranate);
 	}
 
 	.w3 {
@@ -1042,38 +1229,6 @@ const nowISO = new Date().toISOString();
 		gap: 0.6rem;
 	}
 
-	.mtoggle {
-		display: flex;
-		padding: 3px;
-		border-radius: 999px;
-		background: rgba(30, 23, 19, 0.1);
-	}
-
-	.mtoggle__btn {
-		appearance: none;
-		border: 0;
-		cursor: pointer;
-		border-radius: 999px;
-		padding: 0.28rem 0.65rem;
-		background: transparent;
-		color: rgba(30, 23, 19, 0.78);
-		font-family: var(--mono);
-		font-size: 0.68rem;
-		letter-spacing: 0.06em;
-		transition:
-			background 0.2s ease,
-			color 0.2s ease;
-	}
-
-	.mtoggle__btn:hover {
-		color: var(--ink);
-	}
-
-	.mtoggle__btn.is-on {
-		background: var(--ink);
-		color: var(--bone);
-	}
-
 	.mcard {
 		flex: 1;
 		display: flex;
@@ -1087,18 +1242,6 @@ const nowISO = new Date().toISOString();
 			inset 0 0 0 1px rgba(30, 23, 19, 0.1),
 			0 10px 20px -16px rgba(30, 23, 19, 0.8);
 		font-size: 0.86rem;
-	}
-
-	.mcard .ar {
-		display: none;
-	}
-
-	.mcard[lang='ar'] .en {
-		display: none;
-	}
-
-	.mcard[lang='ar'] .ar {
-		display: inline;
 	}
 
 	.mcard.is-flipping {
@@ -1135,7 +1278,7 @@ const nowISO = new Date().toISOString();
 		color: var(--ink);
 	}
 
-	.mcard[dir='rtl'] .mcard__back svg {
+	html[dir='rtl'] .mcard__back svg {
 		transform: scaleX(-1);
 	}
 
@@ -1286,13 +1429,13 @@ const nowISO = new Date().toISOString();
 		font-size: 0.82rem;
 	}
 
-	.mcard[dir='rtl'] .mcard__arrow svg {
+	html[dir='rtl'] .mcard__arrow svg {
 		transform: scaleX(-1);
 	}
 
 	/* The mono face carries no Arabic; in RTL the sans takes those lines. */
-	.mcard[lang='ar'] .mcard__slot,
-	.mcard[lang='ar'] .mcard__price {
+	html[lang='ar'] .mcard__slot,
+	html[lang='ar'] .mcard__price {
 		font-family: var(--sans);
 	}
 
@@ -1300,6 +1443,98 @@ const nowISO = new Date().toISOString();
 		font-size: 0.76rem;
 		line-height: 1.5;
 		color: rgba(30, 23, 19, 0.68);
+	}
+
+	/* ---------------- the language tile ----------------
+	   A two-compartment box with a sliding lid. The lid rests on whichever
+	   language is current; pressing it slides the lid and turns the tray. */
+
+	.lang {
+		justify-content: space-between;
+		background:
+			radial-gradient(
+				120% 90% at 100% 0%,
+				rgba(233, 164, 38, 0.22),
+				rgba(233, 164, 38, 0) 62%
+			),
+			var(--ink);
+	}
+
+	.lidsw {
+		flex: 1;
+		min-height: 9rem;
+		display: block;
+		width: 100%;
+		padding: 4px;
+		border: 0;
+		border-radius: 15px;
+		background: rgba(251, 246, 236, 0.07);
+		box-shadow: inset 0 0 0 1px rgba(251, 246, 236, 0.16);
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.lidsw__slot {
+		position: relative;
+		display: grid;
+		grid-template-rows: 1fr 1fr;
+		height: 100%;
+	}
+
+	.lidsw__lid {
+		position: absolute;
+		z-index: 0;
+		inset-inline: 0;
+		top: 0;
+		height: 50%;
+		border-radius: 11px;
+		background: var(--marigold);
+		box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.8);
+		transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.25, 1);
+	}
+
+	html[lang='ar'] .lidsw__lid {
+		transform: translateY(100%);
+	}
+
+	.lidsw__opt {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		align-content: center;
+		justify-items: center;
+		gap: 0.1rem;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+		line-height: 1;
+		letter-spacing: -0.03em;
+		color: rgba(251, 246, 236, 0.42);
+		transition: color 0.25s ease;
+	}
+
+	.lidsw__opt small {
+		font-family: var(--sans);
+		font-weight: 500;
+		font-size: 0.68rem;
+		letter-spacing: 0;
+	}
+
+	html[lang='en'] .lidsw__opt:nth-child(2),
+	html[lang='ar'] .lidsw__opt:nth-child(3) {
+		color: #2a1c06;
+	}
+
+	.lidsw:hover .lidsw__lid {
+		filter: brightness(1.07);
+	}
+
+	.lang__note {
+		font-size: 0.74rem;
+		line-height: 1.5;
+		color: rgba(251, 246, 236, 0.66);
 	}
 
 	/* ---------------- ledger ---------------- */
@@ -1749,6 +1984,12 @@ const nowISO = new Date().toISOString();
 		color: #241905;
 	}
 
+	.archive__all {
+		background: rgba(233, 164, 38, 0.9) !important;
+		color: #241905;
+		font-weight: 500;
+	}
+
 	/* ---------------- about / record ---------------- */
 
 	.about p {
@@ -1894,32 +2135,39 @@ const nowISO = new Date().toISOString();
 		color: rgba(42, 28, 6, 0.8);
 	}
 
-	.hire__mail {
+	.hire__cta {
 		align-self: flex-start;
-		margin-top: 0.35rem;
+		margin-top: 0.4rem;
 		padding: 0.45rem 0.9rem;
 		border-radius: 999px;
 		background: var(--ink);
 		color: var(--bone);
 		text-decoration: none;
 		font-weight: 600;
-		font-size: clamp(0.85rem, 0.78rem + 0.4vw, 1.05rem);
-		word-break: break-word;
+		font-size: clamp(0.85rem, 0.78rem + 0.4vw, 1.02rem);
 		transition:
 			transform 0.18s ease,
 			background 0.18s ease;
 	}
 
-	.hire__mail:hover {
+	.hire__cta:hover {
 		transform: translateY(-2px);
 		background: var(--pomegranate);
 	}
 
-	.hire__tel {
-		font-size: 0.75rem;
-		color: rgba(42, 28, 6, 0.75);
+	.hire__mail {
+		align-self: flex-start;
+		margin-top: 0.1rem;
+		font-size: 0.8rem;
+		color: rgba(42, 28, 6, 0.8);
 		text-decoration-thickness: 1px;
 		text-underline-offset: 3px;
+		padding: 0.45rem 0.9rem;
+		word-break: break-word;
+	}
+
+	.hire__mail:hover {
+		color: var(--pomegranate);
 	}
 
 	.links__list {
@@ -1973,16 +2221,8 @@ const nowISO = new Date().toISOString();
 
 	.js .board.is-in .tile {
 		animation: tile-in 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
-		animation-delay: calc(var(--i, 0) * 45ms - var(--boardbase, 0ms));
+		animation-delay: calc(var(--i, 0) * 45ms);
 		opacity: 1;
-	}
-
-	.board--work .tile {
-		--boardbase: 270ms;
-	}
-
-	.board--about .tile {
-		--boardbase: 675ms;
 	}
 
 	@keyframes tile-in {
@@ -2036,6 +2276,11 @@ const nowISO = new Date().toISOString();
 		.links {
 			grid-column: span 2;
 		}
+
+		.lang {
+			grid-column: span 3;
+			grid-row: span 2;
+		}
 	}
 
 	/* ---------------- responsive: one column ---------------- */
@@ -2078,6 +2323,10 @@ const nowISO = new Date().toISOString();
 
 		.amman {
 			min-height: 11rem;
+		}
+
+		.lidsw {
+			min-height: 7.5rem;
 		}
 
 		.work--tall .work__shot,
@@ -2147,6 +2396,56 @@ const nowISO = new Date().toISOString();
 		.work__foot .work__stack {
 			max-width: 100%;
 		}
+	}
+
+	/* ---------------- Arabic ----------------
+	   Arabic has no capitals and no italics, and letter-spacing breaks the
+	   joins. Everything carrying lang="ar" opts out of all three. */
+
+	[lang='ar'],
+	[lang='ar'] * {
+		font-family: var(--sans);
+		font-style: normal;
+		font-variant: normal;
+		text-transform: none;
+		letter-spacing: normal;
+	}
+
+	[lang='ar'] {
+		line-height: 1.75;
+	}
+
+	[lang='ar'].thesis__h,
+	[lang='ar'] .thesis__h,
+	.thesis__h [lang='ar'],
+	.about__h [lang='ar'],
+	.hire__h [lang='ar'],
+	.device__h [lang='ar'],
+	.board__h [lang='ar'],
+	.who__name [lang='ar'] {
+		line-height: 1.28;
+	}
+
+	/* Bricolage carries no Arabic, so the display weight comes from Plex. */
+	.thesis__h [lang='ar'],
+	.about__h [lang='ar'],
+	.hire__h [lang='ar'],
+	.device__h [lang='ar'],
+	.board__h [lang='ar'],
+	.who__name [lang='ar'],
+	[lang='ar'].archive__count,
+	[lang='ar'].work__title,
+	.lidsw__opt[lang='ar'] {
+		font-weight: 700;
+		letter-spacing: 0;
+	}
+
+	/* The mono face carries no Arabic either. */
+	[lang='ar'].record__when,
+	[lang='ar'].work__status,
+	.mono [lang='ar'],
+	.lbl [lang='ar'] {
+		font-family: var(--sans);
 	}
 
 	/* ---------------- reduced motion ---------------- */

@@ -1,0 +1,590 @@
+---
+/* /7/projects — the sticker sheet.
+
+   Thirty-nine projects, printed as one sheet of die-cut stickers, torn into
+   six perforated panels by what the thing actually is. The panel heading
+   carries the count as a poster numeral, so the shape of four years of work is
+   visible before a single title is read. The eight with a full write-up are
+   printed in reverse — ink stock, sun ink — so they read as the special ones
+   rather than merely the first ones. */
+import Shell from './_shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import type { ProjectCategory, ProjectStatus } from '../../../content/types';
+
+const catLabel: Record<ProjectCategory, ReturnType<typeof s>> = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+	client: s('cat.client'),
+};
+
+const statusLabel: Record<ProjectStatus, ReturnType<typeof s>> = {
+	live: s('status.live'),
+	shipped: s('status.shipped'),
+	delisted: s('status.delisted'),
+	wip: s('status.wip'),
+	archived: s('status.archived'),
+};
+
+/* One line per panel, so a heading of two words is not the whole argument. */
+const catNote: Record<ProjectCategory, ReturnType<typeof pair>> = {
+	web: pair(
+		'Sites and apps that live in a browser tab.',
+		'مواقع وتطبيقات تعيش في تبويب المتصفح.',
+	),
+	mobile: pair(
+		'Built in React Native, shipped through review.',
+		'مبنية بـ React Native، ومرّت مراجعة المتاجر.',
+	),
+	ai: pair(
+		'Models that run on the device, not in a data centre.',
+		'نماذج تعمل على الجهاز، لا في مركز بيانات.',
+	),
+	desktop: pair(
+		'Things that want a keyboard and a real window.',
+		'أدوات تريد لوحة مفاتيح ونافذة حقيقية.',
+	),
+	extension: pair(
+		'Small tools bolted onto an editor.',
+		'أدوات صغيرة تُركَّب على المحرّر.',
+	),
+	client: pair(
+		'Paid work, delivered to someone else’s deadline.',
+		'أعمال بأجر، سُلّمت وفق موعد جهة أخرى.',
+	),
+};
+
+const order: ProjectCategory[] = [
+	'web',
+	'mobile',
+	'ai',
+	'desktop',
+	'client',
+	'extension',
+];
+
+const panels = order
+	.map((cat) => ({ cat, items: projects.filter((p) => p.category === cat) }))
+	.filter((g) => g.items.length > 0)
+	.sort((a, b) => b.items.length - a.items.length);
+
+const hues = ['melon', 'sky', 'bubble', 'sun', 'mint'];
+---
+
+<Shell
+	title="All 39 projects — Haitham Assoli"
+	description="Every project Haitham Assoli has shipped, laid out as a sticker sheet and grouped by what it is: web, mobile, on-device AI, desktop, client work and editor extensions."
+	active="work"
+>
+	<section class="field field--sun sheet-head">
+		<div class="wrap">
+			<T
+				v={pair('The sticker sheet', 'ورقة الملصقات')}
+				as="p"
+				class="eyebrow"
+			/>
+			<T v={s('work.all')} as="h1" class="section__title" />
+			<T v={s('work.allLede')} as="p" class="section__lede" />
+			<T
+				v={pair(
+					'The eight printed in reverse have the long write-up behind them. Every sticker opens its own page.',
+					'الثمانية المطبوعة بالمقلوب وراءها شرح مطوّل. وكل ملصق يفتح صفحته الخاصة.',
+				)}
+				as="p"
+				class="section__lede sheet-head__note"
+			/>
+
+			<div class="filter" role="group" aria-labelledby="filter-title">
+				<span class="vh" id="filter-title">
+					<T v={pair('Filter by kind', 'تصفية حسب النوع')} />
+				</span>
+				<T v={pair('Show me', 'اعرض لي')} as="span" class="filter__label" />
+
+				<button type="button" class="punch" data-cat="all" aria-pressed="true">
+					<T v={pair('Everything', 'كل شيء')} />
+					<span class="punch__n">{projects.length}</span>
+				</button>
+
+				{
+					panels.map((g) => (
+						<button
+							type="button"
+							class="punch"
+							data-cat={g.cat}
+							aria-pressed="false"
+						>
+							<T v={catLabel[g.cat]} />
+							<span class="punch__n">{g.items.length}</span>
+						</button>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<section class="field field--paper sheet" aria-label="All projects">
+		<div class="wrap" id="sheets">
+			{
+				panels.map((g) => (
+					<section class="panel" data-panel={g.cat}>
+						<header class="panel__head">
+							<span class="panel__n" aria-hidden="true">
+								{g.items.length}
+							</span>
+							<div class="panel__words">
+								<T v={catLabel[g.cat]} as="h2" class="panel__title" />
+								<T v={catNote[g.cat]} as="p" class="panel__note" />
+							</div>
+						</header>
+						<ul class="sc-grid">
+							{g.items.map((p, i) => (
+								<li
+									class:list={[
+										'sc',
+										`sc--${hues[i % hues.length]}`,
+										p.featured && 'sc--featured',
+									]}
+									style={`--i:${i}`}
+								>
+									<a class="sc__hit" href={`/7/work/${p.slug}`}>
+										<T v={p.title} as="span" class="sc__title" />
+									</a>
+									<T v={p.tagline} as="p" class="sc__tag" />
+									<span class="sc__foot">
+										<T v={statusLabel[p.status]} as="span" class="sc__pip" />
+										<T
+											v={catLabel[p.category]}
+											as="span"
+											class="sc__pip sc__pip--faint"
+										/>
+										<T
+											v={yearPair(p.year)}
+											as="span"
+											class="sc__pip sc__pip--year"
+										/>
+									</span>
+									{p.featured && (
+										<T
+											v={pair('Full write-up', 'شرح كامل')}
+											as="span"
+											class="sc__flag"
+										/>
+									)}
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+
+			<p class="sheet__empty" hidden id="sheet-empty">
+				<T
+					v={pair(
+						'Nothing on that shelf. Try another one.',
+						'لا شيء على هذا الرفّ. جرّب رفًّا آخر.',
+					)}
+				/>
+			</p>
+		</div>
+	</section>
+
+	<section class="field field--sky sheet-foot">
+		<div class="wrap sheet-foot__grid">
+			<div>
+				<T
+					v={pair('Seen enough?', 'رأيت ما يكفي؟')}
+					as="h2"
+					class="section__title"
+				/>
+				<T
+					v={pair(
+						'Tell me what has to exist, in which languages, and by when. I will tell you what I would build and what I would leave out.',
+						'قل لي ما الذي يجب أن يوجد، وبأي لغات، ومتى. وسأقول لك ما الذي سأبنيه وما الذي سأتركه خارجًا.',
+					)}
+					as="p"
+					class="section__lede"
+				/>
+			</div>
+			<a class="btn btn--sun btn--big" href="/7/hire">
+				<T v={s('hero.cta2')} />
+			</a>
+		</div>
+	</section>
+</Shell>
+
+<script is:inline>
+	(function () {
+		const sheets = document.getElementById('sheets');
+		const empty = document.getElementById('sheet-empty');
+		if (!sheets) return;
+		const buttons = Array.prototype.slice.call(
+			document.querySelectorAll('.punch'),
+		);
+		const panels = Array.prototype.slice.call(
+			sheets.querySelectorAll('[data-panel]'),
+		);
+
+		buttons.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				const want = btn.dataset.cat;
+				buttons.forEach(function (b) {
+					b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+				});
+				let shown = 0;
+				panels.forEach(function (panel) {
+					const on = want === 'all' || panel.dataset.panel === want;
+					panel.hidden = !on;
+					if (on) shown += 1;
+				});
+				if (empty) empty.hidden = shown > 0;
+			});
+		});
+	})();
+</script>
+
+<style is:global>
+	/* ------------------------------ the head ------------------------------ */
+
+	.playroom .sheet-head__note {
+		font-size: 0.95rem;
+		margin-top: 0.6rem;
+	}
+
+	.filter {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: clamp(1.75rem, 4vw, 2.5rem);
+	}
+
+	.filter__label {
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		margin-inline-end: 0.35rem;
+	}
+
+	.filter__label[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.85rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.punch {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding-block: 0.4rem;
+		padding-inline: 0.9rem 0.5rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--pill);
+		background: var(--paper);
+		box-shadow: var(--s1);
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: 0.92rem;
+		cursor: pointer;
+		transition:
+			transform 0.2s var(--spring),
+			box-shadow 0.2s var(--spring),
+			background-color 0.2s var(--snap);
+	}
+
+	.punch [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+	}
+
+	.punch:hover {
+		transform: translate(calc(var(--dx) * 2px), -2px);
+		box-shadow: var(--s2);
+	}
+
+	.punch:active {
+		transform: translate(calc(var(--dx) * -3px), 3px);
+		box-shadow: var(--s0);
+	}
+
+	.punch__n {
+		display: inline-grid;
+		place-items: center;
+		min-width: 1.6rem;
+		padding: 0.1rem 0.35rem;
+		border-radius: var(--pill);
+		background: var(--ink);
+		color: var(--sun);
+		font-family: var(--mono);
+		font-size: 0.7rem;
+	}
+
+	.punch[aria-pressed='true'] {
+		background: var(--ink);
+		color: var(--sun);
+	}
+
+	.punch[aria-pressed='true'] .punch__n {
+		background: var(--sun);
+		color: var(--ink);
+	}
+
+	/* ------------------------------- panels ------------------------------- */
+
+	.panel:not([hidden]) ~ .panel:not([hidden]) {
+		margin-top: clamp(2.5rem, 6vw, 4rem);
+		padding-top: clamp(2rem, 5vw, 3rem);
+		border-top: var(--b) dashed var(--ink);
+	}
+
+	.panel__head {
+		display: flex;
+		align-items: center;
+		gap: clamp(0.9rem, 2.5vw, 1.5rem);
+		margin-bottom: clamp(1.25rem, 3vw, 1.9rem);
+	}
+
+	.panel__n {
+		flex: none;
+		display: grid;
+		place-items: center;
+		min-width: clamp(3.4rem, 9vw, 5rem);
+		padding: 0.2rem 0.5rem 0.35rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		background: var(--sun);
+		box-shadow: var(--s2);
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(2rem, 6vw, 3.2rem);
+		font-variation-settings: 'wdth' 78;
+		line-height: 1;
+		transform: rotate(-2deg);
+	}
+
+	.panel:nth-child(even) .panel__n {
+		background: var(--mint);
+		transform: rotate(2deg);
+	}
+
+	.panel__title {
+		font-size: clamp(1.5rem, 4vw, 2.4rem);
+		font-variation-settings: 'wdth' 88;
+	}
+
+	.panel__note {
+		margin-top: 0.35rem;
+		font-size: 0.92rem;
+		max-width: 46ch;
+	}
+
+	/* ------------------------------ stickers ------------------------------ */
+
+	.sc-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+		grid-auto-flow: dense;
+		gap: clamp(0.85rem, 2.2vw, 1.35rem);
+	}
+
+	.sc {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1rem 1.05rem 0.9rem;
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		background: var(--paper);
+		box-shadow: var(--s2);
+		transition:
+			transform 0.3s var(--spring),
+			box-shadow 0.3s var(--spring);
+	}
+
+	.sc:nth-child(odd) {
+		transform: rotate(-1deg);
+	}
+	.sc:nth-child(even) {
+		transform: rotate(0.9deg);
+	}
+
+	.sc:hover,
+	.sc:focus-within {
+		transform: rotate(0deg) translateY(-6px);
+		box-shadow: var(--s3);
+		z-index: 2;
+	}
+
+	.sc--melon {
+		background: var(--melon);
+	}
+	.sc--sky {
+		background: var(--sky);
+		color: var(--paper);
+	}
+	.sc--bubble {
+		background: var(--bubble);
+	}
+	.sc--sun {
+		background: var(--sun);
+	}
+	.sc--mint {
+		background: var(--mint);
+	}
+
+	/* Reverse stock: the eight with a case study behind them. */
+	.sc--featured {
+		background: var(--ink);
+		color: var(--sun);
+		box-shadow: var(--s3);
+	}
+
+	.sc--featured:hover,
+	.sc--featured:focus-within {
+		box-shadow: var(--s4);
+	}
+
+	@media (min-width: 34rem) {
+		.sc--featured {
+			grid-column: span 2;
+		}
+	}
+
+	.sc__hit {
+		text-decoration: none;
+	}
+
+	.sc__hit::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: var(--r2);
+	}
+
+	.sc__title {
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: 1.3rem;
+		line-height: 1.05;
+		letter-spacing: -0.02em;
+		font-variation-settings: 'wdth' 88;
+	}
+
+	.sc__title[lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
+		font-size: 1.55rem;
+		line-height: 1.25;
+		font-variation-settings: normal;
+	}
+
+	.sc--featured .sc__title {
+		font-size: clamp(1.5rem, 3.4vw, 2rem);
+	}
+
+	.sc__pip--year {
+		border-style: dashed;
+		opacity: 0.85;
+	}
+
+	.sc__tag {
+		font-size: 0.88rem;
+		line-height: 1.45;
+	}
+
+	.sc--featured .sc__tag {
+		font-size: 0.98rem;
+		max-width: 44ch;
+		color: var(--paper);
+	}
+
+	.sc__foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-top: auto;
+		padding-top: 0.35rem;
+	}
+
+	.sc__pip {
+		padding: 0.15rem 0.55rem;
+		border: 2px solid currentcolor;
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.64rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.sc__pip[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.72rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.sc__pip--faint {
+		opacity: 0.7;
+	}
+
+	.sc__flag {
+		position: absolute;
+		inset-block-start: -0.7rem;
+		inset-inline-start: 1rem;
+		padding: 0.2rem 0.7rem;
+		background: var(--melon);
+		color: var(--ink);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.62rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		transform: rotate(-3deg);
+	}
+
+	.sc__flag[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.72rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.sheet__empty {
+		margin-top: 2rem;
+		font-family: var(--mono);
+	}
+
+	/* ------------------------------- the tail ------------------------------- */
+
+	.sheet-foot__grid {
+		display: grid;
+		gap: clamp(1.5rem, 4vw, 2.5rem);
+		align-items: center;
+	}
+
+	@media (min-width: 780px) {
+		.sheet-foot__grid {
+			grid-template-columns: minmax(0, 1fr) auto;
+		}
+	}
+
+	.sheet-foot .section__title {
+		font-size: clamp(1.7rem, 4.4vw, 2.8rem);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.playroom :is(.sc, .punch):is(:hover, :focus-within) {
+			transform: none;
+		}
+	}
+</style>

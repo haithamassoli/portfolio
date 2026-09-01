@@ -1,14 +1,18 @@
 ---
 import { Image } from 'astro:assets';
+import Shell from './7/_shell.astro';
+import T from '../components/T.astro';
 import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
-import StyleSwitcher from '../components/StyleSwitcher.astro';
+import { s, pair, yearPair } from '../data/variant-ui';
 import profilePhoto from '../assets/images/profile.png';
+import type { I18n, ProjectCategory, ProjectStatus } from '../../content/types';
 
-/* The hero toy. Front faces spell HAITHAM left to right; back faces spell
+/* The signature toy. Front faces spell HAITHAM left to right; back faces spell
    العسولي right to left. Seven tiles either way, so the board mirrors without
-   changing shape — which is the whole argument the page is making. */
+   changing shape. The lever no longer flips a demo: it changes the language of
+   the whole page, and the tiles turn over because the page turned over. */
 const tiles = [
 	{ en: 'H', ar: 'ا', hue: 'melon' },
 	{ en: 'A', ar: 'ل', hue: 'sky' },
@@ -21,766 +25,500 @@ const tiles = [
 
 /* Five counters, five true numbers. */
 const counters = [
-	{ n: '39', label: 'things shipped', hue: 'sun' },
-	{ n: '13', label: 'of them in the app stores', hue: 'melon' },
-	{ n: '8', label: 'written up in full', hue: 'bubble' },
-	{ n: '4', label: 'years of building, roughly', hue: 'mint' },
-	{ n: '2', label: 'scripts, both first-class', hue: 'sky' },
+	{ n: '39', label: s('stat.shipped'), hue: 'sun' },
+	{ n: '13', label: s('stat.stores'), hue: 'melon' },
+	{
+		n: '8',
+		label: pair('written up in full', 'مشروحة بالكامل'),
+		hue: 'bubble',
+	},
+	{ n: '4', label: s('stat.years'), hue: 'mint' },
+	{
+		n: '2',
+		label: pair('scripts, both first-class', 'لغتان، كلتاهما أصلية'),
+		hue: 'sky',
+	},
 ];
 
 /* Card colours come from this page's palette, not from the project accents,
-   so eight loud cards still read as one set. Cycle of five: no two neighbours
-   in the two-column grid land on the same colour. */
+   so eight loud cards still read as one set. */
 const hues = ['melon', 'sky', 'bubble', 'sun', 'ink'];
 
-const statusLabel: Record<string, string> = {
-	live: 'Live',
-	shipped: 'Shipped',
-	delisted: 'Delisted',
-	wip: 'In progress',
-	archived: 'Archived',
+const catLabel: Record<ProjectCategory, I18n> = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+	client: s('cat.client'),
 };
 
-const linkLabel: Record<string, string> = {
-	live: 'Visit',
-	github: 'Code',
-	appStore: 'App Store',
-	playGoogle: 'Google Play',
-	vscode: 'VS Code',
+const statusLabel: Record<ProjectStatus, I18n> = {
+	live: s('status.live'),
+	shipped: s('status.shipped'),
+	delisted: s('status.delisted'),
+	wip: s('status.wip'),
+	archived: s('status.archived'),
 };
+
+const linkLabel: Record<string, I18n> = {
+	live: s('project.live'),
+	playGoogle: s('project.play'),
+	appStore: s('project.apple'),
+	vscode: s('project.vscode'),
+	github: s('project.github'),
+};
+
+const about = profile.about.en.map((en, i) => ({
+	en,
+	ar: profile.about.ar[i] ?? en,
+}));
 
 const rest = projects.filter((p) => !p.featured);
 
-const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Building something together')}`;
-
 const elsewhere = [
-	{ label: 'GitHub', href: profile.links.github, hue: 'sun' },
-	{ label: 'LinkedIn', href: profile.links.linkedin, hue: 'mint' },
-	{ label: 'assoli.site', href: profile.links.website, hue: 'bubble' },
-	{ label: 'The CV', href: profile.links.resume, hue: 'sky' },
-	{ label: 'Google Play', href: profile.links.playStore, hue: 'sun' },
+	{ label: pair('GitHub', 'GitHub'), href: profile.links.github, hue: 'sun' },
+	{
+		label: pair('LinkedIn', 'LinkedIn'),
+		href: profile.links.linkedin,
+		hue: 'mint',
+	},
+	{
+		label: pair('assoli.site', 'assoli.site'),
+		href: profile.links.website,
+		hue: 'bubble',
+	},
+	{ label: s('nav.cv'), href: profile.links.resume, hue: 'sky' },
+	{ label: s('project.play'), href: profile.links.playStore, hue: 'sun' },
 ];
 ---
 
-<!doctype html>
-<html lang="en" dir="ltr">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — every screen has to work twice</title>
-		<meta
-			name="description"
-			content="Haitham Assoli builds bilingual web and mobile products in Amman: React Native and Expo on both stores, Next.js and Astro on the web, and on-device AI that never phones home."
-		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@700&family=Lalezar&display=swap"
-			rel="stylesheet"
-		/>
-		<script is:inline>
-			document.documentElement.classList.add('js');
-		</script>
-	</head>
+<Shell
+	title="Haitham Assoli — every screen has to work twice"
+	description="Haitham Assoli builds bilingual web and mobile products in Amman: React Native and Expo on both stores, Next.js and Astro on the web, and on-device AI that never phones home."
+	active="home"
+>
+	<!-- ============================== HERO ============================== -->
+	<section class="field field--sun hero" id="hero">
+		<div class="hero__glow" aria-hidden="true"></div>
 
-	<body class="playroom">
-		<a class="skip" href="#work">Skip to the work</a>
+		<div class="wrap hero__grid">
+			<div class="hero__text">
+				<p class="whoami">
+					<T
+						v={pair('Haitham Assoli', 'هيثم العسولي')}
+						as="span"
+						class="whoami__sticker"
+					/>
+					<T v={s('hero.role')} as="span" class="whoami__role" />
+				</p>
 
-		<main id="top">
-			<!-- ============================ HERO ============================ -->
-			<header class="hero field field--sun" id="hero">
-				<div class="hero__glow" aria-hidden="true"></div>
+				<h1 class="thesis" data-l="en" lang="en">
+					Every screen I build has to work <span class="stretch">twice</span>.
+				</h1>
+				<h1 class="thesis" data-l="ar" lang="ar">
+					كل شاشة أبنيها لا بد أن تعمل <span class="stretch">مرتين</span>.
+				</h1>
 
-				<div class="wrap hero__grid">
-					<div class="hero__text">
-						<p class="whoami">
-							<span class="whoami__sticker">Haitham Assoli</span>
-							<span class="whoami__role"
-								>Web &amp; mobile full-stack engineer, Amman, Jordan</span
-							>
-						</p>
+				<T
+					v={pair(
+						'Once in English, running left to right. Once in Arabic, running right to left. Same product, flipped on its axis — and a mirrored interface is a different interface, not a translation. Four years of that: 39 shipped, 13 of them sitting in the app stores.',
+						'مرة بالإنجليزية من اليسار إلى اليمين، ومرة بالعربية من اليمين إلى اليسار. المنتج نفسه مقلوبًا على محوره — والواجهة المنعكسة واجهة أخرى، لا ترجمة. أربع سنوات من هذا: 39 مشروعًا صدرت، 13 منها على متاجر التطبيقات.',
+					)}
+					as="p"
+					class="lede"
+				/>
 
-						<h1 class="thesis">
-							Every screen I build has to work <span class="stretch">twice</span
-							>.
-						</h1>
+				<div class="cta-row">
+					<a class="btn btn--melon" href="/7/hire">
+						<T v={s('hero.cta2')} />
+					</a>
+					<a class="btn btn--ghost" href="#work">
+						<T v={s('hero.cta')} />
+					</a>
+				</div>
+			</div>
 
-						<p class="lede">
-							Once in English, running left to right. Once in Arabic, running
-							right to left. Same product, flipped on its axis — and a mirrored
-							interface is a <em>different</em> interface, not a translation. Four
-							years of that: 39 shipped, 13 of them sitting in the app stores.
-						</p>
+			<div class="hero__photo">
+				<Image
+					class="photo"
+					src={profilePhoto}
+					alt="Haitham Assoli"
+					widths={[240, 480]}
+					sizes="240px"
+					loading="eager"
+				/>
+				<T
+					v={pair("that's me", 'هذا أنا')}
+					as="span"
+					class="photo__tag"
+					aria-hidden="true"
+				/>
+			</div>
+		</div>
 
-						<div class="cta-row">
-							<a class="btn btn--melon" href={mailto}>Email me</a>
-							<a class="btn btn--ghost" href="#work">See the work</a>
-						</div>
-					</div>
-
-					<div class="hero__photo">
-						<Image
-							class="photo"
-							src={profilePhoto}
-							alt="Haitham Assoli"
-							widths={[240, 480]}
-							sizes="240px"
-							loading="eager"
-						/>
-						<span class="photo__tag" aria-hidden="true">that's me</span>
-					</div>
+		<!-- ------------------------ the signature toy ------------------------ -->
+		<div class="wrap">
+			<section class="toy">
+				<div class="toy__head">
+					<T
+						v={pair('Pull the lever', 'اسحب الذراع')}
+						as="h2"
+						class="toy__title"
+					/>
+					<T
+						v={pair(
+							'Seven tiles, two scripts, one board. Pull the lever and the whole page changes language: the tiles turn over, the layout crosses to the other side, and every shadow falls the other way.',
+							'سبع قطع، ولغتان، ولوح واحد. اسحب الذراع فتتبدّل لغة الصفحة كلها: تنقلب القطع، وينتقل التخطيط إلى الجهة الأخرى، ويميل كل ظلّ في الاتجاه المعاكس.',
+						)}
+						as="p"
+						class="toy__note"
+					/>
 				</div>
 
-				<!-- ---------------------- the signature toy ---------------------- -->
-				<div class="wrap">
-					<section class="toy" aria-labelledby="toy-title">
-						<div class="toy__head">
-							<h2 class="toy__title" id="toy-title">Pull the lever</h2>
-							<p class="toy__note">
-								Seven tiles, two scripts, one board. Poke a tile to flip it, or
-								throw the whole thing into right-to-left and watch the layout,
-								the letters and the shadows change sides at once.
-							</p>
-						</div>
+				<div class="toy__board">
+					<ul class="tiles" aria-hidden="true">
+						{
+							tiles.map((t, i) => (
+								<li class={`tile tile--${t.hue}`} style={`--i:${i}`}>
+									<span class="tile__flip">
+										<span class="tile__face tile__face--en">{t.en}</span>
+										<span class="tile__face tile__face--ar">{t.ar}</span>
+									</span>
+								</li>
+							))
+						}
+					</ul>
 
-						<div class="toy__board" id="board">
-							<div class="tiles" id="tiles">
-								{
-									tiles.map((t, i) => (
-										<button
-											type="button"
-											class={`tile tile--${t.hue}`}
-											style={`--i:${i}`}
-											data-tile
-											aria-pressed="false"
-											aria-label={`Flip tile ${i + 1}: ${t.en} to ${t.ar}`}
-										>
-											<span
-												class="tile__face tile__face--en"
-												aria-hidden="true"
-											>
-												{t.en}
-											</span>
-											<span
-												class="tile__face tile__face--ar"
-												aria-hidden="true"
-											>
-												{t.ar}
-											</span>
-										</button>
-									))
-								}
-							</div>
-
-							<button
-								type="button"
-								class="lever"
-								id="lever"
-								aria-pressed="false"
-								aria-controls="board"
-							>
-								<span class="lever__knob" aria-hidden="true"></span>
-								<span
-									class="lever__label"
-									data-off="Mirror it"
-									data-on="Put it back">Mirror it</span
-								>
-							</button>
-						</div>
-
-						<p class="toy__caption">
-							<span class="latin">HAITHAM</span>
-							<span class="toy__arrow" aria-hidden="true">⇄</span>
-							<span class="arabic">العسولي</span>
-						</p>
-					</section>
+					<button type="button" class="lever lever--big" data-lang-toggle>
+						<span class="vh" data-l="en" lang="en"
+							>Read this page in Arabic</span
+						>
+						<span class="vh" data-l="ar" lang="ar"
+							>اقرأ هذه الصفحة بالإنجليزية</span
+						>
+						<span class="lever__track" aria-hidden="true">
+							<span class="lever__knob"></span>
+							<span class="lever__side lever__side--en">EN</span>
+							<span class="lever__side lever__side--ar">ع</span>
+						</span>
+					</button>
 				</div>
+
+				<p class="toy__caption">
+					<span class="latin" dir="ltr">HAITHAM</span>
+					<span class="toy__arrow" aria-hidden="true">⇄</span>
+					<span class="arabic" lang="ar" dir="rtl">العسولي</span>
+				</p>
+			</section>
+		</div>
+	</section>
+
+	<!-- ============================ COUNTERS ============================ -->
+	<section class="field field--ink counters">
+		<div class="wrap">
+			<T
+				v={pair('The scoreboard', 'لوحة النتائج')}
+				as="h2"
+				class="section__title counters__title"
+			/>
+			<ul class="counter-row">
+				{
+					counters.map((c, i) => (
+						<li class={`counter counter--${c.hue}`} style={`--i:${i}`}>
+							<span class="counter__n">{c.n}</span>
+							<T v={c.label} as="span" class="counter__label" />
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<!-- ============================== WORK ============================== -->
+	<section class="field field--mint work" id="work">
+		<div class="wrap">
+			<header class="section__head">
+				<T v={pair('The shelf', 'الرفّ')} as="p" class="eyebrow" />
+				<T
+					v={pair('Eight I would hand you first', 'ثمانية أقدّمها أولًا')}
+					as="h2"
+					class="section__title"
+				/>
+				<T
+					v={pair(
+						'Thirty-nine shipped in all. These eight carry the full write-up: what it had to do, what it cost, and what I would do differently.',
+						'تسعة وثلاثون مشروعًا في المجموع. هذه الثمانية تحمل الشرح الكامل: ما كان مطلوبًا منها، وما كلّفته، وما كنت سأفعله على نحو آخر.',
+					)}
+					as="p"
+					class="section__lede"
+				/>
 			</header>
 
-			<!-- =========================== COUNTERS =========================== -->
-			<section class="field field--ink counters" aria-labelledby="count-title">
-				<div class="wrap">
-					<h2 class="section__title" id="count-title">The scoreboard</h2>
-					<ul class="counter-row">
-						{
-							counters.map((c, i) => (
-								<li class={`counter counter--${c.hue}`} style={`--i:${i}`}>
-									<span class="counter__n">{c.n}</span>
-									<span class="counter__label">{c.label}</span>
-								</li>
-							))
-						}
-					</ul>
-				</div>
-			</section>
-
-			<!-- ============================= WORK ============================= -->
-			<section
-				class="field field--mint work"
-				id="work"
-				aria-labelledby="work-title"
-			>
-				<div class="wrap">
-					<header class="section__head">
-						<p class="eyebrow">The shelf</p>
-						<h2 class="section__title" id="work-title">
-							Eight I'd hand you first
-						</h2>
-						<p class="section__lede">
-							Thirty-nine shipped in all. These eight have the full write-up:
-							what it had to do, what it cost, and what I'd do differently.
-						</p>
-					</header>
-
-					<ul class="cards">
-						{
-							featured.map((p, i) => (
-								<li
-									class={`card card--${hues[i % hues.length]}`}
-									style={`--i:${i}`}
-								>
-									<div class="card__bar">
-										<h3 class="card__title">
-											<a href={`/work/${p.slug}`}>{p.title.en}</a>
-										</h3>
-										<span class="card__year">{p.year}</span>
-									</div>
-
-									<div class="card__body">
-										{p.image && (
-											<div class="card__shot">
-												<Image
-													src={p.image}
-													alt={`${p.title.en} — ${p.tagline.en}`}
-													widths={[360, 720]}
-													sizes="(min-width: 860px) 38vw, 88vw"
-													loading="lazy"
-												/>
-											</div>
-										)}
-
-										<p class="card__tagline">{p.tagline.en}</p>
-										<p class="card__summary">{p.summary.en}</p>
-
-										<p class="card__role">{p.role.en}</p>
-
-										<ul class="chips">
-											{p.stack.slice(0, 5).map((s) => (
-												<li class="chip">{s}</li>
-											))}
-										</ul>
-
-										<div class="card__foot">
-											<span class="sticker sticker--sm">
-												{statusLabel[p.status] ?? p.status}
-											</span>
-											<span class="sticker sticker--sm sticker--plain">
-												{p.category}
-											</span>
-											{Object.entries(p.links).map(([k, url]) =>
-												url ? (
-													<a class="link-pill" href={url as string}>
-														{linkLabel[k] ?? k}
-													</a>
-												) : null,
-											)}
-										</div>
-									</div>
-								</li>
-							))
-						}
-					</ul>
-
-					<div class="spill">
-						<h3 class="spill__title">The other {rest.length}, tipped out</h3>
-						<ul class="spill__list">
-							{
-								rest.map((p, i) => (
-									<li style={`--i:${i}`}>
-										<a class="spill__chip" href={`/work/${p.slug}`}>
-											{p.title.en}
-										</a>
-									</li>
-								))
-							}
-						</ul>
-						<a class="btn btn--ink" href="/work">Open the whole shelf</a>
-					</div>
-				</div>
-			</section>
-
-			<!-- ============================ ABOUT ============================ -->
-			<section
-				class="field field--bubble about"
-				id="about"
-				aria-labelledby="about-title"
-			>
-				<div class="wrap about__grid">
-					<div class="about__text">
-						<p class="eyebrow">Who's doing the building</p>
-						<h2 class="section__title" id="about-title">
-							{profile.name.en}
-							<span class="about__ar" lang="ar" dir="rtl"
-								>{profile.name.ar}</span
-							>
-						</h2>
-
-						{profile.about.en.map((para) => <p class="about__para">{para}</p>)}
-
-						<p class="about__where">
-							{profile.title.en} · {profile.location.en}
-						</p>
-					</div>
-
-					<div class="about__stack">
-						<h3 class="mini-title">Where the hours went</h3>
-						<ul class="jobs">
-							{
-								profile.experience.map((job) => (
-									<li class="job">
-										<span class="job__co">{job.company.en}</span>
-										<span class="job__role">{job.role.en}</span>
-										<span class="job__when">{job.period}</span>
-									</li>
-								))
-							}
-						</ul>
-
-						<h3 class="mini-title">School</h3>
-						<ul class="jobs jobs--school">
-							{
-								profile.education.map((ed) => (
-									<li class="job">
-										<span class="job__co">{ed.school.en}</span>
-										<span class="job__role">{ed.degree.en}</span>
-										<span class="job__when">
-											{ed.period}
-											{ed.note ? ` · ${ed.note.en}` : ''}
-										</span>
-									</li>
-								))
-							}
-						</ul>
-					</div>
-				</div>
-			</section>
-
-			<!-- =========================== TOOLBOX =========================== -->
-			<section class="field field--sky toolbox" aria-labelledby="tools-title">
-				<div class="wrap">
-					<header class="section__head">
-						<p class="eyebrow">The toy chest</p>
-						<h2 class="section__title" id="tools-title">What I reach for</h2>
-						<p class="section__lede">
-							Roughly in the order it shows up in the work. TypeScript at the
-							front because it is in nearly all of it.
-						</p>
-					</header>
-
-					<ul class="tools">
-						{
-							toolbox.map((tool, i) => (
-								<li class="tool" style={`--i:${i}`}>
-									{tool}
-								</li>
-							))
-						}
-					</ul>
-
-					<div class="lately">
-						<h3 class="mini-title mini-title--light">And lately, on-device</h3>
-						<ul class="tools tools--alt">
-							{
-								profile.skills.ai.map((tool, i) => (
-									<li class="tool tool--alt" style={`--i:${i}`}>
-										{tool}
-									</li>
-								))
-							}
-						</ul>
-						<p class="lately__note">
-							Video and audio processed entirely on the user's phone or laptop.
-							No cloud, no account, no telemetry.
-						</p>
-					</div>
-				</div>
-			</section>
-
-			<!-- ============================= HIRE ============================= -->
-			<section
-				class="field field--melon hire"
-				id="hire"
-				aria-labelledby="hire-title"
-			>
-				<div class="wrap hire__grid">
-					<div>
-						<p class="eyebrow">Open box</p>
-						<h2 class="section__title" id="hire-title">
-							Got something that has to ship twice?
-						</h2>
-						<p class="section__lede hire__lede">
-							Tell me what it has to do and who reads it in which direction.
-							I'll tell you what I'd build, how long it takes, and what I'd cut.
-						</p>
-
-						<div class="cta-row">
-							<a class="btn btn--ink btn--big" href={mailto}>
-								{profile.email}
-							</a>
-							<a
-								class="btn btn--ghost"
-								href={`tel:${profile.phone.replace(/\s/g, '')}`}
-							>
-								{profile.phone}
-							</a>
-						</div>
-					</div>
-
-					<ul class="elsewhere">
-						{
-							elsewhere.map((l, i) => (
-								<li style={`--i:${i}`}>
-									<a class={`slab slab--${l.hue}`} href={l.href}>
-										{l.label}
-										<span class="slab__arrow" aria-hidden="true">
-											→
-										</span>
+			<ul class="cards">
+				{
+					featured.map((p, i) => (
+						<li
+							class={`card card--${hues[i % hues.length]}`}
+							style={`--i:${i}`}
+						>
+							<div class="card__bar">
+								<h3 class="card__title">
+									<a href={`/7/work/${p.slug}`}>
+										<T v={p.title} />
 									</a>
-								</li>
-							))
-						}
-					</ul>
-				</div>
-			</section>
-		</main>
+								</h3>
+								<T v={yearPair(p.year)} as="span" class="card__year" />
+							</div>
 
-		<footer class="field field--ink foot">
-			<div class="wrap foot__grid">
-				<p class="foot__name">
-					<span>Haitham Assoli</span>
-					<span class="arabic" lang="ar" dir="rtl">هيثم العسولي</span>
+							<div class="card__body">
+								{p.image && (
+									<div class="card__shot">
+										<Image
+											src={p.image}
+											alt={`${p.title.en}: ${p.tagline.en}`}
+											widths={[360, 720]}
+											sizes="(min-width: 860px) 38vw, 88vw"
+											loading="lazy"
+										/>
+									</div>
+								)}
+
+								<T v={p.tagline} as="p" class="card__tagline" />
+								<T v={p.summary} as="p" class="card__summary" />
+								<T v={p.role} as="p" class="card__role" />
+
+								<ul class="chips">
+									{p.stack.slice(0, 5).map((tool) => (
+										<li class="chip">{tool}</li>
+									))}
+								</ul>
+
+								<div class="card__foot">
+									<T v={statusLabel[p.status]} as="span" class="sticker" />
+									<T
+										v={catLabel[p.category]}
+										as="span"
+										class="sticker sticker--plain"
+									/>
+									{Object.entries(p.links).map(([k, url]) =>
+										url ? (
+											<a class="link-pill" href={url as string}>
+												<T v={linkLabel[k] ?? pair(k, k)} />
+											</a>
+										) : null,
+									)}
+								</div>
+							</div>
+						</li>
+					))
+				}
+			</ul>
+
+			<div class="spill">
+				<T
+					v={pair(
+						`The other ${rest.length}, tipped out of the box`,
+						`البقية، وعددها ${rest.length}، مكبوبة من الصندوق`,
+					)}
+					as="h3"
+					class="spill__title"
+				/>
+				<ul class="spill__list">
+					{
+						rest.map((p, i) => (
+							<li style={`--i:${i}`}>
+								<a class="spill__chip" href={`/7/work/${p.slug}`}>
+									<T v={p.title} />
+								</a>
+							</li>
+						))
+					}
+				</ul>
+				<a class="btn btn--ink" href="/7/projects">
+					<T v={pair('Open the whole shelf', 'افتح الرفّ كاملًا')} />
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ============================= ABOUT ============================= -->
+	<section class="field field--bubble about" id="about">
+		<div class="wrap about__grid">
+			<div class="about__text">
+				<T
+					v={pair("Who's doing the building", 'من يبني')}
+					as="p"
+					class="eyebrow"
+				/>
+				<h2 class="section__title">
+					<span class="latin" dir="ltr">{profile.name.en}</span>
+					<span class="about__ar" lang="ar" dir="rtl">{profile.name.ar}</span>
+				</h2>
+
+				{about.map((para) => <T v={para} as="p" class="about__para" />)}
+
+				<p class="about__where">
+					<T v={profile.title} />
+					<span aria-hidden="true"> · </span>
+					<T v={profile.location} />
 				</p>
-				<p class="foot__note">
-					Built in Amman with Astro and hand-written CSS. Every colour on this
-					page is one of six.
-				</p>
-				<ul class="foot__links">
-					<li><a href="#top">Back to the top</a></li>
-					<li><a href="/work">All 39 projects</a></li>
-					<li><a href={profile.links.github}>GitHub</a></li>
-					<li><a href={mailto}>Email</a></li>
+			</div>
+
+			<div class="about__stack">
+				<T
+					v={pair('Where the hours went', 'أين ذهبت الساعات')}
+					as="h3"
+					class="mini-title"
+				/>
+				<ul class="jobs">
+					{
+						profile.experience.map((job) => (
+							<li class="job">
+								<T v={job.company} as="span" class="job__co" />
+								<T v={job.role} as="span" class="job__role" />
+								<T v={yearPair(job.period)} as="span" class="job__when" />
+							</li>
+						))
+					}
+				</ul>
+
+				<T v={pair('School', 'الدراسة')} as="h3" class="mini-title" />
+				<ul class="jobs jobs--school">
+					{
+						profile.education.map((ed) => (
+							<li class="job">
+								<T v={ed.school} as="span" class="job__co" />
+								<T v={ed.degree} as="span" class="job__role" />
+								<T v={yearPair(ed.period)} as="span" class="job__when" />
+								{ed.note && <T v={ed.note} as="span" class="job__when" />}
+							</li>
+						))
+					}
 				</ul>
 			</div>
-		</footer>
+		</div>
+	</section>
 
-		<script is:inline>
-			(function () {
-				const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-				const board = document.getElementById('board');
-				const lever = document.getElementById('lever');
-				const tiles = Array.prototype.slice.call(
-					document.querySelectorAll('[data-tile]'),
-				);
+	<!-- ============================ TOOLBOX ============================ -->
+	<section class="field field--sky toolbox">
+		<div class="wrap">
+			<header class="section__head">
+				<T v={pair('The toy chest', 'صندوق العدّة')} as="p" class="eyebrow" />
+				<T v={s('about.stackTitle')} as="h2" class="section__title" />
+				<T v={s('about.stackLede')} as="p" class="section__lede" />
+			</header>
 
-				function setTile(el, on) {
-					el.classList.toggle('is-flipped', on);
-					el.setAttribute('aria-pressed', on ? 'true' : 'false');
+			<ul class="tools">
+				{
+					toolbox.map((tool, i) => (
+						<li class="tool" style={`--i:${i}`} dir="ltr">
+							{tool}
+						</li>
+					))
 				}
+			</ul>
 
-				tiles.forEach(function (el) {
-					el.addEventListener('click', function () {
-						setTile(el, el.getAttribute('aria-pressed') !== 'true');
-					});
-				});
+			<div class="lately">
+				<T
+					v={pair('And lately, on the device', 'ومؤخرًا، على الجهاز نفسه')}
+					as="h3"
+					class="mini-title mini-title--light"
+				/>
+				<ul class="tools tools--alt">
+					{
+						profile.skills.ai.map((tool, i) => (
+							<li class="tool tool--alt" style={`--i:${i}`} dir="ltr">
+								{tool}
+							</li>
+						))
+					}
+				</ul>
+				<T
+					v={pair(
+						"Video and audio processed entirely on the user's phone or laptop. No cloud, no account, no telemetry.",
+						'معالجة الفيديو والصوت تجري بالكامل على هاتف المستخدم أو حاسوبه. بلا سحابة، وبلا حساب، وبلا تتبّع.',
+					)}
+					as="p"
+					class="lately__note"
+				/>
+			</div>
+		</div>
+	</section>
 
-				if (lever && board) {
-					lever.addEventListener('click', function () {
-						const on = lever.getAttribute('aria-pressed') !== 'true';
-						lever.setAttribute('aria-pressed', on ? 'true' : 'false');
-						board.classList.toggle('is-mirrored', on);
-						board.setAttribute('dir', on ? 'rtl' : 'ltr');
-						const label = lever.querySelector('.lever__label');
-						if (label)
-							label.textContent = label.dataset[on ? 'on' : 'off'] || '';
-						tiles.forEach(function (el, i) {
-							setTimeout(
-								function () {
-									setTile(el, on);
-								},
-								reduce.matches ? 0 : i * 55,
-							);
-						});
-					});
+	<!-- ============================== HIRE ============================== -->
+	<section class="field field--melon hire" id="hire">
+		<div class="wrap hire__grid">
+			<div>
+				<T v={pair('Open box', 'الصندوق مفتوح')} as="p" class="eyebrow" />
+				<T
+					v={pair(
+						'Got something that has to ship twice?',
+						'عندك شيء لا بد أن يصدر بلغتين؟',
+					)}
+					as="h2"
+					class="section__title"
+				/>
+				<T
+					v={pair(
+						'Tell me what it has to do and who reads it in which direction. I will tell you what I would build, how long it takes, and what I would cut.',
+						'قل لي ما المطلوب منه، ومن يقرؤه وبأي اتجاه. وسأقول لك ما الذي سأبنيه، وكم يستغرق، وما الذي سأستغني عنه.',
+					)}
+					as="p"
+					class="section__lede hire__lede"
+				/>
+
+				<div class="cta-row">
+					<a class="btn btn--ink btn--big" href="/7/hire">
+						<T v={pair('Fill in the brief', 'املأ الطلب')} />
+					</a>
+					<a class="btn btn--ghost ltr" href={`mailto:${profile.email}`}>
+						{profile.email}
+					</a>
+				</div>
+			</div>
+
+			<ul class="elsewhere">
+				{
+					elsewhere.map((l, i) => (
+						<li style={`--i:${i}`}>
+							<a class={`slab slab--${l.hue}`} href={l.href}>
+								<T v={l.label} />
+								<span class="slab__arrow" aria-hidden="true">
+									→
+								</span>
+							</a>
+						</li>
+					))
 				}
+			</ul>
+		</div>
+	</section>
+</Shell>
 
-				/* The cursor moves the light: shadows on the hero lean away from it. */
-				const hero = document.getElementById('hero');
-				if (hero && window.matchMedia('(pointer: fine)').matches) {
-					hero.addEventListener('pointermove', function (e) {
-						if (reduce.matches) return;
-						const r = hero.getBoundingClientRect();
-						hero.style.setProperty(
-							'--mx',
-							((e.clientX - r.left) / r.width).toFixed(3),
-						);
-						hero.style.setProperty(
-							'--my',
-							((e.clientY - r.top) / r.height).toFixed(3),
-						);
-					});
-				}
-			})();
-		</script>
-
-		<StyleSwitcher n={7} />
-	</body>
-</html>
+<script is:inline>
+	/* The cursor moves the light: the hero glow follows the pointer. Everything
+	   else on this page is CSS reacting to html[lang] and html[dir]. */
+	(function () {
+		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const hero = document.getElementById('hero');
+		if (!hero || !window.matchMedia('(pointer: fine)').matches) return;
+		hero.addEventListener('pointermove', function (e) {
+			if (reduce.matches) return;
+			const r = hero.getBoundingClientRect();
+			hero.style.setProperty(
+				'--mx',
+				((e.clientX - r.left) / r.width).toFixed(3),
+			);
+			hero.style.setProperty(
+				'--my',
+				((e.clientY - r.top) / r.height).toFixed(3),
+			);
+		});
+	})();
+</script>
 
 <style is:global>
-	/* ==========================================================================
-	   PLAYROOM — the system underneath the noise.
-	   Six colours. One radius scale. One shadow scale (hard, offset, ink).
-	   One motion curve with overshoot. Everything else is arrangement.
-	   ========================================================================== */
-
-	.playroom {
-		--ink: #171033;
-		--sun: #ffcf2d;
-		--mint: #9befd0;
-		--melon: #ff4b34;
-		--sky: #2d5bff;
-		--bubble: #ff6fb5;
-		--paper: #ffffff;
-
-		--r1: 10px;
-		--r2: 20px;
-		--r3: 34px;
-		--pill: 999px;
-		--b: 3px;
-
-		--s1: 3px 3px 0 var(--ink);
-		--s2: 6px 6px 0 var(--ink);
-		--s3: 10px 10px 0 var(--ink);
-
-		--spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-		--snap: cubic-bezier(0.2, 0.9, 0.25, 1);
-
-		--display: 'Bricolage Grotesque', system-ui, sans-serif;
-		--body: 'Space Grotesk', system-ui, sans-serif;
-		--mono: 'Space Mono', ui-monospace, monospace;
-		--arabic: 'Lalezar', 'Bricolage Grotesque', system-ui, sans-serif;
-
-		--focus: var(--ink);
-	}
-
-	.playroom *,
-	.playroom *::before,
-	.playroom *::after {
-		box-sizing: border-box;
-	}
-
-	html:has(.playroom),
-	.playroom {
-		overflow-x: clip;
-	}
-
-	.playroom {
-		margin: 0;
-		padding: 0;
-		background: var(--ink);
-		color: var(--ink);
-		font-family: var(--body);
-		font-size: clamp(1rem, 0.96rem + 0.2vw, 1.075rem);
-		line-height: 1.55;
-		-webkit-font-smoothing: antialiased;
-		text-rendering: optimizeLegibility;
-	}
-
-	/* Resets stay at zero specificity (`:where`) so every class below wins
-	   without a fight. */
-	.playroom :where(h1, h2, h3) {
-		font-family: var(--display);
-		font-weight: 800;
-		line-height: 0.95;
-		letter-spacing: -0.02em;
-		margin: 0;
-		text-wrap: balance;
-	}
-
-	.playroom :where(p) {
-		margin: 0;
-	}
-
-	.playroom :where(ul) {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.playroom :where(img) {
-		display: block;
-		max-width: 100%;
-		height: auto;
-	}
-
-	.playroom :where(a) {
-		color: inherit;
-	}
-
-	/* One focus ring, everywhere, tuned per field. */
-	.playroom :is(a, button, summary, [tabindex]):focus-visible {
-		outline: 3px solid var(--focus);
-		outline-offset: 4px;
-		border-radius: var(--r1);
-	}
-
-	.skip {
-		position: absolute;
-		left: -9999px;
-		top: 0.5rem;
-		z-index: 50;
-		padding: 0.7rem 1.1rem;
-		background: var(--ink);
-		color: var(--sun);
-		font-family: var(--mono);
-		border-radius: var(--pill);
-	}
-
-	.skip:focus-visible {
-		left: 0.75rem;
-	}
-
-	/* ---------------------------- fields + wrap ---------------------------- */
-
-	.field {
-		position: relative;
-		padding-block: clamp(3.5rem, 8vw, 6.5rem);
-	}
-
-	.field--sun {
-		background: var(--sun);
-	}
-	.field--mint {
-		background: var(--mint);
-	}
-	.field--bubble {
-		background: var(--bubble);
-	}
-	.field--melon {
-		background: var(--melon);
-	}
-	.field--sky {
-		background: var(--sky);
-		color: var(--paper);
-		--focus: var(--sun);
-	}
-	.field--ink {
-		background: var(--ink);
-		color: var(--paper);
-		--focus: var(--sun);
-	}
-
-	/* A hard rule between fields, so the colour changes read as an edge. */
-	.field + .field {
-		border-top: var(--b) solid var(--ink);
-	}
-
-	.wrap {
-		width: min(1180px, 100% - clamp(1.25rem, 5vw, 4rem));
-		margin-inline: auto;
-	}
-
-	.eyebrow {
-		font-family: var(--mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		margin-bottom: 0.85rem;
-	}
-
-	.section__title {
-		font-size: clamp(2rem, 5.4vw, 3.6rem);
-		font-variation-settings: 'wdth' 92;
-	}
-
-	.section__head {
-		max-width: 46ch;
-		margin-bottom: clamp(2rem, 4vw, 3rem);
-	}
-
-	.section__lede {
-		margin-top: 1rem;
-		font-size: 1.05rem;
-		max-width: 52ch;
-	}
-
-	.mini-title {
-		font-family: var(--mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		margin: 0 0 0.9rem;
-	}
-
-	/* ------------------------------- buttons ------------------------------- */
-
-	.btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.85rem 1.4rem;
-		border: var(--b) solid var(--ink);
-		border-radius: var(--pill);
-		background: var(--paper);
-		box-shadow: var(--s2);
-		font-family: var(--display);
-		font-weight: 700;
-		font-size: 1.05rem;
-		letter-spacing: -0.01em;
-		text-decoration: none;
-		cursor: pointer;
-		transition:
-			transform 0.22s var(--spring),
-			box-shadow 0.22s var(--spring);
-	}
-
-	.btn:hover {
-		transform: translate(-2px, -2px);
-		box-shadow: var(--s3);
-	}
-
-	.btn:active {
-		transform: translate(6px, 6px);
-		box-shadow: 0 0 0 var(--ink);
-	}
-
-	.btn--melon {
-		background: var(--melon);
-	}
-	.btn--ink {
-		background: var(--ink);
-		color: var(--sun);
-	}
-	.btn--ghost {
-		background: transparent;
-		box-shadow: var(--s1);
-	}
-	.btn--ghost:hover {
-		box-shadow: var(--s2);
-	}
-	.btn--big {
-		font-size: clamp(1rem, 2.6vw, 1.35rem);
-		padding: 1rem 1.6rem;
-		word-break: break-word;
-	}
-
-	.cta-row {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.85rem;
-		margin-top: 1.9rem;
-	}
-
 	/* ================================ HERO ================================ */
 
 	.hero {
@@ -835,6 +573,12 @@ const elsewhere = [
 		box-shadow: 0 0 0 4px var(--sun);
 	}
 
+	.whoami__sticker[lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-size: 1rem;
+		letter-spacing: 0;
+	}
+
 	.whoami__role {
 		font-family: var(--mono);
 		font-size: 0.76rem;
@@ -842,10 +586,23 @@ const elsewhere = [
 		text-transform: uppercase;
 	}
 
+	.whoami__role[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.9rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
 	.thesis {
 		font-size: clamp(2.6rem, 9.5vw, 6.4rem);
 		font-variation-settings: 'wdth' 78;
 		letter-spacing: -0.035em;
+	}
+
+	.thesis[lang='ar'] {
+		font-size: clamp(2.2rem, 8vw, 5.4rem);
+		line-height: 1.25;
 	}
 
 	.thesis .stretch {
@@ -870,13 +627,6 @@ const elsewhere = [
 		margin-top: 1.4rem;
 		max-width: 54ch;
 		font-size: clamp(1.02rem, 1.6vw, 1.2rem);
-	}
-
-	.lede em {
-		font-style: normal;
-		background: var(--paper);
-		box-shadow: 0 0 0 3px var(--paper);
-		border-radius: 3px;
 	}
 
 	.hero__photo {
@@ -920,9 +670,14 @@ const elsewhere = [
 		transform: rotate(-8deg);
 	}
 
+	.photo__tag[lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-size: 0.9rem;
+	}
+
 	/* ------------------------ the toy: flip board ------------------------ */
 
-	/* The board is an enhancement: without scripting there is nothing to pull,
+	/* The board is an enhancement: with no scripting there is no lever to pull,
 	   so it does not appear at all. Every fact it carries is elsewhere too. */
 	.toy {
 		display: none;
@@ -968,24 +723,8 @@ const elsewhere = [
 		min-width: 0;
 	}
 
-	/* `dir="rtl"` on the board already lays the tiles out right to left, so the
-	   back faces read العسولي in the right order. Nothing else to reverse. */
-
-	/* Mirror the light too: in RTL the shadows fall the other way. */
-	.toy__board.is-mirrored .tile,
-	.toy__board.is-mirrored .lever {
-		box-shadow: -6px 6px 0 var(--ink);
-	}
-
-	.toy__board.is-mirrored .tile:hover,
-	.toy__board.is-mirrored .lever:hover {
-		box-shadow: -10px 10px 0 var(--ink);
-	}
-
-	.toy__board.is-mirrored .tile:active,
-	.toy__board.is-mirrored .lever:active {
-		box-shadow: -3px 3px 0 var(--ink);
-	}
+	/* `dir="rtl"` on the document already lays the tiles out right to left, so
+	   the back faces read العسولي in the right order. Nothing else to reverse. */
 
 	.tile {
 		position: relative;
@@ -993,29 +732,25 @@ const elsewhere = [
 		min-width: 0;
 		aspect-ratio: 3 / 4;
 		max-width: 5.5rem;
-		padding: 0;
 		border: var(--b) solid var(--ink);
 		border-radius: var(--r1);
 		background: var(--paper);
 		box-shadow: var(--s2);
-		cursor: pointer;
-		transform-style: preserve-3d;
-		transition:
-			transform 0.55s var(--spring),
-			box-shadow 0.3s var(--snap);
+		perspective: 700px;
 		animation: settle 0.7s var(--spring) backwards;
 		animation-delay: calc(var(--i) * 60ms);
 	}
 
-	.tile:hover {
-		box-shadow: var(--s3);
+	.tile__flip {
+		position: absolute;
+		inset: 0;
+		transform-style: preserve-3d;
+		transition: transform 0.55s var(--spring);
+		transition-delay: calc(var(--i) * 55ms);
 	}
 
-	.tile:active {
-		box-shadow: var(--s1);
-	}
-
-	.tile.is-flipped {
+	/* The tiles turn because the page turned. */
+	html[lang='ar'] .tile__flip {
 		transform: rotateY(180deg);
 	}
 
@@ -1039,7 +774,8 @@ const elsewhere = [
 	}
 
 	.tile__face--ar {
-		font-family: var(--arabic);
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
 		transform: rotateY(180deg);
 		padding-bottom: 0.12em;
 		font-size: clamp(1.7rem, 6.5vw, 3.4rem);
@@ -1078,67 +814,52 @@ const elsewhere = [
 		background: var(--melon);
 	}
 
-	.lever {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.7rem;
-		padding: 0.6rem 1.1rem 0.6rem 0.6rem;
-		border: var(--b) solid var(--ink);
-		border-radius: var(--pill);
+	/* ------------------------------ the lever ------------------------------ */
+
+	.lever--big .lever__track {
+		width: 9.5rem;
+		padding: 4px;
+		border-width: var(--b);
+		border-color: var(--ink);
 		background: var(--sun);
 		box-shadow: var(--s2);
-		font-family: var(--display);
-		font-weight: 700;
-		font-size: 1rem;
-		cursor: pointer;
 		transition:
 			transform 0.25s var(--spring),
-			box-shadow 0.25s var(--spring),
-			background-color 0.25s var(--snap);
+			box-shadow 0.25s var(--spring);
 	}
 
-	.lever__knob {
-		width: 2.6rem;
-		height: 1.5rem;
-		border: var(--b) solid var(--ink);
-		border-radius: var(--pill);
-		background: var(--paper);
-		position: relative;
-	}
-
-	.lever__knob::after {
-		content: '';
-		position: absolute;
-		top: 1px;
-		inset-inline-start: 1px;
-		width: 1rem;
-		height: 1rem;
-		border-radius: 50%;
+	.lever--big .lever__knob {
+		top: 4px;
+		bottom: 4px;
+		left: 4px;
+		width: calc(50% - 4px);
 		background: var(--ink);
-		transition: transform 0.35s var(--spring);
 	}
 
-	.lever[aria-pressed='true'] {
-		background: var(--sky);
-		color: var(--paper);
+	.lever--big .lever__side {
+		padding-block: 0.55rem;
+		font-size: 1rem;
+		color: var(--ink);
 	}
 
-	.lever[aria-pressed='true'] .lever__knob::after {
-		transform: translateX(1.1rem);
+	.lever--big .lever__side--ar {
+		font-size: 1.4rem;
 	}
 
-	.toy__board.is-mirrored .lever[aria-pressed='true'] .lever__knob::after {
-		transform: translateX(-1.1rem);
+	html[lang='en'] .lever--big .lever__side--en,
+	html[lang='ar'] .lever--big .lever__side--ar {
+		color: var(--sun);
 	}
 
-	.lever:hover {
-		transform: translate(-2px, -2px);
+	.lever--big:hover .lever__track {
+		background: var(--sun);
+		transform: translate(calc(var(--dx) * 2px), -2px);
 		box-shadow: var(--s3);
 	}
 
-	.lever:active {
-		transform: translate(4px, 4px);
-		box-shadow: 0 0 0 var(--ink);
+	.lever--big:active .lever__track {
+		transform: translate(calc(var(--dx) * -4px), 4px);
+		box-shadow: var(--s0);
 	}
 
 	.toy__caption {
@@ -1154,9 +875,8 @@ const elsewhere = [
 		letter-spacing: 0.24em;
 	}
 
-	.toy__caption .arabic,
-	.foot__name .arabic {
-		font-family: var(--arabic);
+	.toy__caption .arabic {
+		font-family: var(--arabicDisplay);
 		font-size: 1.5em;
 		line-height: 1;
 	}
@@ -1167,7 +887,7 @@ const elsewhere = [
 
 	/* ============================== COUNTERS ============================== */
 
-	.counters .section__title {
+	.playroom .counters__title {
 		font-size: clamp(1.5rem, 3.4vw, 2.1rem);
 		margin-bottom: 1.6rem;
 		color: var(--paper);
@@ -1233,6 +953,15 @@ const elsewhere = [
 		letter-spacing: 0.05em;
 	}
 
+	.counter__label[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.85rem;
+		line-height: 1.6;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
 	/* ================================ WORK ================================ */
 
 	.cards {
@@ -1270,7 +999,7 @@ const elsewhere = [
 		.card:hover,
 		.card:focus-within {
 			transform: rotate(0deg) translateY(-8px);
-			box-shadow: 14px 14px 0 var(--ink);
+			box-shadow: var(--s4);
 		}
 	}
 
@@ -1304,6 +1033,12 @@ const elsewhere = [
 	.card__title {
 		font-size: clamp(1.35rem, 3vw, 1.8rem);
 		font-variation-settings: 'wdth' 88;
+	}
+
+	.card__title [lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
+		font-variation-settings: normal;
 	}
 
 	.card__title a {
@@ -1352,6 +1087,12 @@ const elsewhere = [
 		line-height: 1.25;
 	}
 
+	.card__tagline[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		line-height: 1.7;
+	}
+
 	.card__summary {
 		font-size: 0.92rem;
 	}
@@ -1363,18 +1104,12 @@ const elsewhere = [
 		letter-spacing: 0.07em;
 	}
 
-	.chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.35rem;
-	}
-
-	.chip {
-		padding: 0.2rem 0.55rem;
-		border: 2px solid var(--ink);
-		border-radius: var(--pill);
-		font-family: var(--mono);
-		font-size: 0.68rem;
+	.card__role[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.82rem;
+		letter-spacing: 0;
+		text-transform: none;
 	}
 
 	.card__foot {
@@ -1384,43 +1119,6 @@ const elsewhere = [
 		gap: 0.45rem;
 		margin-top: auto;
 		padding-top: 0.4rem;
-	}
-
-	.sticker {
-		display: inline-block;
-		padding: 0.25rem 0.7rem;
-		background: var(--sun);
-		border: var(--b) solid var(--ink);
-		border-radius: var(--pill);
-		font-family: var(--mono);
-		font-size: 0.68rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		transform: rotate(-2deg);
-		box-shadow: 0 0 0 3px var(--paper);
-	}
-
-	.sticker--plain {
-		background: var(--paper);
-		transform: rotate(1.5deg);
-	}
-
-	.link-pill {
-		position: relative;
-		z-index: 1;
-		padding: 0.25rem 0.7rem;
-		border: 2px solid var(--ink);
-		border-radius: var(--pill);
-		background: var(--ink);
-		color: var(--sun);
-		font-family: var(--mono);
-		font-size: 0.68rem;
-		text-decoration: none;
-		transition: transform 0.2s var(--spring);
-	}
-
-	.link-pill:hover {
-		transform: translateY(-2px) rotate(-2deg);
 	}
 
 	/* the other 31 */
@@ -1477,10 +1175,12 @@ const elsewhere = [
 		display: block;
 		width: max-content;
 		max-width: 100%;
-		font-family: var(--arabic);
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
 		font-size: 0.9em;
 		line-height: 1.15;
 		margin-top: 0.25rem;
+		font-variation-settings: normal;
 	}
 
 	.about__para {
@@ -1497,6 +1197,12 @@ const elsewhere = [
 		border-radius: var(--pill);
 		font-family: var(--mono);
 		font-size: 0.72rem;
+	}
+
+	.about__where [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.85rem;
 	}
 
 	.about__stack {
@@ -1519,14 +1225,19 @@ const elsewhere = [
 	.job {
 		display: grid;
 		gap: 0.1rem;
-		padding-left: 0.85rem;
-		border-left: var(--b) solid var(--ink);
+		padding-inline-start: 0.85rem;
+		border-inline-start: var(--b) solid var(--ink);
 	}
 
 	.job__co {
 		font-family: var(--display);
 		font-weight: 700;
 		font-size: 1.05rem;
+	}
+
+	.job__co[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
 	}
 
 	.job__role {
@@ -1538,6 +1249,14 @@ const elsewhere = [
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
+	}
+
+	.job__when[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.8rem;
+		letter-spacing: 0;
+		text-transform: none;
 	}
 
 	/* =============================== TOOLBOX =============================== */
@@ -1623,7 +1342,7 @@ const elsewhere = [
 		}
 	}
 
-	.hire__lede {
+	.playroom .hire__lede {
 		max-width: 44ch;
 	}
 
@@ -1650,6 +1369,11 @@ const elsewhere = [
 			box-shadow 0.28s var(--spring);
 	}
 
+	.slab [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+	}
+
 	.slab--sun {
 		background: var(--sun);
 	}
@@ -1665,69 +1389,29 @@ const elsewhere = [
 	}
 
 	.slab:hover {
-		transform: translate(-3px, -3px);
+		transform: translate(calc(var(--dx) * 3px), -3px);
 		box-shadow: var(--s3);
 	}
 
 	.slab:active {
-		transform: translate(6px, 6px);
-		box-shadow: 0 0 0 var(--ink);
+		transform: translate(calc(var(--dx) * -6px), 6px);
+		box-shadow: var(--s0);
 	}
 
 	.slab__arrow {
 		transition: transform 0.28s var(--spring);
 	}
 
+	html[dir='rtl'] .slab__arrow {
+		transform: scaleX(-1);
+	}
+
 	.slab:hover .slab__arrow {
 		transform: translateX(4px);
 	}
 
-	/* ================================ FOOT ================================ */
-
-	.foot {
-		padding-block: clamp(3rem, 6vw, 4.5rem) 7rem;
-	}
-
-	.foot__grid {
-		display: grid;
-		gap: 1.1rem;
-	}
-
-	.foot__name {
-		display: flex;
-		align-items: baseline;
-		flex-wrap: wrap;
-		gap: 0.9rem;
-		font-family: var(--display);
-		font-weight: 800;
-		font-size: clamp(1.6rem, 4vw, 2.4rem);
-		color: var(--sun);
-		font-variation-settings: 'wdth' 85;
-	}
-
-	.foot__note {
-		max-width: 42ch;
-		font-size: 0.9rem;
-		color: rgba(255, 255, 255, 0.82);
-	}
-
-	.foot__links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1.1rem;
-		font-family: var(--mono);
-		font-size: 0.76rem;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-	}
-
-	.foot__links a {
-		text-decoration-thickness: 2px;
-		text-underline-offset: 4px;
-	}
-
-	.foot__links a:hover {
-		color: var(--sun);
+	html[dir='rtl'] .slab:hover .slab__arrow {
+		transform: scaleX(-1) translateX(4px);
 	}
 
 	/* =============================== MOTION =============================== */
@@ -1750,22 +1434,12 @@ const elsewhere = [
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.playroom *,
-		.playroom *::before,
-		.playroom *::after {
-			animation-duration: 0.001ms !important;
-			animation-iteration-count: 1 !important;
-			transition-duration: 0.001ms !important;
-		}
-
-		.playroom .card:hover,
-		.playroom .card:focus-within,
-		.playroom .counter:hover,
-		.playroom .tool:hover,
-		.playroom .spill__chip:hover,
-		.playroom .btn:hover,
-		.playroom .slab:hover,
-		.playroom .lever:hover {
+		.playroom
+			:is(.card, .counter, .tool, .spill__chip, .slab):is(
+				:hover,
+				:focus-within
+			),
+		.playroom .lever--big:hover .lever__track {
 			transform: none;
 		}
 

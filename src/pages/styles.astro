@@ -20,7 +20,10 @@ import { styleVariants } from '../data/style-variants';
 			<h1>Seven directions for one portfolio</h1>
 			<p class="sub">
 				Every tile below is the page itself, running live. Open one, scroll it,
-				then use the switcher at the bottom of any variant to jump between them.
+				then use the switcher at the bottom of any variant to jump between them
+				&mdash; it keeps you on the same sub-page as you move across. Each
+				direction carries the home page, the full project index, a project
+				write-up and the hire form, all of them in Arabic and English.
 			</p>
 		</header>
 
@@ -46,6 +49,11 @@ import { styleVariants } from '../data/style-variants';
 								</span>
 							</span>
 						</a>
+						<nav class="jump" aria-label={`${v.name} pages`}>
+							<a href={`/${v.n}/projects`}>Projects</a>
+							<a href={`/${v.n}/work/aoun`}>A project</a>
+							<a href={`/${v.n}/hire`}>Hire me</a>
+						</nav>
 					</li>
 				))
 			}
@@ -196,6 +204,31 @@ import { styleVariants } from '../data/style-variants';
 	.note {
 		font-size: 0.85rem;
 		color: #8c8c9a;
+	}
+
+	.jump {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.9rem;
+		padding: 0.55rem 0.25rem 0;
+		font-size: 0.8rem;
+	}
+
+	.jump a {
+		color: #8c8c9a;
+		text-decoration: none;
+		border-bottom: 1px solid #2b2b36;
+		padding-bottom: 1px;
+	}
+
+	.jump a:hover {
+		color: #e9e9ee;
+		border-bottom-color: #6b6b80;
+	}
+
+	.jump a:focus-visible {
+		outline: 2px solid #fff;
+		outline-offset: 3px;
 	}
 
 	.foot {

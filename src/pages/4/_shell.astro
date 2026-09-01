@@ -1,0 +1,1209 @@
+---
+/* Variant 4 — "Terminal". The session chrome every /4 route sits inside:
+   the tmux status bar, the window list, the LANG control, the command line,
+   the footer, and the tokens the four pages share.
+
+   The signature is the LANG control in the status bar. It is the shared
+   `data-lang-toggle` underneath, drawn as the environment variable a session
+   would actually carry, with the `dir=` readout beside it reporting what the
+   language chose. */
+import LangBoot from '../../components/LangBoot.astro';
+import StyleSwitcher from '../../components/StyleSwitcher.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+import { dateSpan } from './_dates';
+import { projects } from '../../data/projects';
+
+interface Props {
+	title: string;
+	description: string;
+	/** The working directory the status bar reports. Paths stay Latin. */
+	path: string;
+	/** Which tmux window reads as current. */
+	tab: 'home' | 'projects' | 'hire' | 'work';
+}
+
+const { title, description, path, tab } = Astro.props;
+
+/* A tmux window name is a label a person wrote, so it translates.
+   The path beside it is a path, so it does not. */
+const windows = [
+	{ i: 0, href: '/4', key: 'home', en: 'session', ar: 'الجلسة' },
+	{
+		i: 1,
+		href: '/4/projects',
+		key: 'projects',
+		en: 'projects',
+		ar: 'المشاريع',
+	},
+	{ i: 2, href: '/4/hire', key: 'hire', en: 'hire', ar: 'التوظيف' },
+];
+
+/* The command line browses a real filesystem, so it needs the records:
+   `cat <slug>` prints one, `open <slug>` walks to it, Tab completes it. */
+const files = projects.map((p) => {
+	const st = s(`status.${p.status}` as 'status.live');
+	const c = s(`cat.${p.category}` as 'cat.web');
+	return {
+		s: p.slug,
+		t: [p.title.en, p.title.ar],
+		g: [p.tagline.en, p.tagline.ar],
+		y: dateSpan(p.year),
+		st: [st.en, st.ar],
+		c: [c.en, c.ar],
+	};
+});
+
+const clock = new Intl.DateTimeFormat('en-GB', {
+	timeZone: 'Asia/Amman',
+	hour: '2-digit',
+	minute: '2-digit',
+}).format(new Date());
+
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@1,400&display=swap"
+		/>
+		<LangBoot />
+	</head>
+
+	<body>
+		<T v={s('nav.skip')} as="a" class="skip" href="#main" />
+
+		<header class="chrome">
+			<div class="chrome__inner">
+				<div class="status">
+					<span class="status__tag tty">haitham@amman</span>
+					<span class="status__path tty">{path}</span>
+
+					<nav class="wins" aria-labelledby="wins-label">
+						<span class="sr-only" id="wins-label">
+							<span data-l="en">Session windows</span>
+							<span data-l="ar" lang="ar">نوافذ الجلسة</span>
+						</span>
+						{
+							windows.map((w) => (
+								<a
+									class="win"
+									href={w.href}
+									aria-current={w.key === tab ? 'page' : undefined}
+								>
+									<span class="win__n tty">{w.i}:</span>
+									<span data-l="en">{w.en}</span>
+									<span data-l="ar" lang="ar">
+										{w.ar}
+									</span>
+									<span class="win__mark tty" aria-hidden="true">
+										{w.key === tab
+											? '*'
+											: w.key === 'projects' && tab === 'work'
+												? '-'
+												: ''}
+									</span>
+								</a>
+							))
+						}
+					</nav>
+
+					<span class="status__sp"></span>
+
+					<span class="status__dir tty">
+						<span data-l="en">dir=ltr</span>
+						<span data-l="ar">dir=rtl</span>
+					</span>
+
+					<button class="lang" type="button" data-lang-toggle>
+						<span class="lang__k tty" aria-hidden="true">LANG=</span>
+						<span class="lang__v tty" data-l="en" aria-hidden="true">en</span>
+						<span class="lang__v tty" data-l="ar" aria-hidden="true">ar</span>
+						<span class="sr-only" data-l="en">Run the session in Arabic</span>
+						<span class="sr-only" data-l="ar" lang="ar"
+							>شغّل الجلسة بالإنجليزية</span
+						>
+					</button>
+
+					<span class="status__clock tty"
+						><span data-clock>{clock}</span> +03</span
+					>
+				</div>
+
+				<div class="cmd" data-cmd hidden>
+					<form class="cmd__form" data-form>
+						<label class="sr-only" for="cmdline">
+							<span data-l="en">Run a command</span>
+							<span data-l="ar" lang="ar">نفّذ أمرًا</span>
+						</label>
+						<span class="cmd__caret" aria-hidden="true"></span>
+						<input
+							class="cmd__input tty"
+							id="cmdline"
+							type="text"
+							autocomplete="off"
+							autocapitalize="off"
+							spellcheck="false"
+							enterkeyhint="go"
+							data-ph-en="type help"
+							data-ph-ar="اكتب help"
+							placeholder="type help"
+						/>
+					</form>
+					<div class="cmd__out" data-out role="status" aria-live="polite"></div>
+					<p class="cmd__hint" data-l="en">
+						<kbd>/</kbd> focuses this line · <kbd>Esc</kbd> leaves it · <kbd
+							>Tab</kbd
+						> completes a slug · every command is real
+					</p>
+					<p class="cmd__hint" data-l="ar" lang="ar">
+						<kbd>/</kbd> ينقل التركيز إلى السطر · <kbd>Esc</kbd> يغادره · <kbd
+							>Tab</kbd
+						> يكمل اسم المشروع · كل الأوامر تعمل فعلًا
+					</p>
+				</div>
+			</div>
+		</header>
+
+		<main class="session" id="main">
+			<slot />
+		</main>
+
+		<footer class="foot">
+			<p class="cmdline cmdline--tight">
+				<span class="cmdline__q tty">exit</span>
+			</p>
+			<p class="foot__line">
+				<span class="foot__code tty">[0]</span>{' '}<T
+					v={pair(
+						'session ended · built in Astro, no trackers, no cookie wall',
+						'انتهت الجلسة · مبنيّ بـ Astro، بلا متتبّعات ولا جدار كوكيز',
+					)}
+				/>{' '}
+				<span class="tty">· © {year} Haitham Assoli</span>
+			</p>
+		</footer>
+
+		<script is:inline define:vars={{ files }}>
+			(function () {
+				const root = document.documentElement;
+				const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+				/* Placeholders are attributes, so CSS cannot swap them. The one
+				   observer keeps every `data-ph-*` control honest, whichever way
+				   the language was changed. */
+				function placeholders() {
+					const ar = root.lang === 'ar';
+					document.querySelectorAll('[data-ph-en]').forEach(function (el) {
+						el.setAttribute(
+							'placeholder',
+							(ar
+								? el.getAttribute('data-ph-ar')
+								: el.getAttribute('data-ph-en')) || '',
+						);
+					});
+				}
+				placeholders();
+				new MutationObserver(placeholders).observe(root, {
+					attributes: true,
+					attributeFilter: ['lang'],
+				});
+
+				const clockEl = document.querySelector('[data-clock]');
+				if (clockEl) {
+					const fmt = new Intl.DateTimeFormat('en-GB', {
+						timeZone: 'Asia/Amman',
+						hour: '2-digit',
+						minute: '2-digit',
+					});
+					const tick = function () {
+						clockEl.textContent = fmt.format(new Date());
+					};
+					tick();
+					setInterval(tick, 20000);
+				}
+
+				const wrap = document.querySelector('[data-cmd]');
+				const form = document.querySelector('[data-form]');
+				const input = document.getElementById('cmdline');
+				const out = document.querySelector('[data-out]');
+				if (!wrap || !form || !input || !out) return;
+				wrap.hidden = false;
+
+				const by = {};
+				files.forEach(function (f) {
+					by[f.s] = f;
+				});
+				const slugs = files.map(function (f) {
+					return f.s;
+				});
+
+				/* Where each command lands. A hash target is scrolled to when the
+				   page already holds it, and walked to otherwise. */
+				const nav = {
+					ls: '/4/projects',
+					tree: '/4#fs',
+					whoami: '/4#who',
+					history: '/4#history',
+					stack: '/4#stack',
+					stat: '/4#stat',
+					hire: '/4/hire',
+				};
+
+				const HELP = [
+					['help', 'this list', 'هذه القائمة'],
+					[
+						'ls',
+						'the long listing, all 39 projects',
+						'القائمة الطويلة، المشاريع التسعة والثلاثون',
+					],
+					[
+						'tree',
+						'the same 39, grouped by category',
+						'المشاريع نفسها مرتّبة حسب الفئة',
+					],
+					['open <slug>', 'walk to a project write-up', 'انتقل إلى صفحة مشروع'],
+					['cat <slug>', 'print a record here', 'اطبع سجل المشروع هنا'],
+					['whoami', 'who Haitham is', 'من هو هيثم'],
+					['history', 'where the hours went', 'أين ذهبت الساعات'],
+					['stack', 'the toolbox', 'الأدوات'],
+					['stat', 'the figures', 'الأرقام'],
+					['hire', 'the brief form', 'نموذج المشروع'],
+					['lang [ar|en]', 'switch the language', 'بدّل اللغة'],
+					['clear', 'empty this output', 'أفرغ هذا المخرَج'],
+				];
+
+				function bi(en, ar) {
+					const frag = document.createDocumentFragment();
+					const a = document.createElement('span');
+					a.setAttribute('data-l', 'en');
+					a.lang = 'en';
+					a.textContent = en;
+					const b = document.createElement('span');
+					b.setAttribute('data-l', 'ar');
+					b.lang = 'ar';
+					b.textContent = ar;
+					frag.appendChild(a);
+					frag.appendChild(b);
+					return frag;
+				}
+
+				function block(cmd) {
+					const el = document.createElement('div');
+					el.className = 'echo';
+					const head = document.createElement('p');
+					head.className = 'echo__cmd tty';
+					head.textContent = '❯ ' + cmd;
+					el.appendChild(head);
+					return el;
+				}
+
+				function flush(el) {
+					out.appendChild(el);
+					out.scrollTop = out.scrollHeight;
+				}
+
+				/* Lines are written twice, so output already on screen follows the
+				   reader when they change the language mid-session. */
+				function print(cmd, lines, tone) {
+					const el = block(cmd);
+					lines.forEach(function (l) {
+						const p = document.createElement('p');
+						p.className = 'echo__line' + (tone ? ' echo__line--' + tone : '');
+						p.appendChild(bi(l[0], l[1]));
+						el.appendChild(p);
+					});
+					flush(el);
+				}
+
+				/* Padding a name column with spaces only works in one script. The
+				   help table is a grid instead, so the rhythm holds in Arabic. */
+				function printTable(cmd, rows) {
+					const el = block(cmd);
+					const dl = document.createElement('dl');
+					dl.className = 'echo__tbl';
+					rows.forEach(function (r) {
+						const dt = document.createElement('dt');
+						dt.className = 'tty';
+						dt.textContent = r[0];
+						const dd = document.createElement('dd');
+						dd.appendChild(bi(r[1], r[2]));
+						dl.appendChild(dt);
+						dl.appendChild(dd);
+					});
+					el.appendChild(dl);
+					flush(el);
+				}
+
+				function goto(el) {
+					const bar = document.querySelector('.chrome');
+					if (bar)
+						root.style.setProperty('--head', bar.offsetHeight + 16 + 'px');
+					el.scrollIntoView({
+						behavior: calm.matches ? 'auto' : 'smooth',
+						block: 'start',
+					});
+					el.classList.add('is-hit');
+					setTimeout(function () {
+						el.classList.remove('is-hit');
+					}, 2000);
+				}
+
+				function walk(href) {
+					const hash = href.indexOf('#');
+					const path = hash < 0 ? href : href.slice(0, hash);
+					const id = hash < 0 ? '' : href.slice(hash + 1);
+					const here = location.pathname.replace(/\/$/, '') || '/4';
+					const target =
+						id && here === path ? document.getElementById(id) : null;
+					if (target) return goto(target);
+					window.location.href = href;
+				}
+
+				function setLang(want) {
+					const btn = document.querySelector('[data-lang-toggle]');
+					if (!btn) return;
+					if ((root.lang === 'ar' ? 'ar' : 'en') !== want) btn.click();
+				}
+
+				function run(raw) {
+					const line = raw.trim().replace(/\s+/g, ' ');
+					if (!line) return;
+					const parts = line.split(' ');
+					const cmd = parts[0].toLowerCase();
+					const arg = (parts[1] || '').toLowerCase();
+
+					if (cmd === 'help' || cmd === '?') return printTable(line, HELP);
+
+					if (cmd === 'clear') {
+						out.textContent = '';
+						return;
+					}
+
+					if (cmd === 'lang') {
+						if (!arg) {
+							setLang(root.lang === 'ar' ? 'en' : 'ar');
+							return print(line, [
+								['session language switched', 'تبدّلت لغة الجلسة'],
+							]);
+						}
+						if (arg !== 'ar' && arg !== 'en')
+							return print(
+								line,
+								[['usage: lang ar | lang en', 'الاستعمال: lang ar أو lang en']],
+								'err',
+							);
+						setLang(arg);
+						return print(line, [
+							arg === 'ar'
+								? ['now running in Arabic', 'الجلسة الآن بالعربية']
+								: ['now running in English', 'الجلسة الآن بالإنجليزية'],
+						]);
+					}
+
+					if (cmd === 'cat' || cmd === 'open') {
+						if (!arg)
+							return print(
+								line,
+								[
+									[
+										'usage: ' + cmd + ' <slug>',
+										'الاستعمال: ' + cmd + ' <اسم-المشروع>',
+									],
+								],
+								'err',
+							);
+						const f = by[arg];
+						if (!f)
+							return print(
+								line,
+								[['no such file: ' + arg, 'لا ملف بهذا الاسم: ' + arg]],
+								'err',
+							);
+						if (cmd === 'open') {
+							print(line, [['opening /4/work/' + arg, 'يفتح /4/work/' + arg]]);
+							window.location.href = '/4/work/' + arg;
+							return;
+						}
+						return print(line, [
+							[f.t[0], f.t[1]],
+							[f.g[0], f.g[1]],
+							[
+								f.y +
+									' · ' +
+									f.st[0] +
+									' · ' +
+									f.c[0] +
+									' · open ' +
+									arg +
+									' for the write-up',
+								f.y +
+									' · ' +
+									f.st[1] +
+									' · ' +
+									f.c[1] +
+									' · اكتب open ' +
+									arg +
+									' لقراءة التفاصيل',
+							],
+						]);
+					}
+
+					if (nav[cmd]) {
+						print(line, [['→ ' + nav[cmd], '→ ' + nav[cmd]]]);
+						walk(nav[cmd]);
+						return;
+					}
+
+					print(
+						line,
+						[
+							[
+								cmd + ': command not found. try help',
+								cmd + ': أمر غير معروف. جرّب help',
+							],
+						],
+						'err',
+					);
+				}
+
+				const past = [];
+				let at = -1;
+
+				form.addEventListener('submit', function (e) {
+					e.preventDefault();
+					const v = input.value;
+					if (v.trim()) past.push(v.trim());
+					at = past.length;
+					run(v);
+					input.value = '';
+				});
+
+				input.addEventListener('keydown', function (e) {
+					if (e.key === 'Tab') {
+						const m = input.value.match(/^\s*(open|cat)\s+(\S*)$/i);
+						if (!m) return;
+						const hit = slugs.filter(function (sl) {
+							return sl.indexOf(m[2].toLowerCase()) === 0;
+						});
+						if (!hit.length) return;
+						e.preventDefault();
+						if (hit.length === 1) input.value = m[1] + ' ' + hit[0];
+						else print(input.value.trim(), [[hit.join('  '), hit.join('  ')]]);
+					} else if (e.key === 'ArrowUp' && past.length) {
+						e.preventDefault();
+						at = Math.max(0, at - 1);
+						input.value = past[at];
+					} else if (e.key === 'ArrowDown' && past.length) {
+						e.preventDefault();
+						at = Math.min(past.length, at + 1);
+						input.value = past[at] || '';
+					}
+				});
+
+				/* "/" focuses the line, Esc leaves it. Nothing else is captured. */
+				document.addEventListener('keydown', function (e) {
+					const t = e.target;
+					const typing =
+						t &&
+						(t.tagName === 'INPUT' ||
+							t.tagName === 'TEXTAREA' ||
+							t.isContentEditable);
+					if (
+						e.key === '/' &&
+						!typing &&
+						!e.metaKey &&
+						!e.ctrlKey &&
+						!e.altKey
+					) {
+						e.preventDefault();
+						input.focus();
+					} else if (e.key === 'Escape' && t === input) {
+						input.blur();
+					}
+				});
+			})();
+		</script>
+
+		<StyleSwitcher n={4} />
+	</body>
+</html>
+
+<style is:global>
+	/* ── tokens ─────────────────────────────────────────────────────── */
+	:root {
+		--void: #14110e;
+		--panel: #1c1913;
+		--panel-2: #242019;
+		--rule: #3a342c;
+		--ash: #9c9284;
+		--bone: #ede4d3;
+		--amber: #ffb454;
+		--jade: #8fc7a3;
+		--rose: #f08c7c;
+
+		--mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+		--ar: 'IBM Plex Sans Arabic', 'IBM Plex Mono', sans-serif;
+		--serif: 'IBM Plex Serif', Georgia, serif;
+
+		--gutter: clamp(1rem, 4vw, 2.75rem);
+		--measure: 74rem;
+		--head: 6.5rem;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		background: var(--void);
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		padding-block-end: 7rem;
+		background:
+			radial-gradient(
+				120% 60% at 50% 0%,
+				rgba(255, 180, 84, 0.07),
+				transparent 60%
+			),
+			var(--void);
+		color: var(--bone);
+		font-family: var(--mono);
+		font-size: clamp(0.82rem, 0.76rem + 0.3vw, 0.93rem);
+		line-height: 1.7;
+		font-variant-ligatures: none;
+		overflow-x: hidden;
+	}
+
+	:where(a) {
+		color: inherit;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--amber);
+		outline-offset: 3px;
+		border-radius: 1px;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.skip {
+		position: fixed;
+		z-index: 60;
+		inset-block-start: 0.5rem;
+		inset-inline-start: 0.5rem;
+		padding: 0.5rem 0.9rem;
+		background: var(--amber);
+		color: var(--void);
+		text-decoration: none;
+		transform: translateY(-200%);
+	}
+
+	.skip:focus {
+		transform: none;
+	}
+
+	/* ── Arabic inside a monospaced session ─────────────────────────────
+	   IBM Plex Sans Arabic is proportional, and no monospaced Arabic face
+	   is worth setting a page in. So the column rhythm is never asked to
+	   come from the glyphs:
+
+	   1. Every column here is a CSS grid track. Tracks measured in `ch`
+	      sit on containers that keep the Latin mono face, so a `ch` is the
+	      same width in both languages and nothing reflows on a switch.
+	   2. The character-grid fields — mode strings, sizes, dates, paths,
+	      prompts, slugs, dimensions — carry Latin and digits only, marked
+	      `.tty` and isolated LTR. Arabic is confined to the free-width
+	      name and prose fields, which is where a real terminal lets it run.
+	   3. Arabic gets its own leading and drops the mono tracking, which
+	      reads as machinery in Latin and as damage in Arabic. */
+	[lang='ar'] {
+		font-family: var(--ar);
+		letter-spacing: normal;
+		line-height: 1.95;
+	}
+
+	/* Careful: a logical margin on a `.tty` element resolves against *its*
+	   forced-LTR direction, not the page's. Anything here that needs a gap on
+	   the page's side either sits in a flex/grid `gap`, or says so explicitly
+	   under `html[dir='rtl']`. */
+	.tty {
+		font-family: var(--mono);
+		direction: ltr;
+		unicode-bidi: isolate;
+		letter-spacing: 0.02em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	html[lang='ar'] :is(input, textarea) {
+		font-family: var(--ar);
+	}
+
+	html[lang='ar'] :is(input, textarea).tty {
+		font-family: var(--mono);
+	}
+
+	/* ── chrome ─────────────────────────────────────────────────────── */
+	.chrome {
+		position: sticky;
+		inset-block-start: 0;
+		z-index: 40;
+		background: color-mix(in srgb, var(--void) 92%, transparent);
+		-webkit-backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
+		border-block-end: 1px solid var(--rule);
+	}
+
+	.chrome__inner {
+		max-width: var(--measure);
+		margin-inline: auto;
+		padding-inline: var(--gutter);
+	}
+
+	.status {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.3rem 0.7rem;
+		padding-block: 0.4rem;
+		font-size: 0.74rem;
+		letter-spacing: 0.02em;
+	}
+
+	.status__tag {
+		background: var(--amber);
+		color: var(--void);
+		padding-inline: 0.5rem;
+		font-weight: 600;
+	}
+
+	.status__path {
+		color: var(--ash);
+	}
+
+	.status__sp {
+		flex: 1 1 auto;
+	}
+
+	.status__dir,
+	.status__clock {
+		color: var(--ash);
+	}
+
+	.wins {
+		display: flex;
+		align-items: center;
+		gap: 0.2rem;
+	}
+
+	.win {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.15rem;
+		padding-inline: 0.4rem;
+		color: var(--ash);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.win:hover {
+		color: var(--bone);
+		background: var(--panel-2);
+	}
+
+	.win__n {
+		color: var(--rule);
+	}
+
+	.win[aria-current='page'] {
+		background: var(--panel-2);
+		color: var(--bone);
+		box-shadow: inset 0 -2px 0 var(--amber);
+	}
+
+	.win[aria-current='page'] .win__n {
+		color: var(--amber);
+	}
+
+	.win__mark {
+		color: var(--amber);
+	}
+
+	.lang {
+		appearance: none;
+		border: 1px solid var(--rule);
+		background: var(--panel);
+		padding: 0.05rem 0.5rem;
+		font: inherit;
+		font-family: var(--mono);
+		color: var(--bone);
+		cursor: pointer;
+		white-space: nowrap;
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
+
+	.lang:hover {
+		border-color: var(--amber);
+		background: var(--panel-2);
+	}
+
+	.lang__k {
+		color: var(--ash);
+	}
+
+	.lang__v {
+		color: var(--amber);
+		font-weight: 600;
+	}
+
+	/* ── command line ───────────────────────────────────────────────── */
+	.cmd {
+		padding-block-end: 0.5rem;
+	}
+
+	.cmd__form {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		border: 1px solid var(--rule);
+		background: var(--panel);
+		padding: 0.35rem 0.6rem;
+		direction: ltr;
+	}
+
+	.cmd__form:focus-within {
+		border-color: var(--amber);
+	}
+
+	.cmd__caret::before {
+		content: '❯';
+		color: var(--amber);
+		text-shadow: 0 0 10px rgba(255, 180, 84, 0.5);
+	}
+
+	.cmd__input {
+		flex: 1 1 auto;
+		min-width: 0;
+		border: 0;
+		background: transparent;
+		color: var(--bone);
+		font: inherit;
+		font-family: var(--mono);
+		padding: 0;
+	}
+
+	.cmd__input:focus {
+		outline: none;
+	}
+
+	.cmd__input::placeholder {
+		color: var(--ash);
+	}
+
+	.cmd__out:not(:empty) {
+		max-height: 9rem;
+		overflow: auto;
+		margin-block-start: 0.4rem;
+		padding: 0.35rem 0.6rem;
+		border: 1px solid var(--rule);
+		border-block-start: 0;
+		background: var(--panel);
+		font-size: 0.74rem;
+		line-height: 1.6;
+	}
+
+	.echo + .echo {
+		margin-block-start: 0.4rem;
+	}
+
+	.echo__cmd,
+	.echo__line {
+		margin: 0;
+	}
+
+	.echo__cmd {
+		color: var(--amber);
+	}
+
+	.echo__line {
+		color: var(--ash);
+	}
+
+	.echo__line--err {
+		color: var(--rose);
+	}
+
+	.echo__tbl {
+		margin: 0;
+		display: grid;
+		grid-template-columns: 14ch minmax(0, 1fr);
+		gap: 0 1ch;
+		color: var(--ash);
+	}
+
+	.echo__tbl dt {
+		color: var(--bone);
+	}
+
+	.echo__tbl dd {
+		margin: 0;
+	}
+
+	.cmd__hint {
+		margin: 0.35rem 0 0;
+		font-size: 0.7rem;
+		color: var(--ash);
+	}
+
+	kbd {
+		font: inherit;
+		font-family: var(--mono);
+		border: 1px solid var(--rule);
+		padding: 0 0.25rem;
+		color: var(--bone);
+	}
+
+	/* ── layout ─────────────────────────────────────────────────────── */
+	.session {
+		max-width: var(--measure);
+		margin-inline: auto;
+		padding-inline: var(--gutter);
+	}
+
+	.block {
+		padding-block: clamp(2.5rem, 6vw, 4.5rem);
+		border-block-end: 1px solid var(--rule);
+		scroll-margin-block-start: var(--head);
+	}
+
+	.block:last-of-type {
+		border-block-end: 0;
+	}
+
+	.cmdline {
+		margin: 0 0 0.9rem;
+		color: var(--bone);
+		font-size: 0.8rem;
+		letter-spacing: 0.02em;
+		word-break: break-word;
+		direction: ltr;
+		unicode-bidi: isolate;
+		text-align: start;
+	}
+
+	.cmdline::before {
+		content: '❯ ';
+		color: var(--amber);
+		text-shadow: 0 0 10px rgba(255, 180, 84, 0.45);
+	}
+
+	/* Machine text keeps its own left-to-right run; `text-align` cannot use
+	   start/end here, because on a forced-LTR element `start` is always the
+	   left. So the side is set explicitly, and only the side moves. */
+	html[dir='rtl'] :is(.cmdline, .echo__cmd, .echo__tbl dt) {
+		text-align: right;
+	}
+
+	.cmdline--tight {
+		margin-block-end: 0.4rem;
+		font-size: 0.76rem;
+		color: var(--ash);
+	}
+
+	.cmdline__q {
+		color: var(--jade);
+		font-weight: 600;
+	}
+
+	.h2 {
+		margin: 0 0 0.6rem;
+		font-size: clamp(1.15rem, 0.95rem + 1.1vw, 1.7rem);
+		font-weight: 600;
+		letter-spacing: -0.015em;
+		line-height: 1.25;
+	}
+
+	.h2__dim {
+		color: var(--ash);
+		font-weight: 400;
+		font-size: 0.75rem;
+		margin-inline-start: 0.6rem;
+	}
+
+	.lede {
+		margin: 0 0 2rem;
+		color: var(--ash);
+		max-width: 62ch;
+	}
+
+	/* ── key/value manifest ─────────────────────────────────────────── */
+	.kv {
+		margin: 0;
+		max-width: 58rem;
+		border-block-start: 1px solid var(--rule);
+		font-family: var(--mono);
+	}
+
+	.kv__row {
+		display: grid;
+		grid-template-columns: 8.5ch minmax(0, 1fr);
+		gap: 0 1.25ch;
+		padding-block: 0.5rem;
+		border-block-end: 1px solid var(--rule);
+	}
+
+	html[lang='ar'] .kv__row {
+		grid-template-columns: 12ch minmax(0, 1fr);
+	}
+
+	.kv dt {
+		color: var(--ash);
+		font-size: 0.74rem;
+		letter-spacing: 0.06em;
+		padding-block-start: 0.18rem;
+	}
+
+	.kv dt[data-l='en'] {
+		text-transform: uppercase;
+	}
+
+	.kv dd {
+		margin: 0;
+		max-width: 62ch;
+	}
+
+	.kv b {
+		color: var(--amber);
+		font-weight: 600;
+	}
+
+	.kv--tight .kv__row {
+		padding-block: 0.35rem;
+	}
+
+	/* ── panes: the bordered box with a filename bar ────────────────── */
+	.pane {
+		margin: 0;
+		border: 1px solid var(--rule);
+		background: var(--panel);
+	}
+
+	.pane__bar {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.25rem 0.6rem;
+		border-block-end: 1px solid var(--rule);
+		background: var(--panel-2);
+		font-size: 0.68rem;
+		color: var(--ash);
+		letter-spacing: 0.03em;
+	}
+
+	.pane__name {
+		color: var(--bone);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.pane__meta {
+		flex: none;
+	}
+
+	.pane__view {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0.6rem;
+		min-height: 8rem;
+	}
+
+	.pane__view img {
+		display: block;
+		max-width: 100%;
+		max-height: 19rem;
+		width: auto;
+		height: auto;
+		object-fit: contain;
+	}
+
+	.pane--tall .pane__view img {
+		max-height: 28rem;
+	}
+
+	.pane__body {
+		padding: 0.85rem 1rem;
+	}
+
+	/* ── small parts ────────────────────────────────────────────────── */
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem 0.4rem;
+	}
+
+	.chip {
+		font-family: var(--mono);
+		direction: ltr;
+		unicode-bidi: isolate;
+		border: 1px solid var(--rule);
+		padding: 0 0.4rem;
+		font-size: 0.72rem;
+		color: var(--ash);
+		white-space: nowrap;
+	}
+
+	.go {
+		color: var(--bone);
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule);
+		white-space: nowrap;
+	}
+
+	.go::before {
+		content: '→ ';
+		color: var(--amber);
+	}
+
+	html[dir='rtl'] .go::before {
+		content: '← ';
+	}
+
+	.go--out::before,
+	html[dir='rtl'] .go--out::before {
+		content: '↗ ';
+	}
+
+	.go:hover {
+		color: var(--amber);
+		border-block-end-color: var(--amber);
+	}
+
+	/* status colours: the only meaning colour carries here */
+	.st {
+		font-size: 0.68rem;
+		letter-spacing: 0.08em;
+		color: var(--ash);
+		flex: none;
+	}
+
+	.st[data-l='en'] {
+		text-transform: uppercase;
+	}
+
+	.st--live,
+	.st--shipped {
+		color: var(--jade);
+	}
+
+	.st--wip {
+		color: var(--amber);
+	}
+
+	.st--delisted,
+	.st--archived {
+		color: var(--rose);
+	}
+
+	.prose p {
+		margin: 0 0 1rem;
+		max-width: 64ch;
+	}
+
+	/* ── footer ─────────────────────────────────────────────────────── */
+	.foot {
+		max-width: var(--measure);
+		margin-inline: auto;
+		padding: 2rem var(--gutter) 0;
+		color: var(--ash);
+		font-size: 0.76rem;
+	}
+
+	.foot__line {
+		margin: 0;
+	}
+
+	/* An LTR island inside an RTL line must not be allowed to break, or the
+	   separator ends up alone at the start of a line. */
+	.foot__line .tty {
+		white-space: nowrap;
+	}
+
+	.foot__code {
+		color: var(--jade);
+	}
+
+	/* ── reduced motion ─────────────────────────────────────────────── */
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+		}
+	}
+
+	/* ── narrow ─────────────────────────────────────────────────────── */
+	@media (max-width: 34rem) {
+		.status__path {
+			display: none;
+		}
+
+		/* A phone has no "/" key to press and no Tab. The hint would cost
+		   two lines of a sticky header for advice nobody there can take. */
+		.cmd__hint {
+			display: none;
+		}
+	}
+
+	@media (max-width: 30rem) {
+		.status {
+			font-size: 0.7rem;
+		}
+
+		.status__dir {
+			display: none;
+		}
+
+		.kv__row,
+		html[lang='ar'] .kv__row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.1rem;
+		}
+
+		.echo__tbl {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

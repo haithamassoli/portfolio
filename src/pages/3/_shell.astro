@@ -1,0 +1,900 @@
+---
+/* The frame every /3 sub-page sits in: head, fonts, the field behind the
+   glass, the refraction filter, the sticky glass bar with the language
+   switch, and the footer. Pages stay thin.
+
+   Glass budget: `backdrop-filter` runs on exactly two things here — the bar
+   and the puck inside the language switch. Everything else is `.pane`, which
+   is the same rim and the same tint painted flat. Over a blurred field you
+   cannot tell, and the compositor can. */
+import LangBoot from '../../components/LangBoot.astro';
+import StyleSwitcher from '../../components/StyleSwitcher.astro';
+import T from '../../components/T.astro';
+import { s, pair } from '../../data/variant-ui';
+import { profile } from '../../../content/profile';
+
+interface Props {
+	title: string;
+	description: string;
+	/** Which nav item is the current page. */
+	here?: 'projects' | 'hire';
+}
+
+const { title, description, here } = Astro.props;
+
+const nav = [
+	{ href: '/3', label: s('nav.home'), key: 'home' },
+	{ href: '/3/projects', label: s('work.all'), key: 'projects' },
+	{ href: '/3/hire', label: s('nav.hire'), key: 'hire' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+		/>
+		<LangBoot />
+	</head>
+	<body>
+		<!-- One turbulence field, displaced. The language switch drinks from it. -->
+		<svg
+			class="filters"
+			aria-hidden="true"
+			focusable="false"
+			width="0"
+			height="0"
+		>
+			<filter
+				id="liquid"
+				x="-25%"
+				y="-25%"
+				width="150%"
+				height="150%"
+				color-interpolation-filters="sRGB"
+			>
+				<feTurbulence
+					type="fractalNoise"
+					baseFrequency="0.013 0.019"
+					numOctaves="2"
+					seed="7"
+					result="noise"></feTurbulence>
+				<feGaussianBlur in="noise" stdDeviation="1.2" result="soft"
+				></feGaussianBlur>
+				<feDisplacementMap
+					in="SourceGraphic"
+					in2="soft"
+					scale="18"
+					xChannelSelector="R"
+					yChannelSelector="G"></feDisplacementMap>
+			</filter>
+		</svg>
+
+		<div class="field" aria-hidden="true"><div class="blobs"></div></div>
+		<div class="grain" aria-hidden="true"></div>
+
+		<a class="skip" href="#main">
+			<T v={s('nav.skip')} />
+		</a>
+
+		<header class="top">
+			<div class="top__in pane pane--wet">
+				<a class="brand" href="/3">
+					<span class="brand__lens" aria-hidden="true"></span>
+					<span class="brand__name" data-l="en" lang="en">Haitham Assoli</span>
+					<span class="brand__name" data-l="ar" lang="ar">هيثم العسولي</span>
+				</a>
+
+				<nav class="nav" aria-label="Main navigation — التنقل الرئيسي">
+					{
+						nav.map((n) => (
+							<a
+								class="nav__a"
+								href={n.href}
+								aria-current={n.key === here ? 'page' : undefined}
+							>
+								<T v={n.label} />
+							</a>
+						))
+					}
+				</nav>
+
+				<button type="button" class="lang" data-lang-toggle>
+					<span class="lang__slot" aria-hidden="true">
+						<span class="lang__side lang__side--en">EN</span>
+						<span class="lang__side lang__side--ar" lang="ar">ع</span>
+						<span class="lang__puck">
+							<span class="lang__glass"></span>
+							<span class="lang__rim"></span>
+						</span>
+					</span>
+					<span class="sr" data-l="en" lang="ar">اقرأ بالعربية</span>
+					<span class="sr" data-l="ar" lang="en">Read in English</span>
+				</button>
+			</div>
+		</header>
+
+		<main id="main"><slot /></main>
+
+		<footer class="foot">
+			<div class="foot__in">
+				<p class="foot__name">
+					<span data-l="en" lang="en">Haitham Assoli</span>
+					<span data-l="ar" lang="ar">هيثم العسولي</span>
+				</p>
+				<p class="foot__line"><T v={s('footer.line')} /></p>
+				<ul class="foot__links">
+					<li>
+						<a
+							href={profile.links.github}
+							rel="noreferrer noopener"
+							target="_blank">GitHub</a
+						>
+					</li>
+					<li>
+						<a
+							href={profile.links.linkedin}
+							rel="noreferrer noopener"
+							target="_blank">LinkedIn</a
+						>
+					</li>
+					<li>
+						<a
+							href={profile.links.resume}
+							rel="noreferrer noopener"
+							target="_blank"><T v={s('nav.cv')} /></a
+						>
+					</li>
+					<li>
+						<a href={`mailto:${profile.email}`} dir="ltr">{profile.email}</a>
+					</li>
+				</ul>
+				<p class="foot__tag">
+					<T
+						v={pair('Variant 3 — liquid glass', 'التصميم الثالث — زجاج سائل')}
+					/>
+				</p>
+			</div>
+		</footer>
+
+		<StyleSwitcher n={3} />
+	</body>
+</html>
+
+<style is:global>
+	/* ══ tokens ══════════════════════════════════════════════════════════ */
+	:root {
+		--abyss: #06080f;
+		--deep: #0d1424;
+		--lagoon: #1fb6c8;
+		--iris: #6b5bff;
+		--ember: #ff8a3d;
+		--rose: #ff5b8a;
+		--frost: #eaf2ff;
+		--haze: rgba(234, 242, 255, 0.66);
+		--mute: rgba(234, 242, 255, 0.56);
+
+		--glass-tint: rgba(16, 26, 48, 0.5);
+		--glass-blur: blur(22px) saturate(1.7) brightness(1.12) contrast(1.04);
+		--glass-lift:
+			0 34px 70px -34px rgba(2, 4, 10, 0.95),
+			0 10px 26px -16px rgba(2, 4, 10, 0.75);
+		--radius: 22px;
+
+		--display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+		--body: 'Newsreader', ui-serif, Georgia, serif;
+		--mono: 'Azeret Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+		--arabic: 'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif;
+
+		--gut: clamp(1.15rem, 4vw, 3.25rem);
+		--maxw: 1180px;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		scroll-padding-block-start: 6.5rem;
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		overflow-x: hidden;
+		background: var(--abyss);
+		color: var(--frost);
+		font-family: var(--body);
+		font-size: clamp(1rem, 0.94rem + 0.3vw, 1.1rem);
+		line-height: 1.62;
+		font-optical-sizing: auto;
+		-webkit-font-smoothing: antialiased;
+		padding-block-end: 7.5rem;
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--lagoon);
+		outline-offset: 3px;
+		border-radius: 6px;
+	}
+
+	.sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.skip {
+		position: fixed;
+		inset-block-start: 0.75rem;
+		inset-inline-start: 0.75rem;
+		z-index: 90;
+		transform: translateY(-250%);
+		padding: 0.6rem 1rem;
+		border-radius: 999px;
+		background: var(--frost);
+		color: var(--abyss);
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		text-decoration: none;
+	}
+	.skip:focus-visible {
+		transform: none;
+	}
+
+	.filters {
+		position: absolute;
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+
+	/* ══ the field behind the glass ══════════════════════════════════════ */
+	.field {
+		position: fixed;
+		inset: -12vh -10vw;
+		z-index: -2;
+		pointer-events: none;
+	}
+
+	.blobs {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(
+				42vw 42vw at 14% 12%,
+				rgba(31, 182, 200, 0.5),
+				transparent 62%
+			),
+			radial-gradient(
+				48vw 46vw at 84% 26%,
+				rgba(107, 91, 255, 0.46),
+				transparent 64%
+			),
+			radial-gradient(
+				40vw 40vw at 72% 78%,
+				rgba(255, 138, 61, 0.36),
+				transparent 62%
+			),
+			radial-gradient(
+				38vw 38vw at 22% 88%,
+				rgba(255, 91, 138, 0.3),
+				transparent 64%
+			),
+			linear-gradient(180deg, #080c18, #05080f 60%, #080c18);
+		filter: blur(30px);
+		animation: drift 48s ease-in-out infinite alternate;
+		will-change: transform;
+	}
+
+	@keyframes drift {
+		0% {
+			transform: translate3d(-3%, -2%, 0) scale(1.06);
+		}
+		100% {
+			transform: translate3d(4%, 3%, 0) scale(1.16) rotate(5deg);
+		}
+	}
+
+	.grain {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		opacity: 0.055;
+		mix-blend-mode: overlay;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+	}
+
+	/* ══ glass ═══════════════════════════════════════════════════════════ */
+	.pane {
+		position: relative;
+		isolation: isolate;
+		border-radius: var(--radius);
+		background: linear-gradient(
+			158deg,
+			rgba(26, 40, 70, 0.72),
+			rgba(9, 15, 29, 0.86)
+		);
+		box-shadow: var(--glass-lift);
+	}
+
+	/* the rim: specular top-left, caustic bottom-right, masked to a hairline */
+	.pane::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		border-radius: inherit;
+		padding: 1px;
+		background: linear-gradient(
+			145deg,
+			rgba(255, 255, 255, 0.78),
+			rgba(203, 231, 255, 0.22) 26%,
+			rgba(255, 255, 255, 0.02) 52%,
+			rgba(11, 22, 44, 0.5) 84%,
+			color-mix(in srgb, var(--band, #a0d2ff) 55%, transparent)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	/* Two of these per viewport, no more. */
+	.pane--wet {
+		background: var(--glass-tint);
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+	}
+
+	@supports not (
+		(-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+	) {
+		.pane--wet {
+			background: linear-gradient(
+				158deg,
+				rgba(28, 42, 72, 0.97),
+				rgba(10, 16, 30, 0.99)
+			);
+		}
+		.blobs {
+			filter: blur(60px);
+			opacity: 0.85;
+		}
+	}
+
+	/* ══ the bar ═════════════════════════════════════════════════════════ */
+	.top {
+		position: sticky;
+		inset-block-start: 0.75rem;
+		z-index: 50;
+		padding: 0.75rem var(--gut) 0;
+		max-width: var(--maxw);
+		margin-inline: auto;
+	}
+
+	.top__in {
+		--radius: 999px;
+		/* darker than the general glass tint: the bar passes over white app
+		   screenshots and the wordmark has to stay legible on them */
+		background: rgba(8, 14, 28, 0.74);
+		display: flex;
+		align-items: center;
+		gap: clamp(0.5rem, 2vw, 1.5rem);
+		padding-block: 0.45rem;
+		padding-inline: 1.1rem 0.5rem;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		text-decoration: none;
+		font-family: var(--display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: -0.02em;
+		white-space: nowrap;
+	}
+
+	.brand__lens {
+		width: 13px;
+		height: 13px;
+		border-radius: 999px;
+		flex: none;
+		background: radial-gradient(
+			120% 120% at 30% 24%,
+			rgba(255, 255, 255, 0.95),
+			rgba(31, 182, 200, 0.7) 46%,
+			rgba(107, 91, 255, 0.85)
+		);
+		box-shadow: 0 0 12px 1px rgba(31, 182, 200, 0.55);
+	}
+
+	.nav {
+		display: flex;
+		align-items: center;
+		gap: clamp(0.35rem, 1.6vw, 1rem);
+		margin-inline-start: auto;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.nav__a {
+		padding: 0.4rem 0.55rem;
+		border-radius: 999px;
+		text-decoration: none;
+		color: var(--haze);
+		white-space: nowrap;
+		transition:
+			color 0.2s,
+			background-color 0.2s;
+	}
+
+	.nav__a:hover {
+		color: var(--frost);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.nav__a[aria-current='page'] {
+		color: var(--frost);
+		background: rgba(255, 255, 255, 0.1);
+		box-shadow: inset 0 0 0 1px rgba(200, 230, 255, 0.22);
+	}
+
+	/* ══ the language switch — a lens on a rail ══════════════════════════ */
+	.lang {
+		all: unset;
+		flex: none;
+		cursor: pointer;
+		border-radius: 999px;
+	}
+
+	.lang__slot {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: center;
+		direction: ltr;
+		width: 5.4rem;
+		height: 2.1rem;
+		border-radius: 999px;
+		background: rgba(4, 8, 18, 0.55);
+		box-shadow:
+			inset 0 1px 2px rgba(2, 5, 12, 0.9),
+			inset 0 0 0 1px rgba(200, 230, 255, 0.16);
+		overflow: hidden;
+	}
+
+	.lang__side {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.06em;
+		color: rgba(234, 242, 255, 0.4);
+		transition: color 0.45s ease;
+	}
+
+	.lang__side--ar {
+		font-family: var(--arabic);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0;
+	}
+
+	html[lang='en'] .lang__side--en,
+	html[lang='ar'] .lang__side--ar {
+		color: var(--frost);
+	}
+
+	.lang__puck {
+		position: absolute;
+		z-index: 2;
+		inset-block: 3px;
+		left: 3px;
+		width: calc(50% - 3px);
+		border-radius: 999px;
+		transform: translateX(0);
+		transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.2, 1);
+	}
+
+	html[lang='ar'] .lang__puck {
+		transform: translateX(100%);
+	}
+
+	/* the one place on this page where the turbulence field is spent: the
+	   letter under the puck bends as the glass passes over it */
+	.lang__glass {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		-webkit-backdrop-filter: blur(0.6px) url(#liquid) saturate(1.8)
+			brightness(1.22);
+		backdrop-filter: blur(0.6px) url(#liquid) saturate(1.8) brightness(1.22);
+		background: radial-gradient(
+			120% 130% at 32% 20%,
+			rgba(255, 255, 255, 0.22),
+			rgba(255, 255, 255, 0.04) 46%,
+			rgba(6, 20, 34, 0.2)
+		);
+		box-shadow:
+			inset 0 1px 1px rgba(255, 255, 255, 0.6),
+			inset 0 -8px 14px -9px rgba(120, 210, 255, 0.6),
+			0 8px 18px -8px rgba(2, 6, 14, 0.9);
+	}
+
+	.lang__rim {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		padding: 1px;
+		background: conic-gradient(
+			from 210deg,
+			rgba(255, 255, 255, 0.95),
+			rgba(160, 230, 255, 0.35) 22%,
+			rgba(255, 255, 255, 0.04) 46%,
+			rgba(10, 26, 48, 0.6) 68%,
+			rgba(255, 190, 130, 0.45) 86%,
+			rgba(255, 255, 255, 0.95)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+	}
+
+	.lang:hover .lang__glass {
+		box-shadow:
+			inset 0 1px 1px rgba(255, 255, 255, 0.75),
+			inset 0 -8px 14px -9px rgba(120, 210, 255, 0.8),
+			0 8px 20px -8px rgba(2, 6, 14, 0.9);
+	}
+
+	.lang:focus-visible .lang__slot {
+		outline: 2px solid var(--lagoon);
+		outline-offset: 3px;
+	}
+
+	/* ══ shared type ═════════════════════════════════════════════════════ */
+	.wrap {
+		max-width: var(--maxw);
+		margin-inline: auto;
+		padding-inline: var(--gut);
+	}
+
+	/* a titled section of a sub-page */
+	.block {
+		padding-block-start: clamp(2.75rem, 7vw, 4.5rem);
+	}
+
+	.block > .h2 {
+		margin-block-end: clamp(1.1rem, 3vw, 1.75rem);
+	}
+
+	.eyebrow {
+		margin: 0 0 0.9rem;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(160, 232, 242, 0.9);
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		flex-wrap: wrap;
+	}
+
+	.dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 999px;
+		background: var(--band, var(--lagoon));
+		box-shadow: 0 0 0 3px
+			color-mix(in srgb, var(--band, var(--lagoon)) 22%, transparent);
+		flex: none;
+	}
+
+	.h1 {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(2.3rem, 1.2rem + 4.6vw, 4.6rem);
+		line-height: 0.98;
+		letter-spacing: -0.04em;
+		font-variation-settings: 'wdth' 86;
+		text-wrap: balance;
+	}
+
+	.h2 {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.6rem);
+		line-height: 1.04;
+		letter-spacing: -0.028em;
+		font-variation-settings: 'wdth' 92;
+		text-wrap: balance;
+	}
+
+	.h3 {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 600;
+		font-size: clamp(1.15rem, 1rem + 0.7vw, 1.45rem);
+		line-height: 1.15;
+		letter-spacing: -0.02em;
+	}
+
+	.lede {
+		margin: 0;
+		max-width: 62ch;
+		font-size: clamp(1.08rem, 1rem + 0.5vw, 1.3rem);
+		line-height: 1.62;
+		color: var(--frost);
+	}
+
+	.sub {
+		margin: 1rem 0 0;
+		max-width: 52ch;
+		color: var(--haze);
+		font-size: 1.05rem;
+	}
+
+	.mono {
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--mute);
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.chips li {
+		padding: 0.26rem 0.62rem;
+		border-radius: 999px;
+		border: 1px solid rgba(200, 230, 255, 0.18);
+		background: rgba(255, 255, 255, 0.05);
+		font-family: var(--mono);
+		font-size: 0.67rem;
+		letter-spacing: 0.03em;
+		color: rgba(234, 242, 255, 0.82);
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 0.6rem 1.1rem;
+		border-radius: 999px;
+		border: 1px solid rgba(200, 230, 255, 0.24);
+		background: rgba(255, 255, 255, 0.06);
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.05em;
+		text-decoration: none;
+		color: var(--frost);
+		transition:
+			background-color 0.2s,
+			border-color 0.2s,
+			transform 0.2s;
+	}
+
+	.btn:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(200, 230, 255, 0.45);
+		transform: translateY(-1px);
+	}
+
+	.btn--go {
+		background: rgba(234, 242, 255, 0.92);
+		border-color: transparent;
+		color: #071021;
+		font-weight: 500;
+	}
+
+	.btn--go:hover {
+		background: #fff;
+	}
+
+	.pip {
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: var(--band, var(--lagoon));
+		box-shadow: 0 0 10px 1px
+			color-mix(in srgb, var(--band, var(--lagoon)) 70%, transparent);
+		flex: none;
+	}
+
+	/* ══ footer ══════════════════════════════════════════════════════════ */
+	.foot {
+		margin-block-start: clamp(4rem, 10vw, 7rem);
+	}
+
+	.foot__in {
+		max-width: var(--maxw);
+		margin-inline: auto;
+		padding: 2rem var(--gut) 0;
+		border-block-start: 1px solid rgba(200, 230, 255, 0.12);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		align-items: baseline;
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.05em;
+		color: var(--mute);
+	}
+
+	.foot p {
+		margin: 0;
+	}
+
+	.foot__name {
+		color: var(--frost);
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1.1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.foot__links a {
+		text-decoration: none;
+		color: var(--haze);
+		border-block-end: 1px solid transparent;
+		padding-block-end: 2px;
+		transition:
+			color 0.2s,
+			border-color 0.2s;
+	}
+
+	.foot__links a:hover {
+		color: var(--frost);
+		border-block-end-color: var(--lagoon);
+	}
+
+	.foot__tag {
+		margin-inline-start: auto !important;
+	}
+
+	/* ══ Arabic ══════════════════════════════════════════════════════════ */
+	/* Every <T> puts lang on the element itself, so this catches the copy
+	   exactly. Arabic gets air, keeps its numerals Western, and never
+	   letter-spaces or italicises. */
+	[lang='ar'] {
+		font-family: var(--arabic);
+		font-style: normal;
+		letter-spacing: 0;
+		font-variation-settings: normal;
+		text-transform: none;
+	}
+
+	[lang='ar'] em,
+	[lang='ar'] i {
+		font-style: normal;
+	}
+
+	p[lang='ar'],
+	li[lang='ar'],
+	[lang='ar'] p,
+	[lang='ar'] li {
+		line-height: 1.85;
+	}
+
+	.h1[lang='ar'],
+	.h2[lang='ar'],
+	.h3[lang='ar'] {
+		font-weight: 700;
+		line-height: 1.36;
+	}
+
+	.h1[lang='ar'] {
+		font-size: clamp(1.95rem, 1.1rem + 3.6vw, 3.7rem);
+	}
+
+	.eyebrow[lang='ar'],
+	.mono[lang='ar'],
+	[lang='ar'].nav__a,
+	.eyebrow [lang='ar'],
+	.mono [lang='ar'] {
+		font-size: 0.82rem;
+	}
+
+	/* ══ responsive ══════════════════════════════════════════════════════ */
+	@media (max-width: 720px) {
+		.top__in {
+			flex-wrap: wrap;
+			--radius: 22px;
+			padding-inline: 0.9rem 0.55rem;
+		}
+		.nav {
+			order: 3;
+			width: 100%;
+			margin-inline-start: 0;
+			justify-content: flex-start;
+			padding-block-start: 0.2rem;
+			gap: 0.15rem;
+		}
+		.lang {
+			margin-inline-start: auto;
+		}
+		.foot__tag {
+			margin-inline-start: 0 !important;
+		}
+	}
+
+	@media (max-width: 380px) {
+		.nav__a {
+			padding-inline: 0.4rem;
+			font-size: 0.66rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+		.blobs {
+			animation: none !important;
+		}
+		.lang__puck,
+		.lang__side,
+		.btn,
+		.nav__a {
+			transition: none !important;
+		}
+	}
+</style>

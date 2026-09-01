@@ -1,0 +1,545 @@
+---
+/* /6/projects — the contact sheet.
+
+   Thirty-nine projects is a roll of film, not a card grid. Everything shot
+   gets printed on one sheet at thumbnail size, cut into rolls by what the
+   thing is, and the eight that were worth printing big are circled in grease
+   pencil. The circle is the whole organising idea: it says "these are the
+   selects", which is exactly what `featured` means. */
+import { Image } from 'astro:assets';
+import Shell from './_shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import type { ProjectCategory, ProjectStatus } from '../../../content/types';
+
+const catKey: Record<ProjectCategory, Parameters<typeof s>[0]> = {
+	web: 'cat.web',
+	mobile: 'cat.mobile',
+	ai: 'cat.ai',
+	desktop: 'cat.desktop',
+	extension: 'cat.extension',
+	client: 'cat.client',
+};
+
+/* "In production" reads twice over in both languages: the film sense and the
+   release sense. The other four come straight from the site dictionary. */
+const stateWord = (st: ProjectStatus) =>
+	st === 'wip' ? pair('In production', 'قيد الإنتاج') : s(`status.${st}`);
+
+const order: ProjectCategory[] = [
+	'web',
+	'mobile',
+	'ai',
+	'desktop',
+	'client',
+	'extension',
+];
+
+const rolls = order
+	.map((category) => ({
+		category,
+		items: projects.filter((p) => p.category === category),
+	}))
+	.filter((r) => r.items.length > 0);
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const isPortrait = (img?: ImageMetadata) => !!img && img.height > img.width;
+
+const selects = projects.filter((p) => p.featured).length;
+---
+
+<Shell
+	title="Contact sheet — Night Reel — Haitham Assoli"
+	description="All thirty-nine projects Haitham Assoli has shipped, printed on one contact sheet and cut into rolls by what each one is. The eight written up in full are circled."
+	mark={pair('39 frames', '39 كادرًا')}
+	current="sheet"
+>
+	<section class="band sheet">
+		<div class="wrap">
+			<header class="head">
+				<p class="eyebrow">
+					<T v={pair('Contact sheet', 'ورقة اللقطات')} />
+				</p>
+				<h1 class="head__title" data-l="en" lang="en">
+					Thirty-nine frames, one sheet
+				</h1>
+				<h1 class="head__title" data-l="ar" lang="ar">
+					تسعة وثلاثون كادرًا على ورقة واحدة
+				</h1>
+				<p class="head__lede" data-l="en" lang="en">
+					Everything printed at thumbnail size and cut into rolls by what the
+					thing is. Nothing is hidden behind a “show more”: the delisted ones
+					and the one-afternoon builds are on the sheet beside the ones that
+					took a year.
+				</p>
+				<p class="head__lede" data-l="ar" lang="ar">
+					كل شيء مطبوع بحجم صغير، والورقة مقسومة إلى بكرات بحسب نوع العمل. لا
+					شيء مخبّأ خلف زر «المزيد»: ما أُزيل من المتاجر وما بُني في أصيل واحد
+					موضوعان على الورقة إلى جانب ما استغرق سنة.
+				</p>
+			</header>
+
+			<div class="legend">
+				<p class="legend__note">
+					<span class="legend__ring" aria-hidden="true">
+						<svg viewBox="0 0 60 34" aria-hidden="true">
+							<path
+								d="M32 3C13 2 3 11 3 18c0 8 12 14 27 13 14-1 26-7 26-14C56 9 45 3 29 3c-9 0-16 2-20 6"
+								vector-effect="non-scaling-stroke"></path>
+						</svg>
+					</span>
+					<span data-l="en" lang="en">
+						Circled in grease pencil: the {selects} selects, each written up in full.
+					</span>
+					<span data-l="ar" lang="ar">
+						المُحاط بالقلم الشمعي: {selects} لقطات مختارة، كل واحدة مشروحة بالكامل.
+					</span>
+				</p>
+
+				<div class="legend__jump">
+					{
+						rolls.map((roll) => (
+							<a class="legend__link" href={`#roll-${roll.category}`}>
+								<T v={s(catKey[roll.category])} />
+								<span class="legend__count"> {roll.items.length}</span>
+							</a>
+						))
+					}
+				</div>
+			</div>
+		</div>
+
+		{
+			rolls.map((roll, ri) => (
+				<section class="roll" id={`roll-${roll.category}`}>
+					<div class="wrap">
+						<h2 class="roll__head">
+							<span class="roll__no">{`Roll ${pad(ri + 1)}`}</span>
+							<span class="roll__name">
+								<T v={s(catKey[roll.category])} />
+							</span>
+							<span class="roll__rule" aria-hidden="true" />
+							<span class="roll__count">
+								{roll.items.length < 3 ? (
+									<T
+										v={pair(
+											`Short end · ${roll.items.length}`,
+											`طرف قصير · ${roll.items.length}`,
+										)}
+									/>
+								) : (
+									<T
+										v={pair(
+											`${roll.items.length} frames`,
+											`${roll.items.length} كادرًا`,
+										)}
+									/>
+								)}
+							</span>
+						</h2>
+
+						<div class="sprocket" aria-hidden="true" />
+
+						<ol class="frames">
+							{roll.items.map((p, i) => (
+								<li
+									class={p.featured ? 'frame frame--select' : 'frame'}
+									style={`--gel: ${p.accent}`}
+								>
+									<div class="frame__gate">
+										<div
+											class={
+												isPortrait(p.image) ? 'plate plate--stand' : 'plate'
+											}
+										>
+											<span class="plate__gel" aria-hidden="true" />
+											{p.image ? (
+												<Image
+													class={
+														isPortrait(p.image)
+															? 'plate__img plate__img--stand'
+															: 'plate__img'
+													}
+													src={p.image}
+													alt=""
+													widths={[220, 340, 460]}
+													sizes="(min-width: 62rem) 16vw, (min-width: 40rem) 28vw, 42vw"
+													loading="lazy"
+													decoding="async"
+												/>
+											) : (
+												<span class="plate__empty">
+													<T v={pair('No still', 'بلا لقطة')} />
+												</span>
+											)}
+										</div>
+
+										{p.featured && (
+											<svg
+												class="frame__mark"
+												viewBox="0 0 60 34"
+												preserveAspectRatio="none"
+												aria-hidden="true"
+											>
+												<path
+													d="M32 3C13 2 3 11 3 18c0 8 12 14 27 13 14-1 26-7 26-14C56 9 45 3 29 3c-9 0-16 2-20 6"
+													vector-effect="non-scaling-stroke"
+												/>
+											</svg>
+										)}
+									</div>
+
+									<p class="frame__edge">
+										<span class="frame__no">{pad(i + 1)}</span>
+										<T v={yearPair(p.year)} />
+										<span class={`state state--${p.status}`}>
+											<T v={stateWord(p.status)} />
+										</span>
+									</p>
+
+									<h3 class="frame__title">
+										<a class="frame__link" href={`/6/work/${p.slug}`}>
+											<T v={p.title} />
+										</a>
+									</h3>
+
+									<T v={p.tagline} as="p" class="frame__line" />
+								</li>
+							))}
+						</ol>
+
+						<div class="sprocket" aria-hidden="true" />
+					</div>
+				</section>
+			))
+		}
+	</section>
+</Shell>
+
+<style is:global>
+	/* ── The sheet ─────────────────────────────────────────────────────── */
+
+	.sheet .head__title {
+		font-size: clamp(1.9rem, 5.4vw, 3.6rem);
+		font-stretch: 125%;
+		font-variation-settings:
+			'wdth' 125,
+			'wght' 650;
+	}
+
+	.legend {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.25rem;
+		padding-block: 1.1rem;
+		border-block: 1px solid rgba(163, 171, 189, 0.16);
+	}
+
+	.legend__note {
+		margin: 0;
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		font-family: var(--credit);
+		font-size: 0.85rem;
+		letter-spacing: 0.1em;
+		color: var(--mist);
+	}
+
+	[lang='ar'].legend__note,
+	.legend__note [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.92rem;
+	}
+
+	.legend__ring {
+		flex: none;
+		display: block;
+		width: 2.6rem;
+		height: 1.5rem;
+	}
+
+	.legend__ring svg,
+	.frame__mark {
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+
+	.legend__ring path,
+	.frame__mark path {
+		fill: none;
+		stroke: var(--sodium);
+		stroke-width: 2;
+		stroke-linecap: round;
+		opacity: 0.9;
+	}
+
+	.legend__jump {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.legend__link {
+		font-family: var(--credit);
+		font-size: 0.76rem;
+		font-weight: 500;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--mist);
+		padding: 0.3rem 0.65rem;
+		border: 1px solid rgba(163, 171, 189, 0.18);
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.legend__link:hover {
+		color: var(--key);
+		border-color: rgba(255, 194, 122, 0.5);
+	}
+
+	[lang='ar'].legend__link {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.84rem;
+	}
+
+	.legend__count {
+		color: var(--key);
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* ── A roll ────────────────────────────────────────────────────────── */
+
+	.roll {
+		margin-top: clamp(2.75rem, 7vh, 4.5rem);
+		scroll-margin-top: calc(var(--bar) + 4rem);
+	}
+
+	.roll__head {
+		margin: 0 0 0.7rem;
+		display: flex;
+		align-items: baseline;
+		gap: 0.7rem;
+		font-family: var(--credit);
+		font-size: 0.82rem;
+		font-weight: 500;
+		letter-spacing: 0.24em;
+		text-transform: uppercase;
+		color: var(--mist);
+	}
+
+	.roll__no {
+		color: var(--key);
+		flex: none;
+	}
+
+	.roll__name {
+		flex: none;
+		color: var(--print);
+	}
+
+	[lang='ar'].roll__name,
+	[lang='ar'].roll__count {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.92rem;
+	}
+
+	.roll__rule {
+		flex: 1;
+		height: 1px;
+		min-width: 0.75rem;
+		background: rgba(163, 171, 189, 0.22);
+	}
+
+	.roll__count {
+		flex: none;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* ── A frame on the sheet ──────────────────────────────────────────── */
+
+	.frames {
+		list-style: none;
+		margin: 0;
+		padding-block: 1.1rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+		gap: 1.4rem 0.9rem;
+	}
+
+	.frame {
+		min-width: 0;
+	}
+
+	.frame__gate {
+		position: relative;
+		margin-bottom: 0.6rem;
+	}
+
+	.frame .plate {
+		aspect-ratio: 4 / 3;
+	}
+
+	/* The sheet sits in the dark and comes up one frame at a time under the
+	   pointer, the same rule the home page reel runs on. With no pointer to
+	   raise a frame with, the whole sheet prints at readable density instead. */
+	@media (hover: hover) {
+		.frame .plate__img {
+			filter: brightness(0.66) saturate(0.74) contrast(1.06);
+		}
+	}
+
+	.frame__mark {
+		position: absolute;
+		inset: -0.45rem -0.55rem;
+		z-index: 3;
+		pointer-events: none;
+	}
+
+	.frame__edge {
+		margin: 0 0 0.3rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		font-family: var(--credit);
+		font-size: 0.7rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--mist);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.frame__edge [lang='ar'] {
+		font-family: 'Tajawal', sans-serif;
+		font-size: 0.8rem;
+	}
+
+	.frame__no {
+		color: rgba(163, 171, 189, 0.5);
+	}
+
+	.frame__title {
+		margin: 0 0 0.2rem;
+		font-family: var(--display);
+		font-stretch: 100%;
+		font-variation-settings:
+			'wdth' 100,
+			'wght' 600;
+		font-weight: 600;
+		font-size: 1rem;
+		line-height: 1.15;
+		letter-spacing: -0.005em;
+		text-transform: uppercase;
+	}
+
+	[lang='ar'].frame__title,
+	.frame__title [lang='ar'] {
+		font-family: 'Cairo', sans-serif;
+		font-weight: 700;
+		font-size: 1.05rem;
+		line-height: 1.5;
+	}
+
+	.frame__link {
+		text-decoration: none;
+		background-image: linear-gradient(var(--gel), var(--gel));
+		background-repeat: no-repeat;
+		background-position: var(--upos) 100%;
+		background-size: 0% 1px;
+		transition: background-size 0.35s ease;
+	}
+
+	/* The whole frame is the target; the title carries the accessible name. */
+	.frame__link::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+	}
+
+	.frame {
+		position: relative;
+	}
+
+	.frame:hover .frame__link,
+	.frame:focus-within .frame__link {
+		background-size: 100% 1px;
+	}
+
+	.frame:hover .plate__img,
+	.frame:focus-within .plate__img {
+		filter: brightness(1) saturate(1) contrast(1);
+	}
+
+	.frame:hover .plate::after,
+	.frame:focus-within .plate::after {
+		opacity: 0.5;
+	}
+
+	.frame:hover .plate__gel,
+	.frame:focus-within .plate__gel {
+		opacity: 0.8;
+	}
+
+	.frame--select:hover .frame__mark path,
+	.frame--select:focus-within .frame__mark path {
+		stroke-width: 3;
+	}
+
+	.frame__line {
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.45;
+		color: var(--mist);
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		overflow: hidden;
+	}
+
+	[lang='ar'].frame__line {
+		font-family: 'Amiri', serif;
+		font-weight: 400;
+		font-size: 0.98rem;
+		line-height: 1.75;
+	}
+
+	/* A thumbnail this small cannot carry a sentence. Below 34rem the sheet
+	   is titles and edge codes only, which is what a contact sheet is. */
+	@media (max-width: 34rem) {
+		.frame__line {
+			display: none;
+		}
+	}
+
+	@media (min-width: 40rem) {
+		.frames {
+			grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+			gap: 1.8rem 1.2rem;
+		}
+	}
+
+	@media (min-width: 62rem) {
+		.frames {
+			grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+			gap: 2.2rem 1.5rem;
+		}
+
+		.frame__title {
+			font-size: 1.1rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.frame__link {
+			transition: none;
+		}
+	}
+</style>
