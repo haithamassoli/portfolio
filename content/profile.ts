@@ -18,8 +18,8 @@ export const profile = {
 	} satisfies I18n,
 
 	tagline: {
-		en: 'I turn designs into fast, accessible products, and ship them.',
-		ar: 'أحوّل التصاميم إلى منتجات سريعة وسهلة الوصول، وأطلقها فعليًا.',
+		en: 'I build fast, accessible products from design to release.',
+		ar: 'أبني منتجات سريعة وسهلة الوصول من التصميم حتى الإطلاق.',
 	} satisfies I18n,
 
 	location: { en: 'Amman, Jordan', ar: 'عمّان، الأردن' } satisfies I18n,
@@ -37,14 +37,14 @@ export const profile = {
 
 	about: {
 		en: [
-			'I build web and mobile products end to end, from the data model to the last pixel. Most of what I ship is bilingual and right-to-left first, because most of my users read Arabic.',
-			'I like problems where the constraint is real: a model that has to run on the device instead of a server, a search index that has to answer in milliseconds without a backend, a booking flow that cannot double-sell the same hour. The interesting part is never the framework.',
-			"Lately most of my work has been on-device AI: video and audio processing that runs entirely on the user's phone or laptop, with no cloud and no telemetry.",
+			'I build web and mobile products from the data model to the final interface. Most are bilingual and right-to-left first because my users read Arabic.',
+			'I work on constraints that shape the product: models that run on the device, search that answers in milliseconds without a backend, and booking flows that prevent double-selling a time slot.',
+			'My recent work focuses on on-device AI for video and audio on a phone or laptop, without cloud processing or telemetry.',
 		],
 		ar: [
-			'أبني منتجات ويب وموبايل من طرف إلى طرف، من نموذج البيانات حتى آخر بكسل. معظم ما أطلقه ثنائي اللغة ومبني للاتجاه من اليمين إلى اليسار أولًا، لأن معظم مستخدميّ يقرؤون بالعربية.',
-			'تستهويني المشكلات ذات القيد الحقيقي: نموذج يجب أن يعمل على الجهاز لا على خادم، فهرس بحث يجب أن يجيب خلال أجزاء من الثانية بلا خادم خلفي، ومسار حجز لا يحتمل بيع الساعة نفسها مرتين. الجزء المثير للاهتمام ليس إطار العمل أبدًا.',
-			'معظم عملي مؤخرًا في الذكاء الاصطناعي على الجهاز: معالجة فيديو وصوت تعمل بالكامل على هاتف المستخدم أو حاسوبه، بلا سحابة وبلا تتبّع.',
+			'أبني منتجات ويب وموبايل من نموذج البيانات حتى الواجهة النهائية. معظمها ثنائي اللغة ومبني للاتجاه من اليمين إلى اليسار أولًا لأن مستخدميّ يقرؤون بالعربية.',
+			'أعمل على قيود تؤثر في المنتج: نماذج تعمل على الجهاز، وبحث يجيب خلال أجزاء من الثانية بلا خادم، ومسارات حجز تمنع بيع الموعد نفسه مرتين.',
+			'يركز عملي الأخير على ذكاء اصطناعي يعمل على الجهاز لمعالجة الفيديو والصوت على الهاتف أو الحاسوب، بلا معالجة سحابية أو تتبع.',
 		],
 	} satisfies I18nBlocks,
 
@@ -56,13 +56,13 @@ export const profile = {
 			highlights: {
 				en: [
 					'Building multi-vendor e-commerce systems with NestJS, Next.js and React Native.',
-					'Backend services designed for throughput and reliability under vendor-level concurrency.',
-					'Responsive storefronts and a shared mobile client on top of the same API surface.',
+					'Built backend services for reliable, high-throughput vendor concurrency.',
+					'Built responsive storefronts and a shared mobile client on the same API.',
 				],
 				ar: [
 					'بناء أنظمة تجارة إلكترونية متعددة البائعين باستخدام NestJS وNext.js وReact Native.',
-					'خدمات خلفية مصممة للإنتاجية والموثوقية تحت تزامن على مستوى البائعين.',
-					'واجهات متجر متجاوبة وعميل موبايل مشترك فوق واجهة الـ API نفسها.',
+					'بناء خدمات خلفية موثوقة وعالية الإنتاجية لتزامن البائعين.',
+					'بناء واجهات متجر متجاوبة وعميل موبايل مشترك على واجهة API نفسها.',
 				],
 			},
 		},
@@ -74,19 +74,19 @@ export const profile = {
 			highlights: {
 				en: [
 					'Built bioinformatics applications in a monorepo with React and React Native sharing one codebase.',
-					'End-to-end type safety with TypeScript, Zod for schema validation and Prisma for the data layer.',
+					'Used TypeScript, Zod, and Prisma for type-safe validation and data access.',
 					'Server state and forms on TanStack Query and TanStack Form; API endpoints on Hono.',
 					'Contributed to a no-code platform used by 8,000+ researchers worldwide.',
 					'Shipped GenAI-powered data analysis, literature search, and customisable bioinformatics pipelines.',
-					'Worked to HIPAA, GDPR and SOC 2 Type 2 compliance requirements throughout.',
+					'Built to HIPAA, GDPR, and SOC 2 Type 2 requirements.',
 				],
 				ar: [
 					'بناء تطبيقات معلوماتية حيوية داخل monorepo يتشارك فيه React وReact Native قاعدة شيفرة واحدة.',
-					'أمان أنواع من طرف إلى طرف عبر TypeScript وZod للتحقق من المخططات وPrisma لطبقة البيانات.',
+					'استخدام TypeScript وZod وPrisma للتحقق من البيانات والوصول إليها بأمان الأنواع.',
 					'إدارة حالة الخادم والنماذج عبر TanStack Query وTanStack Form، ونقاط الـ API على Hono.',
 					'المساهمة في منصة بلا شيفرة يستخدمها أكثر من 8,000 باحث حول العالم.',
 					'إطلاق تحليل بيانات مدعوم بالذكاء التوليدي، وبحث في الأدبيات العلمية، وخطوط معالجة قابلة للتخصيص.',
-					'الالتزام بمتطلبات HIPAA وGDPR وSOC 2 Type 2 في كل ما جرى تطويره.',
+					'بناء الميزات وفق متطلبات HIPAA وGDPR وSOC 2 Type 2.',
 				],
 			},
 		},
@@ -97,11 +97,11 @@ export const profile = {
 			highlights: {
 				en: [
 					'Founded and shipped a playground booking and matchmaking app on iOS and Android.',
-					'Owned the whole surface: product, design, mobile client, backend, store releases and support.',
+					'Led product, design, mobile development, backend work, store releases, and support.',
 				],
 				ar: [
 					'تأسيس وإطلاق تطبيق لحجز الملاعب وإيجاد اللاعبين على iOS وAndroid.',
-					'المسؤولية الكاملة: المنتج والتصميم وتطبيق الموبايل والخادم وإصدارات المتاجر والدعم.',
+					'إدارة المنتج والتصميم وتطبيق الموبايل والخادم وإصدارات المتاجر والدعم.',
 				],
 			},
 		},
@@ -130,12 +130,12 @@ export const profile = {
 			highlights: {
 				en: [
 					'Built and maintained a large operational dashboard in TypeScript and React.',
-					'Ran the dependency and code modernisation effort, improving both security posture and runtime speed.',
+					'Updated dependencies and code to improve security and runtime speed.',
 					'Backend work on Node.js with Express.',
 				],
 				ar: [
 					'بناء وصيانة لوحة تحكم تشغيلية كبيرة باستخدام TypeScript وReact.',
-					'قيادة تحديث الاعتماديات والشيفرة، بما حسّن الأمان والأداء معًا.',
+					'تحديث الاعتماديات والشيفرة لتحسين الأمان وسرعة التشغيل.',
 					'عمل على الخادم باستخدام Node.js وExpress.',
 				],
 			},
@@ -168,11 +168,11 @@ export const profile = {
 			period: 'Since 2018',
 			highlights: {
 				en: [
-					'Long-running volunteer work building tools that improve the academic experience for engineering students.',
+					'Volunteer work building tools for engineering students.',
 					"Shipped and still maintain the committee's Android app and website.",
 				],
 				ar: [
-					'عمل تطوّعي طويل الأمد لبناء أدوات تحسّن التجربة الأكاديمية لطلاب الهندسة.',
+					'عمل تطوعي لبناء أدوات لطلاب الهندسة.',
 					'إطلاق تطبيق اللجنة على أندرويد وموقعها، وما زلت أتولّى صيانتهما.',
 				],
 			},
@@ -239,8 +239,8 @@ export const profile = {
 			issuer: { en: 'Cloud Native Base Camp', ar: 'Cloud Native Base Camp' },
 			date: 'Oct 2024',
 			description: {
-				en: 'How Node.js actually works behind the scenes.',
-				ar: 'كيف يعمل Node.js فعليًا خلف الكواليس.',
+				en: 'How Node.js works under the hood.',
+				ar: 'كيف يعمل Node.js داخليًا.',
 			},
 		},
 		{

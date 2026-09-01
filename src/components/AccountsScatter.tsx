@@ -21,7 +21,7 @@ export function AccountsScatter({
 
 	return (
 		<Chart
-			ariaDescription="Up and to the right is healthier: revenue grows without losing retention. Larger points carry more seats. The table below holds the exact values."
+			ariaDescription="Accounts higher and farther right have more revenue and retention. Point size shows seats. The table below provides exact values."
 			ariaLabel={accountsScatterAriaLabel(accounts)}
 			definition={definition}
 			height={380}

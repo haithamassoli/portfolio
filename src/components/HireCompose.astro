@@ -73,8 +73,8 @@ const labels = { en: pick(ui.en), ar: pick(ui.ar) };
 
 			const subject =
 				lang === 'ar'
-					? `مشروع جديد — ${d.get('fullName')}`
-					: `New project — ${d.get('fullName')}`;
+					? `مشروع جديد: ${d.get('fullName')}`
+					: `New project: ${d.get('fullName')}`;
 			const body =
 				rows.map(([k, v]) => `${k}: ${v ?? ''}`).join('\n') +
 				`\n\n${L['hire.summary']}:\n${d.get('summary') ?? ''}\n`;

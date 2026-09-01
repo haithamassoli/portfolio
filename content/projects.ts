@@ -12,12 +12,12 @@ export const projects: Project[] = [
 		slug: 'aoun',
 		title: { en: 'Aoun', ar: 'عون' },
 		tagline: {
-			en: 'A free academic platform for every Jordanian university student.',
-			ar: 'منصة أكاديمية مجانية لكل طالب جامعي في الأردن.',
+			en: 'A free academic platform for Jordanian university students.',
+			ar: 'منصة أكاديمية مجانية لطلاب الجامعات الأردنية.',
 		},
 		summary: {
-			en: 'Aoun pulls summaries, past exams, course material, GPA tools, bookmarks and study planning into one place, for students across Jordanian universities. It is free, needs no account to browse, and works offline as an installed PWA.',
-			ar: 'يجمع «عون» الملخصات والامتحانات السابقة والمواد الدراسية وأدوات المعدّل والمحفوظات وأدوات تنظيم الدراسة في مكان واحد، لطلاب الجامعات الأردنية. مجاني، ولا يحتاج حسابًا للتصفح، ويعمل دون اتصال كتطبيق PWA مثبّت.',
+			en: 'Aoun brings summaries, past exams, course material, GPA tools, bookmarks, and study planning into one place for Jordanian university students. It is free to browse without an account and works offline as an installed PWA.',
+			ar: 'يجمع «عون» الملخصات والامتحانات السابقة والمواد الدراسية وأدوات المعدّل والمحفوظات وتنظيم الدراسة في مكان واحد لطلاب الجامعات الأردنية. تصفحه مجاني بلا حساب، ويعمل دون اتصال كتطبيق PWA مثبّت.',
 		},
 		category: 'web',
 		status: 'live',
@@ -49,9 +49,9 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Jordanian students keep their course material scattered across WhatsApp groups, Google Drive folders shared once and never updated, and Telegram channels that vanish. Nothing is indexed, nothing is versioned, and every intake re-collects the same material from scratch.',
-				'Aoun is the boring fix: one catalogue, organised by university → faculty → course, where a summary or a past exam stays put and stays findable. On top of the archive sit the tools students actually open every week: a GPA calculator that knows the local grading rules, bookmarks, a study planner, and a focus timer.',
-				'The whole thing is a Next.js app on Convex, with the reading experience deliberately account-free: you only sign in when you want to save something.',
+				'Jordanian students find course material in WhatsApp groups, one-off Google Drive folders, and Telegram channels that disappear. Students must collect the same material again for each intake because those sources lack indexing and versioning.',
+				'Aoun keeps one catalogue, organised by university → faculty → course, so students can find summaries and past exams again. It also includes a GPA calculator for local grading rules, bookmarks, a study planner, and a focus timer.',
+				'I built Aoun with Next.js and Convex. Students can read without an account and sign in only to save or contribute.',
 			],
 			ar: [
 				'تتناثر المواد الدراسية عند طلاب الأردن بين مجموعات واتساب، ومجلدات درايف تُشارَك مرة ولا تُحدَّث، وقنوات تيليجرام تختفي. لا فهرسة، ولا إصدارات، وكل دفعة جديدة تعيد جمع المادة نفسها من الصفر.',
@@ -139,8 +139,8 @@ export const projects: Project[] = [
 			ar: 'ابحث عن ملعب، وابحث عن لاعبين، احجز، والعب.',
 		},
 		summary: {
-			en: 'Malabji makes booking a football pitch as simple as booking a table: search nearby grounds, see which slots are actually free, and reserve one. It also solves the other half of the problem, finding enough players, with team search, challenges and tournaments.',
-			ar: 'يجعل «ملعبجي» حجز ملعب كرة قدم بسهولة حجز طاولة: ابحث عن الملاعب القريبة، وشاهد الأوقات الشاغرة فعلًا، واحجز. ويحل النصف الآخر من المشكلة، إيجاد لاعبين كافين، عبر البحث عن فرق والتحديات والبطولات.',
+			en: 'Malabji lets you search nearby football pitches, see available slots, and reserve one. Team search, challenges, and tournaments help players fill the match.',
+			ar: 'يتيح «ملعبجي» البحث عن ملاعب كرة القدم القريبة ورؤية الأوقات المتاحة وحجزها. ويساعد البحث عن الفرق والتحديات والبطولات اللاعبين على إكمال المباراة.',
 		},
 		category: 'mobile',
 		status: 'shipped',
@@ -185,7 +185,7 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Booking a pitch in Jordan runs on phone calls and WhatsApp. You ring the ground, ask what is free on Thursday, get told a time that may or may not still be available by the time you have gathered the players, and pay in cash on arrival. Half the friction is the booking; the other half is that you need nine other people.',
+				'Football pitch bookings in Jordan run through phone calls and WhatsApp. You ask a ground about Thursday, gather players, then find the slot has gone; payment happens in cash on arrival. You also need nine other players.',
 				'Malabji handles both. The booking side is a live availability calendar per pitch with instant reservation. The social side lets you look for a team, challenge another one, and run or join a tournament, plus a directory of sports academies.',
 				'I founded it and built all of it: the Expo client for both stores, the Supabase backend, the store releases, and the support that follows a real product.',
 			],
@@ -275,8 +275,8 @@ export const projects: Project[] = [
 			ar: 'يزيل الموسيقى ويحجب الصور في الفيديو، على جهازك بالكامل.',
 		},
 		summary: {
-			en: 'Naqi filters a video locally: stem separation removes the music while keeping dialogue, and a detector blurs faces or whole frames for the chosen strictness. No cloud, no account, no telemetry, and the original file is never modified. Shipped on Android; a full Swift rewrite targets iPhone, iPad and Mac.',
-			ar: 'يُرشِّح «نقيّ» الفيديو محليًا: فصل المسارات يزيل الموسيقى مع الإبقاء على الحوار، وكاشف يُشوّش الوجوه أو الإطار كاملًا حسب درجة التشدّد المختارة. بلا سحابة ولا حساب ولا تتبّع، ولا يُعدَّل الملف الأصلي أبدًا. صدر على أندرويد، وتجري إعادة كتابته بالكامل بلغة Swift لأجهزة iPhone وiPad وMac.',
+			en: 'Naqi filters video on your device. Stem separation removes music while retaining dialogue, and a detector blurs faces or frames at the selected level. It uses no cloud, account, or telemetry, and leaves the original file unchanged. Android is shipped; a Swift rewrite targets iPhone, iPad, and Mac.',
+			ar: 'يُرشِّح «نقيّ» الفيديو على جهازك. يزيل فصل المسارات الموسيقى مع إبقاء الحوار، ويشوّش الكاشف الوجوه أو الإطارات حسب المستوى المختار. لا يستخدم سحابة أو حسابًا أو تتبعًا، ويترك الملف الأصلي دون تعديل. صدر لأندرويد، وتجري إعادة كتابته بـ Swift لأجهزة iPhone وiPad وMac.',
 		},
 		category: 'ai',
 		status: 'shipped',
@@ -316,9 +316,9 @@ export const projects: Project[] = [
 		},
 		overview: {
 			en: [
-				'Plenty of tools will filter a video for you if you upload it somewhere. That trade is unacceptable for the people who want this most. The whole point is that nobody else sees what you are watching. So Naqi does everything on the device: models ship inside the app, and the only network call it ever makes is an optional model download.',
+				'Many video filters require an upload. Naqi processes video on the device so other parties do not receive it. The app bundles its models; users can choose an optional model download.',
 				'Two operations run independently or together. Removing music runs htdemucs stem separation and keeps vocals, or vocals plus other, while drums and bass are never kept. Censoring blurs the faces of a chosen gender for their whole on-screen span, and censors the entire frame while an NSFW classifier gate is firing, with pre-roll so nothing slips through on the frame the detector fired.',
-				'The Android app is the shipped reference implementation. The Apple version is a ground-up Swift rewrite rather than a port: the Android pipeline is bound to MediaCodec, GLES and ORT-Android, and none of that crosses over.',
+				'The Android app is the reference implementation. I am rebuilding the Apple version in Swift because the Android pipeline depends on MediaCodec, GLES, and ORT-Android.',
 			],
 			ar: [
 				'كثير من الأدوات تُرشِّح الفيديو نيابةً عنك إن رفعته إلى مكان ما. هذه المقايضة مرفوضة تمامًا لمن يريدون هذا أكثر من غيرهم، فجوهر الفكرة ألا يرى أحد آخر ما تشاهده. لذلك يُنفّذ «نقيّ» كل شيء على الجهاز: النماذج داخل التطبيق، والاتصال الشبكي الوحيد تنزيل اختياري للنماذج.',

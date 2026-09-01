@@ -72,16 +72,14 @@ export function AccountsForm({
 		defaultValues,
 		validators: {
 			onChange: ({ value }) =>
-				value.accounts.length === 0
-					? 'Keep at least one account in the portfolio.'
-					: undefined,
+				value.accounts.length === 0 ? 'Keep at least one account.' : undefined,
 		},
 		onSubmit: async ({ value }) => {
 			// ponytail: no accounts API yet. Replace with the real call; the
 			// validation and submit states above do not change.
 			await new Promise((resolve) => setTimeout(resolve, 400));
 			setSavedAt(
-				`${value.accounts.length} accounts saved at ${new Date().toLocaleTimeString()}`,
+				`Saved ${value.accounts.length} accounts at ${new Date().toLocaleTimeString()}`,
 			);
 		},
 	});
@@ -97,7 +95,7 @@ export function AccountsForm({
 						className="text-lg font-semibold text-neutral-900"
 						id="portfolio-heading"
 					>
-						Revenue against retention
+						Revenue and retention
 					</h2>
 					{/*
 					  Selectors are compared by reference, so each subscription
@@ -127,7 +125,7 @@ export function AccountsForm({
 
 				<p aria-live="polite" className="min-h-5 text-sm text-neutral-600">
 					{focused
-						? `${focused.name}: ${usd.format(focused.monthlyRevenue)} per month, ${Math.round(focused.retention * 100)}% retention, ${focused.seats} seats, ${SEGMENT_LABELS[focused.segment]}.`
+						? `${focused.name}: ${usd.format(focused.monthlyRevenue)} monthly revenue, ${Math.round(focused.retention * 100)}% net retention, ${focused.seats} seats, ${SEGMENT_LABELS[focused.segment]}.`
 						: ''}
 				</p>
 			</section>
@@ -158,9 +156,7 @@ export function AccountsForm({
 												name={`accounts[${index}].name`}
 												validators={{
 													onChange: ({ value }) =>
-														value.trim()
-															? undefined
-															: 'Give the account a name.',
+														value.trim() ? undefined : 'Enter an account name.',
 												}}
 											>
 												{(field) => (
@@ -184,13 +180,13 @@ export function AccountsForm({
 													onChange: ({ value }) =>
 														Number.isInteger(value) && value >= 1
 															? undefined
-															: 'Seats must be a whole number of at least 1.',
+															: 'Enter a whole number of 1 or more.',
 												}}
 											>
 												{(field) => (
 													<NumberField
 														field={field}
-														hint="Sets the point area on the chart."
+														hint="Sets the chart point size."
 														label="Seats"
 														min={1}
 													/>
@@ -228,7 +224,7 @@ export function AccountsForm({
 												{(field) => (
 													<PercentField
 														field={field}
-														hint="Net revenue retention over the last 12 months."
+														hint="Revenue retained over the last 12 months."
 														label="Net retention"
 													/>
 												)}
@@ -244,7 +240,7 @@ export function AccountsForm({
 													onChange: ({ value }) =>
 														value.trim()
 															? undefined
-															: 'Name the account owner.',
+															: "Enter the account owner's name.",
 												}}
 											>
 												{(field) => (
@@ -290,7 +286,7 @@ export function AccountsForm({
 													<TextField
 														autoComplete="off"
 														field={field}
-														hint="Checked against the directory as you type."
+														hint="We check the directory as you type."
 														label="Owner email"
 														type="email"
 													/>
@@ -321,7 +317,7 @@ export function AccountsForm({
 												{(field) => (
 													<CheckboxField
 														field={field}
-														hint="Renews without a new order form."
+														hint="Renew this contract without a new order form."
 														label="Auto-renew"
 													/>
 												)}
@@ -355,7 +351,7 @@ export function AccountsForm({
 
 													{contactsField.state.value.length === 0 ? (
 														<p className="text-xs text-neutral-500">
-															No contacts on this account yet.
+															No contacts yet.
 														</p>
 													) : null}
 
