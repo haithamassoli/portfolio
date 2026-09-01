@@ -55,12 +55,6 @@ const files = projects.map((p) => {
 	};
 });
 
-const clock = new Intl.DateTimeFormat('en-GB', {
-	timeZone: 'Asia/Amman',
-	hour: '2-digit',
-	minute: '2-digit',
-}).format(new Date());
-
 const year = new Date().getFullYear();
 ---
 
@@ -87,14 +81,7 @@ const year = new Date().getFullYear();
 			<div class="chrome__inner">
 				<div class="status">
 					<a class="status__tag tty" href="/4">
-						<Logo class="status__logo" labelled={false} />
-						<span aria-hidden="true">@amman</span>
-						<span class="sr-only" data-l="en"
-							>Haitham Assoli — session home</span
-						>
-						<span class="sr-only" data-l="ar" lang="ar"
-							>هيثم العسولي — بداية الجلسة</span
-						>
+						<Logo class="status__logo" />
 					</a>
 					<span class="status__path tty">{path}</span>
 
@@ -143,10 +130,6 @@ const year = new Date().getFullYear();
 							>شغّل الجلسة بالإنجليزية</span
 						>
 					</button>
-
-					<span class="status__clock tty"
-						><span data-clock>{clock}</span> +03</span
-					>
 				</div>
 
 				<div class="cmd" data-cmd hidden>
@@ -227,20 +210,6 @@ const year = new Date().getFullYear();
 					attributes: true,
 					attributeFilter: ['lang'],
 				});
-
-				const clockEl = document.querySelector('[data-clock]');
-				if (clockEl) {
-					const fmt = new Intl.DateTimeFormat('en-GB', {
-						timeZone: 'Asia/Amman',
-						hour: '2-digit',
-						minute: '2-digit',
-					});
-					const tick = function () {
-						clockEl.textContent = fmt.format(new Date());
-					};
-					tick();
-					setInterval(tick, 20000);
-				}
 
 				const wrap = document.querySelector('[data-cmd]');
 				const form = document.querySelector('[data-form]');
@@ -704,16 +673,15 @@ const year = new Date().getFullYear();
 		letter-spacing: 0.02em;
 	}
 
-	/* The `user` half of `user@host` is the wordmark, cut out of the amber
-	   chip in the session's own black. The host stays typed. */
+	/* The wordmark alone, cut out of the amber chip in the session's own
+	   black — no host typed beside it. */
 	.status__tag {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.32rem;
 		background: var(--amber);
 		color: var(--void);
 		padding-inline: 0.5rem;
-		font-weight: 600;
+		padding-block: 0.2rem;
 		text-decoration: none;
 	}
 
@@ -721,9 +689,12 @@ const year = new Date().getFullYear();
 		background: var(--bone);
 	}
 
-	/* (0,3,0): the wordmark's own `block-size: auto` is scoped, so (0,2,0). */
+	/* (0,3,0): the wordmark's own `block-size: auto` is scoped, so (0,2,0).
+	   `inline-size` is set too, or the svg takes its default width and the
+	   chip stretches across the bar. */
 	.status .status__tag .status__logo {
-		block-size: 0.82rem;
+		block-size: 1.15rem;
+		inline-size: auto;
 		color: var(--void);
 		--logo-rule: color-mix(in srgb, var(--void) 62%, transparent);
 	}
@@ -736,8 +707,7 @@ const year = new Date().getFullYear();
 		flex: 1 1 auto;
 	}
 
-	.status__dir,
-	.status__clock {
+	.status__dir {
 		color: var(--ash);
 	}
 
