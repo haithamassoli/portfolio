@@ -58,7 +58,7 @@ const specs: [I18n, I18n][] = [
 	],
 	[
 		pair('Format', 'الصيغة'),
-		pair('Arabic and English, RTL and LTR', 'عربية وإنجليزية، يمينًا ويسارًا'),
+		pair('Web and mobile, end to end', 'ويب وجوّال، من طرف إلى طرف'),
 	],
 	[
 		pair('Sound', 'الصوت'),
@@ -93,7 +93,7 @@ const booking: [I18n, string, string][] = [
 		<title>Haitham Assoli — Night Reel</title>
 		<meta
 			name="description"
-			content="Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products that work in two scripts and two directions. Readable in Arabic and English."
+			content="Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products, including thirteen on the app stores."
 		/>
 		<LangBoot />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -166,27 +166,26 @@ const booking: [I18n, string, string][] = [
 					</p>
 
 					<h1 class="card__title rise" style="--d: 0.2s" data-l="en" lang="en">
-						A mirrored UI is<br /> a different UI
+						Useful software<br /> holds up
 					</h1>
 					<h1 class="card__title rise" style="--d: 0.2s" data-l="ar" lang="ar">
-						الواجهة المعكوسة<br /> واجهة أخرى
+						البرمجيات المفيدة<br /> تصمد
 					</h1>
 
 					<T
-						v={pair('not a translation', 'وليست ترجمة')}
+						v={pair('made for real use', 'مصمّمة للاستخدام الحقيقي')}
 						as="p"
 						class="card__sub rise"
 					/>
 
 					<p class="logline rise" style="--d: 0.45s" data-l="en" lang="en">
-						Haitham Assoli builds web and mobile products that have to hold up
-						in two scripts and two directions. Arabic first, English beside it,
-						the whole layout flipped and re-lit. Same data, two different films.
+						Haitham Assoli builds web and mobile products for real constraints:
+						slow networks, small screens, private media, and the people who rely
+						on them.
 					</p>
 					<p class="logline rise" style="--d: 0.45s" data-l="ar" lang="ar">
-						يبني هيثم العسولي منتجات ويب وموبايل عليها أن تصمد في كتابتين
-						واتجاهين. العربية أولًا، والإنجليزية إلى جانبها، والتخطيط كله ينقلب
-						ويُضاء من جديد. البيانات نفسها، وفِلمان مختلفان.
+						يبني هيثم العسولي منتجات ويب وموبايل لقيود واقعية: شبكة بطيئة،
+						وشاشات صغيرة، ووسائط خاصة، والناس الذين يعتمدون عليها.
 					</p>
 
 					<div class="billing rise" style="--d: 0.55s">
@@ -581,13 +580,12 @@ const booking: [I18n, string, string][] = [
 						<h2 class="head__title" data-l="en" lang="en">Next production</h2>
 						<h2 class="head__title" data-l="ar" lang="ar">الإنتاج القادم</h2>
 						<p class="head__lede" data-l="en" lang="en">
-							Open to work that has to ship in two languages and hold its frame
-							on both sides. The call sheet is the fastest route; the CV has the
-							long version.
+							Open to work that ships cleanly and holds up under real use. The
+							call sheet is the fastest route; the CV has the long version.
 						</p>
 						<p class="head__lede" data-l="ar" lang="ar">
-							مستعدٌّ لعمل عليه أن يصدر بلغتين ويحفظ إطاره في الاتجاهين. ورقة
-							النداء أسرع طريق، والسيرة الذاتية فيها النسخة الطويلة.
+							مستعدٌّ لعمل يصدر بسلاسة ويصمد في الاستخدام الحقيقي. ورقة النداء
+							أسرع طريق، والسيرة الذاتية فيها النسخة الطويلة.
 						</p>
 
 						<p class="cta">

@@ -14,7 +14,7 @@ export const href = (lang: Lang, path = '') =>
 
 export const ui = {
 	en: {
-		'meta.title': 'Haitham Assoli: apps in two scripts',
+		'meta.title': 'Haitham Assoli: mobile & web engineer',
 		'meta.desc':
 			'Haitham Assoli builds mobile and web apps that ship in Arabic and English. Selected work, written up in full.',
 		'name.latin': 'Haitham Assoli',
@@ -30,7 +30,7 @@ export const ui = {
 		'hero.role': 'Mobile & web engineer · Jordan',
 		'hero.lede':
 			'I build apps people actually open, most of them in Arabic first, then in English. Thirty-nine shipped, thirteen of them on the app stores.',
-		'hero.seam': 'Both directions',
+		'hero.seam': 'Built to last',
 		'hero.cta': 'See the work',
 		'hero.cta2': 'Start a project',
 		'stat.shipped': 'projects shipped',
@@ -56,11 +56,11 @@ export const ui = {
 		'work.more': 'Show more',
 		'work.less': 'Show less',
 		'about.eyebrow': 'About',
-		'about.title': 'Two scripts, one codebase',
+		'about.title': 'Built for real use',
 		'about.p1':
 			'I am Haitham Assoli, a software engineer from Jordan. I have spent the last four years shipping React Native apps to the Play Store and the App Store, and Next.js apps to the web, for students, for mosques, for a governorate tourism board, for whoever needed the thing to exist.',
 		'about.p2':
-			'Almost everything I build is bilingual, and I have learned that this is not a translation problem. An interface that mirrors properly is a different interface: the back button moves, the progress bar runs the other way, and the typography has to hold up in a script with no capitals and no italics. I design for that from the first screen rather than bolting it on.',
+			'I care about the details people meet every day: clear type, responsive controls, and flows that stay understandable when the network is slow or the screen is small. I design for those conditions from the first screen.',
 		'about.p3':
 			'The rest of the job is the unglamorous half: caching for campus wifi that drops, reconciling bookings so two people cannot take the same hour, keeping a list at sixty frames per second on a four-year-old Android. That is the part I enjoy.',
 		'about.stackTitle': 'What I reach for',
@@ -190,7 +190,7 @@ export const ui = {
 		'hero.role': 'مهندس تطبيقات جوال وويب · الأردن',
 		'hero.lede':
 			'أبني تطبيقات يفتحها الناس فعلًا، أكثرها بالعربية أولًا ثم بالإنجليزية. تسعة وثلاثون مشروعًا صدرت، ثلاثة عشر منها على متاجر التطبيقات.',
-		'hero.seam': 'في الاتجاهين',
+		'hero.seam': 'مصمّمة لتدوم',
 		'hero.cta': 'شاهد الأعمال',
 		'hero.cta2': 'ابدأ مشروعًا',
 		'stat.shipped': 'مشروعًا صدر',
@@ -215,11 +215,11 @@ export const ui = {
 		'work.more': 'عرض المزيد',
 		'work.less': 'عرض أقل',
 		'about.eyebrow': 'نبذة',
-		'about.title': 'لغتان، شيفرة واحدة',
+		'about.title': 'مصمّمة للاستخدام الحقيقي',
 		'about.p1':
 			'أنا هيثم العسولي، مهندس برمجيات من الأردن. أمضيت السنوات الأربع الماضية في إصدار تطبيقات React Native على متجري جوجل وآبل، وتطبيقات Next.js على الويب، لطلبة، ولمساجد، ولهيئة سياحة في محافظة، ولكل من احتاج أن يوجد الشيء.',
 		'about.p2':
-			'كل ما أبنيه تقريبًا ثنائي اللغة، وتعلّمت أن هذه ليست مسألة ترجمة. الواجهة التي تنعكس انعكاسًا صحيحًا واجهة أخرى: زر الرجوع ينتقل، وشريط التقدم يسير في الاتجاه المعاكس، والخط لا بد أن يصمد في كتابة بلا حروف كبيرة ولا مائلة. أصمّم لهذا من الشاشة الأولى بدل أن أضيفه لاحقًا.',
+			'أهتم بالتفاصيل التي يلتقيها الناس كل يوم: خط واضح، وعناصر تستجيب بسلاسة، ومسارات تبقى مفهومة حين تبطؤ الشبكة أو تصغر الشاشة. أصمّم لهذه الظروف من الشاشة الأولى.',
 		'about.p3':
 			'وبقية العمل هي نصفه غير اللامع: تخزين محلي لشبكة جامعة تنقطع، وتوفيق حجوزات كي لا يأخذ شخصان الساعة نفسها، وإبقاء قائمة تعمل بستين إطارًا في الثانية على هاتف أندرويد عمره أربع سنوات. وهذا هو الجزء الذي أستمتع به.',
 		'about.stackTitle': 'أدواتي',

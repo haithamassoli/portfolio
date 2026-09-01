@@ -110,8 +110,8 @@ const pages = [
 
 const about = [
 	pair(
-		'I work end to end: schema, service, screen, store listing. Most of what I ship is Arabic-first and right-to-left, because most of the people using it read Arabic, and doing that properly is a discipline rather than a config flag.',
-		'أعمل من طرف إلى طرف: المخطط، والخدمة، والشاشة، وصفحة المتجر. معظم ما أطلقه عربي أولًا ومن اليمين إلى اليسار، لأن معظم من يستخدمه يقرأ بالعربية، وإتقان ذلك انضباط لا خانة في ملف إعدادات.',
+		'I work end to end: schema, service, screen, store listing. Most of what I ship is Arabic-first because most of the people using it read Arabic, and doing that properly is a discipline rather than a config flag.',
+		'أعمل من طرف إلى طرف: المخطط، والخدمة، والشاشة، وصفحة المتجر. معظم ما أطلقه عربي أولًا لأن معظم من يستخدمه يقرأ بالعربية، وإتقان ذلك انضباط لا خانة في ملف إعدادات.',
 	),
 	pair(
 		'The work I want is the work with a hard edge on it. A model that has to run on the handset instead of a server. A search index that has to answer in milliseconds with no backend behind it. A booking flow that must never sell the same hour twice. The framework is never the interesting part.',
@@ -131,10 +131,10 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — 一つの画面、二つの方向。</title>
+		<title>Haitham Assoli — 丁寧につくられた画面。</title>
 		<meta
 			name="description"
-			content="Haitham Assoli builds bilingual web and mobile products in Amman. Every screen ships twice: once left to right, once right to left. Read the site in English or Arabic."
+			content="Haitham Assoli builds web and mobile products in Amman. Thirty-nine shipped projects, including thirteen on the app stores."
 		/>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -181,7 +181,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			<!-- 序 — the thesis, stated on three axes -->
 			<section class="hero" aria-labelledby="h1">
 				<div class="wrap hero__in">
-					<p class="hero__thesis tate" lang="ja">一つの画面、二つの方向。</p>
+					<p class="hero__thesis tate" lang="ja">丁寧につくられた画面。</p>
 
 					<div class="hero__body">
 						<p class="eyebrow">
@@ -201,10 +201,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 						     being read and nothing visible rests on a glyph. -->
 						<h1 class="hero__name" id="h1">
 							<Logo class="hero__logo" labelled={false} />
-							<T
-								v={pair('Haitham Assoli', 'هيثم العسولي')}
-								class="sr-only"
-							/>
+							<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="sr-only" />
 							<span class="hero__kana" lang="ja">ハイサム・アッソーリ</span>
 						</h1>
 
@@ -212,8 +209,8 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 							as="p"
 							class="hero__deck"
 							v={pair(
-								'I build products that exist twice. Every screen ships once reading left to right and once reading right to left, and the second one is never a translation of the first — mirrored, a layout becomes a different layout, with its own reading order and its own mistakes. That constraint is most of my work.',
-								'أبني منتجات توجد مرتين. كل شاشة تصدر مرة تُقرأ من اليسار إلى اليمين ومرة من اليمين إلى اليسار، والثانية ليست ترجمة للأولى أبدًا: التخطيط حين ينعكس يصير تخطيطًا آخر، له ترتيب قراءته وأخطاؤه الخاصة. هذا القيد هو معظم عملي.',
+								'I build complete products. Every screen has a job to do, a person to serve, and a real constraint to survive. That is what guides my work.',
+								'أبني منتجات مكتملة. لكل شاشة مهمة تؤديها، وشخص تخدمه، وقيد حقيقي تصمد أمامه. هذا ما يقود عملي.',
 							)}
 						/>
 
@@ -236,7 +233,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 								<div class="spec spec--en" dir="ltr">
 									<span class="spec__axis" aria-hidden="true">→</span>
 									<p class="spec__line spec__line--en" lang="en">
-										Every screen has to hold up in both directions.
+										Every screen should earn its place.
 									</p>
 									<p class="spec__note">
 										<span class="spec__script" lang="en"
@@ -264,7 +261,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 								<div class="spec spec--ar" dir="rtl">
 									<span class="spec__axis" aria-hidden="true">←</span>
 									<p class="spec__line spec__line--ar" lang="ar">
-										كل شاشة يجب أن تصمد في كلا الاتجاهين.
+										كل شاشة يجب أن تستحق مكانها.
 									</p>
 									<p class="spec__note">
 										<span class="spec__script" lang="ar"
@@ -292,7 +289,7 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 								<div class="spec spec--tate" dir="ltr">
 									<span class="spec__axis" aria-hidden="true">↓</span>
 									<p class="spec__line spec__line--ja tate" lang="ja">
-										すべての画面は、両方の方向で成立しなければならない。
+										すべての画面には、理由が必要だ。
 									</p>
 									<p class="spec__note">
 										<span class="spec__script" lang="ja"

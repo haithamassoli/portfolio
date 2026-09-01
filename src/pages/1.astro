@@ -1,7 +1,5 @@
 ---
-/* Variant 1 — "Quiet Room".
-   A single ruled column with a lot of air around it. The page is written
-   twice, once in each language, and the switch decides which one you read. */
+/* Variant 1 — "Quiet Room": a single ruled column with generous space. */
 import { Image } from 'astro:assets';
 import { profile } from '../../content/profile';
 import Shell from './1/_shell.astro';
@@ -73,8 +71,8 @@ const elsewhere = [
 				class="rise"
 				style="--d: 70ms"
 				v={pair(
-					'Everything I build has to say the same thing twice.',
-					'كل ما أبنيه عليه أن يقول الشيء نفسه مرّتين.',
+					'Software should hold up in the real world.',
+					'البرمجيات الجيدة تصمد في العالم الحقيقي.',
 				)}
 			/>
 			<T
@@ -82,8 +80,8 @@ const elsewhere = [
 				class="lede rise"
 				style="--d: 140ms"
 				v={pair(
-					'Four years of it. Thirty-nine projects shipped, thirteen of them live on the app stores, and nearly all of them written in Arabic and English at once. The second language is never a translation pass at the end. It is a constraint on the first screen: how far a label may run, which way a progress bar fills, and which face is doing the reading.',
-					'أربع سنوات من هذا. تسعة وثلاثون مشروعًا صدرت، ثلاثة عشر منها على متاجر التطبيقات، وأكثرها مكتوب بالعربية والإنجليزية معًا. اللغة الثانية ليست جولة ترجمة في آخر الطريق أبدًا، بل قيد على الشاشة الأولى: كم يطول النص، وفي أي اتجاه يمتلئ شريط التقدّم، وأي خط يحمل القراءة.',
+					'Four years of it. Thirty-nine projects shipped, thirteen of them live on the app stores. I build from the first screen to the release that puts a useful product in someone’s hands.',
+					'أربع سنوات من هذا. تسعة وثلاثون مشروعًا صدرت، ثلاثة عشر منها على متاجر التطبيقات. أبني من الشاشة الأولى حتى الإصدار الذي يضع منتجًا مفيدًا في يد الناس.',
 				)}
 			/>
 			<T
@@ -107,9 +105,7 @@ const elsewhere = [
 			<div class="twice rise" style="--d: 340ms">
 				<div class="twice__head">
 					<p class="k">
-						<T
-							v={pair('one sentence, set twice', 'جملة واحدة، مضبوطة مرّتين')}
-						/>
+						<T v={pair('A practical craft', 'حرفة عملية')} />
 					</p>
 					<button class="seg seg--lang" type="button" data-lang-toggle>
 						<span class="seg__opt" data-for="en" lang="en" aria-hidden="true"
@@ -128,19 +124,18 @@ const elsewhere = [
 				</div>
 				<div class="twice__lines">
 					<p class="twice__line" lang="en" dir="ltr">
-						This page is written twice, and the switch decides which one you are
-						reading.
+						From first sketch to final release.
 					</p>
 					<p class="twice__line" lang="ar" dir="rtl">
-						هذه الصفحة مكتوبة مرّتين، والمفتاح يقرّر أيّهما تقرأ.
+						من الفكرة الأولى إلى الإطلاق النهائي.
 					</p>
 				</div>
 				<T
 					as="p"
 					class="twice__note"
 					v={pair(
-						'Both sentences are in the page at once. The switch changes the language, the direction and the face the room is set in. Nothing reloads, and nothing here came out of a translation engine.',
-						'الجملتان في الصفحة معًا. المفتاح يبدّل اللغة والاتجاه والخط الذي تُضبط به الغرفة. لا إعادة تحميل، ولا شيء هنا خرج من مترجم آلي.',
+						'Good software earns its place in someone’s day.',
+						'البرمجيات الجيدة تستحق مكانها في يوم الناس.',
 					)}
 				/>
 			</div>
@@ -370,8 +365,8 @@ const elsewhere = [
 				as="p"
 				class="measure"
 				v={pair(
-					'Contract or full time, Arabic and English, Amman or remote. If it has to work on a phone in two scripts, I have done that thirteen times already.',
-					'بعقد أو بدوام كامل، بالعربية والإنجليزية، من عمّان أو عن بُعد. وإن كان عليه أن يعمل على هاتف بلغتين، فقد فعلتها ثلاث عشرة مرة.',
+					'Contract or full time, Amman or remote. I have shipped thirteen products to the app stores already.',
+					'بعقد أو بدوام كامل، من عمّان أو عن بُعد. أصدرت ثلاثة عشر منتجًا على متاجر التطبيقات بالفعل.',
 				)}
 			/>
 			<p class="hire__mail">
