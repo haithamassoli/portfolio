@@ -7,6 +7,7 @@ import { pair, s } from '../../data/variant-ui';
 import LangBoot from '../../components/LangBoot.astro';
 import T from '../../components/T.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
+import Logo from '../../components/Logo.astro';
 
 interface Props {
 	/** English, for the tab and for search. Both languages live in the body. */
@@ -47,8 +48,8 @@ const nav = [
 		<header class="topbar">
 			<div class="wrap topbar__in">
 				<a class="mark" href="/2">
-					<span class="mark__ja" lang="ja">ハイサム</span>
-					<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="mark__en" />
+					<Logo class="mark__logo" />
+					<span class="mark__ja" lang="ja" aria-hidden="true">ハイサム</span>
 				</a>
 
 				<nav class="nav" aria-label="Pages">
@@ -414,25 +415,20 @@ const nav = [
 				text-decoration: none;
 			}
 
+			/* The name written in sumi, on an indigo rule — the working line
+			   the kana beside it sits on too. */
+			.mark .mark__logo {
+				block-size: clamp(1.05rem, 0.9rem + 0.5vw, 1.35rem);
+				inline-size: auto;
+				color: var(--sumi);
+				--logo-rule: var(--ai);
+			}
+
 			.mark__ja {
 				font-family: var(--jp);
 				font-size: 0.95rem;
 				letter-spacing: 0.12em;
 				color: var(--ai);
-			}
-
-			.mark__en {
-				font-family: var(--gothic);
-				font-size: 0.78rem;
-				font-weight: 500;
-				letter-spacing: 0.1em;
-				white-space: nowrap;
-			}
-
-			.mark__en[lang='ar'] {
-				font-family: var(--ar);
-				font-size: 0.95rem;
-				font-weight: 400;
 			}
 
 			.nav {

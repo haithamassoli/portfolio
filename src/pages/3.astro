@@ -4,6 +4,7 @@ import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
 import LangBoot from '../components/LangBoot.astro';
+import Logo from '../components/Logo.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import T from '../components/T.astro';
 import { s, pair, yearPair } from '../data/variant-ui';
@@ -182,8 +183,20 @@ const widthsFor = (img: ImageMetadata) =>
 		<main id="top">
 			<!-- ── HERO ─────────────────────────────────────────────────────── -->
 			<header class="hero" id="hero">
+				<!-- The mark at cover scale: frost letters, lagoon rule and the same
+				     lens the bar wears on every other /3 page. The wordmark is
+				     presentation; the name beside it is what gets read out, in
+				     whichever language the page is in. -->
+				<div class="mark">
+					<span class="mark__lens" aria-hidden="true"></span>
+					<Logo class="mark__logo" labelled={false} />
+					<p class="mark__name">
+						<span data-l="en" lang="en">Haitham Assoli</span>
+						<span data-l="ar" lang="ar">هيثم العسولي</span>
+					</p>
+				</div>
+
 				<p class="eyebrow">
-					<span class="dot"></span>
 					<T
 						v={pair(
 							'Amman, Jordan — web & mobile, full stack',
@@ -1119,15 +1132,6 @@ const widthsFor = (img: ImageMetadata) =>
 		flex-wrap: wrap;
 	}
 
-	.dot {
-		width: 7px;
-		height: 7px;
-		border-radius: 999px;
-		background: var(--lagoon);
-		box-shadow: 0 0 0 3px rgba(31, 182, 200, 0.2);
-		flex: none;
-	}
-
 	.h2 {
 		margin: 0;
 		font-family: var(--display);
@@ -1161,6 +1165,51 @@ const widthsFor = (img: ImageMetadata) =>
 		max-width: var(--maxw);
 		margin-inline: auto;
 		padding: clamp(4.5rem, 12vh, 7rem) var(--gut) 0;
+	}
+
+	/* The lockup. `.logo` is the component's own class, so three classes here
+	   outrank its scoped `block-size: auto`; everything else is logical, so
+	   the whole thing mirrors with the page. */
+	.mark {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: clamp(0.7rem, 2vw, 1.15rem);
+		margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.mark .mark__logo.logo {
+		flex: none;
+		block-size: clamp(2.6rem, 7vw, 5rem);
+		inline-size: auto;
+		color: var(--frost);
+		--logo-rule: var(--lagoon);
+		filter: drop-shadow(0 0 26px rgba(31, 182, 200, 0.45));
+	}
+
+	.mark__lens {
+		flex: none;
+		width: clamp(14px, 2.4vw, 22px);
+		aspect-ratio: 1;
+		border-radius: 999px;
+		background: radial-gradient(
+			120% 120% at 30% 24%,
+			rgba(255, 255, 255, 0.95),
+			rgba(31, 182, 200, 0.7) 46%,
+			rgba(107, 91, 255, 0.85)
+		);
+		box-shadow: 0 0 20px 2px rgba(31, 182, 200, 0.55);
+	}
+
+	.mark__name {
+		margin: 0;
+		padding-inline-start: clamp(0.7rem, 2vw, 1.15rem);
+		border-inline-start: 1px solid rgba(200, 230, 255, 0.22);
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--haze);
 	}
 
 	/* fit-content, sized by the English block in both languages, so the second
@@ -1992,6 +2041,7 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	.eyebrow [lang='ar'],
+	.mark__name [lang='ar'],
 	.ticks [lang='ar'],
 	.card__meta [lang='ar'],
 	.fig__label[lang='ar'],
@@ -2080,6 +2130,11 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	@media (max-width: 460px) {
+		.mark__name {
+			flex-basis: 100%;
+			padding-inline-start: 0;
+			border-inline-start: 0;
+		}
 		.type--ar {
 			font-size: clamp(1.9rem, 8.4vw, 2.6rem);
 		}

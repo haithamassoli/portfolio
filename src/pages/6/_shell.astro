@@ -7,6 +7,7 @@
    quieter, the key is a wash rather than a beam. Two thousand words have to be
    readable under it. */
 import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { profile } from '../../../content/profile';
@@ -60,9 +61,10 @@ const nav: [string, string, I18n][] = [
 		<div class="vignette" aria-hidden="true"></div>
 
 		<div class="gate gate--top">
-			<span class="gate__mark">
-				<T v={pair('Haitham Assoli', 'هيثم العسولي')} />
-			</span>
+			<a class="gate__brand" href="/6">
+				<Logo labelled={false} />
+				<T class="vh" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+			</a>
 
 			<button class="slate" type="button" data-lang-toggle>
 				<span class="slate__sticks" aria-hidden="true"></span>
@@ -401,6 +403,27 @@ const nav: [string, string, I18n][] = [
 		color: rgba(255, 194, 122, 0.66);
 		font-variant-numeric: tabular-nums;
 		text-align: end;
+	}
+
+	/* The wordmark stands in for the name slug: print white letters over a
+	   tungsten rule, the same two colours the slate is chalked in. It sits
+	   inside the bar in both directions — the gate is flexed, not floated. */
+	.gate__brand {
+		display: inline-flex;
+		flex: none;
+		--logo-rule: var(--key);
+		color: var(--print);
+		transition: color 0.2s;
+	}
+
+	.gate__brand .logo {
+		block-size: 1rem;
+		width: auto;
+	}
+
+	.gate__brand:hover {
+		--logo-rule: var(--sodium);
+		color: var(--key);
 	}
 
 	/* ── The slate: the language switch ────────────────────────────────────
@@ -965,7 +988,6 @@ const nav: [string, string, I18n][] = [
 	}
 
 	@media (max-width: 40rem) {
-		.gate--top .gate__mark:first-child,
 		.gate--bottom .gate__mark {
 			display: none;
 		}
@@ -1026,6 +1048,7 @@ const nav: [string, string, I18n][] = [
 		}
 
 		.slate__sticks,
+		.gate__brand,
 		.plate::after,
 		.plate__img,
 		.plate__gel,

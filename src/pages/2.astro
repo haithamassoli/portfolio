@@ -9,6 +9,7 @@ import { pair, s, yearPair } from '../data/variant-ui';
 import LangBoot from '../components/LangBoot.astro';
 import T from '../components/T.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
+import Logo from '../components/Logo.astro';
 import profilePhoto from '../assets/images/profile.png';
 
 /* Category and status, said properly in Japanese rather than transliterated.
@@ -191,7 +192,13 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 							/>
 						</p>
 
+						<!-- The cover mark: هيثم written once, in sumi on an indigo
+						     rule, exactly as the sub-pages set it — only at a cover's
+						     scale. The mark carries no label of its own: the name is
+						     written out under it in the language being read, so the
+						     heading is announced in full and nothing rests on a glyph. -->
 						<h1 class="hero__name" id="h1">
+							<Logo class="hero__logo" labelled={false} />
 							<T
 								v={pair('Haitham Assoli', 'هيثم العسولي')}
 								class="hero__nameline"
@@ -1114,19 +1121,36 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 			}
 
 			.hero__name {
-				margin-block: 1.1rem 0;
+				margin-block: clamp(1.4rem, 3vw, 2.25rem) 0;
+			}
+
+			/* The mark itself. Sumi letters on an indigo rule — the two
+			   colours the sub-pages give it — set to a cover's height, with
+			   the width left to the artwork so it stays true under either
+			   direction. Two classes: the component's own `block-size: auto`
+			   is one, and would otherwise win on order. */
+			.hero__name .hero__logo {
+				block-size: clamp(3.25rem, 1.9rem + 7vw, 6.75rem);
+				inline-size: auto;
+				color: var(--sumi);
+				--logo-rule: var(--ai);
+			}
+
+			.hero__nameline {
+				display: block;
+				margin-top: clamp(1rem, 2.5vw, 1.65rem);
 				font-family: var(--body);
-				font-size: clamp(2.5rem, 1.4rem + 5vw, 4.75rem);
+				font-size: clamp(1.45rem, 1.1rem + 1.5vw, 2.15rem);
 				font-weight: 300;
-				line-height: 1;
-				letter-spacing: -0.015em;
+				line-height: 1.15;
+				letter-spacing: -0.01em;
 			}
 
 			.hero__nameline[lang='ar'] {
 				font-family: var(--ar);
-				font-size: 0.86em;
+				font-size: clamp(1.3rem, 1rem + 1.3vw, 1.95rem);
 				font-weight: 400;
-				line-height: 1.3;
+				line-height: 1.55;
 			}
 
 			.hero__kana {

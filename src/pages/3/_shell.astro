@@ -8,6 +8,7 @@
    is the same rim and the same tint painted flat. Over a blurred field you
    cannot tell, and the compositor can. */
 import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { s, pair } from '../../data/variant-ui';
@@ -87,10 +88,9 @@ const nav = [
 
 		<header class="top">
 			<div class="top__in pane pane--wet">
-				<a class="brand" href="/3">
+				<a class="brand" href="/3" aria-label="هيثم — Haitham Assoli">
 					<span class="brand__lens" aria-hidden="true"></span>
-					<span class="brand__name" data-l="en" lang="en">Haitham Assoli</span>
-					<span class="brand__name" data-l="ar" lang="ar">هيثم العسولي</span>
+					<Logo class="brand__logo" labelled={false} />
 				</a>
 
 				<nav class="nav" aria-label="Main navigation — التنقل الرئيسي">
@@ -421,12 +421,17 @@ const nav = [
 		display: inline-flex;
 		align-items: center;
 		gap: 0.55rem;
-		text-decoration: none;
-		font-family: var(--display);
-		font-weight: 600;
-		font-size: 0.95rem;
-		letter-spacing: -0.02em;
-		white-space: nowrap;
+		flex: none;
+	}
+
+	/* Frost letters, lagoon rule: the wordmark wears the same two colours as
+	   the lens beside it, and picks up the field's glow. */
+	.brand .brand__logo {
+		--logo-rule: var(--lagoon);
+		block-size: 1.5rem;
+		width: auto;
+		color: var(--frost);
+		filter: drop-shadow(0 0 10px rgba(31, 182, 200, 0.45));
 	}
 
 	.brand__lens {

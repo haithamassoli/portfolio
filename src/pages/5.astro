@@ -6,6 +6,7 @@ import { toolbox } from '../i18n';
 import type { Key } from '../i18n';
 import { pair, s } from '../data/variant-ui';
 import LangBoot from '../components/LangBoot.astro';
+import Logo from '../components/Logo.astro';
 import T from '../components/T.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import profilePhoto from '../assets/images/profile.png';
@@ -91,14 +92,8 @@ const nowISO = new Date().toISOString();
 		<div class="tray">
 			<header class="topbar">
 				<p class="topbar__name">
-					<span data-l="en" lang="en">Haitham Assoli</span>
-					<span data-l="ar" lang="ar">هيثم العسولي</span>
-					<span class="topbar__alt" data-l="en" lang="ar" dir="rtl"
-						>هيثم العسولي</span
-					>
-					<span class="topbar__alt" data-l="ar" lang="en" dir="ltr"
-						>Haitham Assoli</span
-					>
+					<Logo class="topbar__logo" labelled={false} />
+					<T class="sr-only" v={pair('Haitham Assoli', 'هيثم العسولي')} />
 				</p>
 				<nav class="topbar__nav mono">
 					<a class="ilink" href="/5/projects"><T v={s('work.all')} /></a>
@@ -865,16 +860,23 @@ const nowISO = new Date().toISOString();
 	}
 
 	.topbar__name {
-		font-family: var(--display);
-		font-weight: 800;
-		font-size: 1.05rem;
-		letter-spacing: -0.02em;
+		display: flex;
+		align-items: center;
 	}
 
-	.topbar__alt {
-		font-weight: 500;
-		opacity: 0.5;
-		margin-inline-start: 0.45rem;
+	/* The cover wears the same paint as the lid on the inner pages — ink
+	   letters, a pomegranate rule — only bigger, since a cover can carry it.
+	   Three classes to outweigh the component's own scoped `block-size: auto`. */
+	.topbar .topbar__name .topbar__logo {
+		block-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.35rem);
+		inline-size: auto;
+		color: var(--ink);
+		--logo-rule: var(--pomegranate);
+	}
+
+	/* On the way past, the rule warms to marigold, as it does in the lid. */
+	.topbar__name:hover .topbar__logo {
+		--logo-rule: var(--marigold);
 	}
 
 	.topbar__nav {

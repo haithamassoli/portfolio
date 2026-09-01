@@ -4,6 +4,7 @@ import { profile } from '../../content/profile';
 import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
 import LangBoot from '../components/LangBoot.astro';
+import Logo from '../components/Logo.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import T from '../components/T.astro';
 import { s, pair, yearPair } from '../data/variant-ui';
@@ -121,9 +122,10 @@ const booking: [I18n, string, string][] = [
 		<div class="vignette" aria-hidden="true"></div>
 
 		<div class="gate gate--top">
-			<span class="gate__mark" aria-hidden="true">
-				<T v={pair('Haitham Assoli', 'هيثم العسولي')} />
-			</span>
+			<a class="gate__brand" href="#top">
+				<Logo labelled={false} />
+				<T class="vh" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+			</a>
 
 			<button class="slate" type="button" data-lang-toggle>
 				<span class="slate__sticks" aria-hidden="true"></span>
@@ -994,6 +996,29 @@ const booking: [I18n, string, string][] = [
 
 	body.is-end {
 		--bar: clamp(2.75rem, 8vh, 5rem);
+	}
+
+	/* The wordmark stands in for the name slug: print white letters over a
+	   tungsten rule, the same two colours the slate is chalked in. The inner
+	   pages run it at 1rem; the title card can carry it taller. It is also the
+	   way back to the head of the reel. */
+	.gate__brand {
+		display: inline-flex;
+		flex: none;
+		--logo-rule: var(--key);
+		color: var(--print);
+		transition: color 0.2s;
+	}
+
+	/* Two classes, to outweigh the component's own scoped `block-size: auto`. */
+	.gate--top .gate__brand .logo {
+		block-size: 1.25rem;
+		width: auto;
+	}
+
+	.gate__brand:hover {
+		--logo-rule: var(--sodium);
+		color: var(--key);
 	}
 
 	/* ── The slate: the language switch ────────────────────────────────────
@@ -2090,9 +2115,8 @@ const booking: [I18n, string, string][] = [
 	}
 
 	@media (max-width: 40rem) {
-		/* The slate keeps the whole top bar on a narrow phone; the name mark
-		   and the reel label step out of its way. */
-		.gate--top .gate__mark:first-child,
+		/* The slate keeps the whole top bar on a narrow phone, so the reel
+		   label steps out of its way. The wordmark is short enough to stay. */
 		.gate--bottom .gate__mark {
 			display: none;
 		}
@@ -2193,6 +2217,7 @@ const booking: [I18n, string, string][] = [
 		.plate__gel,
 		.plate::after,
 		.gate,
+		.gate__brand,
 		.slate__sticks,
 		.slate__field,
 		.shot__title a,

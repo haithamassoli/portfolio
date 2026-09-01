@@ -10,6 +10,7 @@
    wrapped in `:where()` — a bare `p { margin: 0 }` outranks a class rule and
    quietly eats section spacing. */
 import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
 import T from '../../components/T.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import { profile } from '../../../content/profile';
@@ -66,11 +67,9 @@ const footLinks = [
 		<!-- ============================== THE RAIL ============================== -->
 		<header class="rail">
 			<div class="wrap rail__inner">
-				<a class="rail__name" href="/7">
-					<T
-						v={pair('Haitham Assoli', 'هيثم العسولي')}
-						class="rail__nameText"
-					/>
+				<a class="rail__mark" href="/7">
+					<Logo labelled={false} />
+					<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="vh" />
 				</a>
 
 				<nav class="rail__nav" aria-label="Playroom">
@@ -587,28 +586,24 @@ const footLinks = [
 		padding-block: 0.7rem;
 	}
 
-	.rail__name {
-		text-decoration: none;
-	}
-
-	.rail__nameText {
-		display: inline-block;
-		padding: 0.3rem 0.85rem;
+	/* The wordmark rides in the same sun sticker the name used to wear: ink
+	   letters, a sky rule under them, and the tilt crossing sides with the
+	   language like every other shadow here. */
+	.rail__mark {
+		display: block;
+		padding: 0.4rem 0.9rem;
 		background: var(--sun);
 		color: var(--ink);
+		--logo-rule: var(--sky);
 		border-radius: var(--pill);
-		font-family: var(--display);
-		font-weight: 800;
-		font-size: 0.95rem;
-		font-variation-settings: 'wdth' 84;
-		transform: rotate(-2deg);
+		text-decoration: none;
+		transform: rotate(calc(var(--dx) * 2deg));
 	}
 
-	.rail__nameText[lang='ar'] {
-		font-family: var(--arabicDisplay);
-		font-weight: 400;
-		font-size: 1.15rem;
-		font-variation-settings: normal;
+	/* Height here, width follows the viewBox. */
+	.rail .rail__mark .logo {
+		block-size: 1.2rem;
+		inline-size: auto;
 	}
 
 	.rail__nav {

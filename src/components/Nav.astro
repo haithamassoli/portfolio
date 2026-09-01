@@ -1,5 +1,6 @@
 ---
 import { href, swapLangHref, useT, type Lang } from '../i18n';
+import Logo from './Logo.astro';
 
 interface Props {
 	lang: Lang;
@@ -18,8 +19,7 @@ const links = [
 
 <header class="bar">
 	<a class="mark" href={href(lang)} aria-label={t('nav.home')}>
-		<span class="mark__face mark__face--latin">H</span>
-		<span class="mark__face mark__face--arabic">ه</span>
+		<Logo labelled={false} />
 	</a>
 
 	<nav class="links mono" aria-label={t('nav.work')}>
@@ -54,50 +54,22 @@ const links = [
 		border-bottom: 1px solid var(--rule);
 	}
 
-	/* The monogram holds both scripts in one box and swaps on hover. The
-	   smallest possible statement of what the site is about. */
+	/* The wordmark, bone with the rule in signal; the whole thing warms to
+	   signal on hover. Height is set here, width follows the viewBox. */
 	.mark {
-		position: relative;
-		display: grid;
-		place-items: center;
-		inline-size: 2.25rem;
-		block-size: 2.25rem;
+		display: block;
 		flex: none;
-		border: 1px solid var(--rule-strong);
-		border-radius: 0.55rem;
-		text-decoration: none;
-		overflow: hidden;
-		transition: border-color 0.3s;
+		color: var(--bone);
+		--logo-rule: var(--signal);
+		transition: color 0.3s;
+	}
+
+	.mark :global(.logo) {
+		block-size: 1.55rem;
 	}
 
 	.mark:hover {
-		border-color: var(--signal);
-	}
-
-	.mark__face {
-		grid-area: 1 / 1;
-		font-size: 1.05rem;
-		font-weight: 900;
-		line-height: 1;
-		transition:
-			transform 0.4s cubic-bezier(0.7, 0, 0.2, 1),
-			opacity 0.3s;
-	}
-
-	.mark__face--arabic {
 		color: var(--signal);
-		transform: translateY(110%);
-		opacity: 0;
-	}
-
-	.mark:hover .mark__face--latin {
-		transform: translateY(-110%);
-		opacity: 0;
-	}
-
-	.mark:hover .mark__face--arabic {
-		transform: none;
-		opacity: 1;
 	}
 
 	.links {

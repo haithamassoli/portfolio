@@ -8,6 +8,7 @@
    would actually carry, with the `dir=` readout beside it reporting what the
    language chose. */
 import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -85,7 +86,16 @@ const year = new Date().getFullYear();
 		<header class="chrome">
 			<div class="chrome__inner">
 				<div class="status">
-					<span class="status__tag tty">haitham@amman</span>
+					<a class="status__tag tty" href="/4">
+						<Logo class="status__logo" labelled={false} />
+						<span aria-hidden="true">@amman</span>
+						<span class="sr-only" data-l="en"
+							>Haitham Assoli — session home</span
+						>
+						<span class="sr-only" data-l="ar" lang="ar"
+							>هيثم العسولي — بداية الجلسة</span
+						>
+					</a>
 					<span class="status__path tty">{path}</span>
 
 					<nav class="wins" aria-labelledby="wins-label">
@@ -694,11 +704,28 @@ const year = new Date().getFullYear();
 		letter-spacing: 0.02em;
 	}
 
+	/* The `user` half of `user@host` is the wordmark, cut out of the amber
+	   chip in the session's own black. The host stays typed. */
 	.status__tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.32rem;
 		background: var(--amber);
 		color: var(--void);
 		padding-inline: 0.5rem;
 		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.status__tag:hover {
+		background: var(--bone);
+	}
+
+	/* (0,3,0): the wordmark's own `block-size: auto` is scoped, so (0,2,0). */
+	.status .status__tag .status__logo {
+		block-size: 0.82rem;
+		color: var(--void);
+		--logo-rule: color-mix(in srgb, var(--void) 62%, transparent);
 	}
 
 	.status__path {

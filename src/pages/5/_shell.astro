@@ -3,6 +3,7 @@
    dropped into this. The lid at the top carries the name, the routes and the
    language switch; the compartments below are each page's own composition. */
 import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -40,14 +41,8 @@ const { title, description, page } = Astro.props;
 		<div class="tray">
 			<header class="lid">
 				<a class="lid__name" href="/5">
-					<span data-l="en" lang="en">Haitham Assoli</span>
-					<span data-l="ar" lang="ar">هيثم العسولي</span>
-					<span class="lid__alt" data-l="en" lang="ar" dir="rtl"
-						>هيثم العسولي</span
-					>
-					<span class="lid__alt" data-l="ar" lang="en" dir="ltr"
-						>Haitham Assoli</span
-					>
+					<Logo class="lid__logo" labelled={false} />
+					<T class="sr-only" v={pair('Haitham Assoli', 'هيثم العسولي')} />
 				</a>
 
 				<nav class="lid__nav mono">
@@ -288,17 +283,23 @@ const { title, description, page } = Astro.props;
 	}
 
 	.lid__name {
-		font-family: var(--display);
-		font-weight: 800;
-		font-size: 1rem;
-		letter-spacing: -0.02em;
-		text-decoration: none;
+		display: flex;
+		align-items: center;
 	}
 
-	.lid__alt {
-		font-weight: 500;
-		opacity: 0.5;
-		margin-inline-start: 0.45rem;
+	/* The wordmark wears the tray's own paint: ink letters on bone, ruled in
+	   pomegranate like every other accent on a light tile. Three classes to
+	   outweigh the component's own scoped `block-size: auto`. */
+	.lid .lid__name .lid__logo {
+		block-size: 1.25rem;
+		inline-size: auto;
+		color: var(--ink);
+		--logo-rule: var(--pomegranate);
+	}
+
+	/* On the way in, the rule warms to the lid's own marigold. */
+	.lid__name:hover .lid__logo {
+		--logo-rule: var(--marigold);
 	}
 
 	.lid__nav {
