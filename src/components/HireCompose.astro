@@ -40,42 +40,48 @@ const labels = { en: pick(ui.en), ar: pick(ui.ar) };
 ---
 
 <script define:vars={{ labels, to: profile.email }}>
-	document.addEventListener('submit', (ev) => {
-		const form = ev.target;
-		if (!form.matches || !form.matches('form[data-hire]')) return;
-		ev.preventDefault();
+	/* Capture phase, so the draft is composed before the client router's own
+	   submit listener can mistake this form for a GET it should navigate. */
+	document.addEventListener(
+		'submit',
+		(ev) => {
+			const form = ev.target;
+			if (!form.matches || !form.matches('form[data-hire]')) return;
+			ev.preventDefault();
 
-		const lang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
-		const L = labels[lang];
-		const d = new FormData(form);
-		const listSep = lang === 'ar' ? '، ' : ', ';
-		const opt = (group, v) => L[group + '.' + v] || v;
+			const lang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+			const L = labels[lang];
+			const d = new FormData(form);
+			const listSep = lang === 'ar' ? '، ' : ', ';
+			const opt = (group, v) => L[group + '.' + v] || v;
 
-		const rows = [
-			[L['hire.fullName'], d.get('fullName')],
-			[L['hire.email'], d.get('email')],
-			[L['hire.phone'], d.get('phone')],
-			[L['hire.deal'], opt('deal', d.get('deal'))],
-			[L['hire.location'], opt('loc', d.get('location'))],
-			[L['hire.budget'], d.get('budget')],
-			[
-				L['hire.techStack'],
-				d
-					.getAll('techStack')
-					.map((v) => opt('tech', v))
-					.join(listSep),
-			],
-		];
+			const rows = [
+				[L['hire.fullName'], d.get('fullName')],
+				[L['hire.email'], d.get('email')],
+				[L['hire.phone'], d.get('phone')],
+				[L['hire.deal'], opt('deal', d.get('deal'))],
+				[L['hire.location'], opt('loc', d.get('location'))],
+				[L['hire.budget'], d.get('budget')],
+				[
+					L['hire.techStack'],
+					d
+						.getAll('techStack')
+						.map((v) => opt('tech', v))
+						.join(listSep),
+				],
+			];
 
-		const subject =
-			lang === 'ar'
-				? `مشروع جديد — ${d.get('fullName')}`
-				: `New project — ${d.get('fullName')}`;
-		const body =
-			rows.map(([k, v]) => `${k}: ${v ?? ''}`).join('\n') +
-			`\n\n${L['hire.summary']}:\n${d.get('summary') ?? ''}\n`;
+			const subject =
+				lang === 'ar'
+					? `مشروع جديد — ${d.get('fullName')}`
+					: `New project — ${d.get('fullName')}`;
+			const body =
+				rows.map(([k, v]) => `${k}: ${v ?? ''}`).join('\n') +
+				`\n\n${L['hire.summary']}:\n${d.get('summary') ?? ''}\n`;
 
-		form.setAttribute('data-sent', '');
-		window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-	});
+			form.setAttribute('data-sent', '');
+			window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+		},
+		true,
+	);
 </script>

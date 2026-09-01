@@ -7,6 +7,7 @@
    different room, it is a different variant. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -36,19 +37,26 @@ const { title, description } = Astro.props;
 		<script is:inline>
 			/* Runs before first paint: no flash of the wrong room. */
 			(function () {
-				try {
-					let t = localStorage.getItem('qr-theme');
-					if (t !== 'light' && t !== 'dark') {
-						t = window.matchMedia('(prefers-color-scheme: dark)').matches
-							? 'dark'
-							: 'light';
+				function apply() {
+					try {
+						let t = localStorage.getItem('qr-theme');
+						if (t !== 'light' && t !== 'dark') {
+							t = window.matchMedia('(prefers-color-scheme: dark)').matches
+								? 'dark'
+								: 'light';
+						}
+						document.documentElement.setAttribute('data-theme', t);
+					} catch {
+						document.documentElement.setAttribute('data-theme', 'light');
 					}
-					document.documentElement.setAttribute('data-theme', t);
-				} catch {
-					document.documentElement.setAttribute('data-theme', 'light');
 				}
+				apply();
+				/* The router takes <html> off the incoming page, which knows nothing
+				   of the theme, so it goes back on before that page paints. */
+				document.addEventListener('astro:after-swap', apply);
 			})();
 		</script>
+		<Seam />
 	</head>
 	<body>
 		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
@@ -195,6 +203,9 @@ const { title, description } = Astro.props;
 				});
 
 				sync();
+				/* The swap brings fresh buttons in unstated; state them before they
+				   paint. */
+				document.addEventListener('astro:after-swap', sync);
 			})();
 		</script>
 

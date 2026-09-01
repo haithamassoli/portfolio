@@ -338,7 +338,10 @@ const steps = [
 				});
 			};
 			apply();
+			/* <html> and document both outlive a swap, so these two are
+			   registered once; the fields themselves are new every time. */
 			new MutationObserver(apply).observe(root, { attributeFilter: ['lang'] });
+			document.addEventListener('astro:page-load', apply);
 		})();
 	</script>
 </Shell>

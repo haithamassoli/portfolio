@@ -2,6 +2,7 @@
 /* Contact sheet for the design variants. Each tile is the real page, scaled
    down in an iframe, so what you pick is what you saw.
    ponytail: delete alongside /1 … /7 once a direction is chosen. */
+import Seam from '../components/Seam.astro';
 import { styleVariants } from '../data/style-variants';
 ---
 
@@ -13,6 +14,7 @@ import { styleVariants } from '../data/style-variants';
 		<title>Design variants · Haitham Assoli</title>
 		<meta name="robots" content="noindex" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<Seam />
 	</head>
 	<body>
 		<header class="head">

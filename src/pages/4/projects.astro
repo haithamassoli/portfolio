@@ -224,7 +224,8 @@ const flags = [
 	</section>
 </Shell>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
+	/* Only this page's own rows and buttons, so re-run it per navigation. */
 	(function () {
 		const rows = Array.prototype.slice.call(
 			document.querySelectorAll('[data-row]'),

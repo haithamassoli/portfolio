@@ -5,6 +5,7 @@ import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
 import LangBoot from '../components/LangBoot.astro';
 import Logo from '../components/Logo.astro';
+import Seam from '../components/Seam.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import T from '../components/T.astro';
 import { s, pair, yearPair } from '../data/variant-ui';
@@ -115,6 +116,7 @@ const widthsFor = (img: ImageMetadata) =>
 			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
 		/>
 		<LangBoot />
+		<Seam />
 	</head>
 	<body>
 		<!-- The refraction filter. One turbulence field, displaced gently, used
@@ -643,8 +645,13 @@ const widthsFor = (img: ImageMetadata) =>
 		</footer>
 
 		<script>
-			const stage = document.getElementById('stage');
-			if (stage) {
+			/* A bundled script runs once per session and loses
+			   `data-astro-rerun` on the way out, so the lens is rewired on
+			   every navigation from the document instead. */
+			const wire = () => {
+				const stage = document.getElementById('stage');
+				if (!stage) return;
+
 				let raf = 0;
 				let px = 0;
 				let py = 0;
@@ -674,7 +681,10 @@ const widthsFor = (img: ImageMetadata) =>
 				host.addEventListener('pointerleave', () => {
 					stage.classList.remove('manual');
 				});
-			}
+			};
+
+			/* Fires on the first load too, so this is the only hook needed. */
+			document.addEventListener('astro:page-load', wire);
 		</script>
 
 		<StyleSwitcher n={3} />

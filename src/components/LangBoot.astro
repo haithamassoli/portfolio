@@ -13,15 +13,21 @@
 <script is:inline>
 	/* Before first paint: no flash of the wrong language. */
 	(function () {
-		const el = document.documentElement;
-		let l = 'en';
-		try {
-			l = localStorage.getItem('vx-lang') === 'ar' ? 'ar' : 'en';
-		} catch {
-			/* private mode: English it is */
+		function apply() {
+			const el = document.documentElement;
+			let l = 'en';
+			try {
+				l = localStorage.getItem('vx-lang') === 'ar' ? 'ar' : 'en';
+			} catch {
+				/* private mode: English it is */
+			}
+			el.lang = l;
+			el.dir = l === 'ar' ? 'rtl' : 'ltr';
 		}
-		el.lang = l;
-		el.dir = l === 'ar' ? 'rtl' : 'ltr';
+		apply();
+		/* The router copies <html> attributes off the incoming page, so the
+		   language is put back before that page paints. */
+		document.addEventListener('astro:after-swap', apply);
 	})();
 
 	document.addEventListener('click', function (ev) {

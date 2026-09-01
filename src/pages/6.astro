@@ -5,6 +5,7 @@ import { featured, projects } from '../data/projects';
 import { toolbox } from '../i18n';
 import LangBoot from '../components/LangBoot.astro';
 import Logo from '../components/Logo.astro';
+import Seam from '../components/Seam.astro';
 import StyleSwitcher from '../components/StyleSwitcher.astro';
 import T from '../components/T.astro';
 import { s, pair, yearPair } from '../data/variant-ui';
@@ -101,11 +102,17 @@ const booking: [I18n, string, string][] = [
 			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
 			rel="stylesheet"
 		/>
+		<Seam />
 	</head>
 
 	<body>
 		<script is:inline>
+			/* The router copies <html> off the incoming page, so the flag goes
+			   back on before that page paints. */
 			document.documentElement.classList.add('js');
+			document.addEventListener('astro:after-swap', () =>
+				document.documentElement.classList.add('js'),
+			);
 		</script>
 
 		<a class="skip" href="#reel">
@@ -137,7 +144,6 @@ const booking: [I18n, string, string][] = [
 				<span class="vh" data-l="ar" lang="ar">اقرأ هذه البكرة بالإنجليزية</span
 				>
 			</button>
-
 		</div>
 
 		<div class="gate gate--bottom" aria-hidden="true">
@@ -659,9 +665,12 @@ const booking: [I18n, string, string][] = [
 					},
 					{ passive: true },
 				);
+				/* The router overwrites the <html> style attribute, so the key
+				   is put back before the incoming page paints. */
+				document.addEventListener('astro:after-swap', place);
 
 				/* The timecode is the scroll position, read as film. */
-				const tc = document.querySelector('[data-tc]');
+				let tc = null;
 				let ticking = 0;
 				const readHead = () => {
 					ticking = 0;
@@ -675,7 +684,6 @@ const booking: [I18n, string, string][] = [
 					const two = (n) => String(n).padStart(2, '0');
 					if (tc) tc.textContent = '00:' + two(m) + ':' + two(s) + ':' + two(f);
 				};
-				readHead();
 				window.addEventListener(
 					'scroll',
 					() => {
@@ -684,70 +692,85 @@ const booking: [I18n, string, string][] = [
 					{ passive: true },
 				);
 
-				/* The reveal: the gate opens on each shot as it reaches the light. */
-				const shots = Array.from(document.querySelectorAll('[data-shot]'));
-				const marker = document.querySelector('[data-now]');
-				const markEn = marker && marker.querySelector('[data-l="en"]');
-				const markAr = marker && marker.querySelector('[data-l="ar"]');
-				const plates = document.querySelectorAll('.plate');
+				/* Everything under here is wiring for the page that is on screen
+				   right now. An inline script is not run again after a swap, so the
+				   router calls this on every navigation — and on the first load too.
+				   ponytail: no teardown. The old observers lose their last reference
+				   on the next call and leave with the old DOM. */
+				function wire() {
+					tc = document.querySelector('[data-tc]');
+					readHead();
 
-				if (!('IntersectionObserver' in window) || still.matches) {
-					plates.forEach((el) => el.classList.add('is-lit'));
-				} else {
-					const lighting = new IntersectionObserver(
-						(entries) => {
-							entries.forEach((entry) => {
-								/* Anything the reader has already scrolled past counts as
-								   lit, so a jump never leaves a still in the dark. */
-								if (
-									entry.isIntersecting ||
-									entry.boundingClientRect.bottom < 0
-								) {
-									entry.target.classList.add('is-lit');
-									lighting.unobserve(entry.target);
-								}
-							});
-						},
-						/* The plate is clipped shut before it is lit, so the visible
-						   band is tiny: any intersection at all counts. */
-						{ rootMargin: '0px 0px -10% 0px', threshold: 0 },
-					);
-					plates.forEach((el) => lighting.observe(el));
+					/* The reveal: the gate opens on each shot as it reaches the light. */
+					const shots = Array.from(document.querySelectorAll('[data-shot]'));
+					const marker = document.querySelector('[data-now]');
+					const markEn = marker && marker.querySelector('[data-l="en"]');
+					const markAr = marker && marker.querySelector('[data-l="ar"]');
+					const plates = document.querySelectorAll('.plate');
 
-					/* The bottom gate names the shot under the light, in both
-					   languages at once — the CSS decides which one is on screen, so
-					   the marker does not have to know what the reader is reading. */
-					const naming = new IntersectionObserver(
-						(entries) => {
-							entries.forEach((entry) => {
-								if (!entry.isIntersecting || !markEn || !markAr) return;
-								const no = String(shots.indexOf(entry.target) + 1).padStart(
-									2,
-									'0',
+					if (!('IntersectionObserver' in window) || still.matches) {
+						plates.forEach((el) => el.classList.add('is-lit'));
+					} else {
+						const lighting = new IntersectionObserver(
+							(entries) => {
+								entries.forEach((entry) => {
+									/* Anything the reader has already scrolled past counts as
+									   lit, so a jump never leaves a still in the dark. */
+									if (
+										entry.isIntersecting ||
+										entry.boundingClientRect.bottom < 0
+									) {
+										entry.target.classList.add('is-lit');
+										lighting.unobserve(entry.target);
+									}
+								});
+							},
+							/* The plate is clipped shut before it is lit, so the visible
+							   band is tiny: any intersection at all counts. */
+							{ rootMargin: '0px 0px -10% 0px', threshold: 0 },
+						);
+						plates.forEach((el) => lighting.observe(el));
+
+						/* The bottom gate names the shot under the light, in both
+						   languages at once — the CSS decides which one is on screen, so
+						   the marker does not have to know what the reader is reading. */
+						const naming = new IntersectionObserver(
+							(entries) => {
+								entries.forEach((entry) => {
+									if (!entry.isIntersecting || !markEn || !markAr) return;
+									const no = String(shots.indexOf(entry.target) + 1).padStart(
+										2,
+										'0',
+									);
+									markEn.textContent =
+										'Shot ' + no + ' — ' + entry.target.dataset.titleEn;
+									markAr.textContent =
+										'لقطة ' + no + ' — ' + entry.target.dataset.titleAr;
+								});
+							},
+							{ rootMargin: '-45% 0px -45% 0px' },
+						);
+						shots.forEach((el) => naming.observe(el));
+					}
+
+					/* The bars close again when the credits roll. */
+					const tail = document.querySelector('[data-tail]');
+					if (tail && 'IntersectionObserver' in window) {
+						new IntersectionObserver(
+							(entries) => {
+								entries.forEach((entry) =>
+									document.body.classList.toggle(
+										'is-end',
+										entry.isIntersecting,
+									),
 								);
-								markEn.textContent =
-									'Shot ' + no + ' — ' + entry.target.dataset.titleEn;
-								markAr.textContent =
-									'لقطة ' + no + ' — ' + entry.target.dataset.titleAr;
-							});
-						},
-						{ rootMargin: '-45% 0px -45% 0px' },
-					);
-					shots.forEach((el) => naming.observe(el));
+							},
+							{ threshold: 0.35 },
+						).observe(tail);
+					}
 				}
 
-				/* The bars close again when the credits roll. */
-				const tail = document.querySelector('[data-tail]');
-				if (tail && 'IntersectionObserver' in window) {
-					new IntersectionObserver(
-						(entries) => {
-							entries.forEach((entry) =>
-								document.body.classList.toggle('is-end', entry.isIntersecting),
-							);
-						},
-						{ threshold: 0.35 },
-					).observe(tail);
-				}
+				document.addEventListener('astro:page-load', wire);
 			})();
 		</script>
 

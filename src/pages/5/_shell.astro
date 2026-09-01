@@ -4,6 +4,7 @@
    language switch; the compartments below are each page's own composition. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -33,6 +34,7 @@ const { title, description, page } = Astro.props;
 			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
 		/>
 		<LangBoot />
+		<Seam />
 	</head>
 
 	<body>
@@ -97,42 +99,60 @@ const { title, description, page } = Astro.props;
 		</div>
 
 		<script is:inline>
-			document.documentElement.classList.add('js');
+			/* The tray's wiring, written out the same way here and on /5, so the
+			   router recognises it and runs it once for the whole section rather
+			   than again on every arrival. */
+			(function () {
+				const mark = () => document.documentElement.classList.add('js');
+				mark();
+				/* The router copies <html> off the incoming page, so the class goes
+				   back on before that page paints. */
+				document.addEventListener('astro:after-swap', mark);
 
-			/* Cursor-tracked highlight: one listener for the whole tray. */
-			const tray = document.querySelector('.tray');
-			tray.addEventListener('pointermove', (e) => {
-				const tile = e.target.closest('.tile');
-				if (!tile) return;
-				const r = tile.getBoundingClientRect();
-				tile.style.setProperty('--mx', `${e.clientX - r.left}px`);
-				tile.style.setProperty('--my', `${e.clientY - r.top}px`);
-			});
+				const revealAll = () =>
+					document
+						.querySelectorAll('.board')
+						.forEach((b) => b.classList.add('is-in'));
+				document.addEventListener('visibilitychange', revealAll);
 
-			/* Boards settle in as they arrive. */
-			const revealAll = () =>
-				document
-					.querySelectorAll('.board')
-					.forEach((b) => b.classList.add('is-in'));
-
-			if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-				revealAll();
-			} else {
-				const io = new IntersectionObserver(
-					(entries) => {
-						entries.forEach((entry) => {
-							if (!entry.isIntersecting) return;
-							entry.target.classList.add('is-in');
-							io.unobserve(entry.target);
+				/* The rest hangs off whichever tray is on screen, so it is wired
+				   again on every arrival; the two listeners above are set once. */
+				function wire() {
+					/* Cursor-tracked highlight: one listener for the whole tray. */
+					const tray = document.querySelector('.tray');
+					if (tray) {
+						tray.addEventListener('pointermove', (e) => {
+							const tile = e.target.closest('.tile');
+							if (!tile) return;
+							const r = tile.getBoundingClientRect();
+							tile.style.setProperty('--mx', `${e.clientX - r.left}px`);
+							tile.style.setProperty('--my', `${e.clientY - r.top}px`);
 						});
-					},
-					{ rootMargin: '0px 0px -8% 0px' },
-				);
-				document.querySelectorAll('.board').forEach((b) => io.observe(b));
-				/* Whatever happens, nothing stays hidden. */
-				setTimeout(revealAll, 2000);
-			}
-			document.addEventListener('visibilitychange', revealAll);
+					}
+
+					/* Boards settle in as they arrive. */
+					if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+						revealAll();
+						return;
+					}
+
+					const io = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (!entry.isIntersecting) return;
+								entry.target.classList.add('is-in');
+								io.unobserve(entry.target);
+							});
+						},
+						{ rootMargin: '0px 0px -8% 0px' },
+					);
+					document.querySelectorAll('.board').forEach((b) => io.observe(b));
+					/* Whatever happens, nothing stays hidden. */
+					setTimeout(revealAll, 2000);
+				}
+				wire();
+				document.addEventListener('astro:after-swap', wire);
+			})();
 		</script>
 
 		<StyleSwitcher n={5} />

@@ -43,11 +43,15 @@ const { n } = Astro.props;
 	/* On a sub-page, jumping to another variant should land on the same
 	   sub-page: comparing /3/projects against /5/projects is the whole point. */
 	(function () {
-		const tail = location.pathname.match(/^\/[1-9](\/.+?)\/?$/);
-		if (!tail) return;
-		for (const a of document.querySelectorAll('.sx-bar .sx-link[data-n]')) {
-			a.href = '/' + a.dataset.n + tail[1];
+		function retarget() {
+			const tail = location.pathname.match(/^\/[1-9](\/.+?)\/?$/);
+			for (const a of document.querySelectorAll('.sx-bar .sx-link[data-n]')) {
+				a.href = '/' + a.dataset.n + (tail ? tail[1] : '');
+			}
 		}
+		retarget();
+		/* Fires on the first load too, so this is the only hook needed. */
+		document.addEventListener('astro:page-load', retarget);
 	})();
 </script>
 

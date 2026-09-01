@@ -496,9 +496,10 @@ const elsewhere = [
 	</section>
 </Shell>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
 	/* The cursor moves the light: the hero glow follows the pointer. Everything
-	   else on this page is CSS reacting to html[lang] and html[dir]. */
+	   else on this page is CSS reacting to html[lang] and html[dir].
+	   Rerun: the hero is a fresh element after every client-side navigation. */
 	(function () {
 		const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const hero = document.getElementById('hero');

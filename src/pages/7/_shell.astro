@@ -13,6 +13,7 @@ import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
 import T from '../../components/T.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
+import Seam from '../../components/Seam.astro';
 import { profile } from '../../../content/profile';
 import { s, pair } from '../../data/variant-ui';
 
@@ -55,8 +56,18 @@ const footLinks = [
 		/>
 		<LangBoot />
 		<script is:inline>
-			document.documentElement.classList.add('js');
+			/* The router copies <html> attributes off the incoming page, so the
+			   marker goes back on before that page paints — otherwise the lever
+			   disappears on the second navigation. */
+			(function () {
+				function apply() {
+					document.documentElement.classList.add('js');
+				}
+				apply();
+				document.addEventListener('astro:after-swap', apply);
+			})();
 		</script>
+		<Seam />
 	</head>
 
 	<body class="playroom">

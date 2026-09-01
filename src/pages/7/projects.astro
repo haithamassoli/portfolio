@@ -216,7 +216,9 @@ const hues = ['melon', 'sky', 'bubble', 'sun', 'mint'];
 	</section>
 </Shell>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
+	/* Rerun: the punches and panels are fresh elements after every
+	   client-side navigation, so the filter has to be wired again. */
 	(function () {
 		const sheets = document.getElementById('sheets');
 		const empty = document.getElementById('sheet-empty');

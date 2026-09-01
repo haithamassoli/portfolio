@@ -624,8 +624,9 @@ const linkOrder = [
 	</section>
 </Shell>
 
-<script is:inline>
-	/* One small piece of theatre: the first command types itself. */
+<script is:inline data-astro-rerun>
+	/* One small piece of theatre: the first command types itself. It wires
+	   nothing outside this page, so the router just re-runs it. */
 	(function () {
 		const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const hero = document.querySelector('[data-type]');

@@ -8,6 +8,7 @@
    readable under it. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { profile } from '../../../content/profile';
@@ -45,11 +46,17 @@ const nav: [string, string, I18n][] = [
 			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
 			rel="stylesheet"
 		/>
+		<Seam />
 	</head>
 
 	<body>
 		<script is:inline>
+			/* The router copies <html> off the incoming page, so the flag goes
+			   back on before that page paints. */
 			document.documentElement.classList.add('js');
+			document.addEventListener('astro:after-swap', () =>
+				document.documentElement.classList.add('js'),
+			);
 		</script>
 
 		<a class="skip" href="#content">
@@ -1096,5 +1103,8 @@ const nav: [string, string, I18n][] = [
 			},
 			{ passive: true },
 		);
+		/* The router overwrites the <html> style attribute, so the key is put
+		   back before the incoming page paints. */
+		document.addEventListener('astro:after-swap', place);
 	})();
 </script>

@@ -9,6 +9,7 @@
    language chose. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -72,6 +73,7 @@ const year = new Date().getFullYear();
 			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@1,400&display=swap"
 		/>
 		<LangBoot />
+		<Seam />
 	</head>
 
 	<body>
@@ -211,12 +213,10 @@ const year = new Date().getFullYear();
 					attributeFilter: ['lang'],
 				});
 
-				const wrap = document.querySelector('[data-cmd]');
-				const form = document.querySelector('[data-form]');
-				const input = document.getElementById('cmdline');
-				const out = document.querySelector('[data-out]');
-				if (!wrap || !form || !input || !out) return;
-				wrap.hidden = false;
+				/* The router replaces the body, so the console's own elements
+				   are found again on every navigation. Everything below reads
+				   them through these, never through a captured node. */
+				let form, input, out;
 
 				const by = {};
 				files.forEach(function (f) {
@@ -458,39 +458,56 @@ const year = new Date().getFullYear();
 				const past = [];
 				let at = -1;
 
-				form.addEventListener('submit', function (e) {
-					e.preventDefault();
-					const v = input.value;
-					if (v.trim()) past.push(v.trim());
-					at = past.length;
-					run(v);
-					input.value = '';
-				});
+				/* Per-page wiring. Fires on the first load too, so this is the
+				   only hook needed — and the document listener below stays
+				   registered once, or every key would fire twice. */
+				function wire() {
+					const wrap = document.querySelector('[data-cmd]');
+					form = document.querySelector('[data-form]');
+					input = document.getElementById('cmdline');
+					out = document.querySelector('[data-out]');
+					placeholders();
+					if (!wrap || !form || !input || !out) return;
+					wrap.hidden = false;
 
-				input.addEventListener('keydown', function (e) {
-					if (e.key === 'Tab') {
-						const m = input.value.match(/^\s*(open|cat)\s+(\S*)$/i);
-						if (!m) return;
-						const hit = slugs.filter(function (sl) {
-							return sl.indexOf(m[2].toLowerCase()) === 0;
-						});
-						if (!hit.length) return;
+					form.addEventListener('submit', function (e) {
 						e.preventDefault();
-						if (hit.length === 1) input.value = m[1] + ' ' + hit[0];
-						else print(input.value.trim(), [[hit.join('  '), hit.join('  ')]]);
-					} else if (e.key === 'ArrowUp' && past.length) {
-						e.preventDefault();
-						at = Math.max(0, at - 1);
-						input.value = past[at];
-					} else if (e.key === 'ArrowDown' && past.length) {
-						e.preventDefault();
-						at = Math.min(past.length, at + 1);
-						input.value = past[at] || '';
-					}
-				});
+						const v = input.value;
+						if (v.trim()) past.push(v.trim());
+						at = past.length;
+						run(v);
+						input.value = '';
+					});
+
+					input.addEventListener('keydown', function (e) {
+						if (e.key === 'Tab') {
+							const m = input.value.match(/^\s*(open|cat)\s+(\S*)$/i);
+							if (!m) return;
+							const hit = slugs.filter(function (sl) {
+								return sl.indexOf(m[2].toLowerCase()) === 0;
+							});
+							if (!hit.length) return;
+							e.preventDefault();
+							if (hit.length === 1) input.value = m[1] + ' ' + hit[0];
+							else
+								print(input.value.trim(), [[hit.join('  '), hit.join('  ')]]);
+						} else if (e.key === 'ArrowUp' && past.length) {
+							e.preventDefault();
+							at = Math.max(0, at - 1);
+							input.value = past[at];
+						} else if (e.key === 'ArrowDown' && past.length) {
+							e.preventDefault();
+							at = Math.min(past.length, at + 1);
+							input.value = past[at] || '';
+						}
+					});
+				}
+
+				document.addEventListener('astro:page-load', wire);
 
 				/* "/" focuses the line, Esc leaves it. Nothing else is captured. */
 				document.addEventListener('keydown', function (e) {
+					if (!input) return;
 					const t = e.target;
 					const typing =
 						t &&

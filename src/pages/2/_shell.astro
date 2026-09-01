@@ -5,6 +5,7 @@
 import { profile } from '../../../content/profile';
 import { pair, s } from '../../data/variant-ui';
 import LangBoot from '../../components/LangBoot.astro';
+import Seam from '../../components/Seam.astro';
 import T from '../../components/T.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import Logo from '../../components/Logo.astro';
@@ -40,6 +41,7 @@ const nav = [
 			href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
 		/>
 		<LangBoot />
+		<Seam />
 	</head>
 
 	<body>
@@ -123,25 +125,31 @@ const nav = [
 			</div>
 		</footer>
 
-		<script>
-			const targets = document.querySelectorAll('.rise');
-			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+		<!-- Nothing but this page's own elements, so the router is told to
+		     run it again: a script it has already executed is otherwise
+		     skipped for the rest of the session. Held in a function because a
+		     second run at the top level would redeclare its own names. -->
+		<script data-astro-rerun>
+			(function () {
+				const targets = document.querySelectorAll('.rise');
+				const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-			if (reduce.matches || !('IntersectionObserver' in window)) {
-				targets.forEach((el) => el.classList.add('is-in'));
-			} else {
-				const io = new IntersectionObserver(
-					(entries) => {
-						entries.forEach((entry) => {
-							if (!entry.isIntersecting) return;
-							entry.target.classList.add('is-in');
-							io.unobserve(entry.target);
-						});
-					},
-					{ rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-				);
-				targets.forEach((el) => io.observe(el));
-			}
+				if (reduce.matches || !('IntersectionObserver' in window)) {
+					targets.forEach((el) => el.classList.add('is-in'));
+				} else {
+					const io = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (!entry.isIntersecting) return;
+								entry.target.classList.add('is-in');
+								io.unobserve(entry.target);
+							});
+						},
+						{ rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+					);
+					targets.forEach((el) => io.observe(el));
+				}
+			})();
 		</script>
 
 		<StyleSwitcher n={2} />
