@@ -69,9 +69,6 @@ const { title, description } = Astro.props;
 					<a href="/1/hire"><T v={s('nav.hire')} /></a>
 				</nav>
 				<div class="top__set">
-					<span class="k top__place">
-						<T v={pair('Amman · UTC+3', 'عمّان · UTC+3')} />
-					</span>
 					<button
 						class="seg"
 						type="button"
@@ -589,12 +586,6 @@ const { title, description } = Astro.props;
 		display: flex;
 		align-items: center;
 		gap: 0.6rem 1rem;
-	}
-
-	@media (max-width: 559px) {
-		.top__place {
-			display: none;
-		}
 	}
 
 	/* ── The two switches ──────────────────────────────────────────────────*/
