@@ -1,0 +1,111 @@
+---
+/* Floating switcher for the design variants at /1 … /9. Prototype-only: it is
+   deliberately isolated from whatever styles the host page sets, so a variant
+   can be as maximalist as it likes without swallowing the navigation.
+   ponytail: drop this file and the /N pages once a direction is picked. */
+import { styleVariants } from '../data/style-variants';
+
+interface Props {
+	n: number;
+}
+const { n } = Astro.props;
+---
+
+<nav class="sx-bar" aria-label="Design variants">
+	<a class="sx-link sx-index" href="/styles">All</a>
+	{
+		styleVariants.map((v) => (
+			<a
+				class="sx-link"
+				href={`/${v.n}`}
+				title={`${v.name} — ${v.note}`}
+				aria-current={v.n === n ? 'page' : undefined}
+			>
+				{v.n}
+			</a>
+		))
+	}
+</nav>
+
+<style is:global>
+	.sx-bar {
+		all: revert;
+		position: fixed;
+		z-index: 2147483647;
+		inset-block-end: max(0.75rem, env(safe-area-inset-bottom));
+		inset-inline-start: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 0.125rem;
+		padding: 0.3rem;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		background: rgba(14, 14, 18, 0.72);
+		-webkit-backdrop-filter: blur(14px) saturate(1.4);
+		backdrop-filter: blur(14px) saturate(1.4);
+		box-shadow: 0 10px 34px -12px rgba(0, 0, 0, 0.7);
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.75rem;
+		line-height: 1;
+		direction: ltr;
+	}
+
+	.sx-bar .sx-link {
+		all: unset;
+		display: grid;
+		place-items: center;
+		min-width: 1.75rem;
+		height: 1.75rem;
+		padding-inline: 0.4rem;
+		border-radius: 999px;
+		color: rgba(255, 255, 255, 0.62);
+		cursor: pointer;
+		transition:
+			color 0.15s,
+			background-color 0.15s;
+	}
+
+	.sx-bar .sx-link:hover {
+		color: #fff;
+		background: rgba(255, 255, 255, 0.12);
+	}
+
+	.sx-bar .sx-link:focus-visible {
+		outline: 2px solid #fff;
+		outline-offset: 2px;
+	}
+
+	.sx-bar .sx-link[aria-current='page'] {
+		color: #0e0e12;
+		background: #fff;
+	}
+
+	.sx-bar .sx-index {
+		letter-spacing: 0.04em;
+	}
+
+	/* Ten targets do not fit a 380px phone at full size, so the bar tightens
+	   rather than running off both edges. */
+	@media (max-width: 26rem) {
+		.sx-bar {
+			inset-inline: 0.5rem;
+			transform: none;
+			justify-content: space-between;
+			gap: 0;
+			font-size: 0.7rem;
+		}
+
+		.sx-bar .sx-link {
+			min-width: 1.5rem;
+			height: 1.5rem;
+			padding-inline: 0.2rem;
+		}
+	}
+
+	@media print {
+		.sx-bar {
+			display: none;
+		}
+	}
+</style>

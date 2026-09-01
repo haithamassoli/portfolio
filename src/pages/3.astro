@@ -1,0 +1,1661 @@
+---
+import { Image } from 'astro:assets';
+import { profile } from '../../content/profile';
+import { featured, projects } from '../data/projects';
+import { toolbox } from '../i18n';
+import StyleSwitcher from '../components/StyleSwitcher.astro';
+import profilePhoto from '../assets/images/profile.png';
+
+/* The grid is uneven on purpose, and the spans follow the covers: the three
+   landscape screenshots get the wide slots, the five phone shots get narrow
+   ones, and the last row stands them side by side like a shelf. */
+const spans = [12, 6, 6, 7, 5, 4, 4, 4];
+
+const statusLabel: Record<string, string> = {
+	live: 'Live',
+	shipped: 'On the stores',
+	delisted: 'Delisted',
+	wip: 'In progress',
+	archived: 'Archived',
+};
+
+const linkLabel: Record<string, string> = {
+	live: 'Open it',
+	github: 'Source',
+	appStore: 'App Store',
+	playGoogle: 'Google Play',
+	vscode: 'VS Marketplace',
+};
+
+/* Static figures. dev-stats.ts fetches at build time and is deliberately not
+   imported here. */
+const figures = [
+	{
+		n: '39',
+		label: 'projects shipped',
+		note: 'web, mobile, desktop, extensions',
+	},
+	{
+		n: '13',
+		label: 'live on the app stores',
+		note: 'App Store and Google Play',
+	},
+	{ n: '08', label: 'written up in full', note: 'problem, decision, outcome' },
+	{
+		n: '04',
+		label: 'years building',
+		note: 'freelance, salaried and founder, since 2022',
+	},
+];
+
+const orderedLinks = [
+	'live',
+	'appStore',
+	'playGoogle',
+	'github',
+	'vscode',
+] as const;
+
+/* Five of the eight covers are phone screenshots. Cropping a 1080×2340 shot to
+   a landscape card destroys it, so tall covers stand in the frame instead of
+   filling it, lit from behind by the project accent. */
+const isTall = (img?: ImageMetadata) => !!img && img.height > img.width;
+const widthsFor = (img: ImageMetadata) =>
+	(img.height > img.width ? [320, 560, 780] : [440, 760, 1120]).filter(
+		(w) => w <= img.width,
+	);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Haitham Assoli — two scripts, two directions, one build</title>
+		<meta
+			name="description"
+			content="Haitham Assoli builds bilingual Arabic-first web and mobile products from Amman, Jordan. 39 shipped, 13 on the app stores, recent work in on-device AI."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@500;600&display=swap"
+		/>
+	</head>
+	<body>
+		<!-- The refraction filter. One turbulence field, displaced gently, used
+		     by the hero lens only: it is expensive and it is the signature. -->
+		<svg
+			class="filters"
+			aria-hidden="true"
+			focusable="false"
+			width="0"
+			height="0"
+		>
+			<filter
+				id="liquid"
+				x="-25%"
+				y="-25%"
+				width="150%"
+				height="150%"
+				color-interpolation-filters="sRGB"
+			>
+				<feTurbulence
+					type="fractalNoise"
+					baseFrequency="0.011 0.017"
+					numOctaves="2"
+					seed="7"
+					result="noise"></feTurbulence>
+				<feGaussianBlur in="noise" stdDeviation="1.4" result="soft"
+				></feGaussianBlur>
+				<feDisplacementMap
+					in="SourceGraphic"
+					in2="soft"
+					scale="26"
+					xChannelSelector="R"
+					yChannelSelector="G"></feDisplacementMap>
+			</filter>
+		</svg>
+
+		<div class="field" aria-hidden="true">
+			<div class="blobs"></div>
+		</div>
+		<div class="grain" aria-hidden="true"></div>
+
+		<a class="skip" href="#work">Skip to the work</a>
+
+		<main id="top">
+			<!-- ── HERO ─────────────────────────────────────────────────────── -->
+			<header class="hero" id="hero">
+				<p class="eyebrow">
+					<span class="dot"></span>Amman, Jordan — web &amp; mobile, full stack
+				</p>
+
+				<div class="stage" id="stage">
+					<p
+						class="type type--ar type--ghost"
+						aria-hidden="true"
+						lang="ar"
+						dir="rtl"
+					>
+						<span>لغتان.</span>
+						<span>اتجاهان.</span>
+						<span>بناءٌ واحد.</span>
+					</p>
+					<h1 class="type type--en">
+						<span>Two scripts.</span>
+						<span>Two directions.</span>
+						<span>One build.</span>
+					</h1>
+					<p
+						class="type type--ar type--lit"
+						aria-hidden="true"
+						lang="ar"
+						dir="rtl"
+					>
+						<span>لغتان.</span>
+						<span>اتجاهان.</span>
+						<span>بناءٌ واحد.</span>
+					</p>
+					<div class="lens" id="lens" aria-hidden="true">
+						<span class="lens__body"></span>
+						<span class="lens__rim"></span>
+					</div>
+				</div>
+
+				<p class="stage__hint">
+					<span class="key" data-fine>Move the pointer</span><span
+						class="key"
+						data-coarse>Watch the glass travel</span
+					> across the sentence. It reads the same line right to left — and the whole
+					line moves to the other edge. That is the job.
+				</p>
+
+				<div class="panel panel--thesis">
+					<p class="lede">
+						A mirrored interface is not a translated one. It is a second
+						interface, and it has to be as good as the first. I build products
+						that are bilingual from the first commit — React&nbsp;Native and
+						Expo on both app stores, Next.js and Astro on the web, NestJS,
+						Convex and Supabase underneath.
+					</p>
+					<ul class="ticks">
+						<li><b>39</b> shipped</li>
+						<li><b>13</b> on the stores</li>
+						<li><b>8</b> written up</li>
+						<li><b>4</b> years</li>
+					</ul>
+				</div>
+			</header>
+
+			<!-- ── WORK ─────────────────────────────────────────────────────── -->
+			<section class="section" id="work" aria-labelledby="work-h">
+				<div class="head">
+					<p class="eyebrow">Eight of thirty-nine</p>
+					<h2 class="h2" id="work-h">The ones worth the walkthrough</h2>
+					<p class="sub">
+						Each of these has a full write-up behind it: what was actually hard,
+						what I chose, and what it did once real people used it.
+					</p>
+				</div>
+
+				<div class="grid">
+					{
+						featured.map((p, i) => (
+							<article
+								class="card panel"
+								data-shape={isTall(p.image) ? 'tall' : 'wide'}
+								data-span={spans[i] ?? 6}
+								style={`--accent:${p.accent}; --span:${spans[i] ?? 6}`}
+							>
+								<div class="card__media">
+									{p.image ? (
+										<Image
+											src={p.image}
+											alt={`${p.title.en} — ${p.tagline.en}`}
+											widths={widthsFor(p.image)}
+											sizes="(max-width: 780px) 92vw, (max-width: 1180px) 46vw, 560px"
+											loading={i === 0 ? 'eager' : 'lazy'}
+											decoding="async"
+											class="card__img"
+										/>
+									) : (
+										<div class="card__void">
+											<span>{p.title.en}</span>
+										</div>
+									)}
+									<span class="card__scrim" />
+								</div>
+
+								<div class="card__body">
+									<p class="card__meta">
+										<span class="pip" />
+										{statusLabel[p.status] ?? p.status} · {p.year} ·{' '}
+										{p.category}
+									</p>
+									<h3 class="card__title">
+										<a href={`/work/${p.slug}`}>{p.title.en}</a>
+									</h3>
+									<p class="card__tag">{p.tagline.en}</p>
+									<p class="card__sum">{p.summary.en}</p>
+									<p class="card__role">{p.role.en}</p>
+
+									<ul class="chips">
+										{p.stack.slice(0, 5).map((s) => (
+											<li>{s}</li>
+										))}
+										{p.stack.length > 5 && (
+											<li class="chips__more">+{p.stack.length - 5}</li>
+										)}
+									</ul>
+
+									<div class="card__links">
+										<a class="btn btn--go" href={`/work/${p.slug}`}>
+											Read the case
+										</a>
+										{orderedLinks.map((k) =>
+											p.links[k] ? (
+												<a
+													class="btn"
+													href={p.links[k]}
+													rel="noreferrer noopener"
+													target="_blank"
+												>
+													{linkLabel[k]}
+												</a>
+											) : null,
+										)}
+									</div>
+								</div>
+							</article>
+						))
+					}
+				</div>
+
+				<p class="aside">
+					The other {projects.length - featured.length} live in the archive — municipal
+					portals, tourism guides, charity platforms, a few extensions and a handful
+					of things that only ever ran on my own machine.
+				</p>
+			</section>
+
+			<!-- ── WHO ──────────────────────────────────────────────────────── -->
+			<section class="section" id="who" aria-labelledby="who-h">
+				<div class="head">
+					<p class="eyebrow">Amman, Jordan</p>
+					<h2 class="h2" id="who-h">Who is behind the glass</h2>
+				</div>
+
+				<div class="who">
+					<figure class="portrait panel">
+						<Image
+							src={profilePhoto}
+							alt="Haitham Assoli"
+							widths={[280, 480]}
+							sizes="(max-width: 780px) 60vw, 300px"
+							loading="lazy"
+							decoding="async"
+						/>
+						<figcaption>
+							{profile.name.en} · <span lang="ar" dir="rtl"
+								>{profile.name.ar}</span
+							>
+						</figcaption>
+					</figure>
+
+					<div class="who__text">
+						<p>
+							I build web and mobile products end to end — the data model, the
+							API, the screens, the store listing. Most of what I ship is
+							bilingual and right-to-left first, because most of the people
+							using it read Arabic.
+						</p>
+						<p>
+							The problems I like have a hard constraint in them: a model that
+							has to run on the device instead of a server, a search index that
+							has to answer in milliseconds without a backend, a booking flow
+							that cannot sell the same hour twice. The framework is never the
+							interesting part.
+						</p>
+						<p>
+							Lately that constraint has been the phone itself. My recent work
+							is on-device AI — video and audio processed entirely on the user's
+							hardware, with no cloud, no account and no telemetry. The original
+							file never leaves the device.
+						</p>
+
+						<ul class="track">
+							{
+								profile.experience.slice(0, 4).map((e) => (
+									<li>
+										<span class="track__when">{e.period}</span>
+										<span class="track__what">
+											<b>{e.role.en}</b>
+											<i>{e.company.en}</i>
+										</span>
+									</li>
+								))
+							}
+						</ul>
+
+						<p class="who__edu">
+							{profile.education[0].degree.en}, {
+								profile.education[0].school.en
+							},
+							{' '}{profile.education[0].period} ({
+								profile.education[0].note?.en
+							}).
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- ── TOOLBOX ──────────────────────────────────────────────────── -->
+			<section class="section" id="stack" aria-labelledby="stack-h">
+				<div class="head">
+					<p class="eyebrow">{toolbox.length} tools, in order of how often</p>
+					<h2 class="h2" id="stack-h">What I actually reach for</h2>
+					<p class="sub">
+						Not a list of everything I have opened once. This is the order the
+						work is really made of.
+					</p>
+				</div>
+
+				<ul class="tools">
+					{
+						toolbox.map((t, i) => (
+							<li class="tool panel" style={`--i:${i}`}>
+								<span class="tool__n">{String(i + 1).padStart(2, '0')}</span>
+								{t}
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<!-- ── FIGURES ──────────────────────────────────────────────────── -->
+			<section class="section" id="count" aria-labelledby="count-h">
+				<div class="head">
+					<p class="eyebrow">The count</p>
+					<h2 class="h2" id="count-h">Four numbers, none of them rounded up</h2>
+				</div>
+
+				<div class="figures panel">
+					{
+						figures.map((f) => (
+							<div class="fig">
+								<p class="fig__n">{f.n}</p>
+								<p class="fig__label">{f.label}</p>
+								<p class="fig__note">{f.note}</p>
+							</div>
+						))
+					}
+				</div>
+			</section>
+
+			<!-- ── HIRE ─────────────────────────────────────────────────────── -->
+			<section class="section section--hire" id="hire" aria-labelledby="hire-h">
+				<div class="hire panel">
+					<p class="eyebrow">Hiring</p>
+					<h2 class="h2 h2--hire" id="hire-h">
+						If it has to work in two directions, start here.
+					</h2>
+					<p class="sub sub--hire">
+						Tell me the constraint and I will tell you whether I am the right
+						person for it. Usually within a day.
+					</p>
+
+					<a class="mailto" href={`mailto:${profile.email}`}>
+						<span class="mailto__label">Write to</span>
+						<span class="mailto__addr">{profile.email}</span>
+					</a>
+
+					<ul class="rail">
+						<li>
+							<a
+								href={profile.links.github}
+								rel="noreferrer noopener"
+								target="_blank">GitHub</a
+							>
+						</li>
+						<li>
+							<a
+								href={profile.links.linkedin}
+								rel="noreferrer noopener"
+								target="_blank">LinkedIn</a
+							>
+						</li>
+						<li>
+							<a
+								href={profile.links.website}
+								rel="noreferrer noopener"
+								target="_blank">assoli.site</a
+							>
+						</li>
+						<li>
+							<a
+								href={profile.links.resume}
+								rel="noreferrer noopener"
+								target="_blank">CV</a
+							>
+						</li>
+						<li>
+							<a
+								href={profile.links.playStore}
+								rel="noreferrer noopener"
+								target="_blank">Play Store</a
+							>
+						</li>
+						<li>
+							<a href={`tel:${profile.phone.replace(/\s/g, '')}`}
+								>{profile.phone}</a
+							>
+						</li>
+					</ul>
+				</div>
+			</section>
+		</main>
+
+		<footer class="foot">
+			<p class="foot__name">
+				Haitham Assoli — <span lang="ar" dir="rtl">هيثم العسولي</span>
+			</p>
+			<p class="foot__line">
+				{profile.title.en} · {profile.location.en} · variant 3, liquid glass
+			</p>
+			<p class="foot__back"><a href="#top">Back to the top</a></p>
+		</footer>
+
+		<script>
+			const stage = document.getElementById('stage');
+			if (stage) {
+				let raf = 0;
+				let px = 0;
+				let py = 0;
+
+				const apply = () => {
+					raf = 0;
+					stage.style.setProperty('--lx', px + 'px');
+					stage.style.setProperty('--ly', py + 'px');
+				};
+
+				const onMove = (e: PointerEvent) => {
+					const r = stage.getBoundingClientRect();
+					px = e.clientX - r.left;
+					py = e.clientY - r.top;
+					if (!stage.classList.contains('manual'))
+						stage.classList.add('manual');
+					if (!raf) raf = requestAnimationFrame(apply);
+				};
+
+				const host = stage.closest('.hero') ?? stage;
+				host.addEventListener('pointermove', onMove as EventListener, {
+					passive: true,
+				});
+				host.addEventListener('pointerleave', () => {
+					stage.classList.remove('manual');
+				});
+			}
+		</script>
+
+		<StyleSwitcher n={3} />
+	</body>
+</html>
+
+<style is:global>
+	/* ══ tokens ══════════════════════════════════════════════════════════ */
+	:root {
+		--abyss: #06080f;
+		--deep: #0d1424;
+		--lagoon: #1fb6c8;
+		--iris: #6b5bff;
+		--ember: #ff8a3d;
+		--rose: #ff5b8a;
+		--frost: #eaf2ff;
+		--haze: rgba(234, 242, 255, 0.66);
+		--mute: rgba(234, 242, 255, 0.56);
+
+		/* the glass recipe, in one place */
+		--glass-tint: rgba(16, 26, 48, 0.5);
+		--glass-blur: blur(22px) saturate(1.7) brightness(1.12) contrast(1.04);
+		--glass-lift:
+			0 34px 70px -34px rgba(2, 4, 10, 0.95),
+			0 10px 26px -16px rgba(2, 4, 10, 0.75);
+		--radius: 22px;
+
+		--display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+		--body: 'Newsreader', ui-serif, Georgia, serif;
+		--mono: 'Azeret Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+		--arabic: 'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif;
+
+		--gut: clamp(1.15rem, 4vw, 3.25rem);
+		--maxw: 1180px;
+	}
+
+	@property --lx {
+		syntax: '<length-percentage>';
+		inherits: true;
+		initial-value: 26%;
+	}
+	@property --ly {
+		syntax: '<length-percentage>';
+		inherits: true;
+		initial-value: 42%;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		overflow-x: hidden;
+		background: var(--abyss);
+		color: var(--frost);
+		font-family: var(--body);
+		font-size: clamp(1rem, 0.94rem + 0.3vw, 1.1rem);
+		line-height: 1.62;
+		font-optical-sizing: auto;
+		-webkit-font-smoothing: antialiased;
+		padding-block-end: 7.5rem;
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--lagoon);
+		outline-offset: 3px;
+		border-radius: 6px;
+	}
+
+	.skip {
+		position: fixed;
+		inset-block-start: 0.75rem;
+		inset-inline-start: 0.75rem;
+		z-index: 60;
+		transform: translateY(-250%);
+		padding: 0.6rem 1rem;
+		border-radius: 999px;
+		background: var(--frost);
+		color: var(--abyss);
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		text-decoration: none;
+	}
+	.skip:focus-visible {
+		transform: none;
+	}
+
+	.filters {
+		position: absolute;
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+
+	/* ══ the field behind the glass ══════════════════════════════════════ */
+	.field {
+		position: fixed;
+		inset: -12vh -10vw;
+		z-index: -2;
+		pointer-events: none;
+		will-change: transform;
+	}
+
+	.blobs {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(
+				42vw 42vw at 14% 12%,
+				rgba(31, 182, 200, 0.55),
+				transparent 62%
+			),
+			radial-gradient(
+				48vw 46vw at 84% 26%,
+				rgba(107, 91, 255, 0.5),
+				transparent 64%
+			),
+			radial-gradient(
+				40vw 40vw at 72% 78%,
+				rgba(255, 138, 61, 0.4),
+				transparent 62%
+			),
+			radial-gradient(
+				38vw 38vw at 22% 88%,
+				rgba(255, 91, 138, 0.34),
+				transparent 64%
+			),
+			radial-gradient(
+				34vw 30vw at 46% 44%,
+				rgba(90, 150, 210, 0.28),
+				transparent 66%
+			),
+			linear-gradient(180deg, #080c18, #05080f 60%, #080c18);
+		filter: blur(28px);
+		animation: drift 42s ease-in-out infinite alternate;
+		will-change: transform;
+	}
+
+	@keyframes drift {
+		0% {
+			transform: translate3d(-3%, -2%, 0) scale(1.06) rotate(0deg);
+		}
+		100% {
+			transform: translate3d(4%, 3%, 0) scale(1.16) rotate(6deg);
+		}
+	}
+
+	/* The field moves with the scroll, the glass does not: that difference
+	   is what makes the panels read as objects rather than as fills. */
+	@supports (animation-timeline: scroll()) {
+		.field {
+			animation: sink linear both;
+			animation-timeline: scroll(root);
+		}
+		@keyframes sink {
+			to {
+				transform: translate3d(0, -9vh, 0);
+			}
+		}
+	}
+
+	.grain {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		opacity: 0.055;
+		mix-blend-mode: overlay;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+	}
+
+	/* ══ the glass recipe ════════════════════════════════════════════════ */
+	.panel {
+		position: relative;
+		isolation: isolate;
+		border-radius: var(--radius);
+		background: var(--glass-tint);
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+		box-shadow: var(--glass-lift);
+		overflow: hidden;
+	}
+
+	/* the scrim: this is what keeps text on glass readable */
+	.panel::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: linear-gradient(
+			168deg,
+			rgba(6, 9, 18, 0.24),
+			rgba(6, 9, 18, 0.5) 55%,
+			rgba(6, 9, 18, 0.62)
+		);
+		pointer-events: none;
+	}
+
+	/* the rim: specular top-left, caustic bottom-right, masked to a hairline */
+	.panel::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		border-radius: inherit;
+		padding: 1px;
+		background: linear-gradient(
+			145deg,
+			rgba(255, 255, 255, 0.82),
+			rgba(203, 231, 255, 0.24) 26%,
+			rgba(255, 255, 255, 0.02) 52%,
+			rgba(11, 22, 44, 0.5) 84%,
+			rgba(160, 210, 255, 0.3)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	@supports not (
+		(-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+	) {
+		/* Polished stone instead of frosted glass: opaque, still lit from the
+		   top-left, still heavy. Nothing looks broken, it just stops being wet. */
+		.panel {
+			background: linear-gradient(
+				158deg,
+				rgba(28, 42, 72, 0.97),
+				rgba(10, 16, 30, 0.99)
+			);
+		}
+		.panel::before {
+			background: none;
+		}
+		.blobs {
+			filter: blur(60px);
+			opacity: 0.85;
+		}
+		.lens__body {
+			background: rgba(24, 58, 78, 0.92) !important;
+		}
+	}
+
+	/* ══ shared type ═════════════════════════════════════════════════════ */
+	.eyebrow {
+		margin: 0 0 0.9rem;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(160, 232, 242, 0.9);
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+	}
+
+	.dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 999px;
+		background: var(--lagoon);
+		box-shadow: 0 0 0 3px rgba(31, 182, 200, 0.2);
+		flex: none;
+	}
+
+	.h2 {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: clamp(1.85rem, 1.15rem + 3vw, 3.4rem);
+		line-height: 1.02;
+		letter-spacing: -0.028em;
+		font-variation-settings: 'wdth' 92;
+		text-wrap: balance;
+	}
+
+	.sub {
+		margin: 1rem 0 0;
+		max-width: 46ch;
+		color: var(--haze);
+		font-size: 1.05rem;
+	}
+
+	.section {
+		max-width: var(--maxw);
+		margin-inline: auto;
+		padding: clamp(3.5rem, 9vw, 7rem) var(--gut) 0;
+	}
+
+	.head {
+		margin-block-end: clamp(1.75rem, 4vw, 2.75rem);
+	}
+
+	/* ══ hero ════════════════════════════════════════════════════════════ */
+	.hero {
+		max-width: var(--maxw);
+		margin-inline: auto;
+		padding: clamp(3.5rem, 12vh, 7rem) var(--gut) 0;
+	}
+
+	/* fit-content, so the Arabic block right-aligns to the same column the
+	   English fills. The two readings overlap; the lens sits in the overlap. */
+	.stage {
+		position: relative;
+		isolation: isolate;
+		width: fit-content;
+		max-width: 100%;
+		margin-block: clamp(1rem, 3vw, 2rem) 0;
+		animation: roam 34s linear infinite;
+	}
+
+	.stage.manual {
+		animation: none;
+	}
+
+	@keyframes roam {
+		0% {
+			--lx: 28%;
+			--ly: 34%;
+		}
+		25% {
+			--lx: 70%;
+			--ly: 62%;
+		}
+		50% {
+			--lx: 86%;
+			--ly: 34%;
+		}
+		75% {
+			--lx: 52%;
+			--ly: 70%;
+		}
+		100% {
+			--lx: 28%;
+			--ly: 34%;
+		}
+	}
+
+	.type {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(2.6rem, 1rem + 9.4vw, 7.4rem);
+		line-height: 0.94;
+		letter-spacing: -0.045em;
+		font-variation-settings: 'wdth' 84;
+	}
+
+	.type span {
+		display: block;
+	}
+
+	.type--en {
+		position: relative;
+		z-index: 1;
+		color: var(--frost);
+		text-shadow: 0 2px 30px rgba(4, 8, 18, 0.6);
+	}
+
+	.type--ar {
+		position: absolute;
+		inset: 0;
+		direction: rtl;
+		text-align: right;
+		font-family: var(--arabic);
+		font-weight: 600;
+		font-size: clamp(2.2rem, 0.9rem + 7.8vw, 6.2rem);
+		line-height: 1.12;
+		letter-spacing: 0;
+		color: #c8f4fb;
+		pointer-events: none;
+	}
+
+	/* the second reading is always there, just not lit */
+	.type--ghost {
+		z-index: 0;
+		opacity: 0.17;
+	}
+
+	/* …until the glass finds it */
+	.type--lit {
+		z-index: 2;
+		text-shadow: 0 2px 24px rgba(4, 22, 34, 0.85);
+		clip-path: circle(calc(var(--lens-r, 120px) - 2px) at var(--lx) var(--ly));
+	}
+
+	.lens {
+		position: absolute;
+		inset-block-start: var(--ly);
+		inset-inline-start: var(--lx);
+		width: calc(var(--lens-r, 120px) * 2);
+		height: calc(var(--lens-r, 120px) * 2);
+		margin: calc(var(--lens-r, 120px) * -1) 0 0 calc(var(--lens-r, 120px) * -1);
+		border-radius: 999px;
+		pointer-events: none;
+		z-index: 3;
+	}
+
+	.lens__body {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		-webkit-backdrop-filter: blur(1.5px) url(#liquid) saturate(1.9)
+			brightness(1.14);
+		backdrop-filter: blur(1.5px) url(#liquid) saturate(1.9) brightness(1.14);
+		background: radial-gradient(
+			120% 120% at 30% 22%,
+			rgba(255, 255, 255, 0.16),
+			rgba(255, 255, 255, 0.03) 42%,
+			rgba(6, 20, 34, 0.16)
+		);
+		box-shadow:
+			inset 0 2px 1px rgba(255, 255, 255, 0.6),
+			inset 0 -14px 22px -14px rgba(120, 210, 255, 0.55),
+			0 26px 50px -22px rgba(2, 6, 14, 0.9);
+	}
+
+	.lens__rim {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		padding: 1.5px;
+		background: conic-gradient(
+			from 210deg,
+			rgba(255, 255, 255, 0.95),
+			rgba(160, 230, 255, 0.35) 22%,
+			rgba(255, 255, 255, 0.04) 46%,
+			rgba(10, 26, 48, 0.6) 68%,
+			rgba(255, 190, 130, 0.45) 86%,
+			rgba(255, 255, 255, 0.95)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+	}
+
+	.stage {
+		--lens-r: clamp(72px, 11vw, 150px);
+	}
+
+	.stage__hint {
+		margin: clamp(1.4rem, 3vw, 2.2rem) 0 0;
+		max-width: 44ch;
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		line-height: 1.75;
+		letter-spacing: 0.01em;
+		color: var(--mute);
+	}
+
+	.key {
+		color: rgba(160, 232, 242, 0.95);
+	}
+
+	.key[data-coarse] {
+		display: none;
+	}
+
+	@media (pointer: coarse) {
+		.key[data-fine] {
+			display: none;
+		}
+		.key[data-coarse] {
+			display: inline;
+		}
+	}
+
+	.panel--thesis {
+		margin-block-start: clamp(2rem, 5vw, 3.25rem);
+		padding: clamp(1.4rem, 3.5vw, 2.4rem);
+	}
+
+	.lede {
+		margin: 0;
+		max-width: 62ch;
+		font-size: clamp(1.08rem, 1rem + 0.5vw, 1.32rem);
+		line-height: 1.62;
+		color: var(--frost);
+	}
+
+	.ticks {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1.6rem;
+		margin: 1.5rem 0 0;
+		padding: 1.1rem 0 0;
+		border-block-start: 1px solid rgba(200, 230, 255, 0.14);
+		list-style: none;
+		font-family: var(--mono);
+		font-size: 0.76rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--haze);
+	}
+
+	.ticks b {
+		color: var(--frost);
+		font-weight: 500;
+		font-size: 0.95rem;
+		margin-inline-end: 0.3rem;
+	}
+
+	/* ══ work ════════════════════════════════════════════════════════════ */
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(12, 1fr);
+		gap: clamp(1rem, 2vw, 1.6rem);
+	}
+
+	.card {
+		grid-column: span var(--span);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.card__media {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		background: color-mix(in srgb, var(--accent) 24%, #0a0f1c);
+	}
+
+	.card__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top center;
+		transform: scale(1.01);
+		/* pulled down into the palette, so a white app screenshot does not
+		   punch a hole in the field */
+		filter: saturate(0.9) brightness(0.84) contrast(1.03);
+		transition:
+			transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+			filter 0.5s ease;
+	}
+
+	.card:hover .card__img,
+	.card:focus-within .card__img {
+		transform: scale(1.05);
+		filter: saturate(1) brightness(1) contrast(1);
+	}
+
+	/* the opener runs letterbox-wide so a full-bleed browser shot stays a strip
+	   rather than a wall */
+	.card[data-span='12'][data-shape='wide'] .card__media {
+		aspect-ratio: 21 / 9;
+	}
+
+	/* Phone screenshots stand in the frame rather than being cropped by it. */
+	.card[data-shape='tall'] .card__media {
+		aspect-ratio: auto;
+		height: clamp(300px, 30vw, 430px);
+		padding: clamp(1rem, 2.4vw, 1.75rem) clamp(1rem, 2.4vw, 1.75rem) 4.1rem;
+		background:
+			radial-gradient(
+				76% 86% at 50% 2%,
+				color-mix(in srgb, var(--accent) 52%, transparent),
+				transparent 72%
+			),
+			#070c17;
+	}
+
+	.card[data-shape='tall'] .card__img {
+		object-fit: contain;
+		object-position: center top;
+		border-radius: 12px;
+		filter: drop-shadow(0 22px 34px rgba(2, 5, 12, 0.8));
+	}
+
+	.card[data-shape='tall'] .card__scrim {
+		background: linear-gradient(
+			to bottom,
+			transparent 52%,
+			rgba(4, 7, 14, 0.82) 86%,
+			rgba(4, 7, 14, 0.96)
+		);
+	}
+
+	.card__void {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: 1.6rem;
+		letter-spacing: -0.03em;
+		color: rgba(255, 255, 255, 0.82);
+		background:
+			radial-gradient(
+				90% 120% at 20% 0%,
+				color-mix(in srgb, var(--accent) 62%, transparent),
+				transparent 70%
+			),
+			#0a0f1c;
+	}
+
+	/* the scrim over the cover — this is where glass usually loses contrast */
+	.card__scrim {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			to bottom,
+			rgba(4, 7, 14, 0.12) 24%,
+			rgba(4, 7, 14, 0.72) 78%,
+			rgba(4, 7, 14, 0.94)
+		);
+		pointer-events: none;
+	}
+
+	.card__body {
+		position: relative;
+		z-index: 2;
+		padding: clamp(1.15rem, 2.4vw, 1.75rem);
+		margin-block-start: -3.25rem;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
+	.card__meta {
+		margin: 0 0 0.7rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.13em;
+		text-transform: uppercase;
+		color: rgba(234, 242, 255, 0.72);
+	}
+
+	.pip {
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: var(--accent);
+		box-shadow: 0 0 10px 1px color-mix(in srgb, var(--accent) 70%, transparent);
+		flex: none;
+	}
+
+	.card__title {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2.15rem);
+		line-height: 1.02;
+		letter-spacing: -0.03em;
+		font-variation-settings: 'wdth' 90;
+	}
+
+	.card__title a {
+		text-decoration: none;
+	}
+
+	.card__title a::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+	}
+
+	.card:hover .card__title a {
+		color: color-mix(in srgb, var(--accent) 55%, #ffffff);
+	}
+
+	.card__tag {
+		margin: 0.5rem 0 0;
+		max-width: 46ch;
+		font-family: var(--body);
+		font-style: italic;
+		font-size: 1.05rem;
+		color: #d7e6ff;
+	}
+
+	.card__sum {
+		margin: 0.7rem 0 0;
+		max-width: 70ch;
+		font-size: 0.97rem;
+		line-height: 1.6;
+		color: var(--haze);
+	}
+
+	.card__role {
+		margin: 0.85rem 0 0;
+		font-family: var(--mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.06em;
+		color: var(--mute);
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin: 1rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.chips li {
+		padding: 0.26rem 0.6rem;
+		border-radius: 999px;
+		border: 1px solid rgba(200, 230, 255, 0.18);
+		background: rgba(255, 255, 255, 0.05);
+		font-family: var(--mono);
+		font-size: 0.67rem;
+		letter-spacing: 0.03em;
+		color: rgba(234, 242, 255, 0.82);
+	}
+
+	.chips__more {
+		color: var(--mute) !important;
+	}
+
+	.card__links {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+		margin-block-start: auto;
+		padding-block-start: 1.15rem;
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 0.5rem 0.95rem;
+		border-radius: 999px;
+		border: 1px solid rgba(200, 230, 255, 0.24);
+		background: rgba(255, 255, 255, 0.06);
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.05em;
+		text-decoration: none;
+		color: var(--frost);
+		transition:
+			background-color 0.2s,
+			border-color 0.2s,
+			transform 0.2s;
+	}
+
+	.btn:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(200, 230, 255, 0.45);
+		transform: translateY(-1px);
+	}
+
+	.btn--go {
+		background: rgba(234, 242, 255, 0.92);
+		border-color: transparent;
+		color: #071021;
+		font-weight: 500;
+	}
+
+	.btn--go:hover {
+		background: #ffffff;
+	}
+
+	.aside {
+		margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+		max-width: 60ch;
+		color: var(--haze);
+		font-size: 1rem;
+	}
+
+	/* ══ who ═════════════════════════════════════════════════════════════ */
+	.who {
+		display: grid;
+		grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+		gap: clamp(1.5rem, 4vw, 3rem);
+		align-items: start;
+	}
+
+	.portrait {
+		margin: 0;
+		padding: 0.75rem 0.75rem 0;
+		position: sticky;
+		inset-block-start: 2rem;
+	}
+
+	.portrait img {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 1;
+		object-fit: cover;
+		border-radius: 14px;
+		filter: saturate(1.05) contrast(1.02);
+	}
+
+	.portrait figcaption {
+		padding: 0.85rem 0.25rem 1rem;
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.05em;
+		color: var(--haze);
+		text-align: center;
+	}
+
+	.who__text p {
+		margin: 0 0 1.15rem;
+		max-width: 62ch;
+		font-size: clamp(1.02rem, 0.96rem + 0.35vw, 1.18rem);
+		color: #dce8ff;
+	}
+
+	.track {
+		list-style: none;
+		margin: 2rem 0 1.5rem;
+		padding: 0;
+		border-block-start: 1px solid rgba(200, 230, 255, 0.16);
+	}
+
+	.track li {
+		display: flex;
+		gap: 1.25rem;
+		align-items: baseline;
+		padding: 0.85rem 0;
+		border-block-end: 1px solid rgba(200, 230, 255, 0.1);
+	}
+
+	.track__when {
+		flex: none;
+		width: 9.5rem;
+		font-family: var(--mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(160, 232, 242, 0.85);
+	}
+
+	.track__what b {
+		display: block;
+		font-family: var(--display);
+		font-weight: 600;
+		font-size: 1.08rem;
+		letter-spacing: -0.015em;
+	}
+
+	.track__what i {
+		font-style: normal;
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		color: var(--mute);
+	}
+
+	.who__edu {
+		font-family: var(--mono) !important;
+		font-size: 0.76rem !important;
+		line-height: 1.7;
+		color: var(--mute) !important;
+	}
+
+	/* ══ toolbox ═════════════════════════════════════════════════════════ */
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tool {
+		--radius: 999px;
+		display: flex;
+		align-items: baseline;
+		gap: 0.55rem;
+		padding: 0.62rem 1.15rem;
+		font-family: var(--display);
+		font-weight: 500;
+		font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+		letter-spacing: -0.01em;
+		transition: transform 0.25s ease;
+	}
+
+	.tool:hover {
+		transform: translateY(-2px);
+	}
+
+	.tool__n {
+		font-family: var(--mono);
+		font-size: 0.62rem;
+		letter-spacing: 0.08em;
+		color: rgba(160, 232, 242, 0.75);
+	}
+
+	/* ══ figures ═════════════════════════════════════════════════════════ */
+	.figures {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+		padding: 0;
+	}
+
+	.fig {
+		padding: clamp(1.4rem, 3vw, 2.2rem);
+		border-inline-start: 1px solid rgba(200, 230, 255, 0.14);
+	}
+
+	.fig:first-child {
+		border-inline-start: 0;
+	}
+
+	.fig__n {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(2.8rem, 2rem + 4vw, 4.6rem);
+		line-height: 0.88;
+		letter-spacing: -0.05em;
+		font-variation-settings: 'wdth' 80;
+		background: linear-gradient(150deg, #ffffff, #a9e9f5 55%, #7f9bff);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+
+	.fig__label {
+		margin: 0.8rem 0 0;
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--frost);
+	}
+
+	.fig__note {
+		margin: 0.4rem 0 0;
+		font-size: 0.92rem;
+		color: var(--haze);
+	}
+
+	/* ══ hire ════════════════════════════════════════════════════════════ */
+	.section--hire {
+		padding-block-start: clamp(4rem, 10vw, 8rem);
+	}
+
+	.hire {
+		padding: clamp(1.75rem, 5vw, 3.5rem);
+	}
+
+	.h2--hire {
+		max-width: 18ch;
+	}
+
+	.sub--hire {
+		margin-block-start: 1.1rem;
+	}
+
+	.mailto {
+		display: inline-flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		margin-block-start: clamp(1.75rem, 4vw, 2.5rem);
+		padding: 1.05rem 1.5rem;
+		border-radius: 16px;
+		border: 1px solid rgba(200, 230, 255, 0.28);
+		background: rgba(255, 255, 255, 0.07);
+		text-decoration: none;
+		max-width: 100%;
+		transition:
+			background-color 0.25s,
+			border-color 0.25s;
+	}
+
+	.mailto:hover {
+		background: rgba(255, 255, 255, 0.14);
+		border-color: rgba(200, 230, 255, 0.55);
+	}
+
+	.mailto__label {
+		font-family: var(--mono);
+		font-size: 0.66rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(160, 232, 242, 0.9);
+	}
+
+	.mailto__addr {
+		font-family: var(--display);
+		font-weight: 600;
+		font-size: clamp(1.02rem, 0.85rem + 1.5vw, 1.9rem);
+		letter-spacing: -0.03em;
+		word-break: break-word;
+	}
+
+	.rail {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1.4rem;
+		margin: 1.9rem 0 0;
+		padding: 1.25rem 0 0;
+		border-block-start: 1px solid rgba(200, 230, 255, 0.16);
+		list-style: none;
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.04em;
+	}
+
+	.rail a {
+		text-decoration: none;
+		color: var(--haze);
+		border-block-end: 1px solid transparent;
+		padding-block-end: 2px;
+		transition:
+			color 0.2s,
+			border-color 0.2s;
+	}
+
+	.rail a:hover {
+		color: var(--frost);
+		border-block-end-color: var(--lagoon);
+	}
+
+	/* ══ footer ══════════════════════════════════════════════════════════ */
+	.foot {
+		max-width: var(--maxw);
+		margin: clamp(3.5rem, 9vw, 6rem) auto 0;
+		padding: 2rem var(--gut) 0;
+		border-block-start: 1px solid rgba(200, 230, 255, 0.12);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1.5rem;
+		align-items: baseline;
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.05em;
+		color: var(--mute);
+	}
+
+	.foot p {
+		margin: 0;
+	}
+
+	.foot__name {
+		color: var(--frost);
+	}
+
+	.foot__back {
+		margin-inline-start: auto !important;
+	}
+
+	.foot__back a {
+		text-decoration: none;
+		color: rgba(160, 232, 242, 0.9);
+	}
+
+	/* ══ responsive ══════════════════════════════════════════════════════ */
+	@media (max-width: 1040px) {
+		.card {
+			grid-column: span 6;
+		}
+		.card:first-child {
+			grid-column: span 12;
+		}
+	}
+
+	@media (max-width: 900px) {
+		.who {
+			grid-template-columns: 1fr;
+		}
+		.portrait {
+			position: static;
+			max-width: 260px;
+		}
+		.track li {
+			flex-direction: column;
+			gap: 0.3rem;
+		}
+		.track__when {
+			width: auto;
+		}
+	}
+
+	@media (max-width: 780px) {
+		.card {
+			grid-column: span 12;
+		}
+		.card__media {
+			aspect-ratio: 16 / 10;
+		}
+		.fig {
+			border-inline-start: 0;
+			border-block-start: 1px solid rgba(200, 230, 255, 0.14);
+		}
+		.fig:first-child {
+			border-block-start: 0;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.eyebrow {
+			font-size: 0.64rem;
+			letter-spacing: 0.12em;
+		}
+		.stage {
+			margin-block-start: 1.75rem;
+			--lens-r: 66px;
+		}
+	}
+
+	@media (max-width: 460px) {
+		.type--ar {
+			font-size: clamp(1.9rem, 8.4vw, 2.6rem);
+		}
+		.card__body {
+			margin-block-start: -2.25rem;
+		}
+		.chips li {
+			font-size: 0.64rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+		.blobs,
+		.stage,
+		.field {
+			animation: none !important;
+		}
+		.card__img,
+		.tool,
+		.btn {
+			transition: none !important;
+		}
+		.stage {
+			--lx: 30%;
+			--ly: 44%;
+		}
+	}
+</style>

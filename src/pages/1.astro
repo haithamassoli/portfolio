@@ -1,0 +1,1167 @@
+---
+/* Variant 1 — "Quiet Room".
+   A single ruled column with a lot of air around it. Two switches: the theme,
+   and the reading direction, because the second one is the actual subject. */
+import { Image } from 'astro:assets';
+import { profile } from '../../content/profile';
+import { featured, projects } from '../data/projects';
+import { toolbox } from '../i18n';
+import StyleSwitcher from '../components/StyleSwitcher.astro';
+import profilePhoto from '../assets/images/profile.png';
+
+const statusWord: Record<string, string> = {
+	live: 'live',
+	shipped: 'on the stores',
+	delisted: 'delisted',
+	wip: 'in progress',
+	archived: 'archived',
+};
+
+const categoryWord: Record<string, string> = {
+	web: 'web',
+	mobile: 'mobile',
+	desktop: 'desktop',
+	extension: 'extension',
+	ai: 'on-device ai',
+	client: 'client work',
+};
+
+const linkWord: Record<string, string> = {
+	live: 'Live',
+	github: 'Code',
+	appStore: 'App Store',
+	playGoogle: 'Google Play',
+	vscode: 'VS Code',
+};
+
+const rest = projects.filter((p) => !p.featured);
+
+const counts = [
+	{ label: 'Projects shipped', value: '39' },
+	{ label: 'Live on the app stores', value: '13' },
+	{ label: 'Written up in full', value: '8' },
+	{ label: 'Years building', value: '~4' },
+	{ label: 'Languages every screen ships in', value: '2' },
+];
+
+const elsewhere = [
+	{ label: 'GitHub', href: profile.links.github },
+	{ label: 'LinkedIn', href: profile.links.linkedin },
+	{ label: 'CV', href: profile.links.resume },
+	{ label: 'Google Play', href: profile.links.playStore },
+	{ label: 'assoli.site', href: profile.links.website },
+];
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Haitham Assoli — web &amp; mobile engineer, Amman</title>
+		<meta
+			name="description"
+			content="Haitham Assoli builds bilingual web and mobile products from Amman, Jordan. Thirty-nine shipped, thirteen on the app stores, all of them built to read both ways."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400..500&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&display=swap"
+		/>
+		<script is:inline>
+			/* Runs before first paint: no flash of the wrong room. */
+			(function () {
+				try {
+					const el = document.documentElement;
+					let t = localStorage.getItem('qr-theme');
+					if (t !== 'light' && t !== 'dark') {
+						t = window.matchMedia('(prefers-color-scheme: dark)').matches
+							? 'dark'
+							: 'light';
+					}
+					el.setAttribute('data-theme', t);
+					el.setAttribute(
+						'dir',
+						localStorage.getItem('qr-dir') === 'rtl' ? 'rtl' : 'ltr',
+					);
+				} catch {
+					document.documentElement.setAttribute('data-theme', 'light');
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<div class="shell">
+			<header class="top">
+				<a class="top__name" href="#hero">Haitham Assoli</a>
+				<div class="top__set">
+					<span class="k top__place">Amman · UTC+3</span>
+					<button class="seg" type="button" data-toggle="theme">
+						<span class="seg__opt" data-for="light">light</span>
+						<span class="seg__opt" data-for="dark">dark</span>
+					</button>
+				</div>
+			</header>
+
+			<main>
+				<section class="band" id="hero" aria-labelledby="hero-h">
+					<p class="rail"><span>hello</span></p>
+					<div class="col col--hero">
+						<p class="k rise" style="--d: 0ms">
+							web &amp; mobile engineer, Amman, Jordan
+						</p>
+						<h1 class="rt rise" id="hero-h" style="--d: 70ms">
+							I build software that has to work in two directions.
+						</h1>
+						<p class="lede rt rise" style="--d: 140ms">
+							Four years of it. Thirty-nine projects shipped, thirteen of them
+							live on the app stores, and nearly all of them open in Arabic
+							before they open in English. A mirrored interface is not a
+							translated one. It is a different interface, and I draw it that
+							way from the first commit instead of patching it in the week
+							before launch.
+						</p>
+						<p class="rt rise" style="--d: 200ms">
+							React Native and Expo on phones, Next.js and Astro on the web,
+							NestJS, Convex and Supabase underneath. Lately the models run on
+							the device itself, so the video never leaves the phone.
+						</p>
+						<p class="hero__do rise" style="--d: 260ms">
+							<a class="lnk" href={`mailto:${profile.email}`}>{profile.email}</a
+							>
+							<a class="lnk" href={profile.links.github}>GitHub</a>
+							<a class="lnk" href="#work">The work</a>
+						</p>
+
+						<div class="flip rise" style="--d: 340ms">
+							<div class="flip__head">
+								<p class="k">reading direction</p>
+								<button class="seg" type="button" data-toggle="dir">
+									<span class="seg__opt" data-for="ltr">ltr</span>
+									<span class="seg__opt" data-for="rtl">rtl</span>
+								</button>
+							</div>
+							<p class="rt flip__note">
+								Every rule on this page is written in logical properties, so
+								there is no second stylesheet. Flip it: the rail changes sides,
+								the covers change sides, the whole page rebuilds the other way
+								round. That is what shipping Arabic actually costs, and it is
+								the part most portfolios quietly skip.
+							</p>
+						</div>
+					</div>
+				</section>
+
+				<section class="band" id="work" aria-labelledby="work-h">
+					<p class="rail"><span>selected work</span></p>
+					<div class="col">
+						<h2 class="rt" id="work-h">Eight I can talk about at length.</h2>
+
+						<div class="projs">
+							{
+								featured.map((p, i) => (
+									<article class="proj">
+										<p class="k proj__meta">
+											<span>{p.year}</span>
+											<span>{statusWord[p.status] ?? p.status}</span>
+											<span>{categoryWord[p.category] ?? p.category}</span>
+										</p>
+										<div class="proj__body">
+											<h3 class="proj__title rt">
+												<a href={`/work/${p.slug}`}>{p.title.en}</a>
+											</h3>
+											<p class="rt proj__tag">{p.tagline.en}</p>
+											<p class="k proj__stack">
+												{p.stack.slice(0, 6).join('  ·  ')}
+											</p>
+											<p class="k proj__links">
+												<a href={`/work/${p.slug}`}>Read the case</a>
+												{Object.entries(p.links).map(([key, url]) =>
+													url ? (
+														<a href={url} rel="noreferrer">
+															{linkWord[key] ?? key}
+														</a>
+													) : null,
+												)}
+											</p>
+										</div>
+										{p.image && (
+											<a
+												class="proj__shot"
+												href={`/work/${p.slug}`}
+												tabindex="-1"
+												aria-hidden="true"
+											>
+												<Image
+													src={p.image}
+													alt=""
+													widths={[300, 480, 720]}
+													sizes="(min-width: 1040px) 16rem, (min-width: 640px) 13rem, calc(100vw - 5rem)"
+													loading={i === 0 ? 'eager' : 'lazy'}
+													decoding="async"
+												/>
+											</a>
+										)}
+									</article>
+								))
+							}
+						</div>
+					</div>
+				</section>
+
+				<section class="band" aria-labelledby="rest-h">
+					<p class="rail"><span>the rest</span></p>
+					<div class="col">
+						<h2 class="rt" id="rest-h">
+							Thirty-one more, and every one has a page.
+						</h2>
+						<p class="rt measure">
+							Municipal service apps, tourism guides for Ajloun and Al-Jouf, a
+							Qur’an memorisation platform, a browser extension, a handful of
+							client sites that just had to be fast. Nothing here is a concept.
+						</p>
+						<ul class="arch">
+							{
+								rest.map((p) => (
+									<li>
+										<a class="k" href={`/work/${p.slug}`}>
+											{p.title.en}
+										</a>
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</section>
+
+				<section class="band" aria-labelledby="about-h">
+					<p class="rail"><span>the short version</span></p>
+					<div class="col">
+						<h2 class="rt" id="about-h">
+							End to end, and mostly right to left.
+						</h2>
+						<div class="about">
+							<figure class="about__pic">
+								<Image
+									src={profilePhoto}
+									alt="Haitham Assoli"
+									widths={[180, 320, 440]}
+									sizes="(min-width: 720px) 11rem, 40vw"
+									loading="lazy"
+									decoding="async"
+								/>
+							</figure>
+							<div class="about__text">
+								<p class="rt">
+									I build products from the data model to the last pixel. Most
+									of what I ship is bilingual and right-to-left first, because
+									most of the people using it read Arabic.
+								</p>
+								<p class="rt">
+									I like problems with a hard constraint inside them: a model
+									that has to run on the phone instead of a server, a search
+									index that has to answer in milliseconds with no backend
+									behind it, a booking flow that must never sell the same hour
+									twice. The framework is never the interesting part.
+								</p>
+								<p class="rt">
+									Right now that means on-device AI, video and audio processing
+									that happens entirely on the user’s own phone or laptop. No
+									cloud, no telemetry, and the original file left untouched.
+								</p>
+							</div>
+						</div>
+
+						<p class="k sub">where</p>
+						<ul class="cv">
+							{
+								profile.experience.map((job) => (
+									<li class="cv__row">
+										<span class="cv__co">{job.company.en}</span>
+										<span class="k cv__when">{job.period}</span>
+										<span class="cv__role rt">{job.role.en}</span>
+									</li>
+								))
+							}
+						</ul>
+
+						<p class="k sub">study</p>
+						<ul class="cv">
+							{
+								profile.education.map((ed) => (
+									<li class="cv__row">
+										<span class="cv__co">{ed.school.en}</span>
+										<span class="k cv__when">{ed.period}</span>
+										<span class="cv__role rt">
+											{ed.degree.en}
+											{ed.note ? ` — ${ed.note.en}` : ''}
+										</span>
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</section>
+
+				<section class="band" aria-labelledby="tools-h">
+					<p class="rail"><span>toolbox</span></p>
+					<div class="col">
+						<h2 class="rt" id="tools-h">What I reach for, in that order.</h2>
+						<ul class="tools">
+							{toolbox.map((tool) => <li class="k">{tool}</li>)}
+						</ul>
+
+						<p class="k sub">on the device</p>
+						<ul class="tools tools--quiet">
+							{profile.skills.ai.map((tool) => <li class="k">{tool}</li>)}
+						</ul>
+
+						<p class="k sub">always on the checklist</p>
+						<ul class="tools tools--quiet">
+							{profile.skills.craft.map((tool) => <li class="k">{tool}</li>)}
+						</ul>
+					</div>
+				</section>
+
+				<section class="band" aria-labelledby="count-h">
+					<p class="rail"><span>counted</span></p>
+					<div class="col">
+						<h2 class="rt" id="count-h">Four years, added up.</h2>
+						<dl class="count">
+							{
+								counts.map((row) => (
+									<div class="count__row">
+										<dt>{row.label}</dt>
+										<span class="count__lead" aria-hidden="true" />
+										<dd class="k">{row.value}</dd>
+									</div>
+								))
+							}
+						</dl>
+					</div>
+				</section>
+
+				<section class="band" id="hire" aria-labelledby="hire-h">
+					<p class="rail"><span>write to me</span></p>
+					<div class="col">
+						<h2 class="rt" id="hire-h">
+							Tell me what you are building and when it has to be live.
+						</h2>
+						<p class="rt measure">
+							Contract or full time, Arabic and English, Amman or remote. If it
+							has to work on a phone in two scripts, I have done it thirteen
+							times already.
+						</p>
+						<p class="hire__mail">
+							<a class="lnk" href={`mailto:${profile.email}`}>{profile.email}</a
+							>
+						</p>
+						<p class="hire__tel">
+							<a class="lnk k" href={`tel:${profile.phone.replace(/\s/g, '')}`}
+								>{profile.phone}</a
+							>
+						</p>
+						<ul class="tools tools--quiet">
+							{
+								elsewhere.map((l) => (
+									<li>
+										<a class="k" href={l.href} rel="noreferrer">
+											{l.label}
+										</a>
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</section>
+			</main>
+
+			<footer class="foot">
+				<p class="k">Haitham Assoli · Amman, Jordan</p>
+				<p class="k foot__set">
+					Newsreader &amp; Geist Mono · built with Astro
+					<button class="seg" type="button" data-toggle="theme">
+						<span class="seg__opt" data-for="light">light</span>
+						<span class="seg__opt" data-for="dark">dark</span>
+					</button>
+					<button class="seg" type="button" data-toggle="dir">
+						<span class="seg__opt" data-for="ltr">ltr</span>
+						<span class="seg__opt" data-for="rtl">rtl</span>
+					</button>
+				</p>
+			</footer>
+		</div>
+
+		<script is:inline>
+			(function () {
+				const el = document.documentElement;
+
+				function sync() {
+					const theme =
+						el.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+					const dir = el.getAttribute('dir') === 'rtl' ? 'rtl' : 'ltr';
+					document.querySelectorAll('[data-toggle]').forEach(function (btn) {
+						const isDir = btn.getAttribute('data-toggle') === 'dir';
+						btn.setAttribute('data-state', isDir ? dir : theme);
+						btn.setAttribute(
+							'aria-label',
+							isDir
+								? dir === 'rtl'
+									? 'Read the page left to right'
+									: 'Read the page right to left'
+								: theme === 'dark'
+									? 'Switch to the light theme'
+									: 'Switch to the dark theme',
+						);
+					});
+				}
+
+				document.addEventListener('click', function (event) {
+					const btn = event.target.closest('[data-toggle]');
+					if (!btn) return;
+					if (btn.getAttribute('data-toggle') === 'dir') {
+						const dir = el.getAttribute('dir') === 'rtl' ? 'ltr' : 'rtl';
+						el.setAttribute('dir', dir);
+						try {
+							localStorage.setItem('qr-dir', dir);
+						} catch {}
+					} else {
+						const theme =
+							el.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+						el.setAttribute('data-theme', theme);
+						try {
+							localStorage.setItem('qr-theme', theme);
+						} catch {}
+					}
+					sync();
+				});
+
+				sync();
+			})();
+		</script>
+
+		<StyleSwitcher n={1} />
+	</body>
+</html>
+
+<style is:global>
+	/* ── Tokens ─────────────────────────────────────────────────────────────
+	   Light: a cool grey-green paper stock, the colour of a laid sheet in
+	   daylight. Dark: the same room at night, never pure black.
+	   One accent for both: ink violet, the colour of a pen that bled. */
+	:root {
+		--paper: #edeee8;
+		--raised: #f6f7f2;
+		--ink: #1e2321;
+		--graphite: #6b736c;
+		--rule: #d5d8cf;
+		--signal: #4a3ad1;
+		--selection: #d9d6f6;
+
+		--s-hero: clamp(1.95rem, 4.6vw, 3.05rem);
+		--s-lede: clamp(1.0625rem, 0.98rem + 0.4vw, 1.1875rem);
+		--s-body: 1.0625rem;
+		--s-meta: 0.78125rem;
+
+		--gutter: clamp(1.25rem, 3vw, 2.75rem);
+		--band: clamp(3.25rem, 7vw, 5.75rem);
+
+		color-scheme: light;
+	}
+
+	:root[data-theme='dark'] {
+		--paper: #171a17;
+		--raised: #1e221e;
+		--ink: #e5e8df;
+		--graphite: #8b938a;
+		--rule: #2c312c;
+		--signal: #a99eff;
+		--selection: #2f2a55;
+
+		color-scheme: dark;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:root:not([data-theme]) {
+			--paper: #171a17;
+			--raised: #1e221e;
+			--ink: #e5e8df;
+			--graphite: #8b938a;
+			--rule: #2c312c;
+			--signal: #a99eff;
+			--selection: #2f2a55;
+
+			color-scheme: dark;
+		}
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		background: var(--paper);
+		transition:
+			background-color 0.4s ease,
+			color 0.4s ease;
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		background: var(--paper);
+		color: var(--ink);
+		font-family: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+		font-size: var(--s-body);
+		font-weight: 400;
+		line-height: 1.62;
+		font-optical-sizing: auto;
+		overflow-x: hidden;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	::selection {
+		background: var(--selection);
+		color: var(--ink);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--signal);
+		outline-offset: 3px;
+		border-radius: 1px;
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	/* ── Shell and the one continuous rule ─────────────────────────────────
+	   Every band shares the same two-column grid, and the hairline is the
+	   inline-start border of the content column. Vertical space is padding,
+	   never margin, so the line never breaks from the top of the page to the
+	   bottom of it. */
+	.shell {
+		max-width: 71rem;
+		margin-inline: auto;
+		padding-inline: clamp(1.15rem, 5vw, 4rem);
+	}
+
+	.band {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.rail {
+		margin: 0;
+		display: none;
+	}
+
+	.col {
+		border-inline-start: 1px solid var(--rule);
+		padding-inline-start: var(--gutter);
+		padding-block: var(--band);
+	}
+
+	.col > :first-child {
+		margin-block-start: 0;
+	}
+
+	.col > :last-child {
+		margin-block-end: 0;
+	}
+
+	@media (min-width: 760px) {
+		.band {
+			grid-template-columns: 9.5rem minmax(0, 1fr);
+			column-gap: 2.25rem;
+		}
+
+		.rail {
+			display: block;
+		}
+
+		.rail > span {
+			display: block;
+			padding-block-start: calc(var(--band) + 0.42rem);
+			font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+			font-size: var(--s-meta);
+			font-weight: 400;
+			letter-spacing: 0.07em;
+			line-height: 1.4;
+			color: var(--graphite);
+			text-align: end;
+		}
+	}
+
+	/* ── Type roles ────────────────────────────────────────────────────────
+	   Four sizes on the whole page. The hero is the only thing set large. */
+	h1 {
+		margin: 1.6rem 0 0;
+		font-size: var(--s-hero);
+		font-weight: 300;
+		line-height: 1.08;
+		letter-spacing: -0.018em;
+		text-wrap: balance;
+		max-width: 17ch;
+	}
+
+	h2 {
+		margin: 0 0 1.7rem;
+		font-size: var(--s-lede);
+		font-weight: 500;
+		line-height: 1.32;
+		letter-spacing: -0.008em;
+		max-width: 26ch;
+		text-wrap: balance;
+	}
+
+	h3 {
+		margin: 0;
+		font-size: var(--s-lede);
+		font-weight: 500;
+		line-height: 1.3;
+	}
+
+	p {
+		margin: 0 0 1.05rem;
+		max-width: 36rem;
+	}
+
+	.lede {
+		font-size: var(--s-lede);
+		line-height: 1.55;
+	}
+
+	.measure {
+		max-width: 34rem;
+		color: var(--graphite);
+	}
+
+	.k {
+		font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: var(--s-meta);
+		font-weight: 400;
+		letter-spacing: 0.055em;
+		line-height: 1.5;
+		color: var(--graphite);
+	}
+
+	.sub {
+		margin-block: 3.25rem 1.1rem;
+		color: var(--graphite);
+	}
+
+	a {
+		color: inherit;
+		text-decoration-color: color-mix(in oklab, currentColor 32%, transparent);
+		text-underline-offset: 0.22em;
+		text-decoration-thickness: 1px;
+	}
+
+	a:hover {
+		color: var(--signal);
+		text-decoration-color: currentColor;
+	}
+
+	.lnk {
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule);
+		padding-block-end: 0.14rem;
+		transition:
+			color 0.18s ease,
+			border-color 0.18s ease;
+	}
+
+	.lnk:hover {
+		border-block-end-color: var(--signal);
+	}
+
+	/* RTL: mirror the layout, but keep English sentences reading forwards so
+	   the punctuation does not jump to the wrong end of the line. */
+	[dir='rtl'] .rt {
+		direction: ltr;
+		text-align: end;
+	}
+
+	/* ── Top bar ───────────────────────────────────────────────────────────*/
+	.top {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.75rem 1.25rem;
+		padding-block: 1.6rem 0;
+	}
+
+	.top__name {
+		font-size: var(--s-body);
+		font-weight: 500;
+		text-decoration: none;
+		letter-spacing: -0.01em;
+	}
+
+	.top__set {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	@media (max-width: 419px) {
+		.top__place {
+			display: none;
+		}
+	}
+
+	/* ── The two switches ──────────────────────────────────────────────────*/
+	.seg {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.1rem;
+		margin: 0;
+		padding: 0.22rem 0.3rem;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+		background: transparent;
+		font: inherit;
+		font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: var(--s-meta);
+		letter-spacing: 0.05em;
+		line-height: 1;
+		color: var(--graphite);
+		cursor: pointer;
+		direction: ltr;
+		transition: border-color 0.2s ease;
+	}
+
+	.seg:hover {
+		border-color: var(--graphite);
+	}
+
+	.seg__opt {
+		display: block;
+		padding: 0.26rem 0.5rem 0.3rem;
+		border-radius: 999px;
+		transition:
+			color 0.2s ease,
+			background-color 0.2s ease;
+	}
+
+	.seg[data-state='light'] .seg__opt[data-for='light'],
+	.seg[data-state='dark'] .seg__opt[data-for='dark'] {
+		background: var(--ink);
+		color: var(--paper);
+	}
+
+	/* The only place the accent lives by default: the switch that is the
+	   whole point of the page. */
+	.seg[data-state='ltr'] .seg__opt[data-for='ltr'],
+	.seg[data-state='rtl'] .seg__opt[data-for='rtl'] {
+		background: var(--signal);
+		color: var(--paper);
+	}
+
+	:root[data-theme='dark'] .seg[data-state='ltr'] .seg__opt[data-for='ltr'],
+	:root[data-theme='dark'] .seg[data-state='rtl'] .seg__opt[data-for='rtl'] {
+		color: #14161d;
+	}
+
+	/* ── Hero ──────────────────────────────────────────────────────────────*/
+	.col--hero {
+		padding-block-start: clamp(3.5rem, 12vw, 8.5rem);
+	}
+
+	.col--hero .lede {
+		margin-block-start: 1.9rem;
+	}
+
+	.hero__do {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem 1.75rem;
+		margin-block-start: 1.9rem;
+		max-width: none;
+	}
+
+	.hero__do .lnk {
+		overflow-wrap: anywhere;
+	}
+
+	/* The signature: the direction switch, given its own room. */
+	.flip {
+		margin-block-start: clamp(3.25rem, 7vw, 5rem);
+		max-width: 36rem;
+		padding: 1.15rem 1.3rem 1.25rem;
+		border: 1px solid var(--rule);
+		border-radius: 3px;
+		background: var(--raised);
+	}
+
+	.flip__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem 1rem;
+		margin-block-end: 0.9rem;
+	}
+
+	.flip__head .k {
+		margin: 0;
+	}
+
+	.flip__note {
+		margin: 0;
+		font-size: 0.9375rem;
+		line-height: 1.55;
+		color: var(--graphite);
+	}
+
+	/* ── Project rows ──────────────────────────────────────────────────────
+	   No cards, no rules between them. Space is the separator. */
+	.projs {
+		display: grid;
+		gap: clamp(3rem, 6vw, 4.75rem);
+	}
+
+	.proj {
+		display: grid;
+		gap: 1rem 2rem;
+		grid-template-areas: 'shot' 'meta' 'body';
+	}
+
+	.proj__meta {
+		grid-area: meta;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.55rem;
+		margin: 0;
+		max-width: none;
+	}
+
+	.proj__meta span + span::before {
+		content: '·';
+		padding-inline-end: 0.5rem;
+		color: var(--rule);
+	}
+
+	.proj__body {
+		grid-area: body;
+	}
+
+	.proj__shot {
+		grid-area: shot;
+		display: block;
+		border: 1px solid var(--rule);
+		border-radius: 3px;
+		background: var(--raised);
+		overflow: hidden;
+		align-self: start;
+	}
+
+	.proj__shot img {
+		width: 100%;
+		aspect-ratio: 16 / 11;
+		object-fit: cover;
+		object-position: 50% 0%;
+		filter: saturate(0.94);
+		transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+	}
+
+	.proj:hover .proj__shot img {
+		transform: scale(1.018);
+	}
+
+	.proj__title a {
+		text-decoration: none;
+	}
+
+	.proj__tag {
+		margin: 0.5rem 0 0.85rem;
+		max-width: 33rem;
+		color: var(--graphite);
+	}
+
+	.proj__stack {
+		margin: 0;
+	}
+
+	.proj__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem 1.15rem;
+		margin: 0.85rem 0 0;
+		max-width: none;
+	}
+
+	.proj__links a {
+		color: var(--ink);
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule);
+		padding-block-end: 0.1rem;
+	}
+
+	.proj__links a:hover {
+		color: var(--signal);
+		border-block-end-color: var(--signal);
+	}
+
+	@media (min-width: 640px) {
+		.proj {
+			grid-template-columns: minmax(0, 1fr) 13rem;
+			grid-template-areas: 'meta shot' 'body shot';
+			align-content: start;
+		}
+	}
+
+	@media (min-width: 1040px) {
+		.proj {
+			grid-template-columns: 7.5rem minmax(0, 1fr) 16rem;
+			grid-template-areas: 'meta body shot';
+			gap: 0 2rem;
+		}
+
+		/* Wide enough to stack the three facts instead of letting them wrap. */
+		.proj__meta {
+			flex-direction: column;
+			gap: 0.2rem;
+			padding-block-start: 0.34rem;
+		}
+
+		.proj__meta span + span::before {
+			content: none;
+		}
+	}
+
+	/* ── The archive of the other thirty-one ───────────────────────────────*/
+	.arch {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem 0;
+		max-width: 46rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	/* Separator trails its item, so a wrapped line never opens with a dot. */
+	.arch li:not(:last-child)::after {
+		content: '·';
+		display: inline-block;
+		padding-inline: 0.7rem;
+		color: var(--rule);
+	}
+
+	.arch a {
+		text-decoration: none;
+		color: var(--graphite);
+	}
+
+	.arch a:hover {
+		color: var(--signal);
+	}
+
+	/* ── About ─────────────────────────────────────────────────────────────*/
+	.about {
+		display: grid;
+		gap: 1.75rem 2.25rem;
+	}
+
+	.about__pic {
+		margin: 0;
+		width: min(11rem, 42vw);
+	}
+
+	.about__pic img {
+		width: 100%;
+		border: 1px solid var(--rule);
+		border-radius: 3px;
+		filter: saturate(0.9);
+	}
+
+	:root[data-theme='dark'] .about__pic img {
+		filter: saturate(0.8) brightness(0.88);
+	}
+
+	.about__text p:last-child {
+		margin-block-end: 0;
+	}
+
+	@media (min-width: 720px) {
+		.about {
+			grid-template-columns: 11rem minmax(0, 1fr);
+			align-items: start;
+		}
+	}
+
+	.cv {
+		display: grid;
+		gap: 1.5rem;
+		max-width: 36rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.cv__row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 0.15rem 1.5rem;
+		align-items: baseline;
+	}
+
+	.cv__co {
+		font-weight: 500;
+	}
+
+	.cv__when {
+		text-align: end;
+		white-space: nowrap;
+	}
+
+	.cv__role {
+		grid-column: 1 / -1;
+		color: var(--graphite);
+	}
+
+	/* ── Toolbox ───────────────────────────────────────────────────────────*/
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem 0;
+		max-width: 46rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tools li {
+		color: var(--ink);
+	}
+
+	.tools li:not(:last-child)::after {
+		content: '·';
+		display: inline-block;
+		padding-inline: 0.7rem;
+		color: var(--rule);
+	}
+
+	.tools--quiet li {
+		color: var(--graphite);
+	}
+
+	.tools a {
+		text-decoration: none;
+	}
+
+	/* ── Counted ───────────────────────────────────────────────────────────*/
+	.count {
+		display: grid;
+		gap: 0.95rem;
+		margin: 0;
+		max-width: 32rem;
+	}
+
+	.count__row {
+		display: flex;
+		align-items: baseline;
+		gap: 0.7rem;
+	}
+
+	.count__row dt {
+		flex: 0 1 auto;
+	}
+
+	.count__lead {
+		flex: 1 1 2rem;
+		min-width: 1.5rem;
+		border-block-end: 1px dotted var(--rule);
+		transform: translateY(-0.28em);
+	}
+
+	.count__row dd {
+		margin: 0;
+		flex: 0 0 auto;
+		color: var(--ink);
+		font-size: var(--s-body);
+		letter-spacing: 0.02em;
+	}
+
+	/* ── Hire ──────────────────────────────────────────────────────────────*/
+	.hire__mail {
+		margin-block: 2rem 0.75rem;
+		font-size: var(--s-lede);
+		max-width: none;
+	}
+
+	.hire__mail a {
+		overflow-wrap: anywhere;
+	}
+
+	.hire__tel {
+		margin-block-end: 1.9rem;
+	}
+
+	.hire__tel a {
+		text-decoration: none;
+	}
+
+	/* ── Footer ────────────────────────────────────────────────────────────*/
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem 1.5rem;
+		padding-block: 1.6rem 7.5rem;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.foot p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.foot__set {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.7rem 0.9rem;
+	}
+
+	/* ── Motion ────────────────────────────────────────────────────────────*/
+	.rise {
+		animation: rise 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+		animation-delay: var(--d, 0ms);
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.7rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			transition: none;
+		}
+
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
+</style>

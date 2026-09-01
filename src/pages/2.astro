@@ -1,0 +1,1798 @@
+---
+import { Image } from 'astro:assets';
+import { profile } from '../../content/profile';
+import { featured, projects } from '../data/projects';
+import { toolbox } from '../i18n';
+import StyleSwitcher from '../components/StyleSwitcher.astro';
+import profilePhoto from '../assets/images/profile.png';
+
+/* Category and status, said properly in Japanese rather than transliterated.
+   受託 is the ordinary word for contract work; 端末内 means "inside the
+   handset", which is exactly what the on-device work is. */
+const categoryJa: Record<string, string> = {
+	web: 'ウェブ',
+	mobile: 'モバイル',
+	desktop: 'デスクトップ',
+	extension: '拡張機能',
+	ai: '端末内AI',
+	client: '受託',
+};
+
+const statusJa: Record<string, string> = {
+	live: '公開中',
+	shipped: '出荷済',
+	delisted: '掲載終了',
+	wip: '制作中',
+	archived: '保管',
+};
+
+/* Uneven on purpose: the empty half of a row is 間, not a gap to be filled. */
+const spans = [7, 5, 5, 7, 6, 6, 7, 5];
+
+/* Counters matter in Japanese: 件 for items of work, 本 for released apps,
+   編 for written pieces. Digits stay Arabic and get 縦中横 when set vertically. */
+const ledger = [
+	{
+		ja: '作品',
+		n: String(projects.length),
+		unit: '件',
+		en: 'Products taken from data model to store listing.',
+	},
+	{
+		ja: '公開',
+		n: '13',
+		unit: '本',
+		en: 'Of them live on the App Store or Google Play.',
+	},
+	{
+		ja: '事例',
+		n: '8',
+		unit: '編',
+		en: 'Written up in full, decisions and all.',
+	},
+	{
+		ja: '経験',
+		n: '4',
+		unit: '年',
+		en: 'Roughly, building for the web and phones.',
+	},
+];
+
+const nav = [
+	{ href: '#sakuhin', ja: '作品', en: 'Work' },
+	{ href: '#keireki', ja: '経歴', en: 'About' },
+	{ href: '#dogu', ja: '道具', en: 'Tools' },
+	{ href: '#renraku', ja: '連絡', en: 'Contact' },
+];
+
+const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project enquiry')}`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Haitham Assoli — 一つの画面、二つの方向。</title>
+		<meta
+			name="description"
+			content="Haitham Assoli builds bilingual web and mobile products in Amman. Every screen ships twice: once left to right, once right to left."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
+		/>
+	</head>
+
+	<body>
+		<a class="skip" href="#main">Skip to content</a>
+
+		<header class="topbar">
+			<div class="wrap topbar__in">
+				<a class="mark" href="#main">
+					<span class="mark__ja" lang="ja">ハイサム</span>
+					<span class="mark__en">Haitham Assoli</span>
+				</a>
+				<nav class="nav" aria-label="Sections">
+					{
+						nav.map((item) => (
+							<a class="nav__a" href={item.href}>
+								<span lang="ja">{item.ja}</span>
+								<span class="nav__en">{item.en}</span>
+							</a>
+						))
+					}
+				</nav>
+			</div>
+		</header>
+
+		<main id="main">
+			<!-- 序 — the thesis, stated on three axes -->
+			<section class="hero" aria-labelledby="h1">
+				<div class="wrap hero__in">
+					<p class="hero__thesis tate" lang="ja">一つの画面、二つの方向。</p>
+
+					<div class="hero__body">
+						<p class="eyebrow">
+							<span lang="ja">職業</span>
+							<span>Web &amp; mobile engineer · Amman, Jordan</span>
+						</p>
+
+						<h1 class="hero__name" id="h1">
+							Haitham Assoli
+							<span class="hero__kana" lang="ja">ハイサム・アッソーリ</span>
+						</h1>
+
+						<p class="hero__deck">
+							I build products that exist twice. Every screen ships once reading
+							left to right and once reading right to left, and the second one
+							is never a translation of the first — mirrored, a layout becomes a
+							different layout, with its own reading order and its own mistakes.
+							That constraint is most of my work.
+						</p>
+
+						<div class="sanpo rise">
+							<p class="sanpo__label">
+								<span lang="ja">三方</span>
+								<span>One sentence, three directions</span>
+							</p>
+
+							<div class="sanpo__rows">
+								<div class="spec">
+									<span class="spec__axis" aria-hidden="true">→</span>
+									<p class="spec__line spec__line--en">
+										Every screen has to hold up in both directions.
+									</p>
+									<span class="spec__note">left to right</span>
+								</div>
+
+								<div class="spec spec--rtl">
+									<span class="spec__axis" aria-hidden="true">←</span>
+									<p class="spec__line spec__line--ar" lang="ar" dir="rtl">
+										كل شاشة يجب أن تصمد في كلا الاتجاهين.
+									</p>
+									<span class="spec__note">right to left</span>
+								</div>
+
+								<div class="spec spec--tate">
+									<span class="spec__axis" aria-hidden="true">↓</span>
+									<p class="spec__line spec__line--ja tate" lang="ja">
+										すべての画面は、両方の方向で成立しなければならない。
+									</p>
+									<span class="spec__note">top to bottom</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="hanko" aria-hidden="true">
+							<span class="hanko__col" lang="ja">ハイ</span>
+							<span class="hanko__col" lang="ja">サム</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div class="fold" aria-hidden="true"></div>
+
+			<!-- 作品 -->
+			<section class="band" id="sakuhin" aria-labelledby="sakuhin-h">
+				<div class="wrap">
+					<div class="head">
+						<p class="marker tate" lang="ja" aria-hidden="true">作品</p>
+						<div class="head__text">
+							<h2 class="head__title" id="sakuhin-h">
+								Work
+								<span class="head__ja" lang="ja">作品</span>
+							</h2>
+							<p class="head__lede">
+								Eight of {projects.length}, chosen because each one had a
+								constraint worth solving. Every card opens onto the long
+								version.
+							</p>
+						</div>
+					</div>
+
+					<ol class="grid">
+						{
+							featured.map((p, i) => (
+								<li class="card rise" style={`--span:${spans[i] ?? 6}`}>
+									<a class="card__link" href={`/work/${p.slug}`}>
+										<span class="card__hit" />
+										<span class="card__titles">
+											<span class="card__title">{p.title.en}</span>
+											<span class="card__more" aria-hidden="true">
+												<span lang="ja">詳しく見る</span> →
+											</span>
+										</span>
+									</a>
+
+									<div class="card__paper">
+										<p class="card__rail tate" lang="ja">
+											<span class="card__year">{p.year}</span>
+											<span class="card__dot" aria-hidden="true">
+												・
+											</span>
+											<span class="card__status">
+												{statusJa[p.status] ?? p.status}
+											</span>
+										</p>
+
+										<div class="card__shot" data-frame={p.frame}>
+											{p.image ? (
+												<Image
+													src={p.image}
+													alt={`Screen from ${p.title.en}`}
+													widths={[420, 840]}
+													sizes="(min-width: 62rem) 42vw, 90vw"
+													loading={i === 0 ? 'eager' : 'lazy'}
+													decoding="async"
+												/>
+											) : (
+												<span class="card__noshot" lang="ja">
+													図版なし
+												</span>
+											)}
+										</div>
+									</div>
+
+									<p class="card__cat">
+										<span lang="ja">
+											{categoryJa[p.category] ?? p.category}
+										</span>
+										<span class="card__role">{p.role.en}</span>
+									</p>
+
+									<p class="card__tagline">{p.tagline.en}</p>
+									<p class="card__summary">{p.summary.en}</p>
+
+									<p class="card__stack" lang="ja">
+										{p.stack.slice(0, 7).map((s, j) => (
+											<>
+												{j > 0 && <span class="sep">、</span>}
+												<span class="tool">{s}</span>
+											</>
+										))}
+									</p>
+
+									{(p.links.live ||
+										p.links.appStore ||
+										p.links.playGoogle ||
+										p.links.github) && (
+										<p class="card__links">
+											{p.links.live && (
+												<a class="lnk" href={p.links.live} rel="noreferrer">
+													Live
+												</a>
+											)}
+											{p.links.appStore && (
+												<a class="lnk" href={p.links.appStore} rel="noreferrer">
+													App Store
+												</a>
+											)}
+											{p.links.playGoogle && (
+												<a
+													class="lnk"
+													href={p.links.playGoogle}
+													rel="noreferrer"
+												>
+													Google Play
+												</a>
+											)}
+											{p.links.github && (
+												<a class="lnk" href={p.links.github} rel="noreferrer">
+													Source
+												</a>
+											)}
+										</p>
+									)}
+								</li>
+							))
+						}
+					</ol>
+				</div>
+			</section>
+
+			<div class="fold" aria-hidden="true"></div>
+
+			<!-- 経歴 -->
+			<section class="band" id="keireki" aria-labelledby="keireki-h">
+				<div class="wrap">
+					<div class="head">
+						<p class="marker tate" lang="ja" aria-hidden="true">経歴</p>
+						<div class="head__text">
+							<h2 class="head__title" id="keireki-h">
+								About
+								<span class="head__ja" lang="ja">経歴</span>
+							</h2>
+						</div>
+					</div>
+
+					<div class="about">
+						<figure class="portrait rise">
+							<Image
+								src={profilePhoto}
+								alt="Haitham Assoli"
+								widths={[260, 520]}
+								sizes="(min-width: 62rem) 16rem, 9rem"
+								loading="lazy"
+							/>
+							<figcaption>
+								<span lang="ja">ハイサム・アッソーリ</span>
+								<span>{profile.location.en}</span>
+							</figcaption>
+						</figure>
+
+						<div class="prose rise">
+							<p>
+								I work end to end: schema, service, screen, store listing. Most
+								of what I ship is Arabic-first and right-to-left, because most
+								of the people using it read Arabic, and doing that properly is a
+								discipline rather than a config flag.
+							</p>
+							<p>
+								The work I want is the work with a hard edge on it. A model that
+								has to run on the handset instead of a server. A search index
+								that has to answer in milliseconds with no backend behind it. A
+								booking flow that must never sell the same hour twice. The
+								framework is never the interesting part.
+							</p>
+							<p>
+								Lately that has meant on-device AI: video and audio processing
+								that finishes entirely on the user's phone or laptop, with no
+								cloud leg and no telemetry. Before that, four years of client
+								work, a founded product, and a volunteer app that has outlived
+								several intakes of students.
+							</p>
+
+							<blockquote class="pull">
+								<p class="pull__ja tate" lang="ja">
+									制約のない仕事に、面白さはない。
+								</p>
+								<p class="pull__en">
+									Work without a constraint holds nothing worth doing.
+								</p>
+							</blockquote>
+						</div>
+
+						<dl class="track rise">
+							{
+								profile.experience.slice(0, 5).map((job) => (
+									<div class="track__row">
+										<dt class="track__co">{job.company.en}</dt>
+										<dd class="track__meta">
+											<span>{job.role.en}</span>
+											<span class="track__yr">{job.period}</span>
+										</dd>
+									</div>
+								))
+							}
+							{
+								profile.education.slice(0, 1).map((ed) => (
+									<div class="track__row">
+										<dt class="track__co">{ed.school.en}</dt>
+										<dd class="track__meta">
+											<span>{ed.degree.en}</span>
+											<span class="track__yr">{ed.period}</span>
+										</dd>
+									</div>
+								))
+							}
+						</dl>
+					</div>
+				</div>
+			</section>
+
+			<div class="fold" aria-hidden="true"></div>
+
+			<!-- 道具 + 数字 -->
+			<section class="band" id="dogu" aria-labelledby="dogu-h">
+				<div class="wrap">
+					<div class="head">
+						<p class="marker tate" lang="ja" aria-hidden="true">道具</p>
+						<div class="head__text">
+							<h2 class="head__title" id="dogu-h">
+								Tools
+								<span class="head__ja" lang="ja">道具</span>
+							</h2>
+							<p class="head__lede">
+								Set the way a craftsman lays out a bench: the things reached for
+								daily, in the order they get reached for. Nothing here is on the
+								list because it looked good on a list.
+							</p>
+						</div>
+					</div>
+
+					<ul class="dogu rise" lang="ja">
+						{
+							toolbox.map((tool) => (
+								<li class="dogu__item tate">
+									<span>{tool}</span>
+								</li>
+							))
+						}
+					</ul>
+
+					<div class="ledger">
+						<h3 class="sr-only" id="suji-h">Figures</h3>
+						<p class="marker marker--inline tate" lang="ja" aria-hidden="true">
+							数字
+						</p>
+						<dl class="ledger__rows" aria-labelledby="suji-h">
+							{
+								ledger.map((row) => (
+									<div class="ledger__row rise">
+										<dt class="ledger__ja tate" lang="ja">
+											<span class="ledger__name">{row.ja}</span>
+											<span class="ledger__count">
+												<span class="tcy">{row.n}</span>
+												{row.unit}
+											</span>
+										</dt>
+										<dd class="ledger__en">{row.en}</dd>
+									</div>
+								))
+							}
+						</dl>
+					</div>
+				</div>
+			</section>
+
+			<!-- 連絡 -->
+			<section class="renraku" id="renraku" aria-labelledby="renraku-h">
+				<div class="wrap renraku__in">
+					<div class="renraku__left">
+						<h2 class="head__title" id="renraku-h">
+							Contact
+							<span class="head__ja" lang="ja">連絡</span>
+						</h2>
+						<p class="renraku__lede">
+							Bilingual product, a mobile build that has to reach both stores,
+							or something that has to run without a server behind it — send the
+							brief and what it has to do by when. I answer in English or
+							Arabic.
+						</p>
+
+						<a class="cta" href={mailto}>
+							<span class="cta__en">{profile.email}</span>
+							<span class="cta__ja" lang="ja">仕事のご依頼はこちらへ</span>
+						</a>
+
+						<ul class="elsewhere">
+							<li><a class="lnk" href={profile.links.github}>GitHub</a></li>
+							<li><a class="lnk" href={profile.links.linkedin}>LinkedIn</a></li>
+							<li>
+								<a class="lnk" href={profile.links.playStore}>Play Store</a>
+							</li>
+							<li><a class="lnk" href={profile.links.resume}>Résumé</a></li>
+							<li>
+								<a class="lnk" href={`tel:${profile.phone.replace(/\s/g, '')}`}>
+									{profile.phone}
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="renraku__seal" aria-hidden="true">
+						<div class="hanko hanko--static">
+							<span class="hanko__col" lang="ja">ハイ</span>
+							<span class="hanko__col" lang="ja">サム</span>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="foot">
+			<div class="wrap foot__in">
+				<p class="foot__ja" lang="ja">以上</p>
+				<p class="foot__en">
+					<span lang="ja">作</span> Haitham Assoli · {profile.location.en} · Set in
+					Shippori Mincho and Newsreader
+				</p>
+			</div>
+		</footer>
+
+		<script>
+			const targets = document.querySelectorAll('.rise');
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+			if (reduce.matches || !('IntersectionObserver' in window)) {
+				targets.forEach((el) => el.classList.add('is-in'));
+			} else {
+				const io = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (!entry.isIntersecting) return;
+							entry.target.classList.add('is-in');
+							io.unobserve(entry.target);
+						});
+					},
+					{ rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+				);
+				targets.forEach((el) => io.observe(el));
+			}
+		</script>
+
+		<StyleSwitcher n={2} />
+
+		<style is:global>
+			/* ── 静けさ ─────────────────────────────────────────────
+			   Aoboku (blue-toned sumi) on kinari washi, indigo for the
+			   working type, one vermilion seal. Everything else is 間. */
+
+			:root {
+				--kinari: #e7e4db; /* 生成り — unbleached paper ground */
+				--washi: #f3f1ea; /* raised sheet */
+				--sumi: #1e252b; /* 青墨 — blue-cast ink */
+				--usuzumi: #6e747a; /* 薄墨 — thin ink */
+				--ai: #2e4257; /* 藍 — indigo, for links and labels */
+				--shu: #c8452c; /* 朱 — vermilion, the seal only */
+				--rule: rgba(30, 37, 43, 0.16);
+				--rule-soft: rgba(30, 37, 43, 0.09);
+
+				--jp: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+				--body:
+					'Newsreader', 'Shippori Mincho', 'Iowan Old Style', Georgia, serif;
+				--gothic: 'Zen Kaku Gothic New', 'Hiragino Sans', system-ui, sans-serif;
+
+				--gap: clamp(1.5rem, 4vw, 3.25rem);
+			}
+
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+			}
+
+			html {
+				-webkit-text-size-adjust: 100%;
+				scroll-behavior: smooth;
+			}
+
+			body {
+				margin: 0;
+				padding-bottom: 7rem;
+				background-color: var(--kinari);
+				color: var(--sumi);
+				font-family: var(--body);
+				font-size: clamp(1rem, 0.97rem + 0.2vw, 1.075rem);
+				font-weight: 300;
+				line-height: 1.72;
+				overflow-x: hidden;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			/* Washi is a woven sheet, not a flat colour. Two crossed grains,
+			   almost below the threshold of noticing. */
+			body::before {
+				content: '';
+				position: fixed;
+				inset: 0;
+				z-index: 0;
+				pointer-events: none;
+				background-image:
+					repeating-linear-gradient(
+						93deg,
+						rgba(30, 37, 43, 0.026) 0 1px,
+						transparent 1px 5px
+					),
+					repeating-linear-gradient(
+						3deg,
+						rgba(30, 37, 43, 0.02) 0 1px,
+						transparent 1px 8px
+					);
+			}
+
+			body > * {
+				position: relative;
+				z-index: 1;
+			}
+
+			p,
+			h1,
+			h2,
+			figure,
+			blockquote,
+			dl,
+			dd {
+				margin: 0;
+			}
+
+			ol,
+			ul {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			img {
+				display: block;
+				max-width: 100%;
+				height: auto;
+			}
+
+			a {
+				color: inherit;
+			}
+
+			:focus-visible {
+				outline: 2px solid var(--ai);
+				outline-offset: 3px;
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				margin: -1px;
+				padding: 0;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+
+			.skip {
+				position: absolute;
+				left: -9999px;
+				top: 0;
+				z-index: 40;
+				padding: 0.6rem 1rem;
+				background: var(--sumi);
+				color: var(--washi);
+				font-family: var(--gothic);
+				font-size: 0.8rem;
+			}
+
+			.skip:focus {
+				left: 0.75rem;
+				top: 0.75rem;
+			}
+
+			.wrap {
+				width: 100%;
+				max-width: 78rem;
+				margin-inline: auto;
+				padding-inline: clamp(1.15rem, 5vw, 4rem);
+			}
+
+			/* ── vertical setting ─────────────────────────────── */
+
+			.tate {
+				writing-mode: vertical-rl;
+				text-orientation: mixed; /* kanji upright, Latin rotates — correct */
+				font-family: var(--jp);
+				font-feature-settings:
+					'vkrn' 1,
+					'vpal' 1;
+				line-height: 1.5;
+			}
+
+			.tcy {
+				-webkit-text-combine: horizontal;
+				text-combine-upright: all; /* 縦中横 — two digits sit upright as one */
+			}
+
+			/* ── top bar ──────────────────────────────────────── */
+
+			.topbar {
+				border-bottom: 1px solid var(--rule-soft);
+			}
+
+			.topbar__in {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+				min-height: 3.75rem;
+			}
+
+			.mark {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.55rem;
+				text-decoration: none;
+			}
+
+			.mark__ja {
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				letter-spacing: 0.12em;
+				color: var(--ai);
+			}
+
+			.mark__en {
+				font-family: var(--gothic);
+				font-size: 0.78rem;
+				font-weight: 500;
+				letter-spacing: 0.1em;
+				white-space: nowrap;
+			}
+
+			.nav {
+				display: flex;
+				gap: clamp(0.9rem, 3vw, 2rem);
+			}
+
+			.nav__a {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.4rem;
+				padding-block: 0.35rem;
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				white-space: nowrap;
+				text-decoration: none;
+				border-bottom: 1px solid transparent;
+				transition:
+					border-color 0.25s,
+					color 0.25s;
+			}
+
+			.nav__a:hover {
+				color: var(--ai);
+				border-bottom-color: var(--ai);
+			}
+
+			.nav__en {
+				font-family: var(--gothic);
+				font-size: 0.66rem;
+				font-weight: 500;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			/* ── hero ─────────────────────────────────────────── */
+
+			.hero {
+				padding-block: clamp(3.5rem, 9vw, 8rem) clamp(3rem, 7vw, 6rem);
+			}
+
+			.hero__in {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: clamp(1.25rem, 5vw, 4rem);
+				align-items: start;
+			}
+
+			.hero__thesis {
+				grid-column: 2;
+				grid-row: 1;
+				margin: 0;
+				font-size: clamp(1.55rem, 1.1rem + 2.6vw, 3.1rem);
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				line-height: 1.35;
+				height: min(84vh, 44rem);
+			}
+
+			.hero__body {
+				grid-column: 1;
+				grid-row: 1;
+				position: relative;
+				max-width: 44rem;
+			}
+
+			.eyebrow {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.7rem;
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.eyebrow [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.9rem;
+				letter-spacing: 0.2em;
+				text-transform: none;
+				color: var(--ai);
+			}
+
+			.hero__name {
+				margin-block: 1.1rem 0;
+				font-family: var(--body);
+				font-size: clamp(2.5rem, 1.4rem + 5vw, 4.75rem);
+				font-weight: 300;
+				line-height: 1;
+				letter-spacing: -0.015em;
+			}
+
+			.hero__kana {
+				display: block;
+				margin-top: 0.85rem;
+				font-family: var(--jp);
+				font-size: clamp(0.85rem, 0.78rem + 0.4vw, 1.05rem);
+				font-weight: 400;
+				letter-spacing: 0.22em;
+				color: var(--usuzumi);
+			}
+
+			.hero__deck {
+				margin-top: clamp(1.75rem, 4vw, 2.75rem);
+				max-width: 34em;
+				font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+				line-height: 1.68;
+			}
+
+			/* ── 三方 — the signature: one sentence on three axes ── */
+
+			.sanpo {
+				margin-top: clamp(2.5rem, 6vw, 4.5rem);
+				padding-top: 1.5rem;
+				border-top: 1px solid var(--rule);
+			}
+
+			.sanpo__label {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.75rem;
+				margin-bottom: 1.75rem;
+			}
+
+			.sanpo__label [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 1.05rem;
+				letter-spacing: 0.3em;
+				color: var(--ai);
+			}
+
+			.sanpo__label span + span {
+				font-family: var(--gothic);
+				font-size: 0.7rem;
+				font-weight: 500;
+				letter-spacing: 0.13em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.sanpo__rows {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				/* the vertical specimen is tall; let the slack fall into an empty
+				   third row instead of prising the two flat lines apart */
+				grid-template-rows: auto auto 1fr;
+				gap: 1.75rem clamp(1.5rem, 4vw, 2.75rem);
+				align-items: start;
+			}
+
+			.spec {
+				grid-column: 1;
+				display: grid;
+				grid-template-columns: 1.5rem 1fr;
+				gap: 0 0.85rem;
+				align-items: baseline;
+			}
+
+			.spec__axis {
+				font-family: var(--gothic);
+				font-size: 0.95rem;
+				color: var(--ai);
+			}
+
+			.spec__line {
+				font-size: clamp(0.98rem, 0.94rem + 0.25vw, 1.12rem);
+				line-height: 1.55;
+			}
+
+			.spec__line--ar {
+				font-family: var(--body);
+				font-size: clamp(1.05rem, 1rem + 0.35vw, 1.25rem);
+				line-height: 1.9;
+			}
+
+			.spec--rtl {
+				direction: rtl;
+			}
+
+			.spec--rtl .spec__note {
+				direction: ltr;
+				text-align: right;
+			}
+
+			.spec__note {
+				grid-column: 2;
+				font-family: var(--gothic);
+				font-size: 0.63rem;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.spec--tate {
+				grid-column: 2;
+				grid-row: 1 / span 3;
+				grid-template-columns: auto 1.5rem;
+				justify-items: center;
+				align-items: start;
+				gap: 0.6rem;
+				padding-inline-start: clamp(1rem, 3vw, 2rem);
+				border-inline-start: 1px solid var(--rule-soft);
+			}
+
+			.spec--tate .spec__axis {
+				grid-column: 2;
+				grid-row: 1;
+			}
+
+			.spec__line--ja {
+				grid-column: 1;
+				grid-row: 1;
+				height: 19rem;
+				font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.12rem);
+				letter-spacing: 0.05em;
+			}
+
+			.spec--tate .spec__note {
+				grid-column: 1 / -1;
+				grid-row: 2;
+			}
+
+			/* ── 判子 — the seal, stamped once ────────────────── */
+
+			.hanko {
+				position: absolute;
+				inset-inline-end: 0.5rem;
+				inset-block-start: 4.5rem;
+				display: flex;
+				flex-direction: row-reverse; /* right column first, as a seal reads */
+				gap: 0.1rem;
+				padding: 0.5rem 0.45rem;
+				background: var(--shu);
+				color: var(--kinari);
+				box-shadow:
+					0 0 0 1.5px var(--shu),
+					0 0 0 3.5px rgba(200, 69, 44, 0.16);
+				transform: rotate(-7deg);
+				animation: stamp 0.9s 0.5s both cubic-bezier(0.2, 0.9, 0.3, 1);
+			}
+
+			.hanko__col {
+				writing-mode: vertical-rl;
+				text-orientation: upright;
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+			}
+
+			@keyframes stamp {
+				0% {
+					opacity: 0;
+					transform: rotate(-16deg) scale(1.45);
+				}
+				60% {
+					opacity: 1;
+					transform: rotate(-7deg) scale(0.96);
+				}
+				100% {
+					opacity: 1;
+					transform: rotate(-7deg) scale(1);
+				}
+			}
+
+			/* ── folds and section heads ──────────────────────── */
+
+			.fold {
+				height: 2.75rem;
+				border-top: 1px solid var(--rule);
+				background: linear-gradient(
+					to bottom,
+					rgba(30, 37, 43, 0.075),
+					rgba(30, 37, 43, 0) 62%
+				);
+			}
+
+			.band {
+				padding-block: clamp(3rem, 7vw, 6.5rem);
+			}
+
+			.head {
+				display: grid;
+				grid-template-columns: 3.5rem minmax(0, 1fr);
+				gap: clamp(1rem, 3vw, 2.5rem);
+				margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+			}
+
+			.marker {
+				margin: 0;
+				justify-self: center;
+				font-size: 1.1rem;
+				font-weight: 600;
+				letter-spacing: 0.4em;
+				color: var(--ai);
+			}
+
+			.head__text {
+				max-width: 46rem;
+			}
+
+			.head__title {
+				display: flex;
+				align-items: baseline;
+				gap: 0.9rem;
+				font-family: var(--body);
+				font-size: clamp(1.9rem, 1.3rem + 2.4vw, 3rem);
+				font-weight: 300;
+				line-height: 1.1;
+				letter-spacing: -0.01em;
+			}
+
+			.head__ja {
+				font-family: var(--jp);
+				font-size: 0.42em;
+				font-weight: 400;
+				letter-spacing: 0.3em;
+				color: var(--usuzumi);
+			}
+
+			.head__lede {
+				margin-top: 1.1rem;
+				max-width: 36em;
+				color: #3a4249;
+			}
+
+			/* ── 作品 grid ────────────────────────────────────── */
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(12, minmax(0, 1fr));
+				gap: clamp(3rem, 7vw, 5.5rem) var(--gap);
+			}
+
+			.card {
+				grid-column: span var(--span, 6);
+				display: flex;
+				flex-direction: column;
+				position: relative;
+			}
+
+			/* 間: the short cards drop, so no row ever lines up flat */
+			.card:nth-child(2),
+			.card:nth-child(5),
+			.card:nth-child(8) {
+				margin-top: clamp(0rem, 5vw, 4.5rem);
+			}
+
+			.card__link {
+				display: block;
+				text-decoration: none;
+				order: 2;
+			}
+
+			.card__hit {
+				position: absolute;
+				inset: 0;
+			}
+
+			.card__titles {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 0.75rem;
+				margin-top: 1.35rem;
+			}
+
+			.card__title {
+				font-family: var(--body);
+				font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+				font-weight: 400;
+				line-height: 1.15;
+				background-image: linear-gradient(var(--sumi), var(--sumi));
+				background-size: 0% 1px;
+				background-repeat: no-repeat;
+				background-position: 0 100%;
+				transition: background-size 0.35s ease;
+			}
+
+			.card:hover .card__title,
+			.card__link:focus-visible .card__title {
+				background-size: 100% 1px;
+			}
+
+			.card__more {
+				font-family: var(--gothic);
+				font-size: 0.7rem;
+				font-weight: 500;
+				letter-spacing: 0.12em;
+				color: var(--ai);
+				opacity: 0.45;
+				transition: opacity 0.3s;
+			}
+
+			.card__more [lang='ja'] {
+				font-family: var(--jp);
+				letter-spacing: 0.16em;
+			}
+
+			.card:hover .card__more,
+			.card__link:focus-visible .card__more {
+				opacity: 1;
+			}
+
+			.card__link:focus-visible {
+				outline: 2px solid var(--ai);
+				outline-offset: 6px;
+			}
+
+			.card__paper {
+				order: 1;
+				position: relative;
+				display: flex;
+				gap: 0.9rem;
+				padding: 0.9rem;
+				background: var(--washi);
+				border: 1px solid var(--rule-soft);
+				box-shadow:
+					0 1px 0 rgba(255, 255, 255, 0.7) inset,
+					0 14px 28px -22px rgba(30, 37, 43, 0.55);
+			}
+
+			.card__rail {
+				flex: 0 0 auto;
+				display: flex;
+				align-items: center;
+				gap: 0.4rem;
+				margin: 0;
+				padding-block: 0.15rem;
+				font-size: 0.72rem;
+				letter-spacing: 0.12em;
+				color: var(--usuzumi);
+			}
+
+			.card__status {
+				color: var(--ai);
+			}
+
+			.card__shot {
+				flex: 1 1 auto;
+				min-width: 0;
+				overflow: hidden;
+				background: #dedbd2;
+			}
+
+			.card__shot img {
+				width: 100%;
+				aspect-ratio: 16 / 10;
+				object-fit: cover;
+				object-position: top center;
+				filter: saturate(0.86) contrast(1.02);
+				transition:
+					transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+					filter 0.5s ease;
+			}
+
+			.card:hover .card__shot img {
+				transform: scale(1.025);
+				filter: saturate(1) contrast(1.02);
+			}
+
+			/* A phone shot is a tall plate; cropping it to a landscape band
+			   throws away the screen. Mount it whole instead. */
+			.card__shot[data-frame='phone'] {
+				display: grid;
+				place-items: center;
+				padding: clamp(0.75rem, 3vw, 1.6rem);
+				background: linear-gradient(180deg, #e4e1d8, #dcd9d0);
+			}
+
+			.card__shot[data-frame='phone'] img {
+				width: 100%;
+				height: auto;
+				max-height: 26rem;
+				aspect-ratio: auto;
+				object-fit: contain;
+				box-shadow: 0 12px 26px -18px rgba(30, 37, 43, 0.8);
+			}
+
+			.card__noshot {
+				display: grid;
+				place-items: center;
+				aspect-ratio: 16 / 10;
+				font-family: var(--jp);
+				font-size: 0.85rem;
+				letter-spacing: 0.3em;
+				color: var(--usuzumi);
+			}
+
+			.card__cat {
+				order: 3;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.7rem;
+				margin-top: 0.7rem;
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				font-weight: 500;
+				letter-spacing: 0.08em;
+				color: var(--usuzumi);
+			}
+
+			.card__cat [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.82rem;
+				letter-spacing: 0.18em;
+				color: var(--ai);
+			}
+
+			.card__tagline {
+				order: 4;
+				margin-top: 0.9rem;
+				font-size: 1.02rem;
+				font-style: italic;
+			}
+
+			.card__summary {
+				order: 5;
+				margin-top: 0.6rem;
+				max-width: 40em;
+				font-size: 0.96rem;
+				line-height: 1.7;
+				color: #3d454c;
+			}
+
+			.card__stack {
+				order: 6;
+				margin-top: 1rem;
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				line-height: 2;
+				color: var(--usuzumi);
+			}
+
+			.card__stack .sep {
+				font-family: var(--jp);
+				color: rgba(30, 37, 43, 0.35);
+			}
+
+			.card__links {
+				order: 7;
+				position: relative;
+				z-index: 2;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1.15rem;
+				margin-top: 0.9rem;
+			}
+
+			.lnk {
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				font-weight: 500;
+				letter-spacing: 0.09em;
+				color: var(--ai);
+				text-decoration: none;
+				border-bottom: 1px solid rgba(46, 66, 87, 0.32);
+				padding-bottom: 0.1rem;
+				transition: border-color 0.25s;
+			}
+
+			.lnk:hover {
+				border-bottom-color: var(--ai);
+			}
+
+			/* ── 経歴 ─────────────────────────────────────────── */
+
+			.about {
+				display: grid;
+				grid-template-columns: 16rem minmax(0, 1fr);
+				gap: clamp(2rem, 5vw, 4.5rem);
+				align-items: start;
+			}
+
+			.portrait {
+				position: sticky;
+				top: 2.5rem;
+			}
+
+			/* torn from the sheet rather than cropped */
+			.portrait img {
+				width: 100%;
+				filter: grayscale(1) contrast(1.06);
+				mix-blend-mode: multiply;
+				clip-path: polygon(
+					0% 1.5%,
+					13% 0%,
+					27% 2%,
+					41% 0.4%,
+					56% 2.2%,
+					70% 0.6%,
+					86% 2.4%,
+					100% 1%,
+					99% 15%,
+					100% 32%,
+					98.6% 51%,
+					100% 68%,
+					98.8% 86%,
+					100% 99%,
+					84% 97.6%,
+					69% 100%,
+					54% 97.8%,
+					38% 99.6%,
+					23% 97.6%,
+					9% 99.8%,
+					0% 98%,
+					1.4% 80%,
+					0% 62%,
+					1.6% 44%,
+					0% 26%
+				);
+			}
+
+			.portrait figcaption {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+				margin-top: 1rem;
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				letter-spacing: 0.09em;
+				color: var(--usuzumi);
+			}
+
+			.portrait figcaption [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.8rem;
+				letter-spacing: 0.2em;
+				color: var(--sumi);
+			}
+
+			.prose p {
+				max-width: 38em;
+			}
+
+			.prose p + p {
+				margin-top: 1.15rem;
+			}
+
+			.pull {
+				display: flex;
+				align-items: flex-start;
+				gap: clamp(1rem, 3vw, 2rem);
+				margin-top: clamp(2rem, 5vw, 3.25rem);
+				padding-inline-start: clamp(1rem, 3vw, 2rem);
+				border-inline-start: 2px solid var(--rule);
+			}
+
+			.pull__ja {
+				margin: 0;
+				height: 22rem;
+				font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.4rem);
+				font-weight: 600;
+				letter-spacing: 0.1em;
+			}
+
+			.pull__en {
+				max-width: 18em;
+				padding-top: 0.35rem;
+				font-size: 1.02rem;
+				font-style: italic;
+				color: #3d454c;
+			}
+
+			.track {
+				grid-column: 2;
+				margin-top: clamp(2.5rem, 5vw, 3.5rem);
+				border-top: 1px solid var(--rule);
+			}
+
+			.track__row {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+				gap: 0.5rem 1.5rem;
+				padding-block: 0.85rem;
+				border-bottom: 1px solid var(--rule-soft);
+			}
+
+			.track__co {
+				font-size: 1.02rem;
+			}
+
+			.track__meta {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				gap: 0.5rem 1rem;
+				font-family: var(--gothic);
+				font-size: 0.76rem;
+				letter-spacing: 0.05em;
+				color: var(--usuzumi);
+			}
+
+			.track__yr {
+				white-space: nowrap;
+			}
+
+			/* ── 道具 ─────────────────────────────────────────── */
+
+			.dogu {
+				display: flex;
+				flex-direction: row-reverse; /* columns read right to left */
+				flex-wrap: wrap;
+				justify-content: flex-start;
+				gap: clamp(0.9rem, 2.4vw, 1.7rem);
+				padding-block: 1.5rem;
+				border-block: 1px solid var(--rule);
+			}
+
+			.dogu__item {
+				height: 9.5rem;
+				font-family: var(--gothic);
+				font-size: 0.92rem;
+				font-weight: 400;
+				letter-spacing: 0.06em;
+				color: #3d454c;
+			}
+
+			.dogu__item:nth-child(3n) {
+				color: var(--ai);
+			}
+
+			/* ── 数字 ─────────────────────────────────────────── */
+
+			.ledger {
+				display: grid;
+				grid-template-columns: 3.5rem minmax(0, 1fr);
+				gap: clamp(1rem, 3vw, 2.5rem);
+				margin-top: clamp(3rem, 7vw, 5rem);
+			}
+
+			.marker--inline {
+				justify-self: center;
+				align-self: start;
+			}
+
+			.ledger__rows {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+				gap: clamp(1.5rem, 4vw, 3rem);
+			}
+
+			.ledger__row {
+				display: flex;
+				align-items: flex-start;
+				gap: 1rem;
+				padding-top: 1rem;
+				border-top: 1px solid var(--rule);
+			}
+
+			.ledger__ja {
+				margin: 0;
+				display: flex;
+				align-items: center;
+				gap: 0.9rem;
+				height: 9.5rem;
+			}
+
+			.ledger__name {
+				font-size: 0.85rem;
+				letter-spacing: 0.3em;
+				color: var(--usuzumi);
+			}
+
+			.ledger__count {
+				font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem);
+				font-weight: 600;
+				letter-spacing: 0.04em;
+			}
+
+			.ledger__en {
+				flex: 1 1 auto;
+				font-size: 0.94rem;
+				line-height: 1.65;
+				color: #3d454c;
+			}
+
+			/* ── 連絡 ─────────────────────────────────────────── */
+
+			.renraku {
+				margin-top: clamp(2rem, 6vw, 4rem);
+				padding-block: clamp(3.5rem, 8vw, 6.5rem);
+				background: var(--washi);
+				/* torn along the top, as if lifted off the block */
+				clip-path: polygon(
+					0 14px,
+					4% 5px,
+					9% 15px,
+					15% 6px,
+					22% 17px,
+					29% 5px,
+					36% 14px,
+					44% 3px,
+					51% 13px,
+					58% 6px,
+					66% 16px,
+					73% 5px,
+					80% 14px,
+					87% 4px,
+					94% 15px,
+					100% 6px,
+					100% 100%,
+					0 100%
+				);
+			}
+
+			.renraku__in {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: clamp(2rem, 6vw, 4rem);
+				align-items: center;
+			}
+
+			.renraku__lede {
+				margin-top: 1.25rem;
+				max-width: 34em;
+				font-size: clamp(1.02rem, 0.98rem + 0.3vw, 1.15rem);
+			}
+
+			.cta {
+				display: inline-flex;
+				flex-direction: column;
+				gap: 0.4rem;
+				margin-top: clamp(1.75rem, 4vw, 2.5rem);
+				padding-bottom: 0.5rem;
+				border-bottom: 2px solid var(--shu);
+				text-decoration: none;
+			}
+
+			.cta__en {
+				font-family: var(--body);
+				font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem);
+				font-weight: 300;
+				line-height: 1.1;
+				word-break: break-word;
+			}
+
+			.cta__ja {
+				font-family: var(--jp);
+				font-size: 0.82rem;
+				letter-spacing: 0.2em;
+				color: var(--usuzumi);
+				transition: color 0.25s;
+			}
+
+			.cta:hover .cta__ja {
+				color: var(--shu);
+			}
+
+			.elsewhere {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.85rem 1.5rem;
+				margin-top: clamp(1.75rem, 4vw, 2.5rem);
+			}
+
+			.renraku__seal {
+				display: grid;
+				place-items: center;
+			}
+
+			.hanko--static {
+				position: static;
+				animation: none;
+				padding: 0.85rem 0.75rem;
+				gap: 0.2rem;
+				transform: rotate(4deg);
+			}
+
+			.hanko--static .hanko__col {
+				font-size: 1.5rem;
+			}
+
+			/* ── footer ───────────────────────────────────────── */
+
+			.foot {
+				padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem;
+			}
+
+			.foot__in {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				padding-top: 1.25rem;
+				border-top: 1px solid var(--rule-soft);
+			}
+
+			.foot__ja {
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				letter-spacing: 0.5em;
+				color: var(--ai);
+			}
+
+			.foot__en {
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				letter-spacing: 0.06em;
+				color: var(--usuzumi);
+			}
+
+			.foot__en [lang='ja'] {
+				font-family: var(--jp);
+				letter-spacing: 0.2em;
+				color: var(--sumi);
+			}
+
+			/* ── entrances ────────────────────────────────────── */
+
+			.rise {
+				opacity: 0;
+				transform: translateY(14px);
+				transition:
+					opacity 0.75s ease,
+					transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+
+			.rise.is-in {
+				opacity: 1;
+				transform: none;
+			}
+
+			/* ── narrower than a hand ─────────────────────────── */
+
+			@media (max-width: 62rem) {
+				.about {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				.portrait {
+					position: static;
+					max-width: 11rem;
+				}
+
+				.track {
+					grid-column: 1;
+				}
+
+				.card {
+					grid-column: span 12;
+				}
+
+				.card:nth-child(2),
+				.card:nth-child(5),
+				.card:nth-child(8) {
+					margin-top: 0;
+				}
+			}
+
+			@media (max-width: 48rem) {
+				.nav__en,
+				.mark__ja {
+					display: none;
+				}
+
+				.head,
+				.ledger {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				/* The section marker lies down where there is no gutter to hold it. */
+				.marker {
+					writing-mode: horizontal-tb;
+					justify-self: start;
+					margin-bottom: 0.5rem;
+					font-size: 0.95rem;
+					letter-spacing: 0.45em;
+				}
+
+				.sanpo__rows {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				.spec--tate {
+					grid-column: 1;
+					grid-row: auto;
+					grid-template-columns: 1fr 1.5rem;
+					justify-items: start;
+					padding-inline-start: 0;
+					padding-top: 1.25rem;
+					border-inline-start: 0;
+					border-top: 1px solid var(--rule-soft);
+				}
+
+				.spec__line--ja {
+					height: 17rem;
+				}
+
+				/* 19 rotated tool names would run off a phone: lay them flat. */
+				.dogu__item {
+					writing-mode: horizontal-tb;
+					height: auto;
+					font-size: 0.85rem;
+				}
+
+				.dogu {
+					flex-direction: row;
+					gap: 0.5rem 1.1rem;
+				}
+
+				.pull__ja {
+					height: 17rem;
+				}
+
+				.renraku__in {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				.renraku__seal {
+					justify-items: start;
+					place-items: start;
+				}
+			}
+
+			@media (max-width: 30rem) {
+				.hero__in {
+					gap: 0.9rem;
+				}
+
+				.hero__thesis {
+					font-size: 1.5rem;
+					letter-spacing: 0.04em;
+				}
+
+				.card__paper {
+					flex-direction: column-reverse;
+					gap: 0.7rem;
+				}
+
+				.card__rail {
+					writing-mode: horizontal-tb;
+					align-items: baseline;
+				}
+
+				.ledger__ja {
+					writing-mode: horizontal-tb;
+					height: auto;
+					align-items: baseline;
+				}
+
+				.ledger__row {
+					flex-direction: column;
+					gap: 0.4rem;
+				}
+
+				.hanko {
+					inset-inline-end: 0;
+					inset-block-start: auto;
+					inset-block-end: -1.5rem;
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				html {
+					scroll-behavior: auto;
+				}
+
+				*,
+				*::before,
+				*::after {
+					animation-duration: 0.001ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.001ms !important;
+				}
+
+				.rise {
+					opacity: 1;
+					transform: none;
+				}
+
+				.hanko {
+					animation: none;
+				}
+			}
+		</style>
+	</body>
+</html>
