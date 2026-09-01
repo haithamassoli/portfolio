@@ -1,0 +1,706 @@
+---
+import { Font } from 'astro:assets';
+
+/* Contact sheet for logo marks. Every mark is one 64×64 SVG, drawn from the
+   same parts the site is made of: an H, a heh, and the seam between them.
+   ponytail: delete once a mark is chosen and moved into Nav + favicon. */
+
+const marks = [
+	{
+		id: 'seam',
+		name: 'Seam',
+		note: 'The crossbar breaks in the middle and steps down — the seam where the two scripts meet.',
+		svg: `<rect x="10" y="8" width="11" height="48"/><rect x="43" y="8" width="11" height="48"/><rect x="21" y="26" width="11" height="11"/><rect x="32" y="30" width="11" height="11" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'curl',
+		name: 'Curl',
+		note: 'The right stem of the H lets go and closes into a heh. One letter in two alphabets.',
+		svg: `<rect x="10" y="8" width="11" height="48"/><rect x="21" y="26" width="17" height="11" fill="var(--sig)"/><rect x="38" y="8" width="11" height="19"/><circle cx="43.5" cy="40" r="11" fill="none" stroke="currentColor" stroke-width="11"/>`,
+	},
+	{
+		id: 'ring',
+		name: 'Ring',
+		note: 'A heh loop with the H crossbar driven straight through it. Reads at any size.',
+		svg: `<circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="11"/><rect x="6" y="26.5" width="52" height="11" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'bracket',
+		name: 'Bracket',
+		note: 'Monospace logic: the initial held inside two rules, like a token in the code.',
+		svg: `<path d="M20 8H8v48h12" fill="none" stroke="var(--sig)" stroke-width="7"/><path d="M44 8h12v48H44" fill="none" stroke="var(--sig)" stroke-width="7"/><rect x="24" y="16" width="8" height="32"/><rect x="32" y="28" width="8" height="8"/><rect x="40" y="16" width="8" height="32"/>`,
+	},
+	{
+		id: 'stack',
+		name: 'Stack',
+		note: 'H above, heh below, the signal rule between them. The bilingual case, stated flat.',
+		svg: `<rect x="14" y="4" width="9" height="24"/><rect x="41" y="4" width="9" height="24"/><rect x="23" y="12" width="18" height="9"/><rect x="6" y="31" width="52" height="3" fill="var(--sig)"/><circle cx="32" cy="47" r="7" fill="none" stroke="currentColor" stroke-width="9"/>`,
+	},
+	{
+		id: 'grid',
+		name: 'Grid',
+		note: 'Seven squares on a three-by-three field. The one that carries the bar is orange.',
+		svg: `<rect x="10" y="8" width="14" height="14"/><rect x="10" y="25" width="14" height="14"/><rect x="10" y="42" width="14" height="14"/><rect x="40" y="8" width="14" height="14"/><rect x="40" y="25" width="14" height="14"/><rect x="40" y="42" width="14" height="14"/><rect x="25" y="25" width="14" height="14" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'arrow',
+		name: 'Arrow',
+		note: 'The crossbar overshoots and points. Same arrow the buttons already use.',
+		svg: `<rect x="8" y="8" width="11" height="48"/><rect x="38" y="8" width="11" height="48"/><rect x="19" y="26" width="24" height="11"/><path d="M43 18l16 13.5L43 45z" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'notch',
+		name: 'Notch',
+		note: 'A solid tile with the H cut out of it. Negative space does the work; survives on any field.',
+		svg: `<path fill-rule="evenodd" fill="var(--sig)" d="M4 4h56v56H4z M19 15h9v13h8V15h9v34h-9V36h-8v13h-9z"/>`,
+	},
+	{
+		id: 'slab',
+		name: 'Slab',
+		note: 'Full-bleed H, no margins. Built to be cropped by whatever box it lands in.',
+		svg: `<rect x="4" y="0" width="15" height="64"/><rect x="45" y="0" width="15" height="64"/><rect x="4" y="25" width="56" height="14" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'dot',
+		name: 'Nuqta',
+		note: 'A Latin H that took an Arabic dot. The smallest possible bilingual gag.',
+		svg: `<rect x="13" y="8" width="11" height="34"/><rect x="40" y="8" width="11" height="34"/><rect x="24" y="20" width="16" height="11"/><circle cx="32" cy="53" r="6" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'split',
+		name: 'Split',
+		note: 'Two heavy blocks and a four-unit bridge. The counters are the letter.',
+		svg: `<rect x="6" y="6" width="24" height="52"/><rect x="34" y="6" width="24" height="52"/><rect x="28" y="27" width="8" height="10" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'seal',
+		name: 'Seal',
+		note: 'Roundel. The one that already looks like an avatar wherever it gets pasted.',
+		svg: `<circle cx="32" cy="32" r="28" fill="none" stroke="var(--sig)" stroke-width="6"/><rect x="19" y="16" width="9" height="32"/><rect x="36" y="16" width="9" height="32"/><rect x="28" y="27" width="8" height="9"/>`,
+	},
+];
+
+
+/* Second pass: the surname. A, the double S, and the arch — plus four
+   wordmarks, type-set here and outlined once one is picked. */
+const assoli = [
+	{
+		id: 'alef',
+		name: 'Alef',
+		note: 'One upright standing on a rule. The A of Assoli and the ا it opens with are the same stroke.',
+		svg: `<rect x="26" y="6" width="12" height="38"/><rect x="8" y="46" width="48" height="10" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'apex',
+		name: 'Apex',
+		note: 'An A with the crossbar taken out. Two legs, one of them lit.',
+		svg: `<path d="M11 57 32 9l21 48" fill="none" stroke="currentColor" stroke-width="11" stroke-linejoin="miter" stroke-miterlimit="8"/><path d="M38 23l15 34" fill="none" stroke="var(--sig)" stroke-width="11"/>`,
+	},
+	{
+		id: 'link',
+		name: 'Link',
+		note: 'The double S of Assoli read as two loops that will not come apart.',
+		svg: `<circle cx="23" cy="32" r="14" fill="none" stroke="currentColor" stroke-width="9"/><circle cx="41" cy="32" r="14" fill="none" stroke="var(--sig)" stroke-width="9"/>`,
+	},
+	{
+		id: 'sol',
+		name: 'Sol',
+		note: 'Assoli carries a sun in the middle of it. Half a disc and a horizon.',
+		svg: `<path d="M11 42a21 21 0 0 1 42 0z"/><rect x="4" y="47" width="56" height="9" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'ha',
+		name: 'HA',
+		note: 'Both initials on one armature — the H hands its right stem to the A, and they share one bar.',
+		svg: `<rect x="6" y="8" width="11" height="48"/><path d="M26 56 40 8l14 48" fill="none" stroke="currentColor" stroke-width="11" stroke-linejoin="miter" stroke-miterlimit="8"/><rect x="6" y="27" width="42" height="11" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'arch',
+		name: 'Arch',
+		note: 'The A as a doorway, with the keystone in orange. The only mark here with a homeland.',
+		svg: `<path d="M9 58V32a23 23 0 0 1 46 0v26H44V32a12 12 0 0 0-24 0v26z"/><rect x="25" y="4" width="14" height="12" fill="var(--sig)"/>`,
+	},
+	{
+		id: 'wave',
+		name: 'Wave',
+		note: 'An S folded into right angles. A signal, a bracket, a letter — depending on the day.',
+		svg: `<rect x="10" y="9" width="44" height="10"/><rect x="10" y="9" width="10" height="26"/><rect x="10" y="27" width="44" height="10" fill="var(--sig)"/><rect x="44" y="27" width="10" height="28"/><rect x="10" y="45" width="44" height="10"/>`,
+	},
+	{
+		id: 'counter',
+		name: 'Counter',
+		note: 'A solid tile with the A cut clean out of it. Pairs with 08 if you want a set.',
+		svg: `<path fill-rule="evenodd" fill="var(--sig)" d="M4 4h56v56H4z M32 16l17 32H15z"/>`,
+	},
+];
+
+const words = [
+	{
+		id: 'tracked',
+		name: 'Tracked',
+		note: 'Monospace, wide tracking, one orange stop. Sits in a header without asking for room.',
+		html: `<span class="w w--track">ASSOLI<i>.</i></span>`,
+	},
+	{
+		id: 'heavy',
+		name: 'Heavy',
+		note: 'Lowercase and tight, with a dot dropped over the l — where Arabic would have put one anyway.',
+		html: `<span class="w w--heavy">asso<em>l</em>i</span>`,
+	},
+	{
+		id: 'lockup',
+		name: 'Lockup',
+		note: 'Both names stacked on a rule. The version that goes on the CV and the invoice.',
+		html: `<span class="w w--lock"><b>HAITHAM</b><i></i><b>ASSOLI</b></span>`,
+	},
+	{
+		id: 'domain',
+		name: 'Domain',
+		note: 'The address as the logo. Nothing to explain, and it is already typed everywhere.',
+		html: `<span class="w w--domain">assoli<i>.site</i></span>`,
+	},
+];
+
+/* Fourth sheet: the name in Arabic, set in Thmanyah Sans — the face the site
+   already ships, so these need no new download to be real. */
+const arabic = [
+	{
+		id: 'heh',
+		name: 'هـ',
+		note: 'The isolated heh at black weight, standing on the rule. The nav mark, grown up.',
+		html: `<span class="a a--heh">ه</span><span class="a-rule"></span>`,
+	},
+	{
+		id: 'medial',
+		name: 'ـهـ',
+		note: 'The medial heh — the one shaped like a knot. Symmetrical, and unmistakable at any size.',
+		html: `<span class="a a--medial">ـهـ</span>`,
+	},
+	{
+		id: 'tatweel',
+		name: 'هيثــم',
+		note: 'The kashida pulled long over a rule. The stretch does the work a crossbar does in Latin, and it retunes to any width.',
+		html: `<span class="a a--tatweel">هيثــــم</span><span class="a-rule a-rule--wide"></span>`,
+	},
+	{
+		id: 'bilingual',
+		name: 'هيثم / HAITHAM',
+		note: 'Both scripts stacked on one rule, the same width. The seam the whole site is built on.',
+		html: `<span class="a a--stack"><b>هيثم</b><i></i><u>HAITHAM</u></span>`,
+	},
+	{
+		id: 'pair',
+		name: 'ه | H',
+		note: 'Two letters, one sound, one bar between them. The smallest bilingual statement here.',
+		html: `<span class="a a--pair"><b>ه</b><i></i><u>H</u></span>`,
+	},
+	{
+		id: 'full',
+		name: 'هيثم العسولي',
+		note: 'The whole name in light weight, tracked open. Reads as a signature, not a logo.',
+		html: `<span class="a a--full">هيثم العسولي</span>`,
+	},
+	{
+		id: 'seal',
+		name: 'ختم',
+		note: 'Heh inside a ring. Drops into an avatar slot without being cropped into nonsense.',
+		html: `<span class="a a--seal">ه</span>`,
+	},
+	{
+		id: 'article',
+		name: 'العسولي',
+		note: 'The surname with its definite article picked out. Colour instead of a hyphen.',
+		html: `<span class="a a--article"><i>ال</i>عسولي</span>`,
+	},
+];
+
+const wrap = (m: (typeof marks)[number], cls: string) =>
+	`<svg class="${cls}" viewBox="0 0 64 64" fill="currentColor" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${m.name} mark">${m.svg}</svg>`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Logo marks · Haitham Assoli</title>
+		<meta name="robots" content="noindex" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<Font cssVariable="--font-thmanyah" preload={[{ weight: 900 }]} />
+	</head>
+	<body>
+		<header class="head">
+			<p class="kicker">Contact sheet</p>
+			<h1>Twelve marks for one name</h1>
+			<p class="sub">
+				Each one is a single 64&times;64 SVG in two colours &mdash; the ink of
+				whatever sits behind it, plus the signal orange. Every tile shows the
+				mark large, then reversed out on bone, then at nav size and favicon
+				size, because that last row is where marks actually die. Pick a number.
+			</p>
+		</header>
+
+		<ul class="grid">
+			{
+				marks.map((m, i) => (
+					<li class="card">
+						<div class="big">
+							<Fragment set:html={wrap(m, 'mark')} />
+						</div>
+						<div class="tests">
+							<span class="chip">
+								<Fragment set:html={wrap(m, 'mark')} />
+							</span>
+							<span class="sizes">
+								<Fragment set:html={wrap(m, 'mark s32')} />
+								<Fragment set:html={wrap(m, 'mark s20')} />
+								<Fragment set:html={wrap(m, 'mark s14')} />
+							</span>
+						</div>
+						<div class="meta">
+							<span class="num">{String(i + 1).padStart(2, '0')}</span>
+							<span class="text">
+								<span class="name">{m.name}</span>
+								<span class="note">{m.note}</span>
+							</span>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+
+
+		<header class="head head--two">
+			<p class="kicker">Second sheet</p>
+			<h1>Eight for the surname</h1>
+			<p class="sub">
+				Same rules, different letter. These lean on the A, the double S and the
+				sun buried in the middle of <em>Assoli</em>, so they read as a mark
+				rather than an initial &mdash; useful anywhere the H would just look
+				like a hotel sign.
+			</p>
+		</header>
+
+		<ul class="grid">
+			{
+				assoli.map((m, i) => (
+					<li class="card">
+						<div class="big">
+							<Fragment set:html={wrap(m, 'mark')} />
+						</div>
+						<div class="tests">
+							<span class="chip">
+								<Fragment set:html={wrap(m, 'mark')} />
+							</span>
+							<span class="sizes">
+								<Fragment set:html={wrap(m, 'mark s32')} />
+								<Fragment set:html={wrap(m, 'mark s20')} />
+								<Fragment set:html={wrap(m, 'mark s14')} />
+							</span>
+						</div>
+						<div class="meta">
+							<span class="num">{String(i + 13).padStart(2, '0')}</span>
+							<span class="text">
+								<span class="name">{m.name}</span>
+								<span class="note">{m.note}</span>
+							</span>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+
+		<header class="head head--two">
+			<p class="kicker">Wordmarks</p>
+			<h1>Four ways to just write it</h1>
+			<p class="sub">
+				No mark at all &mdash; the name doing its own work. Type-set here so you
+				can judge the shape; whichever one survives gets drawn as outlines so it
+				stops depending on a font being installed.
+			</p>
+		</header>
+
+		<ul class="grid grid--wide">
+			{
+				words.map((m, i) => (
+					<li class="card">
+						<div class="big big--word">
+							<Fragment set:html={m.html} />
+						</div>
+						<div class="tests">
+							<span class="chip chip--word">
+								<Fragment set:html={m.html} />
+							</span>
+							<span class="sizes sizes--word">
+								<span class="w14">
+									<Fragment set:html={m.html} />
+								</span>
+							</span>
+						</div>
+						<div class="meta">
+							<span class="num">{String(i + 21).padStart(2, '0')}</span>
+							<span class="text">
+								<span class="name">{m.name}</span>
+								<span class="note">{m.note}</span>
+							</span>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+
+
+		<header class="head head--two">
+			<p class="kicker">Arabic</p>
+			<h1>Eight in Thmanyah Sans</h1>
+			<p class="sub">
+				The name as it is actually written, set in the face the site already
+				loads &mdash; so any of these is shippable today without a new file.
+				The kashida in 27 is a real tatweel, not a drawn line, which means it
+				stretches or shortens to fit whatever box you put it in.
+			</p>
+		</header>
+
+		<ul class="grid grid--wide">
+			{
+				arabic.map((m, i) => (
+					<li class="card">
+						<div class="big big--word" dir="rtl">
+							<Fragment set:html={m.html} />
+						</div>
+						<div class="tests">
+							<span class="chip chip--ar" dir="rtl">
+								<Fragment set:html={m.html} />
+							</span>
+							<span class="sizes sizes--ar" dir="rtl">
+								<span class="ar24">
+									<Fragment set:html={m.html} />
+								</span>
+								<span class="ar14">
+									<Fragment set:html={m.html} />
+								</span>
+							</span>
+						</div>
+						<div class="meta">
+							<span class="num">{String(i + 25).padStart(2, '0')}</span>
+							<span class="text">
+								<span class="name">{m.name}</span>
+								<span class="note">{m.note}</span>
+							</span>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+
+		<style is:global>
+			:root {
+				--ink: #16183a;
+				--ink-2: #1d2050;
+				--bone: #f0ebe1;
+				--sig: #ff5a1f;
+				--muted: #9a9cbe;
+				color-scheme: dark;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: clamp(2rem, 6vw, 5rem);
+				background: var(--ink);
+				color: var(--bone);
+				font: 16px/1.5 ui-sans-serif, system-ui, sans-serif;
+			}
+			.head {
+				max-width: 60ch;
+				margin-bottom: clamp(2rem, 6vw, 4rem);
+			}
+			.kicker {
+				margin: 0 0 0.75rem;
+				font: 0.75rem/1 ui-monospace, monospace;
+				letter-spacing: 0.18em;
+				text-transform: uppercase;
+				color: var(--sig);
+			}
+			h1 {
+				margin: 0 0 1rem;
+				font-size: clamp(1.8rem, 4vw, 3rem);
+				line-height: 1.05;
+				font-weight: 600;
+			}
+			.sub {
+				margin: 0;
+				color: var(--muted);
+			}
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+				gap: 1.5rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.card {
+				border: 1px solid color-mix(in oklab, var(--bone) 16%, transparent);
+				border-radius: 4px;
+				overflow: hidden;
+				background: var(--ink-2);
+			}
+			.big {
+				display: grid;
+				place-items: center;
+				padding: 2.5rem;
+			}
+			.mark {
+				width: 100%;
+				height: auto;
+				display: block;
+			}
+			.tests {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+				padding: 0.75rem 1rem;
+				border-top: 1px solid
+					color-mix(in oklab, var(--bone) 12%, transparent);
+			}
+			.chip {
+				display: grid;
+				place-items: center;
+				width: 48px;
+				height: 48px;
+				padding: 8px;
+				border-radius: 3px;
+				background: var(--bone);
+				color: var(--ink);
+			}
+			.sizes {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+			}
+			.s32 {
+				width: 32px;
+			}
+			.s20 {
+				width: 20px;
+			}
+			.s14 {
+				width: 14px;
+			}
+			.meta {
+				display: flex;
+				gap: 0.75rem;
+				padding: 1rem;
+				border-top: 1px solid
+					color-mix(in oklab, var(--bone) 12%, transparent);
+			}
+			.num {
+				font: 0.75rem/1.4 ui-monospace, monospace;
+				color: var(--sig);
+			}
+			.name {
+				display: block;
+				font-weight: 600;
+			}
+			.note {
+				display: block;
+				margin-top: 0.25rem;
+				font-size: 0.85rem;
+				color: var(--muted);
+			}
+
+			.head--two {
+				margin-top: clamp(3rem, 8vw, 6rem);
+			}
+			.grid--wide {
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			}
+			.big--word,
+			.chip--word,
+			.sizes--word {
+				font-family: ui-sans-serif, system-ui, sans-serif;
+			}
+			.big--word {
+				padding: 2rem 1.25rem;
+			}
+			.w {
+				display: block;
+				text-align: center;
+				line-height: 1;
+			}
+			.w i {
+				font-style: normal;
+				color: var(--sig);
+			}
+			.w--track {
+				font-family: ui-monospace, monospace;
+				font-size: 1.7em;
+				letter-spacing: 0.42em;
+				text-indent: 0.42em;
+			}
+			.w--heavy {
+				font-size: 3em;
+				font-weight: 800;
+				letter-spacing: -0.04em;
+			}
+			.w--heavy em {
+				font-style: normal;
+				position: relative;
+			}
+			.w--heavy em::after {
+				content: '';
+				position: absolute;
+				top: -0.06em;
+				left: 50%;
+				width: 0.2em;
+				height: 0.2em;
+				border-radius: 50%;
+				background: var(--sig);
+				transform: translateX(-50%);
+			}
+			.w--lock {
+				font-family: ui-monospace, monospace;
+				font-size: 1.35em;
+				letter-spacing: 0.24em;
+				text-indent: 0.24em;
+			}
+			.w--lock b {
+				display: block;
+				font-weight: 600;
+			}
+			.w--lock i {
+				display: block;
+				width: 100%;
+				height: 3px;
+				margin: 0.45em 0;
+				background: var(--sig);
+			}
+			.w--domain {
+				font-family: ui-monospace, monospace;
+				font-size: 2em;
+				letter-spacing: -0.02em;
+			}
+			.chip--word {
+				width: auto;
+				min-width: 120px;
+				height: 44px;
+				padding: 0 10px;
+				font-size: 7px;
+			}
+			.sizes--word {
+				font-size: 5px;
+				color: var(--bone);
+			}
+
+			.a {
+				display: block;
+				font-family: var(--font-thmanyah), ui-sans-serif, system-ui, sans-serif;
+				font-weight: 900;
+				line-height: 1;
+				text-align: center;
+			}
+			.a i {
+				font-style: normal;
+				color: var(--sig);
+			}
+			.a--heh {
+				font-size: 4.6em;
+			}
+			.a-rule--wide {
+				width: 84%;
+			}
+			.a-rule {
+				display: block;
+				width: 62%;
+				height: 0.16em;
+				margin: 0.28em auto 0;
+				background: var(--sig);
+			}
+			.a--medial {
+				font-size: 4.2em;
+			}
+			.a--tatweel {
+				font-size: 3.4em;
+			}
+			.a--stack b,
+			.a--stack u {
+				display: block;
+				text-decoration: none;
+			}
+			.a--stack b {
+				font-size: 2.4em;
+			}
+			.a--stack u {
+				font-size: 1.5em;
+				font-weight: 700;
+				letter-spacing: 0.3em;
+				text-indent: 0.3em;
+			}
+			.a--stack i {
+				display: block;
+				width: 100%;
+				height: 3px;
+				margin: 0.24em 0;
+				background: var(--sig);
+			}
+			.a--pair {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.34em;
+				font-size: 3.6em;
+			}
+			.a--pair u {
+				text-decoration: none;
+			}
+			.a--pair i {
+				width: 0.09em;
+				height: 0.8em;
+				background: var(--sig);
+			}
+			.a--full {
+				font-size: 1.9em;
+				font-weight: 300;
+				letter-spacing: 0.06em;
+			}
+			.a--seal {
+				display: grid;
+				place-items: center;
+				width: 2.3em;
+				height: 2.3em;
+				margin: 0 auto;
+				padding-bottom: 0.12em;
+				font-size: 2.4em;
+				border: 0.11em solid var(--sig);
+				border-radius: 50%;
+			}
+			.a--article {
+				font-size: 2.6em;
+			}
+			.chip--ar {
+				width: auto;
+				min-width: 92px;
+				height: 52px;
+				padding: 0 10px;
+				font-size: 8px;
+			}
+			.sizes--ar {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				color: var(--bone);
+			}
+			.ar24 {
+				display: block;
+				font-size: 7px;
+			}
+			.ar14 {
+				display: block;
+				font-size: 4px;
+			}
+		</style>
+	</body>
+</html>
