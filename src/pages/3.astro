@@ -184,16 +184,11 @@ const widthsFor = (img: ImageMetadata) =>
 			<!-- ── HERO ─────────────────────────────────────────────────────── -->
 			<header class="hero" id="hero">
 				<!-- The mark at cover scale: frost letters, lagoon rule and the same
-				     lens the bar wears on every other /3 page. The wordmark is
-				     presentation; the name beside it is what gets read out, in
-				     whichever language the page is in. -->
+				     lens the bar wears on every other /3 page. The wordmark stands
+				     alone and is presentation; the h1 below carries the reading. -->
 				<div class="mark">
 					<span class="mark__lens" aria-hidden="true"></span>
 					<Logo class="mark__logo" labelled={false} />
-					<p class="mark__name">
-						<span data-l="en" lang="en">Haitham Assoli</span>
-						<span data-l="ar" lang="ar">هيثم العسولي</span>
-					</p>
 				</div>
 
 				<p class="eyebrow">
@@ -1201,17 +1196,6 @@ const widthsFor = (img: ImageMetadata) =>
 		box-shadow: 0 0 20px 2px rgba(31, 182, 200, 0.55);
 	}
 
-	.mark__name {
-		margin: 0;
-		padding-inline-start: clamp(0.7rem, 2vw, 1.15rem);
-		border-inline-start: 1px solid rgba(200, 230, 255, 0.22);
-		font-family: var(--mono);
-		font-size: 0.74rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		color: var(--haze);
-	}
-
 	/* fit-content, sized by the English block in both languages, so the second
 	   reading is always inside the box the lens travels across. */
 	.stage {
@@ -2041,7 +2025,6 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	.eyebrow [lang='ar'],
-	.mark__name [lang='ar'],
 	.ticks [lang='ar'],
 	.card__meta [lang='ar'],
 	.fig__label[lang='ar'],
@@ -2130,11 +2113,6 @@ const widthsFor = (img: ImageMetadata) =>
 	}
 
 	@media (max-width: 460px) {
-		.mark__name {
-			flex-basis: 100%;
-			padding-inline-start: 0;
-			border-inline-start: 0;
-		}
 		.type--ar {
 			font-size: clamp(1.9rem, 8.4vw, 2.6rem);
 		}

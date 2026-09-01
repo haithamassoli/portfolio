@@ -194,14 +194,14 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 
 						<!-- The cover mark: هيثم written once, in sumi on an indigo
 						     rule, exactly as the sub-pages set it — only at a cover's
-						     scale. The mark carries no label of its own: the name is
-						     written out under it in the language being read, so the
-						     heading is announced in full and nothing rests on a glyph. -->
+						     scale. Nothing is written out under it; the name stays in
+						     the heading, clipped, so it is announced in the language
+						     being read and nothing visible rests on a glyph. -->
 						<h1 class="hero__name" id="h1">
 							<Logo class="hero__logo" labelled={false} />
 							<T
 								v={pair('Haitham Assoli', 'هيثم العسولي')}
-								class="hero__nameline"
+								class="sr-only"
 							/>
 							<span class="hero__kana" lang="ja">ハイサム・アッソーリ</span>
 						</h1>
@@ -1136,26 +1136,9 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 				--logo-rule: var(--ai);
 			}
 
-			.hero__nameline {
-				display: block;
-				margin-top: clamp(1rem, 2.5vw, 1.65rem);
-				font-family: var(--body);
-				font-size: clamp(1.45rem, 1.1rem + 1.5vw, 2.15rem);
-				font-weight: 300;
-				line-height: 1.15;
-				letter-spacing: -0.01em;
-			}
-
-			.hero__nameline[lang='ar'] {
-				font-family: var(--ar);
-				font-size: clamp(1.3rem, 1rem + 1.3vw, 1.95rem);
-				font-weight: 400;
-				line-height: 1.55;
-			}
-
 			.hero__kana {
 				display: block;
-				margin-top: 0.85rem;
+				margin-top: clamp(1rem, 2.5vw, 1.65rem);
 				font-family: var(--jp);
 				font-size: clamp(0.85rem, 0.78rem + 0.4vw, 1.05rem);
 				font-weight: 400;
