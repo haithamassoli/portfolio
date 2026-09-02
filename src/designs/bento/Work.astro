@@ -2,7 +2,7 @@
 import type { Design } from '../registry';
 import { url as designUrl } from '../routes';
 import type { Lang } from '../../i18n';
-/* The whole shelf. Thirty-nine projects sorted into six compartments, and
+/* The whole shelf. Forty projects sorted into six compartments, and
    every compartment laid out by hand: the sizes below are a composition, not
    a loop. Featured work takes the big slots and carries a marigold band. */
 import { Image } from 'astro:assets';
@@ -54,9 +54,10 @@ const trays: {
 			['w3', 'h2', 'bone'],
 			['w5', 'h2', 'bone'],
 			['w4', 'h2', 'ink'],
-			['w4', 'h1', 'bone'],
-			['w4', 'h1', 'bone'],
-			['w4', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
 		],
 	},
 	{
@@ -142,8 +143,8 @@ const total = projects.length;
 	lang={lang}
 	page="projects"
 	title={pair(
-		'All 39 projects — Haitham Assoli',
-		'المشاريع الـ39 كاملة — هيثم العسولي',
+		'All 40 projects — Haitham Assoli',
+		'المشاريع الـ40 كاملة — هيثم العسولي',
 	)[lang]}
 	description={pair(
 		'Every project Haitham Assoli has shipped, sorted into six compartments: web, mobile, on-device AI, client work, desktop and browser extensions.',
@@ -154,8 +155,8 @@ const total = projects.length;
 		<article class="tile tile--bone w7 h2 open" style="--i: 0">
 			<p class="mono lbl"><T v={pair('The whole shelf', 'الرفّ كاملًا')} /></p>
 			<h1 class="tile__h tile__h--big" id="all-h">
-				<span data-l="en" lang="en">Thirty-nine, in six compartments</span>
-				<span data-l="ar" lang="ar">تسعة وثلاثون في ستّ خانات</span>
+				<span data-l="en" lang="en">Forty, in six compartments</span>
+				<span data-l="ar" lang="ar">أربعون في ستّ خانات</span>
 			</h1>
 			<T
 				v={pair(
@@ -401,7 +402,7 @@ const total = projects.length;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		object-position: 50% 8%;
+		object-position: 50% 50%;
 		transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
 	}
 

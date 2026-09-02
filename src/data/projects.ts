@@ -6,7 +6,7 @@ export type { Locale, Project as Content } from '../../content';
 export type Frame = 'phone' | 'browser' | 'editor' | 'postcard';
 
 /**
- * The site's data is `content/`: 39 bilingual projects, written up in full.
+ * The site's data is `content/`: 40 bilingual projects, written up in full.
  * This module only adds the two things the design needs and the content layer
  * does not carry: a frame to show the project in, and an accent colour.
  */

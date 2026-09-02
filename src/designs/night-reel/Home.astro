@@ -61,7 +61,7 @@ const specs: [I18n, I18n][] = [
 		pair('Running time', 'مدة العرض'),
 		pair('About four years', 'نحو أربع سنوات'),
 	],
-	[pair('Titles', 'الأعمال'), pair('39 shipped', '39 عملًا صدرت')],
+	[pair('Titles', 'الأعمال'), pair('40 shipped', '40 عملًا صدرت')],
 	[
 		pair('In distribution', 'في التوزيع'),
 		pair('13 on the app stores', '13 على متاجر التطبيقات'),
@@ -103,8 +103,8 @@ const title = pair('Haitham Assoli — Night Reel', 'هيثم العسولي —
 	lang
 ];
 const description = pair(
-	'Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products, including thirteen on the app stores.',
-	'هيثم العسولي، مهندس ويب وجوال متكامل في عمّان. تسعة وثلاثون منتجًا صدر، منها ثلاثة عشر على متاجر التطبيقات.',
+	'Haitham Assoli, web and mobile full-stack engineer in Amman. Forty shipped products, including thirteen on the app stores.',
+	'هيثم العسولي، مهندس ويب وجوال متكامل في عمّان. أربعون منتجًا صدر، منها ثلاثة عشر على متاجر التطبيقات.',
 )[lang];
 ---
 
@@ -212,8 +212,8 @@ const description = pair(
 						<p class="billing__role">
 							{profile.title[lang]} · {
 								pair(
-									'39 titles · 13 on the app stores',
-									'39 عملًا · 13 على متاجر التطبيقات',
+									'40 titles · 13 on the app stores',
+									'40 عملًا · 13 على متاجر التطبيقات',
 								)[lang]
 							}
 						</p>
@@ -250,8 +250,8 @@ const description = pair(
 							ثماني لقطات، تُضاء واحدة تلو الأخرى
 						</h2>
 						<p class="head__lede" data-l="en" lang="en">
-							Eight of the thirty-nine, written up in full. Move the light over
-							a still to bring it up; the rest of the filmography runs after the
+							Eight of the forty, written up in full. Move the light over a
+							still to bring it up; the rest of the filmography runs after the
 							credits.
 						</p>
 						<p class="head__lede" data-l="ar" lang="ar">
@@ -540,12 +540,8 @@ const description = pair(
 							as="p"
 							class="eyebrow"
 						/>
-						<h2 class="head__title" data-l="en" lang="en">
-							Thirty-nine titles
-						</h2>
-						<h2 class="head__title" data-l="ar" lang="ar">
-							تسعة وثلاثون عملًا
-						</h2>
+						<h2 class="head__title" data-l="en" lang="en">Forty titles</h2>
+						<h2 class="head__title" data-l="ar" lang="ar">أربعون عملًا</h2>
 						<p class="head__lede" data-l="en" lang="en">
 							Everything shipped, in order, including the ones that were taken
 							down. Each one opens its own page, and the contact sheet prints
@@ -1395,22 +1391,25 @@ const description = pair(
 	}
 
 	/* Without JS nothing is ever told to light up, so the gate stays open
-	   and the stills stay at full print density. */
-	.js .plate {
+	   and the stills stay at full print density.
+
+	   Scoped to the reel: night-reel routes all four pages through one file, so
+	   an unscoped `.plate` rule here would clip and dim the contact sheet too. */
+	.js [data-page='reel'] .plate {
 		clip-path: inset(48% 0 48% 0);
 	}
 
-	.js .plate.is-lit {
+	.js [data-page='reel'] .plate.is-lit {
 		clip-path: inset(0 0 0 0);
 	}
 
-	.js .plate:not(.is-lit) .plate__img {
+	.js [data-page='reel'] .plate:not(.is-lit) .plate__img {
 		opacity: 0.3;
 		filter: brightness(0.52) saturate(0.78) contrast(1.06);
 		transform: scale(1.02);
 	}
 
-	.js .plate:not(.is-lit) .plate__slate {
+	.js [data-page='reel'] .plate:not(.is-lit) .plate__slate {
 		opacity: 0.3;
 	}
 
@@ -2258,8 +2257,8 @@ const description = pair(
 			transition: none;
 		}
 
-		.js .plate,
-		.js .plate.is-lit {
+		.js [data-page='reel'] .plate,
+		.js [data-page='reel'] .plate.is-lit {
 			clip-path: none;
 		}
 
@@ -2268,8 +2267,8 @@ const description = pair(
 			filter: brightness(0.95) saturate(0.98) contrast(1.02);
 		}
 
-		.js .plate:not(.is-lit) .plate__img,
-		.js .plate:not(.is-lit) .plate__slate {
+		.js [data-page='reel'] .plate:not(.is-lit) .plate__img,
+		.js [data-page='reel'] .plate:not(.is-lit) .plate__slate {
 			opacity: 1;
 			filter: brightness(0.95) saturate(0.98) contrast(1.02);
 			transform: none;

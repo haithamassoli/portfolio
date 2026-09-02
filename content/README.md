@@ -7,7 +7,7 @@ TypeScript, import it from whatever you build.
 content/
   types.ts      shapes (I18n, Project, Challenge, ExperienceItem, …)
   profile.ts    bio, experience, education, certifications, skills, interests
-  projects.ts   39 projects, each with detail-page content
+  projects.ts   40 projects, each with detail-page content
   index.ts      re-exports + getProject / featuredProjects / t()
 public/
   projects/     web screenshots (1440×900 @2x) + repo logos
@@ -40,24 +40,31 @@ Each project carries enough for a full page:
 | `outcomes`                                            | result bullets                                       |
 | `stack`, `links`, `gallery`, `year`, `role`, `status` | metadata                                             |
 
-74 challenge entries across 39 projects.
+75 challenge entries across 40 projects.
 
 ## The `sourced` flag
 
-- `sourced: true` (27) is a write-up grounded in that project's own README, PRD or
+- `sourced: true` (29) is a write-up grounded in that project's own README, PRD or
   store listing. Naqi, Ghadd, sada, mubah, pastehtml, Kashaf, Fazawwijuhu,
   Aoun, the store-listed apps, and the rest of the documented ones.
-- `sourced: false` (12) is reconstructed from the stack and shape of the repo,
+- `sourced: false` (13) is reconstructed from the stack and shape of the repo,
   because the repo only had a `create-next-app` README. The stack and what the
   product does are accurate; the _specific_ engineering problems are plausible
   reconstruction, not recovered fact.
 
-Read the 12 `sourced: false` ones before publishing and correct anything that
+Read the 13 `sourced: false` ones before publishing and correct anything that
 misremembers the work:
 
 `hirfati` · `hadanati` · `ghurza` · `service` · `hijabk` · `al-manal` ·
-`telestream` · `wedding-invitation` · `almadrsa` · `hafiz-platform` ·
-`kheir` · `web-archive-fetcher`
+`telestream` · `feedgram` · `wedding-invitation` · `almadrsa` · `hafiz-platform` ·
+`kheir`
+
+## Framed shots
+
+Phone captures and square logos are stored pre-framed: `scripts/frame-shots.mjs`
+sits each one at its own size on a blurred wash of itself in a 2400×1350 plate,
+so no design has to stretch or crop it. Originals live in `src/assets/_raw/` and
+are the input on every run — edit those, then re-run `node scripts/frame-shots.mjs`.
 
 ## Missing covers
 

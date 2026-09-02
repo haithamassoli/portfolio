@@ -182,7 +182,9 @@ const alt = `${title}: ${p.tagline[lang]}`;
 		/* full-bleed cards would otherwise eat a whole screen */
 		max-block-size: min(66svh, 32rem);
 		object-fit: cover;
-		object-position: top center;
+		/* Phone and logo shots are framed dead centre (scripts/frame-shots.mjs),
+		   so a top-anchored crop would cut their feet off. */
+		object-position: center;
 		transition: scale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 

@@ -46,7 +46,7 @@ export const ui = {
 		'work.read': 'View the case study',
 		'work.all': 'All projects',
 		'work.allLede':
-			'Browse 39 projects by platform and open any project for its scope, stack, constraints, and outcome.',
+			'Browse 40 projects by platform and open any project for its scope, stack, constraints, and outcome.',
 		'cat.web': 'Web',
 		'cat.mobile': 'Mobile',
 		'cat.ai': 'AI',

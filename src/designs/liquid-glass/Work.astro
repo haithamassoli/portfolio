@@ -2,7 +2,7 @@
 import type { Design } from '../registry';
 import { url as designUrl } from '../routes';
 import type { Lang } from '../../i18n';
-/* The archive as a prism. One beam of thirty-nine goes in; six bands come
+/* The archive as a prism. One beam of forty goes in; six bands come
    out, and each band is as wide as its share of the work. The widths are not
    decoration — they are the census. */
 import { Image } from 'astro:assets';
@@ -77,8 +77,8 @@ const widthsFor = (img: ImageMetadata) =>
 	design={design}
 	lang={lang}
 	title={pair(
-		'All 39 projects — Haitham Assoli',
-		'المشاريع الـ39 كاملة — هيثم العسولي',
+		'All 40 projects — Haitham Assoli',
+		'المشاريع الـ40 كاملة — هيثم العسولي',
 	)[lang]}
 	description={pair(
 		'Every project Haitham Assoli has shipped, split by kind: 18 web, 9 mobile, 7 AI, 2 client, 2 desktop and 1 editor extension. Each one has its own write-up.',
@@ -96,8 +96,8 @@ const widthsFor = (img: ImageMetadata) =>
 		</h1>
 		<T
 			v={pair(
-				'Thirty-nine shipped projects, put through the glass and sorted by what they are. Every band below is as wide as its share of the work.',
-				'تسعة وثلاثون مشروعًا صدرت، مرّت في الزجاج ورُتّبت بحسب نوعها. عرض كل شريط أدناه بقدر نصيبه من العمل.',
+				'Forty shipped projects, put through the glass and sorted by what they are. Every band below is as wide as its share of the work.',
+				'أربعون مشروعًا صدرت، مرّت في الزجاج ورُتّبت بحسب نوعها. عرض كل شريط أدناه بقدر نصيبه من العمل.',
 			)}
 			as="p"
 			class="lede prism__lede"
@@ -415,7 +415,7 @@ const widthsFor = (img: ImageMetadata) =>
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		object-position: top center;
+		object-position: center;
 		filter: saturate(0.92) brightness(0.86);
 	}
 

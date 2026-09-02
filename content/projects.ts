@@ -132,6 +132,402 @@ export const projects: Project[] = [
 		sourced: true,
 	},
 	{
+		slug: 'kashaf-alkulify',
+		title: { en: "Kashaf Abi Ja'far", ar: 'كشّاف أبي جعفر' },
+		tagline: {
+			en: 'Search thousands of hours of lessons and land on the exact second.',
+			ar: 'ابحث في آلاف الساعات من الدروس، وصِل إلى الثانية بعينها.',
+		},
+		summary: {
+			en: "A fully Arabic, right-to-left search engine over a scholar's video lessons and written articles. You type a phrase and get back the passages where it was actually said; one click opens the video at that exact second. No login, no database.",
+			ar: 'محرك بحث عربي بالكامل ومن اليمين إلى اليسار في دروس الشيخ المرئية ومقالاته المكتوبة. تكتب عبارة فتصلك المقاطع التي قيلت فيها فعلًا؛ ونقرة واحدة تفتح الفيديو عند الثانية نفسها. بلا تسجيل دخول وبلا قاعدة بيانات.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: true,
+		year: '2026',
+		role: {
+			en: 'Solo: pipeline, search and interface',
+			ar: 'منفردًا: خط المعالجة والبحث والواجهة',
+		},
+		stack: [
+			'Astro',
+			'TypeScript',
+			'Meilisearch',
+			'Whisper ASR',
+			'Tailwind CSS',
+		],
+		cover: '/projects/kashaf-alkulify.png',
+		gallery: ['/projects/kashaf-alkulify.png'],
+		links: {
+			live: 'https://alkulify.assoli.site',
+			github: 'https://github.com/haithamassoli/kashaf-alkulify',
+		},
+		overview: {
+			en: [
+				'A scholar with years of recorded lessons has, in practice, an unsearchable archive. The knowledge is there, but finding the ten minutes where a specific question was answered means remembering which lesson it was in and scrubbing through it.',
+				'This site fixes that. Lessons from the YouTube channel are transcribed automatically, articles are collected from the blog, and everything is indexed in Meilisearch. A search returns transcript segments of roughly thirty seconds each; clicking one opens the player at that timestamp. Beside the player runs an interactive transcript that follows along, can be searched within the lesson, and lets you copy a link to any single line.',
+				'There is no backend for search and no database. The index is static and served directly, which is why it stays fast and costs nothing to run.',
+			],
+			ar: [
+				'الشيخ الذي لديه سنوات من الدروس المسجلة يملك عمليًا أرشيفًا غير قابل للبحث. المعرفة موجودة، لكن إيجاد العشر دقائق التي أُجيب فيها عن سؤال بعينه يتطلب تذكّر الدرس ثم التنقّل داخله.',
+				'يعالج الموقع ذلك. تُفرَّغ دروس قناة اليوتيوب آليًا، وتُجمَع المقالات من المدوّنة، ويُفهرس الكل في Meilisearch. يعيد البحث مقاطع تفريغ مدة كل منها نحو ثلاثين ثانية؛ والنقر على أحدها يفتح المشغّل عند تلك اللحظة. وبجانب المشغّل تفريغ تفاعلي يتابع تلقائيًا، ويمكن البحث داخله، ونسخ رابط لأي سطر.',
+				'لا خادم للبحث ولا قاعدة بيانات. الفهرس ثابت ويُقدَّم مباشرة، ولهذا يبقى سريعًا وبلا كلفة تشغيل.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Where does a search result begin?',
+					ar: 'أين تبدأ نتيجة البحث؟',
+				},
+				problem: {
+					en: 'Raw transcripts come out as a stream of short caption lines. Indexing each line makes every result a fragment with no context; indexing whole lessons makes every result a two-hour video with no useful timestamp.',
+					ar: 'تخرج التفريغات الخام كتدفق أسطر قصيرة. فهرسة كل سطر تجعل كل نتيجة شذرة بلا سياق؛ وفهرسة الدرس كاملًا تجعل كل نتيجة فيديو من ساعتين بلا لحظة مفيدة.',
+				},
+				solution: {
+					en: 'I chunk the transcript into roughly thirty-second passages that keep their start time. That is long enough to read as a thought and short enough that the timestamp is precise. The result is a readable quote that is also a jump target.',
+					ar: 'قسّمت التفريغ إلى مقاطع بنحو ثلاثين ثانية تحتفظ بوقت بدايتها. طويلة بما يكفي لتُقرأ كفكرة، وقصيرة بما يجعل اللحظة دقيقة، فتكون النتيجة اقتباسًا مقروءًا ونقطة انتقال في آن.',
+				},
+			},
+			{
+				title: {
+					en: 'Arabic does not match itself',
+					ar: 'العربية لا تطابق نفسها',
+				},
+				problem: {
+					en: 'The same word appears with and without diacritics, with أ / إ / ا used interchangeably, with ة and ه confused, and with tatweel stretching letters. A visitor searching the phrase they remember hearing rarely types it the way the transcriber wrote it.',
+					ar: 'تظهر الكلمة نفسها بالتشكيل وبدونه، وبتبادل أ/إ/ا، وبالخلط بين ة وه، وبالتطويل الذي يمدّ الحروف. والزائر الذي يبحث عن عبارة يتذكّر سماعها نادرًا ما يكتبها كما كتبها المُفرِّغ.',
+				},
+				solution: {
+					en: 'Normalisation runs identically over the index and the query, so both sides are reduced to the same canonical form before matching. Anything else produces a search that works for the person who built it and nobody else.',
+					ar: 'يُطبَّق التطبيع نفسه على الفهرس والاستعلام معًا، فيُختزل الطرفان إلى الصورة المعيارية ذاتها قبل المطابقة. وأي بديل ينتج بحثًا يعمل لمن بناه وحده.',
+				},
+			},
+			{
+				title: {
+					en: 'Automatic transcription is imperfect',
+					ar: 'التفريغ الآلي غير كامل',
+				},
+				problem: {
+					en: 'ASR misreads names, technical terms and classical vocabulary, exactly the words people search for. Presenting a wrong transcript as authoritative text would misrepresent the scholar, which matters far more here than a bad search result.',
+					ar: 'يخطئ التعرّف الآلي على الكلام في الأسماء والمصطلحات والألفاظ التراثية، وهي بالضبط ما يبحث عنه الناس. وتقديم تفريغ خاطئ كنصّ موثوق يُحرّف كلام الشيخ، وهو أخطر هنا بكثير من نتيجة بحث سيئة.',
+				},
+				solution: {
+					en: 'The transcript is framed as an index into the audio, not as a quotable source. Every result leads back to the recording at that moment, so the video stays the authority and the text is only the way you find it.',
+					ar: 'يُقدَّم التفريغ بوصفه فهرسًا إلى الصوت لا مصدرًا للاقتباس. وكل نتيجة تعيدك إلى التسجيل عند تلك اللحظة، فيبقى الفيديو هو المرجع والنص مجرد وسيلة للوصول إليه.',
+				},
+			},
+			{
+				title: {
+					en: 'Search with no server to search on',
+					ar: 'بحث بلا خادم يبحث عليه',
+				},
+				problem: {
+					en: 'A always-on search backend for a free, non-commercial site is a recurring cost and a thing that can go down at 3am with nobody on call.',
+					ar: 'خادم بحث دائم التشغيل لموقع مجاني غير تجاري يعني كلفة متكررة وشيئًا قد يتعطّل في الثالثة فجرًا دون أحد للمناوبة.',
+				},
+				solution: {
+					en: 'The site is built with Astro and ships a static index that the browser queries directly. Nothing needs to be running for search to work, which is the right operational profile for a project meant to outlive my attention to it.',
+					ar: 'بُني الموقع بـ Astro ويُصدِّر فهرسًا ثابتًا يستعلمه المتصفح مباشرة. لا شيء يحتاج أن يكون قيد التشغيل ليعمل البحث، وهو الملمح التشغيلي الصحيح لمشروع يُراد له أن يعيش بعد انصراف انتباهي عنه.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Two searchable corpora, lessons and articles, with per-tab result counts and playlist filtering.',
+				'Every result is a deep link into the video at the second it was said.',
+				'Static, serverless search: no database, no login, no running cost.',
+			],
+			ar: [
+				'مدوّنتان قابلتان للبحث، الدروس والمقالات، مع عدّاد نتائج لكل تبويب وتصفية بقوائم التشغيل.',
+				'كل نتيجة رابط عميق إلى الفيديو عند الثانية التي قيلت فيها.',
+				'بحث ثابت بلا خادم: بلا قاعدة بيانات وبلا تسجيل دخول وبلا كلفة تشغيل.',
+			],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'pastehtml',
+		title: { en: 'pastehtml', ar: 'pastehtml' },
+		tagline: {
+			en: 'Drop an HTML file, get a public URL on its own origin.',
+			ar: 'أفلِت ملف HTML، واحصل على رابط عام على نطاق مستقل.',
+		},
+		summary: {
+			en: 'Publish a page in one step: drop a file, paste markup, curl it, or hand it to an agent over MCP. Markdown is rendered to a self-contained page on upload. No account, no build step.',
+			ar: 'انشر صفحة بخطوة واحدة: أفلِت ملفًا، أو الصق شيفرة، أو أرسلها بـ curl، أو مرّرها لوكيل عبر MCP. ويُحوَّل الـ Markdown إلى صفحة مكتفية بذاتها عند الرفع. بلا حساب وبلا خطوة بناء.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: true,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'Convex', 'MCP', 'Tailwind CSS'],
+		cover: '/projects/pastehtml.png',
+		gallery: ['/projects/pastehtml.png'],
+		links: {
+			live: 'https://pastehtml.assoli.site',
+			github: 'https://github.com/haithamassoli/pastehtml',
+		},
+		overview: {
+			en: [
+				'I kept generating single-file HTML pages like reports, mockups and one-off tools, and having nowhere nowhere to put them. Every option was heavier than the artefact: a repo and a deploy for a page that exists to be looked at once.',
+				'pastehtml is the missing step. The drop zone, a paste, a curl and an MCP call from an agent all end at the same function and come back with a URL. Markdown is converted to real HTML at upload time, so the stored paste is a page and every view of it behaves identically: the live origin, the raw view, the sandboxed preview, the ETag.',
+			],
+			ar: [
+				'كنت أُولّد باستمرار صفحات HTML بملف واحد، من تقارير ونماذج وأدوات لمرة واحدة، ولا أجد أين أضعها. كل الخيارات أثقل من الشيء نفسه: مستودع ونشر لصفحة وُجدت لتُرى مرة.',
+				'pastehtml هو الخطوة الناقصة. منطقة الإفلات واللصق وcurl ونداء MCP من وكيل، كلها تنتهي عند الدالة نفسها وتعود برابط. ويُحوَّل الـ Markdown إلى HTML حقيقي عند الرفع، فتكون النسخة المخزّنة صفحةً وتتصرّف كل الواجهات تحتها بالطريقة ذاتها: النطاق المباشر، والعرض الخام، والمعاينة المعزولة، وETag.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Hosting arbitrary HTML is hosting arbitrary JavaScript',
+					ar: 'استضافة HTML عشوائي هي استضافة JavaScript عشوائي',
+				},
+				problem: {
+					en: 'A paste is a full page with scripts in it. Serve all pastes from one domain and any one of them can read the cookies, storage and DOM of every other. The service becomes a hosted cross-site scripting platform.',
+					ar: 'كل نسخة صفحة كاملة تحوي شيفرات. ولو قُدّمت كل النسخ من نطاق واحد لأمكن لأيٍّ منها قراءة الكعكات والتخزين وDOM لكل النسخ الأخرى، فتتحول الخدمة إلى منصة استضافة لهجمات XSS.',
+				},
+				solution: {
+					en: "Each paste is served from its own origin, so the browser's own same-origin policy does the isolation rather than a sanitiser I would have to keep ahead of. Sanitising untrusted HTML is a losing race; giving it nothing worth stealing is not.",
+					ar: 'تُقدَّم كل نسخة من نطاق خاص بها، فتتولى سياسة أصل المتصفح نفسها العزل بدل مُنقٍّ عليّ أن أظل متقدمًا عليه. تنقية HTML غير موثوق سباق خاسر؛ أما ألا تترك له ما يستحق السرقة فليس كذلك.',
+				},
+			},
+			{
+				title: {
+					en: 'Link previews need per-page tags',
+					ar: 'معاينات الروابط تحتاج وسومًا لكل صفحة',
+				},
+				problem: {
+					en: 'A shared link should preview as the page it points to. But the page belongs to the user, who did not write Open Graph tags, and injecting them into their markup would mean rewriting their document.',
+					ar: 'ينبغي أن يُعاين الرابط المشارَك بوصفه الصفحة التي يشير إليها. لكن الصفحة تخصّ المستخدم الذي لم يكتب وسوم Open Graph، وحقنها في شيفرته يعني إعادة كتابة مستنده.',
+				},
+				solution: {
+					en: "Crawlers are detected at the edge and rewritten to a separate function that renders OG tags for that paste, while human visitors get the untouched document. The user's HTML is never modified. The crawler gets a different response.",
+					ar: 'تُكتشف زواحف الفهرسة عند الحافة وتُحوَّل إلى دالة منفصلة تُنتج وسوم OG لتلك النسخة، بينما يحصل الزائر البشري على المستند كما هو. لا تُعدَّل شيفرة المستخدم أبدًا. الزاحف وحده يتلقى استجابة مختلفة.',
+				},
+			},
+			{
+				title: {
+					en: 'One publish path, four entry points',
+					ar: 'مسار نشر واحد وأربع نقاط دخول',
+				},
+				problem: {
+					en: 'A drop zone, a paste box, a REST call and an MCP tool are four different clients. Implementing publishing four times guarantees they drift apart, and the agent path, the one I most wanted, would be the least tested.',
+					ar: 'منطقة الإفلات وصندوق اللصق ونداء REST وأداة MCP أربعة عملاء مختلفين. وتنفيذ النشر أربع مرات يضمن تباعدها، ويكون مسار الوكيل، وهو أكثر ما أردته، أقلّها اختبارًا.',
+				},
+				solution: {
+					en: 'All four are thin shells over a single Convex function. Whatever works from the browser works identically from curl and from an agent, because it is the same code path.',
+					ar: 'الأربعة أغلفة رقيقة فوق دالة Convex واحدة. وما يعمل من المتصفح يعمل بالطريقة ذاتها من curl ومن وكيل، لأنه مسار الشيفرة نفسه.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Publish from a browser, a terminal, or an AI agent over MCP.',
+				'Per-paste origins, so pages cannot reach each other.',
+				'Markdown becomes a styled, self-contained page at upload.',
+			],
+			ar: [
+				'النشر من المتصفح أو الطرفية أو وكيل ذكاء اصطناعي عبر MCP.',
+				'نطاق مستقل لكل نسخة، فلا تصل الصفحات إلى بعضها.',
+				'يتحوّل الـ Markdown إلى صفحة منسّقة مكتفية بذاتها عند الرفع.',
+			],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'gift',
+		title: { en: 'Gift', ar: 'هديّة' },
+		tagline: {
+			en: 'Animated 3D gifts you send as a link.',
+			ar: 'هدايا ثلاثية الأبعاد متحركة تُرسَل كرابط.',
+		},
+		summary: {
+			en: 'Pick a gift, record a voice note, send a link. The recipient opens a 3D scene that unwraps in the browser. Free, no accounts, and the sender gets an email when it is opened.',
+			ar: 'اختر هدية، وسجّل رسالة صوتية، وأرسل رابطًا. يفتح المستلم مشهدًا ثلاثي الأبعاد يُفكّ غلافه في المتصفح. مجاني وبلا حسابات، ويصل المرسِل بريد حين تُفتح.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: [
+			'Next.js 16',
+			'React Three Fiber',
+			'drei',
+			'Convex',
+			'Tailwind CSS',
+			'Turbopack',
+			'React Compiler',
+		],
+		cover: '/projects/gift.png',
+		gallery: ['/projects/gift.png'],
+		links: {
+			live: 'https://gift.assoli.site',
+			github: 'https://github.com/haithamassoli/gift',
+		},
+		overview: {
+			en: [
+				'A greeting sent as a link is usually a static page with a name interpolated into it. This one is a real 3D scene: the gift sits there wrapped, and opening it is an animation rather than a page load.',
+				'Senders can attach a voice note, and get an email when the gift is actually opened, which turns out to be the part people care about most.',
+			],
+			ar: [
+				'التهنئة المُرسَلة كرابط عادةً صفحة ثابتة أُدرج فيها اسم. أما هنا فمشهد ثلاثي الأبعاد حقيقي: الهدية موضوعة مغلَّفة، وفتحها حركة لا تحميل صفحة.',
+				'يستطيع المرسِل إرفاق رسالة صوتية، ويصله بريد حين تُفتح الهدية فعلًا، وتبيّن أن هذا أكثر ما يهتم به الناس.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'A shared link that previews as a grey box does not get opened',
+					ar: 'رابط يُعاين كمربع رمادي لا يُفتح',
+				},
+				problem: {
+					en: 'The entire distribution model is someone pasting the link into a chat. A client-rendered 3D app gives crawlers an empty shell, so the preview is blank and the link looks like spam.',
+					ar: 'نموذج التوزيع كله أن يلصق أحدهم الرابط في محادثة. والتطبيق ثلاثي الأبعاد المعروض من طرف العميل يعطي الزواحف هيكلًا فارغًا، فتأتي المعاينة خالية ويبدو الرابط كرسالة مزعجة.',
+				},
+				solution: {
+					en: 'Crawlers hitting a gift URL are rewritten to a server function that returns per-gift Open Graph tags, while real visitors get the full 3D app. The preview is correct without server-rendering a WebGL scene.',
+					ar: 'تُحوَّل الزواحف التي تصل رابط هدية إلى دالة على الخادم تعيد وسوم Open Graph خاصة بتلك الهدية، بينما يحصل الزائر الحقيقي على التطبيق ثلاثي الأبعاد كاملًا. فتصحّ المعاينة دون عرض مشهد WebGL على الخادم.',
+				},
+			},
+			{
+				title: {
+					en: '3D scenes and server rendering do not mix',
+					ar: 'المشاهد ثلاثية الأبعاد والعرض من الخادم لا يمتزجان',
+				},
+				problem: {
+					en: 'React Three Fiber needs a canvas and a browser; server rendering it produces hydration mismatches and a flash of broken layout before the scene appears.',
+					ar: 'يحتاج React Three Fiber لوحةً ومتصفحًا؛ وعرضه من الخادم ينتج عدم تطابق في الترطيب ووميض تخطيط مكسور قبل ظهور المشهد.',
+				},
+				solution: {
+					en: 'The app tree renders client-only behind a mounted gate, so it behaves like a single-page app while the routes around it stay server-rendered. Fighting the framework here would have cost more than accepting the boundary.',
+					ar: 'تُعرَض شجرة التطبيق من طرف العميل فقط خلف بوابة تركيب، فتتصرّف كتطبيق أحادي الصفحة بينما تبقى المسارات حولها معروضة من الخادم. ومصارعة الإطار هنا كانت ستكلّف أكثر من قبول الحد.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Per-gift link previews without server-rendering WebGL.',
+				'Voice notes and open-notification emails, with no account required.',
+			],
+			ar: [
+				'معاينات روابط خاصة بكل هدية دون عرض WebGL على الخادم.',
+				'رسائل صوتية وإشعارات بريدية عند الفتح، بلا حاجة إلى حساب.',
+			],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'telestream',
+		title: { en: 'TeleStream', ar: 'تيليستريم' },
+		tagline: {
+			en: 'Read every Telegram channel you follow as one timeline.',
+			ar: 'اقرأ كل قنوات تيليجرام التي تتابعها كخط زمني واحد.',
+		},
+		summary: {
+			en: 'A browser reader that signs in with your own Telegram account and folds the channels you already follow into a single chronological timeline, separate from your conversations.',
+			ar: 'قارئ في المتصفح يسجّل الدخول بحسابك على تيليجرام ويطوي القنوات التي تتابعها أصلًا في خط زمني واحد مرتّب زمنيًا، منفصل عن محادثاتك.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'Telegram API', 'Tailwind CSS'],
+		cover: '/projects/telegram-feed.png',
+		gallery: ['/projects/telegram-feed.png'],
+		links: { live: 'https://tele-timeline.vercel.app' },
+		overview: {
+			en: [
+				'Following a dozen Telegram channels means a dozen separate chats, each buffering unread counts, mixed in with actual conversations with people. There is no way to just read them.',
+				'TeleStream signs in as you and reads the channels your account already has, then prints them as one chronological timeline. It is a reader, not a client: nothing to reply to, nothing to mark read.',
+			],
+			ar: [
+				'متابعة اثنتي عشرة قناة على تيليجرام تعني اثنتي عشرة محادثة منفصلة، كلٌّ تُراكم عدّادات غير مقروء، مختلطة بمحادثات حقيقية مع أشخاص. ولا سبيل لمجرّد قراءتها.',
+				'يسجّل «تيليستريم» الدخول باسمك ويقرأ القنوات التي يملكها حسابك أصلًا، ثم يطبعها خطًا زمنيًا واحدًا. قارئ لا عميل: لا شيء تردّ عليه، ولا شيء تعلّمه مقروءًا.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'A session key that never leaves the browser',
+					ar: 'مفتاح جلسة لا يغادر المتصفح',
+				},
+				problem: {
+					en: 'Reading the channels an account follows needs a real Telegram session, and a session string is as good as the account itself. Parking one on a server makes the reader a target worth attacking.',
+					ar: 'قراءة القنوات التي يتابعها حساب تتطلب جلسة تيليجرام حقيقية، ونصّ الجلسة يعادل الحساب نفسه. وحفظه على خادم يجعل القارئ هدفًا يستحق الهجوم.',
+				},
+				solution: {
+					en: 'The session is created and kept in the browser, and the sign-in screen says so plainly rather than quietly. There is no account store to breach, and the warning is part of the interface, not buried in a policy page.',
+					ar: 'تُنشأ الجلسة وتبقى في المتصفح، وشاشة الدخول تقول ذلك صراحةً لا همسًا. لا مخزن حسابات يُخترق، والتحذير جزء من الواجهة لا مدفون في صفحة سياسة.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'One chronological reader for the channels an account already follows.',
+			],
+			ar: ['قارئ زمني واحد للقنوات التي يتابعها الحساب أصلًا.'],
+		},
+		sourced: false,
+	},
+	{
+		slug: 'feedgram',
+		title: { en: 'FeedGram', ar: 'فيدجرام' },
+		tagline: {
+			en: 'Follow public Telegram channels without an account.',
+			ar: 'تابع قنوات تيليجرام العامة بلا حساب.',
+		},
+		summary: {
+			en: 'The second pass at the same idea as TeleStream, with the account taken out: add public channels by handle and read them as one feed, with the follow list held in the browser.',
+			ar: 'المحاولة الثانية للفكرة نفسها التي بدأت بتيليستريم، بعد نزع الحساب منها: أضف القنوات العامة بمعرّفها واقرأها خطًا واحدًا، وقائمة المتابعة محفوظة في المتصفح.',
+		},
+		category: 'web',
+		status: 'archived',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'Tailwind CSS'],
+		cover: '/projects/feed-gram.png',
+		gallery: ['/projects/feed-gram.png'],
+		links: { github: 'https://github.com/haithamassoli/telegram-feed' },
+		overview: {
+			en: [
+				'TeleStream worked, but it asked for a phone number and a Telegram session before it showed anything, which is a lot to ask of a reader.',
+				'FeedGram drops that entirely. You type a channel handle, it appears in the sidebar, and the posts show up. The follow list is yours and lives in your browser; nothing is stored server-side because there is no account to store it against.',
+			],
+			ar: [
+				'نجح «تيليستريم»، لكنه كان يطلب رقم هاتف وجلسة تيليجرام قبل أن يعرض شيئًا، وهذا طلب كبير مقابل قارئ.',
+				'يسقط «فيدجرام» ذلك كلّه. تكتب معرّف القناة فتظهر في الشريط الجانبي وتصل منشوراتها. قائمة المتابعة لك وتعيش في متصفحك؛ ولا شيء يُحفظ على الخادم لأنه لا حساب يُحفظ بإزائه.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Reading public channels without an account',
+					ar: 'قراءة القنوات العامة بلا حساب',
+				},
+				problem: {
+					en: 'The obvious route is the bot API, which requires the bot to be a member of every channel, impossible for channels you do not control, and the whole point was to read without joining.',
+					ar: 'الطريق البديهي واجهة البوتات، وهي تتطلب أن يكون البوت عضوًا في كل قناة، وهذا مستحيل لقنوات لا تملكها، والغاية كلها كانت القراءة دون انضمام.',
+				},
+				solution: {
+					en: 'The reader works from the public web preview each channel already exposes, so it only ever sees what is public anyway and needs no credentials at all.',
+					ar: 'يعمل القارئ من المعاينة العامة التي تكشفها كل قناة أصلًا، فلا يرى إلا ما هو عام على أي حال ولا يحتاج أي بيانات اعتماد.',
+				},
+			},
+		],
+		outcomes: {
+			en: ['A credential-free reader for public Telegram channels.'],
+			ar: ['قارئ بلا بيانات اعتماد لقنوات تيليجرام العامة.'],
+		},
+		sourced: false,
+	},
+	{
 		slug: 'malabji',
 		title: { en: 'Malabji', ar: 'ملعبجي' },
 		tagline: {
@@ -399,208 +795,586 @@ export const projects: Project[] = [
 		sourced: true,
 	},
 	{
-		slug: 'kashaf-alkulify',
-		title: { en: "Kashaf Abi Ja'far", ar: 'كشّاف أبي جعفر' },
+		slug: 'eecommittee',
+		title: { en: 'EECommittee', ar: 'لجنة الهندسة الكهربائية' },
 		tagline: {
-			en: 'Search thousands of hours of lessons and land on the exact second.',
-			ar: 'ابحث في آلاف الساعات من الدروس، وصِل إلى الثانية بعينها.',
+			en: 'Every resource an electrical engineering student needs, in one place.',
+			ar: 'كل ما يحتاجه طالب الهندسة الكهربائية، في مكان واحد.',
 		},
 		summary: {
-			en: "A fully Arabic, right-to-left search engine over a scholar's video lessons and written articles. You type a phrase and get back the passages where it was actually said; one click opens the video at that exact second. No login, no database.",
-			ar: 'محرك بحث عربي بالكامل ومن اليمين إلى اليسار في دروس الشيخ المرئية ومقالاته المكتوبة. تكتب عبارة فتصلك المقاطع التي قيلت فيها فعلًا؛ ونقرة واحدة تفتح الفيديو عند الثانية نفسها. بلا تسجيل دخول وبلا قاعدة بيانات.',
+			en: 'Pick any subject from the study plan tree and get everything attached to it: material, recordings, staff contacts. Includes a GPA calculator, bilingual Arabic/English search, and a night mode. Volunteer work that has outlived several intakes of students.',
+			ar: 'اختر أي مادة من شجرة الخطة الدراسية واحصل على كل ما يتعلق بها: مواد وتسجيلات وبيانات الهيئة التدريسية. ويتضمن حاسبة معدّل، وبحثًا ثنائي اللغة بالعربية والإنجليزية، ووضعًا ليليًا. عمل تطوعي عاش أكثر من دفعة طلابية.',
 		},
-		category: 'web',
-		status: 'live',
+		category: 'mobile',
+		status: 'shipped',
 		featured: true,
-		year: '2026',
+		year: 'Since 2022',
 		role: {
-			en: 'Solo: pipeline, search and interface',
-			ar: 'منفردًا: خط المعالجة والبحث والواجهة',
+			en: 'Volunteer: mobile and backend',
+			ar: 'متطوّع: الموبايل والخادم',
 		},
 		stack: [
-			'Astro',
+			'React Native',
+			'Expo',
 			'TypeScript',
-			'Meilisearch',
-			'Whisper ASR',
-			'Tailwind CSS',
+			'Firebase',
+			'Zustand',
+			'React Query',
+			'Reanimated',
+			'Zod',
+			'Caching',
 		],
-		cover: '/projects/kashaf-alkulify.png',
-		gallery: ['/projects/kashaf-alkulify.png'],
+		cover: '/apps/eecommittee-2.png',
+		gallery: [
+			'/apps/eecommittee-1.png',
+			'/apps/eecommittee-2.png',
+			'/apps/eecommittee-3.png',
+			'/apps/eecommittee-4.png',
+			'/apps/eecommittee-5.png',
+			'/apps/eecommittee-6.png',
+		],
 		links: {
-			live: 'https://alkulify.assoli.site',
-			github: 'https://github.com/haithamassoli/kashaf-alkulify',
+			playGoogle:
+				'https://play.google.com/store/apps/details?id=com.haithamassoli.EECommitte',
+			github: 'https://github.com/haithamassoli/EECommitte-App',
 		},
 		overview: {
 			en: [
-				'A scholar with years of recorded lessons has, in practice, an unsearchable archive. The knowledge is there, but finding the ten minutes where a specific question was answered means remembering which lesson it was in and scrubbing through it.',
-				'This site fixes that. Lessons from the YouTube channel are transcribed automatically, articles are collected from the blog, and everything is indexed in Meilisearch. A search returns transcript segments of roughly thirty seconds each; clicking one opens the player at that timestamp. Beside the player runs an interactive transcript that follows along, can be searched within the lesson, and lets you copy a link to any single line.',
-				'There is no backend for search and no database. The index is static and served directly, which is why it stays fast and costs nothing to run.',
+				'The committee had been answering the same questions in the same Facebook group for years: which prerequisites does this subject have, who teaches it, where are the notes, what will my GPA be if this goes badly.',
+				'The app turns that into structure. The study plan is a navigable tree, so a subject is a destination with everything hanging off it. Staff details are searchable. The GPA box projects both semester and cumulative results before the semester ends.',
+				'It is the longest-running thing I maintain, and the constraint that shapes it is that I am not paid for it. Anything that needs constant attention does not survive.',
 			],
 			ar: [
-				'الشيخ الذي لديه سنوات من الدروس المسجلة يملك عمليًا أرشيفًا غير قابل للبحث. المعرفة موجودة، لكن إيجاد العشر دقائق التي أُجيب فيها عن سؤال بعينه يتطلب تذكّر الدرس ثم التنقّل داخله.',
-				'يعالج الموقع ذلك. تُفرَّغ دروس قناة اليوتيوب آليًا، وتُجمَع المقالات من المدوّنة، ويُفهرس الكل في Meilisearch. يعيد البحث مقاطع تفريغ مدة كل منها نحو ثلاثين ثانية؛ والنقر على أحدها يفتح المشغّل عند تلك اللحظة. وبجانب المشغّل تفريغ تفاعلي يتابع تلقائيًا، ويمكن البحث داخله، ونسخ رابط لأي سطر.',
-				'لا خادم للبحث ولا قاعدة بيانات. الفهرس ثابت ويُقدَّم مباشرة، ولهذا يبقى سريعًا وبلا كلفة تشغيل.',
+				'ظلّت اللجنة تجيب عن الأسئلة نفسها في مجموعة فيسبوك نفسها سنوات: ما متطلبات هذه المادة، ومن يدرّسها، وأين الملخصات، وكم سيصير معدّلي إن ساءت الأمور.',
+				'يحوّل التطبيق ذلك إلى بنية. الخطة الدراسية شجرة قابلة للتنقّل، فتصير المادة وجهةً يتدلّى منها كل شيء. وبيانات الهيئة التدريسية قابلة للبحث. وتتوقّع حاسبة المعدّل نتيجة الفصل والتراكمي قبل انتهاء الفصل.',
+				'هو أطول ما أتولى صيانته عمرًا، والقيد الذي يشكّله أنني لا أتقاضى عليه أجرًا، فأي شيء يحتاج انتباهًا دائمًا لا ينجو.',
 			],
 		},
 		challenges: [
 			{
 				title: {
-					en: 'Where does a search result begin?',
-					ar: 'أين تبدأ نتيجة البحث؟',
+					en: 'Searching in two languages at once',
+					ar: 'البحث بلغتين في آن',
 				},
 				problem: {
-					en: 'Raw transcripts come out as a stream of short caption lines. Indexing each line makes every result a fragment with no context; indexing whole lessons makes every result a two-hour video with no useful timestamp.',
-					ar: 'تخرج التفريغات الخام كتدفق أسطر قصيرة. فهرسة كل سطر تجعل كل نتيجة شذرة بلا سياق؛ وفهرسة الدرس كاملًا تجعل كل نتيجة فيديو من ساعتين بلا لحظة مفيدة.',
+					en: "Students refer to the same subject as 'Signals', 'إشارات', or a course code, often switching mid-sentence. Indexing one language means half the searches fail silently.",
+					ar: 'يشير الطلاب إلى المادة نفسها بـ Signals أو «إشارات» أو برمز المساق، وكثيرًا ما يبدّلون في منتصف الجملة. وفهرسة لغة واحدة تعني فشل نصف عمليات البحث بصمت.',
 				},
 				solution: {
-					en: 'I chunk the transcript into roughly thirty-second passages that keep their start time. That is long enough to read as a thought and short enough that the timestamp is precise. The result is a readable quote that is also a jump target.',
-					ar: 'قسّمت التفريغ إلى مقاطع بنحو ثلاثين ثانية تحتفظ بوقت بدايتها. طويلة بما يكفي لتُقرأ كفكرة، وقصيرة بما يجعل اللحظة دقيقة، فتكون النتيجة اقتباسًا مقروءًا ونقطة انتقال في آن.',
+					en: 'Every subject carries both names and its code in one searchable field, normalised on both sides. A query in either language, or a code, reaches the same subject.',
+					ar: 'تحمل كل مادة اسميها ورمزها في حقل واحد قابل للبحث، مُطبَّع من الطرفين. فيصل الاستعلام بأي لغة، أو بالرمز، إلى المادة نفسها.',
 				},
 			},
 			{
 				title: {
-					en: 'Arabic does not match itself',
-					ar: 'العربية لا تطابق نفسها',
+					en: 'A campus network you cannot rely on',
+					ar: 'شبكة جامعية لا يُعتمد عليها',
 				},
 				problem: {
-					en: 'The same word appears with and without diacritics, with أ / إ / ا used interchangeably, with ة and ه confused, and with tatweel stretching letters. A visitor searching the phrase they remember hearing rarely types it the way the transcriber wrote it.',
-					ar: 'تظهر الكلمة نفسها بالتشكيل وبدونه، وبتبادل أ/إ/ا، وبالخلط بين ة وه، وبالتطويل الذي يمدّ الحروف. والزائر الذي يبحث عن عبارة يتذكّر سماعها نادرًا ما يكتبها كما كتبها المُفرِّغ.',
+					en: 'Students open the app between lectures, in corridors and basements where the connection is unreliable. Every screen hitting the network makes the app feel broken in exactly the place it is used.',
+					ar: 'يفتح الطلاب التطبيق بين المحاضرات، في الممرات والطوابق السفلية حيث الاتصال غير موثوق. وأي شاشة تتصل بالشبكة تجعل التطبيق يبدو معطلًا في المكان الذي يُستخدم فيه بالضبط.',
 				},
 				solution: {
-					en: 'Normalisation runs identically over the index and the query, so both sides are reduced to the same canonical form before matching. Anything else produces a search that works for the person who built it and nobody else.',
-					ar: 'يُطبَّق التطبيع نفسه على الفهرس والاستعلام معًا، فيُختزل الطرفان إلى الصورة المعيارية ذاتها قبل المطابقة. وأي بديل ينتج بحثًا يعمل لمن بناه وحده.',
+					en: 'The plan tree and staff directory are cached aggressively and treated as slow-changing data, so the app opens instantly from cache and revalidates in the background rather than blocking on a request.',
+					ar: 'تُخزَّن شجرة الخطة ودليل الهيئة التدريسية بقوة وتُعامَل كبيانات بطيئة التغيّر، فيفتح التطبيق فورًا من الذاكرة ويُعيد التحقق في الخلفية بدل الانتظار على طلب.',
 				},
 			},
 			{
 				title: {
-					en: 'Automatic transcription is imperfect',
-					ar: 'التفريغ الآلي غير كامل',
+					en: 'Content that must outlive its maintainer',
+					ar: 'محتوى يجب أن يعيش بعد صائنه',
 				},
 				problem: {
-					en: 'ASR misreads names, technical terms and classical vocabulary, exactly the words people search for. Presenting a wrong transcript as authoritative text would misrepresent the scholar, which matters far more here than a bad search result.',
-					ar: 'يخطئ التعرّف الآلي على الكلام في الأسماء والمصطلحات والألفاظ التراثية، وهي بالضبط ما يبحث عنه الناس. وتقديم تفريغ خاطئ كنصّ موثوق يُحرّف كلام الشيخ، وهو أخطر هنا بكثير من نتيجة بحث سيئة.',
+					en: 'Study plans change, staff move, and I am one volunteer. An app that needs a code release every time a course is renamed dies the moment I get busy.',
+					ar: 'تتغيّر الخطط الدراسية، وينتقل أعضاء الهيئة، وأنا متطوّع واحد. والتطبيق الذي يحتاج إصدار شيفرة كلما تغيّر اسم مساق يموت لحظة انشغالي.',
 				},
 				solution: {
-					en: 'The transcript is framed as an index into the audio, not as a quotable source. Every result leads back to the recording at that moment, so the video stays the authority and the text is only the way you find it.',
-					ar: 'يُقدَّم التفريغ بوصفه فهرسًا إلى الصوت لا مصدرًا للاقتباس. وكل نتيجة تعيدك إلى التسجيل عند تلك اللحظة، فيبقى الفيديو هو المرجع والنص مجرد وسيلة للوصول إليه.',
-				},
-			},
-			{
-				title: {
-					en: 'Search with no server to search on',
-					ar: 'بحث بلا خادم يبحث عليه',
-				},
-				problem: {
-					en: 'A always-on search backend for a free, non-commercial site is a recurring cost and a thing that can go down at 3am with nobody on call.',
-					ar: 'خادم بحث دائم التشغيل لموقع مجاني غير تجاري يعني كلفة متكررة وشيئًا قد يتعطّل في الثالثة فجرًا دون أحد للمناوبة.',
-				},
-				solution: {
-					en: 'The site is built with Astro and ships a static index that the browser queries directly. Nothing needs to be running for search to work, which is the right operational profile for a project meant to outlive my attention to it.',
-					ar: 'بُني الموقع بـ Astro ويُصدِّر فهرسًا ثابتًا يستعلمه المتصفح مباشرة. لا شيء يحتاج أن يكون قيد التشغيل ليعمل البحث، وهو الملمح التشغيلي الصحيح لمشروع يُراد له أن يعيش بعد انصراف انتباهي عنه.',
+					en: 'All of it is content in Firebase, editable by committee members without touching the app. My job is the client; keeping the data current is theirs, which is the only arrangement that lasts.',
+					ar: 'كل ذلك محتوى في Firebase، قابل للتعديل من أعضاء اللجنة دون المساس بالتطبيق. مهمتي التطبيق، وتحديث البيانات مهمتهم، وهو الترتيب الوحيد الذي يدوم.',
 				},
 			},
 		],
 		outcomes: {
 			en: [
-				'Two searchable corpora, lessons and articles, with per-tab result counts and playlist filtering.',
-				'Every result is a deep link into the video at the second it was said.',
-				'Static, serverless search: no database, no login, no running cost.',
+				'Published on Google Play and maintained across multiple student intakes.',
+				'About eleven services behind one search box.',
+				'Content editable by the committee without a release.',
 			],
 			ar: [
-				'مدوّنتان قابلتان للبحث، الدروس والمقالات، مع عدّاد نتائج لكل تبويب وتصفية بقوائم التشغيل.',
-				'كل نتيجة رابط عميق إلى الفيديو عند الثانية التي قيلت فيها.',
-				'بحث ثابت بلا خادم: بلا قاعدة بيانات وبلا تسجيل دخول وبلا كلفة تشغيل.',
+				'منشور على Google Play ومُصان عبر دفعات طلابية متعددة.',
+				'نحو أحد عشر خدمة خلف صندوق بحث واحد.',
+				'محتوى قابل للتعديل من اللجنة دون إصدار جديد.',
 			],
 		},
 		sourced: true,
 	},
 	{
-		slug: 'pastehtml',
-		title: { en: 'pastehtml', ar: 'pastehtml' },
+		slug: 'tawsilah-abshir',
+		title: { en: 'Tawsilah Abshir', ar: 'توصيلة ابشر' },
 		tagline: {
-			en: 'Drop an HTML file, get a public URL on its own origin.',
-			ar: 'أفلِت ملف HTML، واحصل على رابط عام على نطاق مستقل.',
+			en: 'Ride-hailing built for Ajloun, not adapted to it.',
+			ar: 'تطبيق توصيل مبني لعجلون، لا مُكيَّف عليها.',
 		},
 		summary: {
-			en: 'Publish a page in one step: drop a file, paste markup, curl it, or hand it to an agent over MCP. Markdown is rendered to a self-contained page on upload. No account, no build step.',
-			ar: 'انشر صفحة بخطوة واحدة: أفلِت ملفًا، أو الصق شيفرة، أو أرسلها بـ curl، أو مرّرها لوكيل عبر MCP. ويُحوَّل الـ Markdown إلى صفحة مكتفية بذاتها عند الرفع. بلا حساب وبلا خطوة بناء.',
+			en: 'A ride service for Ajloun and the surrounding governorates, with vetted drivers who know the area. Built for daily local trips as much as long runs to other governorates.',
+			ar: 'خدمة توصيل لعجلون والمحافظات المحيطة، بسائقين معتمدين يعرفون المنطقة. مبنية للمشاوير اليومية المحلية كما للرحلات الطويلة إلى محافظات أخرى.',
 		},
-		category: 'web',
-		status: 'live',
-		featured: true,
+		category: 'mobile',
+		status: 'shipped',
+		featured: false,
 		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'Convex', 'MCP', 'Tailwind CSS'],
-		cover: '/projects/pastehtml.png',
-		gallery: ['/projects/pastehtml.png'],
+		role: {
+			en: 'Client project: mobile development',
+			ar: 'مشروع لعميل: تطوير الموبايل',
+		},
+		stack: [
+			'React Native',
+			'Expo',
+			'TypeScript',
+			'Maps',
+			'Push Notifications',
+			'React Query',
+		],
+		cover: '/apps/tawsilah-1.png',
+		gallery: [
+			'/apps/tawsilah-1.png',
+			'/apps/tawsilah-2.png',
+			'/apps/tawsilah-3.png',
+			'/apps/tawsilah-4.png',
+			'/apps/tawsilah-5.png',
+		],
 		links: {
-			live: 'https://pastehtml.assoli.site',
-			github: 'https://github.com/haithamassoli/pastehtml',
+			playGoogle:
+				'https://play.google.com/store/apps/details?id=com.assoliindustries.tawsilah',
+			github: 'https://github.com/haithamassoli/tawseel',
 		},
 		overview: {
 			en: [
-				'I kept generating single-file HTML pages like reports, mockups and one-off tools, and having nowhere nowhere to put them. Every option was heavier than the artefact: a repo and a deploy for a page that exists to be looked at once.',
-				'pastehtml is the missing step. The drop zone, a paste, a curl and an MCP call from an agent all end at the same function and come back with a URL. Markdown is converted to real HTML at upload time, so the stored paste is a page and every view of it behaves identically: the live origin, the raw view, the sandboxed preview, the ETag.',
+				'The large ride-hailing apps work in Amman and thin out fast outside it. In a governorate like Ajloun that leaves people back on calling a driver they know, which works until he is busy.',
+				'This is the local version: drivers vetted for the area, pricing that makes sense for both short in-town trips and inter-governorate runs, and an interface aimed at people who have never used a ride app before.',
 			],
 			ar: [
-				'كنت أُولّد باستمرار صفحات HTML بملف واحد، من تقارير ونماذج وأدوات لمرة واحدة، ولا أجد أين أضعها. كل الخيارات أثقل من الشيء نفسه: مستودع ونشر لصفحة وُجدت لتُرى مرة.',
-				'pastehtml هو الخطوة الناقصة. منطقة الإفلات واللصق وcurl ونداء MCP من وكيل، كلها تنتهي عند الدالة نفسها وتعود برابط. ويُحوَّل الـ Markdown إلى HTML حقيقي عند الرفع، فتكون النسخة المخزّنة صفحةً وتتصرّف كل الواجهات تحتها بالطريقة ذاتها: النطاق المباشر، والعرض الخام، والمعاينة المعزولة، وETag.',
+				'تعمل تطبيقات التوصيل الكبرى في عمّان وتتلاشى بسرعة خارجها. وفي محافظة كعجلون يترك ذلك الناس عائدين إلى الاتصال بسائق يعرفونه، وهو حلّ يصلح حتى ينشغل.',
+				'هذه هي النسخة المحلية: سائقون معتمدون للمنطقة، وتسعير منطقي للمشاوير القصيرة داخل المدينة وللرحلات بين المحافظات، وواجهة موجّهة لمن لم يستخدم تطبيق توصيل من قبل.',
 			],
 		},
 		challenges: [
 			{
-				title: {
-					en: 'Hosting arbitrary HTML is hosting arbitrary JavaScript',
-					ar: 'استضافة HTML عشوائي هي استضافة JavaScript عشوائي',
-				},
+				title: { en: 'Addresses that do not exist', ar: 'عناوين غير موجودة' },
 				problem: {
-					en: 'A paste is a full page with scripts in it. Serve all pastes from one domain and any one of them can read the cookies, storage and DOM of every other. The service becomes a hosted cross-site scripting platform.',
-					ar: 'كل نسخة صفحة كاملة تحوي شيفرات. ولو قُدّمت كل النسخ من نطاق واحد لأمكن لأيٍّ منها قراءة الكعكات والتخزين وDOM لكل النسخ الأخرى، فتتحول الخدمة إلى منصة استضافة لهجمات XSS.',
+					en: 'Outside the capital, street addressing is unreliable and many destinations are known by landmark rather than by any address a geocoder recognises.',
+					ar: 'خارج العاصمة، عنونة الشوارع غير موثوقة، وكثير من الوجهات تُعرف بمعلم بارز لا بعنوان يعرفه أي مُرمِّز جغرافي.',
 				},
 				solution: {
-					en: "Each paste is served from its own origin, so the browser's own same-origin policy does the isolation rather than a sanitiser I would have to keep ahead of. Sanitising untrusted HTML is a losing race; giving it nothing worth stealing is not.",
-					ar: 'تُقدَّم كل نسخة من نطاق خاص بها، فتتولى سياسة أصل المتصفح نفسها العزل بدل مُنقٍّ عليّ أن أظل متقدمًا عليه. تنقية HTML غير موثوق سباق خاسر؛ أما ألا تترك له ما يستحق السرقة فليس كذلك.',
-				},
-			},
-			{
-				title: {
-					en: 'Link previews need per-page tags',
-					ar: 'معاينات الروابط تحتاج وسومًا لكل صفحة',
-				},
-				problem: {
-					en: 'A shared link should preview as the page it points to. But the page belongs to the user, who did not write Open Graph tags, and injecting them into their markup would mean rewriting their document.',
-					ar: 'ينبغي أن يُعاين الرابط المشارَك بوصفه الصفحة التي يشير إليها. لكن الصفحة تخصّ المستخدم الذي لم يكتب وسوم Open Graph، وحقنها في شيفرته يعني إعادة كتابة مستنده.',
-				},
-				solution: {
-					en: "Crawlers are detected at the edge and rewritten to a separate function that renders OG tags for that paste, while human visitors get the untouched document. The user's HTML is never modified. The crawler gets a different response.",
-					ar: 'تُكتشف زواحف الفهرسة عند الحافة وتُحوَّل إلى دالة منفصلة تُنتج وسوم OG لتلك النسخة، بينما يحصل الزائر البشري على المستند كما هو. لا تُعدَّل شيفرة المستخدم أبدًا. الزاحف وحده يتلقى استجابة مختلفة.',
-				},
-			},
-			{
-				title: {
-					en: 'One publish path, four entry points',
-					ar: 'مسار نشر واحد وأربع نقاط دخول',
-				},
-				problem: {
-					en: 'A drop zone, a paste box, a REST call and an MCP tool are four different clients. Implementing publishing four times guarantees they drift apart, and the agent path, the one I most wanted, would be the least tested.',
-					ar: 'منطقة الإفلات وصندوق اللصق ونداء REST وأداة MCP أربعة عملاء مختلفين. وتنفيذ النشر أربع مرات يضمن تباعدها، ويكون مسار الوكيل، وهو أكثر ما أردته، أقلّها اختبارًا.',
-				},
-				solution: {
-					en: 'All four are thin shells over a single Convex function. Whatever works from the browser works identically from curl and from an agent, because it is the same code path.',
-					ar: 'الأربعة أغلفة رقيقة فوق دالة Convex واحدة. وما يعمل من المتصفح يعمل بالطريقة ذاتها من curl ومن وكيل، لأنه مسار الشيفرة نفسه.',
+					en: 'Pickup and destination are set by dropping a pin and optionally naming a landmark, so a rider never has to produce an address that does not exist.',
+					ar: 'يُحدَّد موضع الانطلاق والوجهة بوضع دبوس مع تسمية اختيارية لمعلم، فلا يضطر الراكب أبدًا إلى إنتاج عنوان غير موجود.',
 				},
 			},
 		],
 		outcomes: {
 			en: [
-				'Publish from a browser, a terminal, or an AI agent over MCP.',
-				'Per-paste origins, so pages cannot reach each other.',
-				'Markdown becomes a styled, self-contained page at upload.',
+				'Published on Google Play, serving Ajloun and inter-governorate trips.',
+			],
+			ar: ['منشور على Google Play، ويخدم عجلون والرحلات بين المحافظات.'],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'azkari',
+		title: { en: 'Azkari / Dhikr', ar: 'أذكاري / ذِكر' },
+		tagline: {
+			en: 'One remembrance, every so often, on whichever screen you are at.',
+			ar: 'ذِكر واحد، بين حين وآخر، على أي شاشة تكون أمامها.',
+		},
+		summary: {
+			en: 'A remembrance reminder that has followed me onto every platform I use: a VS Code extension, a macOS app, a Windows tray app, a standalone Apple Watch app, and a Wear OS watch face companion. Each one is native, offline, and deliberately tiny.',
+			ar: 'تذكير بالذِّكر تبعني إلى كل منصة أستخدمها: إضافة VS Code، وتطبيق macOS، وتطبيق شريط مهام لويندوز، وتطبيق مستقل لساعة Apple، ورفيق لساعات Wear OS. كل منها أصلي وبلا اتصال وصغير عمدًا.',
+		},
+		category: 'desktop',
+		status: 'shipped',
+		featured: false,
+		year: '2023 to 2026',
+		role: { en: 'Solo: five platforms', ar: 'منفردًا: خمس منصات' },
+		stack: [
+			'JavaScript',
+			'Swift',
+			'SwiftUI',
+			'Kotlin',
+			'C#',
+			'WPF',
+			'VS Code API',
+			'WatchKit',
+			'UserNotifications',
+		],
+		cover: '/projects/azkari-mac.png',
+		gallery: [
+			'/projects/azkari-mac.png',
+			'/projects/azkari-preview.png',
+			'/projects/azkari-logo.png',
+			'/apps/dhikr-android-icon.png',
+		],
+		links: {
+			vscode:
+				'https://marketplace.visualstudio.com/items?itemName=HaithamAssoli.azkari',
+			playGoogle:
+				'https://play.google.com/store/apps/details?id=com.haithamassoli.dhikr',
+			github: 'https://github.com/haithamassoli/Azkari',
+			live: 'https://dhikr.assoli.site',
+		},
+		overview: {
+			en: [
+				'This started as a VS Code extension: a small notification during a coding session, dismissible with a keystroke, gone by itself after six seconds. It is the most-starred thing I have written, which says something about how many developers wanted exactly that and nothing more.',
+				'Since then it has gone everywhere I work: a macOS app, a Windows tray app in C# and WPF with zero NuGet dependencies, a standalone watchOS app that needs no iPhone companion, and a Wear OS version. The Windows build even ships a self-test flag that prints PASS/FAIL for its own logic.',
+				'The design constraint is the same on all five: it must never become an app you have to manage. Interval, list, and nothing else.',
 			],
 			ar: [
-				'النشر من المتصفح أو الطرفية أو وكيل ذكاء اصطناعي عبر MCP.',
-				'نطاق مستقل لكل نسخة، فلا تصل الصفحات إلى بعضها.',
-				'يتحوّل الـ Markdown إلى صفحة منسّقة مكتفية بذاتها عند الرفع.',
+				'بدأ هذا إضافةً لـ VS Code: إشعار صغير أثناء جلسة برمجة، يُغلق بضغطة، ويختفي وحده بعد ست ثوانٍ. وهو أكثر ما كتبته نجومًا، وفي ذلك دلالة على عدد المطورين الذين أرادوا هذا بالضبط ولا شيء أكثر.',
+				'ومنذ ذلك الحين ذهب إلى كل مكان أعمل فيه: تطبيق macOS، وتطبيق شريط مهام لويندوز بـ C# وWPF بلا أي اعتمادية NuGet، وتطبيق watchOS مستقل لا يحتاج رفيقًا على iPhone، ونسخة Wear OS. بل تأتي نسخة ويندوز براية اختبار ذاتي تطبع نجاح/فشل لمنطقها.',
+				'قيد التصميم واحد في الخمسة: يجب ألا يصير تطبيقًا مضطرًا لإدارته. فاصل زمني، وقائمة، ولا شيء غير ذلك.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'A reminder that interrupts stops being used',
+					ar: 'التذكير الذي يقاطع يُهجَر',
+				},
+				problem: {
+					en: 'The whole value is frequency, but anything that steals focus while you are typing gets uninstalled within a day. A native system toast is too intrusive and stacks up in notification history.',
+					ar: 'القيمة كلها في التكرار، لكن ما يخطف التركيز أثناء الكتابة يُحذف خلال يوم. والإشعار النظامي الأصلي مقتحم أكثر مما ينبغي ويتراكم في سجل الإشعارات.',
+				},
+				solution: {
+					en: 'Each platform interrupts as little as it can: a frameless transparent popup that fades in over all windows without taking focus or blocking clicks on desktop, a wrist tap on the watch, an editor notification in VS Code. It auto-dismisses, so ignoring it is a valid response.',
+					ar: 'تقاطعك كل منصة بأقل ما تستطيع: نافذة منبثقة بلا إطار وشفافة تظهر فوق كل النوافذ دون أخذ التركيز أو حجب النقر على سطح المكتب، ونقرة على المعصم في الساعة، وإشعار محرر في VS Code. ويختفي تلقائيًا، فيكون التجاهل استجابة صحيحة.',
+				},
+			},
+			{
+				title: {
+					en: 'Battery on a watch is the whole product',
+					ar: 'البطارية في الساعة هي المنتج كله',
+				},
+				problem: {
+					en: 'A watch app that fires reminders all day and costs noticeable battery gets removed regardless of how good the reminders are. Extended runtime sessions and complications were the obvious route and the wrong one.',
+					ar: 'تطبيق ساعة يطلق تذكيرات طوال اليوم ويستهلك بطارية ملحوظة يُحذف مهما كانت تذكيراته جيدة. وجلسات التشغيل الممتد والمضاعفات كانت الطريق البديهي والخاطئ.',
+				},
+				solution: {
+					en: 'The watchOS build uses only system-scheduled local notifications plus opportunistic background refresh: no workout sessions, no complication, no network at all. Reminders survive a reboot and an app update without the user doing anything.',
+					ar: 'تستخدم نسخة watchOS إشعارات محلية مجدولة من النظام فقط مع تحديث خلفي انتهازي: بلا جلسات تمرين ولا مضاعفات ولا شبكة إطلاقًا. وتنجو التذكيرات من إعادة التشغيل ومن تحديث التطبيق دون أن يفعل المستخدم شيئًا.',
+				},
+			},
+			{
+				title: {
+					en: 'Five platforms is five times the maintenance',
+					ar: 'خمس منصات تعني صيانة خمسة أضعاف',
+				},
+				problem: {
+					en: 'Writing the same tiny app five times in five languages is how side projects die. Every dependency upgrade multiplies by five.',
+					ar: 'كتابة التطبيق الصغير نفسه خمس مرات بخمس لغات هي كيف تموت المشاريع الجانبية، فكل ترقية اعتمادية تتضاعف خمس مرات.',
+				},
+				solution: {
+					en: 'Each build depends on almost nothing. The Windows version has zero NuGet packages: tray via in-box WinForms, JSON via System.Text.Json, startup via the registry, chime via SystemSounds. Nothing to upgrade means nothing to break.',
+					ar: 'لا تكاد كل نسخة تعتمد على شيء. فنسخة ويندوز بلا أي حزمة NuGet: شريط المهام عبر WinForms المدمج، وJSON عبر System.Text.Json، والإقلاع عبر السجل، والتنبيه عبر SystemSounds. ولا شيء يُرقّى يعني لا شيء ينكسر.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Published on the VS Code Marketplace and Google Play.',
+				'Five native builds: VS Code, macOS, Windows, watchOS, Wear OS.',
+				'Fully offline everywhere; no accounts, no analytics, no data collected.',
+			],
+			ar: [
+				'منشور على متجر VS Code وعلى Google Play.',
+				'خمس نسخ أصلية: VS Code وmacOS وويندوز وwatchOS وWear OS.',
+				'يعمل دون اتصال في كل مكان؛ بلا حسابات ولا تحليلات ولا جمع بيانات.',
+			],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'assoli-site',
+		title: { en: 'assoli.site', ar: 'assoli.site' },
+		tagline: {
+			en: 'My previous portfolio: one animated page, driven by a command menu.',
+			ar: 'معرض أعمالي السابق: صفحة واحدة متحركة تُدار بقائمة أوامر.',
+		},
+		summary: {
+			en: 'The portfolio that came before this one: a single animated page with a command menu, built to be looked at rather than read, and to make the first two seconds count.',
+			ar: 'معرض الأعمال الذي سبق هذا: صفحة واحدة متحركة بقائمة أوامر، بُنيت لتُشاهَد لا لتُقرأ، ولتجعل الثانيتين الأوليين ذواتَي أثر.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: [
+			'Next.js',
+			'TypeScript',
+			'React',
+			'Framer Motion',
+			'Tailwind CSS',
+			'SEO',
+		],
+		cover: '/projects/portfolio-old.png',
+		gallery: ['/projects/portfolio-old.png'],
+		links: {
+			live: 'https://assoli.site',
+			github: 'https://github.com/haithamassoli/nextjs-portfolio',
+		},
+		overview: {
+			en: [
+				'A portfolio is the pitch, not the reference. This one is animated, opinionated and built to be looked at, with a command menu instead of a navigation bar so the whole site is one keystroke deep.',
+				'Keeping it apart from the résumé meant it never had to compromise: it can be heavy on motion without making a recruiter fight it for the facts, because the facts live on their own site.',
+			],
+			ar: [
+				'معرض الأعمال هو العرض التقديمي لا المرجع. هذا متحرك وذو رأي ومبني ليُنظر إليه، بقائمة أوامر بدل شريط تنقّل، فيصير الموقع كله على بُعد ضغطة واحدة.',
+				'وفصله عن السيرة الذاتية عنى ألّا يتنازل: يستطيع الإكثار من الحركة دون أن يصارعه مسؤول التوظيف على المعلومة، لأن المعلومة تعيش في موقعها الخاص.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Motion that does not cost the first impression',
+					ar: 'حركة لا تكلّف الانطباع الأول',
+				},
+				problem: {
+					en: 'A portfolio is judged in the first two seconds, and that is exactly the window that heavy animation and font loading spend on themselves.',
+					ar: 'يُحكَم على معرض الأعمال في أول ثانيتين، وهي بالضبط النافذة التي تنفقها الحركة الثقيلة وتحميل الخطوط على نفسها.',
+				},
+				solution: {
+					en: 'Content is readable before the animation resolves rather than gated behind it, so a slow connection degrades to a plain page instead of a blank one.',
+					ar: 'المحتوى مقروء قبل انتهاء الحركة لا محجوب خلفها، فيتحوّل الاتصال البطيء إلى صفحة بسيطة بدل صفحة فارغة.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'A motion-led single-page portfolio, navigable entirely from the keyboard.',
+				'Now being replaced by this bilingual rebuild.',
+			],
+			ar: [
+				'معرض أعمال أحادي الصفحة تقوده الحركة، يُتنقَّل فيه بالكامل من لوحة المفاتيح.',
+				'ويجري الآن استبداله بهذه النسخة ثنائية اللغة.',
+			],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'cv-assoli-site',
+		title: { en: 'cv.assoli.site', ar: 'cv.assoli.site' },
+		tagline: {
+			en: 'My web résumé: dense, scannable, and printable as-is.',
+			ar: 'سيرتي الذاتية على الويب: كثيفة وسهلة المسح وقابلة للطباعة كما هي.',
+		},
+		summary: {
+			en: 'A standalone web résumé with a keyboard-driven interface, laid out so the browser print dialog produces a clean one-file PDF without a separate export.',
+			ar: 'سيرة ذاتية مستقلة على الويب بواجهة تُدار من لوحة المفاتيح، مُنسَّقة بحيث ينتج مربّع طباعة المتصفح ملف PDF نظيفًا دون تصدير منفصل.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'SEO'],
+		cover: '/projects/cv.png',
+		gallery: ['/projects/cv.png'],
+		links: {
+			live: 'https://cv.assoli.site',
+			github: 'https://github.com/haithamassoli/cv',
+		},
+		overview: {
+			en: [
+				'A résumé is the reference, not the pitch. This one is dense and scannable on purpose: everything a recruiter checks is above the fold, and the keyboard gets you to any section without reaching for the mouse.',
+				'It is also the canonical copy. The résumé link everywhere else on the web points here, so there is one version to keep current instead of a folder of dated PDFs.',
+			],
+			ar: [
+				'السيرة الذاتية مرجع لا عرض تقديمي. هذه كثيفة وسهلة المسح عمدًا: كل ما يتحقق منه مسؤول التوظيف فوق الطيّة، ولوحة المفاتيح توصلك إلى أي قسم دون يد على الفأرة.',
+				'وهي أيضًا النسخة المعتمدة. رابط السيرة في كل مكان آخر على الويب يشير إلى هنا، فتبقى نسخة واحدة تُحدَّث بدل مجلّد من ملفات PDF مؤرّخة.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'One layout that is both a web page and a printed sheet',
+					ar: 'تخطيط واحد يصلح صفحة ويب وورقة مطبوعة',
+				},
+				problem: {
+					en: 'Recruiters still print. Maintaining a separate PDF means two copies that drift apart, and the one that drifts is always the one that gets sent.',
+					ar: 'ما زال مسؤولو التوظيف يطبعون. والاحتفاظ بملف PDF منفصل يعني نسختين تتباعدان، والنسخة التي تتباعد هي دائمًا التي تُرسَل.',
+				},
+				solution: {
+					en: 'The page is written so the print stylesheet is the only difference: same content, page breaks placed between sections, chrome dropped. Printing from the browser is the export.',
+					ar: 'كُتبت الصفحة بحيث تكون ورقة أنماط الطباعة هي الفارق الوحيد: المحتوى نفسه، وفواصل الصفحات بين الأقسام، والزخرفة تُسقَط. والطباعة من المتصفح هي التصدير.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'One always-current résumé that reads on the web and prints clean.',
+				'The canonical résumé link used across the rest of my sites.',
+			],
+			ar: [
+				'سيرة ذاتية واحدة محدَّثة دائمًا، تُقرأ على الويب وتُطبَع نظيفة.',
+				'ورابط السيرة المعتمد المستخدَم في بقية مواقعي.',
+			],
+		},
+		sourced: true,
+	},
+	{
+		slug: 'almadrsa',
+		title: { en: 'Almadrsa', ar: 'المدرسة' },
+		tagline: {
+			en: 'An e-learning platform for schools.',
+			ar: 'منصة تعليم إلكتروني للمدارس.',
+		},
+		summary: {
+			en: "An online school platform bringing courses, materials and student progress into one place for a school's teachers and students.",
+			ar: 'منصة مدرسية إلكترونية تجمع المساقات والمواد وتقدّم الطلاب في مكان واحد لمعلمي المدرسة وطلابها.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'RTL'],
+		cover: '/projects/almadrsa.png',
+		gallery: ['/projects/almadrsa.png'],
+		links: {
+			live: 'https://almadrsa.vercel.app',
+			github: 'https://github.com/haithamassoli/almadrsa',
+		},
+		overview: {
+			en: [
+				'Schools that went online during the pandemic mostly ended up with a mix of a video call link, a WhatsApp group and a shared drive. None of it survives a change of teacher.',
+				'Almadrsa gives the same activity a structure that outlasts the term: courses hold their material, students have progress, and nothing depends on somebody still being in the right group chat.',
+			],
+			ar: [
+				'المدارس التي انتقلت إلى الإنترنت في الجائحة انتهت في معظمها إلى خليط من رابط مكالمة مرئية ومجموعة واتساب ومجلد مشترك. ولا شيء من ذلك ينجو من تغيير معلّم.',
+				'تمنح «المدرسة» النشاط نفسه بنيةً تدوم بعد الفصل: تحتفظ المساقات بموادها، وللطلاب تقدّم، ولا يعتمد شيء على بقاء أحدهم في المجموعة الصحيحة.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Teachers will not learn a new tool mid-term',
+					ar: 'لن يتعلم المعلمون أداة جديدة في منتصف الفصل',
+				},
+				problem: {
+					en: 'Any platform that asks a teacher to restructure how they already work gets used for one week and abandoned. Adoption fails on effort, not features.',
+					ar: 'أي منصة تطلب من المعلّم إعادة هيكلة طريقة عمله الحالية تُستخدم أسبوعًا ثم تُهجَر. ويفشل التبنّي بسبب الجهد لا الميزات.',
+				},
+				solution: {
+					en: 'The model mirrors what a school already has, a course with its material and its students, so nothing needs to be rethought to start using it.',
+					ar: 'يحاكي النموذج ما لدى المدرسة أصلًا، من مساق ومواده وطلابه، فلا يحتاج شيء إلى إعادة تفكير للبدء باستخدامه.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Courses, materials and student progress in one Arabic-first platform.',
+			],
+			ar: ['مساقات ومواد وتقدّم الطلاب في منصة عربية أولًا.'],
+		},
+		sourced: false,
+	},
+	{
+		slug: 'fazuwjuh',
+		title: { en: 'Fazawwijuhu', ar: 'فَزَوِّجُوهُ' },
+		tagline: {
+			en: 'A supervised platform for lawful marriage introductions.',
+			ar: 'منصة لتيسير الزواج الشرعي بإشراف إداري.',
+		},
+		summary: {
+			en: 'A platform that introduces people seeking marriage under explicit, published conditions with administrative supervision throughout, deliberately structured to keep the process within religious bounds rather than reproducing a dating app.',
+			ar: 'منصة تُعرِّف الراغبين والراغبات في الزواج وفق شروط واضحة معلنة مع إشراف إداري في كل مرحلة، مبنيّة عمدًا لإبقاء العملية ضمن الحدود الشرعية بدل استنساخ تطبيقات المواعدة.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: [
+			'Next.js 16',
+			'React 19',
+			'TypeScript',
+			'Convex',
+			'Better Auth',
+			'Tailwind v4',
+			'shadcn',
+			'Base UI',
+		],
+		cover: '/projects/fazuwjuh.png',
+		gallery: ['/projects/fazuwjuh.png'],
+		links: {
+			live: 'https://fazuwjuh.vercel.app',
+			github: 'https://github.com/haithamassoli/fazuwjuh',
+		},
+		overview: {
+			en: [
+				'The default shape of this product is a dating app, and the default shape is exactly what the users this is for want to avoid. The design problem was structural rather than visual: what does the flow look like when open browsing and private messaging are the things you are trying to prevent?',
+				'The answer was a form-driven, admin-supervised pipeline. Applicants answer a structured questionnaire that differs by gender, agree to explicit published conditions, and every introduction passes through administrative review rather than happening directly between two users.',
+				'Built on Convex with Better Auth, where the server holds the rules and the client is only a view of them.',
+			],
+			ar: [
+				'الشكل الافتراضي لهذا المنتج تطبيق مواعدة، والشكل الافتراضي هو بالضبط ما يريد مستخدموه تجنّبه. فكانت مشكلة التصميم بنيوية لا بصرية: كيف يبدو المسار حين يكون التصفح المفتوح والمراسلة الخاصة هما ما تحاول منعه؟',
+				'كان الجواب مسارًا قائمًا على استمارات وبإشراف إداري. يجيب المتقدمون عن استبيان منظّم يختلف بحسب الجنس، ويوافقون على شروط معلنة صريحة، وتمرّ كل تعريفة عبر مراجعة إدارية بدل أن تقع مباشرة بين طرفين.',
+				'بُنيت على Convex مع Better Auth، حيث تُحفظ القواعد على الخادم ولا يكون العميل إلا عرضًا لها.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'The rules are the product, so they cannot live in the UI',
+					ar: 'القواعد هي المنتج، فلا يمكن أن تسكن الواجهة',
+				},
+				problem: {
+					en: 'If eligibility and visibility rules are enforced by which screens the client renders, anyone who inspects the network can step around them. For this product that is not a bug class, it is a breach of the entire premise.',
+					ar: 'إن فُرضت قواعد الأهلية والظهور عبر الشاشات التي يعرضها العميل، أمكن لمن يفحص الاتصال تجاوزها. وهذا في هذا المنتج ليس صنفًا من الأخطاء، بل خرق للفكرة كلها.',
+				},
+				solution: {
+					en: 'Convex functions are the source of truth and the enforcement point. The client cannot request what it is not entitled to see, regardless of what it renders.',
+					ar: 'دوال Convex هي مصدر الحقيقة ونقطة الفرض. فلا يستطيع العميل طلب ما لا يحق له رؤيته، مهما عرض.',
+				},
+			},
+			{
+				title: {
+					en: 'The questions must change without a deploy',
+					ar: 'يجب أن تتغير الأسئلة دون نشر',
+				},
+				problem: {
+					en: 'The form questions and the published conditions are religious and editorial content, not engineering decisions. Having them hard-coded means the person who owns that content has to go through me to change a sentence.',
+					ar: 'أسئلة الاستمارة والشروط المعلنة محتوى شرعي وتحريري، لا قرارات هندسية. وترميزها في الشيفرة يعني أن صاحب هذا المحتوى مضطر للمرور بي لتعديل جملة.',
+				},
+				solution: {
+					en: 'Questions and Arabic copy live in dedicated, owner-editable config modules, separate from application code and marked as such in the repo layout.',
+					ar: 'توجد الأسئلة والنصوص العربية في وحدات إعدادات مخصصة قابلة لتحرير صاحب المنتج، منفصلة عن شيفرة التطبيق ومُعلَّمة كذلك في بنية المستودع.',
+				},
+			},
+			{
+				title: {
+					en: "Publishing someone's details is irreversible",
+					ar: 'نشر بيانات شخص لا رجعة فيه',
+				},
+				problem: {
+					en: "An accidental disclosure here is not a UI bug. It affects a real person's reputation and family, and it cannot be undone by deleting a record afterwards.",
+					ar: 'الإفشاء العارض هنا ليس خللًا في الواجهة، بل يمسّ سمعة شخص حقيقي وأسرته، ولا يُلغى بحذف سجل بعد وقوعه.',
+				},
+				solution: {
+					en: 'Nothing is visible by default. Publication requires explicit, recorded consent from the applicant plus administrative approval, so disclosure needs two deliberate acts rather than one missing check.',
+					ar: 'لا شيء ظاهر افتراضيًا. ويتطلب النشر موافقة صريحة موثّقة من المتقدّم مع اعتماد إداري، فيحتاج الإفشاء فعلين مقصودين لا فحصًا واحدًا غائبًا.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Server-enforced visibility rules. The client cannot request what it may not see.',
+				'Questions and religious copy editable by the product owner without a deploy.',
+				'Publication gated behind recorded consent plus admin approval.',
+			],
+			ar: [
+				'قواعد ظهور مفروضة على الخادم. لا يستطيع العميل طلب ما لا يحق له رؤيته.',
+				'أسئلة ونصوص شرعية قابلة للتحرير من صاحب المنتج دون نشر.',
+				'النشر محكوم بموافقة موثّقة واعتماد إداري.',
 			],
 		},
 		sourced: true,
@@ -717,118 +1491,397 @@ export const projects: Project[] = [
 		sourced: true,
 	},
 	{
-		slug: 'eecommittee',
-		title: { en: 'EECommittee', ar: 'لجنة الهندسة الكهربائية' },
+		slug: 'devcards',
+		title: { en: 'DevCards', ar: 'بطاقات المقابلات' },
 		tagline: {
-			en: 'Every resource an electrical engineering student needs, in one place.',
-			ar: 'كل ما يحتاجه طالب الهندسة الكهربائية، في مكان واحد.',
+			en: 'Spaced-repetition flashcards for engineering interviews.',
+			ar: 'بطاقات مراجعة متباعدة للتحضير لمقابلات الهندسة.',
 		},
 		summary: {
-			en: 'Pick any subject from the study plan tree and get everything attached to it: material, recordings, staff contacts. Includes a GPA calculator, bilingual Arabic/English search, and a night mode. Volunteer work that has outlived several intakes of students.',
-			ar: 'اختر أي مادة من شجرة الخطة الدراسية واحصل على كل ما يتعلق بها: مواد وتسجيلات وبيانات الهيئة التدريسية. ويتضمن حاسبة معدّل، وبحثًا ثنائي اللغة بالعربية والإنجليزية، ووضعًا ليليًا. عمل تطوعي عاش أكثر من دفعة طلابية.',
+			en: 'Hundreds of multiple-choice questions across thirteen topics, each with a full explanation, scheduled by a Leitner system so the cards you get wrong keep coming back until they stick. Entirely frontend: no backend, no account, no network calls.',
+			ar: 'مئات الأسئلة متعددة الخيارات في ثلاثة عشر موضوعًا، لكل سؤال شرح كامل، مجدولة بنظام لايتنر بحيث تعود البطاقات التي تخطئ فيها حتى ترسخ. واجهة أمامية بالكامل: بلا خادم وبلا حساب وبلا اتصالات شبكية.',
 		},
-		category: 'mobile',
-		status: 'shipped',
-		featured: true,
-		year: 'Since 2022',
-		role: {
-			en: 'Volunteer: mobile and backend',
-			ar: 'متطوّع: الموبايل والخادم',
-		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo: content and app', ar: 'منفردًا: المحتوى والتطبيق' },
 		stack: [
-			'React Native',
-			'Expo',
+			'Next.js',
 			'TypeScript',
-			'Firebase',
-			'Zustand',
-			'React Query',
-			'Reanimated',
-			'Zod',
-			'Caching',
+			'Tailwind CSS',
+			'localStorage',
+			'Leitner scheduling',
 		],
-		cover: '/apps/eecommittee-2.png',
-		gallery: [
-			'/apps/eecommittee-1.png',
-			'/apps/eecommittee-2.png',
-			'/apps/eecommittee-3.png',
-			'/apps/eecommittee-4.png',
-			'/apps/eecommittee-5.png',
-			'/apps/eecommittee-6.png',
-		],
+		cover: '/projects/devcards.png',
+		gallery: ['/projects/devcards.png'],
 		links: {
-			playGoogle:
-				'https://play.google.com/store/apps/details?id=com.haithamassoli.EECommitte',
-			github: 'https://github.com/haithamassoli/EECommitte-App',
+			live: 'https://flashcards.assoli.site',
+			github: 'https://github.com/haithamassoli/Interview-Flashcards-Game',
 		},
 		overview: {
 			en: [
-				'The committee had been answering the same questions in the same Facebook group for years: which prerequisites does this subject have, who teaches it, where are the notes, what will my GPA be if this goes badly.',
-				'The app turns that into structure. The study plan is a navigable tree, so a subject is a destination with everything hanging off it. Staff details are searchable. The GPA box projects both semester and cumulative results before the semester ends.',
-				'It is the longest-running thing I maintain, and the constraint that shapes it is that I am not paid for it. Anything that needs constant attention does not survive.',
+				'Interview prep material is either a list of questions with one-line answers you forget immediately, or a course you never finish. Neither does the thing that actually works, which is being asked the question again a few days after getting it wrong.',
+				"DevCards covers thirteen areas at three difficulty levels: software engineering, frontend, backend, system design, microservices, caching, databases, security, React, PHP, Laravel, Next.js and Node.js. Every card is multiple choice and graded instantly, with a short answer and a deeper 'behind the scenes' explanation.",
+				'There is no backend at all. Progress lives in the browser, which means it opens instantly and costs nothing to run.',
 			],
 			ar: [
-				'ظلّت اللجنة تجيب عن الأسئلة نفسها في مجموعة فيسبوك نفسها سنوات: ما متطلبات هذه المادة، ومن يدرّسها، وأين الملخصات، وكم سيصير معدّلي إن ساءت الأمور.',
-				'يحوّل التطبيق ذلك إلى بنية. الخطة الدراسية شجرة قابلة للتنقّل، فتصير المادة وجهةً يتدلّى منها كل شيء. وبيانات الهيئة التدريسية قابلة للبحث. وتتوقّع حاسبة المعدّل نتيجة الفصل والتراكمي قبل انتهاء الفصل.',
-				'هو أطول ما أتولى صيانته عمرًا، والقيد الذي يشكّله أنني لا أتقاضى عليه أجرًا، فأي شيء يحتاج انتباهًا دائمًا لا ينجو.',
+				'مواد التحضير للمقابلات إما قائمة أسئلة بإجابات من سطر تُنسى فورًا، وإما دورة لا تُنهيها أبدًا. ولا يفعل أيٌّ منهما ما ينفع فعلًا: أن يُطرح عليك السؤال ثانيةً بعد أيام من خطئك فيه.',
+				'تغطي DevCards ثلاثة عشر مجالًا بثلاثة مستويات صعوبة: هندسة البرمجيات، والواجهات الأمامية والخلفية، وتصميم الأنظمة، والخدمات المصغّرة، والتخزين المؤقت، وقواعد البيانات، والأمان، وReact وPHP وLaravel وNext.js وNode.js. كل بطاقة متعددة الخيارات وتُصحَّح فورًا، مع إجابة قصيرة وشرح أعمق لما يجري خلف الكواليس.',
+				'لا خادم إطلاقًا. يبقى التقدّم في المتصفح، فيُفتح فورًا وبلا كلفة تشغيل.',
 			],
 		},
 		challenges: [
 			{
 				title: {
-					en: 'Searching in two languages at once',
-					ar: 'البحث بلغتين في آن',
+					en: 'Getting it right once is not learning it',
+					ar: 'الإصابة مرة ليست تعلّمًا',
 				},
 				problem: {
-					en: "Students refer to the same subject as 'Signals', 'إشارات', or a course code, often switching mid-sentence. Indexing one language means half the searches fail silently.",
-					ar: 'يشير الطلاب إلى المادة نفسها بـ Signals أو «إشارات» أو برمز المساق، وكثيرًا ما يبدّلون في منتصف الجملة. وفهرسة لغة واحدة تعني فشل نصف عمليات البحث بصمت.',
+					en: 'A plain quiz shuffles and moves on, so a question you guessed correctly and a question you actually know are treated identically, and the ones you got wrong are the ones you never see again.',
+					ar: 'الاختبار العادي يخلط ويمضي، فيُعامَل السؤال الذي خمّنته صوابًا والسؤال الذي تعرفه فعلًا معاملةً واحدة، وتكون الأسئلة التي أخطأت فيها هي ما لا تراه ثانيةً أبدًا.',
 				},
 				solution: {
-					en: 'Every subject carries both names and its code in one searchable field, normalised on both sides. A query in either language, or a code, reaches the same subject.',
-					ar: 'تحمل كل مادة اسميها ورمزها في حقل واحد قابل للبحث، مُطبَّع من الطرفين. فيصل الاستعلام بأي لغة، أو بالرمز، إلى المادة نفسها.',
+					en: 'A Leitner system with self-rating. A missed card drops to box zero and returns almost immediately, both later in the same session and in future ones, while cards you know climb to longer intervals.',
+					ar: 'نظام لايتنر مع تقييم ذاتي. تهبط البطاقة المُخطأة إلى الصندوق صفر وتعود بعد قليل، في الجلسة نفسها وفي الجلسات اللاحقة، بينما تصعد البطاقات التي تعرفها إلى فواصل أطول.',
 				},
 			},
 			{
 				title: {
-					en: 'A campus network you cannot rely on',
-					ar: 'شبكة جامعية لا يُعتمد عليها',
+					en: 'No backend means no account to restore from',
+					ar: 'بلا خادم يعني بلا حساب تستعيد منه',
 				},
 				problem: {
-					en: 'Students open the app between lectures, in corridors and basements where the connection is unreliable. Every screen hitting the network makes the app feel broken in exactly the place it is used.',
-					ar: 'يفتح الطلاب التطبيق بين المحاضرات، في الممرات والطوابق السفلية حيث الاتصال غير موثوق. وأي شاشة تتصل بالشبكة تجعل التطبيق يبدو معطلًا في المكان الذي يُستخدم فيه بالضبط.',
+					en: 'Keeping everything client-side is what makes the app free and instant, but it also means progress is tied to one browser and can be cleared without warning.',
+					ar: 'إبقاء كل شيء على العميل هو ما يجعل التطبيق مجانيًا وفوريًا، لكنه يعني أيضًا أن التقدّم مرتبط بمتصفح واحد وقد يُمسح دون إنذار.',
 				},
 				solution: {
-					en: 'The plan tree and staff directory are cached aggressively and treated as slow-changing data, so the app opens instantly from cache and revalidates in the background rather than blocking on a request.',
-					ar: 'تُخزَّن شجرة الخطة ودليل الهيئة التدريسية بقوة وتُعامَل كبيانات بطيئة التغيّر، فيفتح التطبيق فورًا من الذاكرة ويُعيد التحقق في الخلفية بدل الانتظار على طلب.',
-				},
-			},
-			{
-				title: {
-					en: 'Content that must outlive its maintainer',
-					ar: 'محتوى يجب أن يعيش بعد صائنه',
-				},
-				problem: {
-					en: 'Study plans change, staff move, and I am one volunteer. An app that needs a code release every time a course is renamed dies the moment I get busy.',
-					ar: 'تتغيّر الخطط الدراسية، وينتقل أعضاء الهيئة، وأنا متطوّع واحد. والتطبيق الذي يحتاج إصدار شيفرة كلما تغيّر اسم مساق يموت لحظة انشغالي.',
-				},
-				solution: {
-					en: 'All of it is content in Firebase, editable by committee members without touching the app. My job is the client; keeping the data current is theirs, which is the only arrangement that lasts.',
-					ar: 'كل ذلك محتوى في Firebase، قابل للتعديل من أعضاء اللجنة دون المساس بالتطبيق. مهمتي التطبيق، وتحديث البيانات مهمتهم، وهو الترتيب الوحيد الذي يدوم.',
+					en: 'I took the trade deliberately rather than adding accounts for a study tool. Storage reads and writes are defensive so a cleared or blocked store degrades to a fresh session instead of a crash.',
+					ar: 'قبلت المقايضة عمدًا بدل إضافة حسابات لأداة مذاكرة. وعمليات القراءة والكتابة في التخزين دفاعية، فيتحوّل التخزين الممسوح أو المحظور إلى جلسة جديدة بدل انهيار.',
 				},
 			},
 		],
 		outcomes: {
 			en: [
-				'Published on Google Play and maintained across multiple student intakes.',
-				'About eleven services behind one search box.',
-				'Content editable by the committee without a release.',
+				'Thirteen categories, hundreds of graded questions with explanations.',
+				'Leitner scheduling plus in-session re-queueing of missed cards.',
+				'Fully offline-capable; keyboard-driven throughout.',
 			],
 			ar: [
-				'منشور على Google Play ومُصان عبر دفعات طلابية متعددة.',
-				'نحو أحد عشر خدمة خلف صندوق بحث واحد.',
-				'محتوى قابل للتعديل من اللجنة دون إصدار جديد.',
+				'ثلاثة عشر تصنيفًا، ومئات الأسئلة المُصحَّحة مع شروح.',
+				'جدولة لايتنر مع إعادة إدراج البطاقات المُخطأة داخل الجلسة.',
+				'قادر على العمل دون اتصال بالكامل، ويُدار بالكامل من لوحة المفاتيح.',
 			],
 		},
 		sourced: true,
+	},
+	{
+		slug: 'hadanati',
+		title: { en: 'Hadanati', ar: 'حضانتي' },
+		tagline: {
+			en: 'Run a nursery: attendance, assessments, fees and a parent portal.',
+			ar: 'إدارة حضانة: حضور وتقييمات ورسوم وبوابة لأولياء الأمور.',
+		},
+		summary: {
+			en: "An Arabic platform for nurseries in Jordan covering daily attendance, child assessments, fee tracking and a portal that lets parents see their child's day without phoning the nursery.",
+			ar: 'منصة عربية لحضانات الأردن تغطي الحضور اليومي وتقييمات الأطفال ومتابعة الرسوم، وبوابة تُطلع أولياء الأمور على يوم أطفالهم دون الاتصال بالحضانة.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'RTL'],
+		cover: '/projects/hadanati.png',
+		gallery: ['/projects/hadanati.png'],
+		links: {
+			live: 'https://hadanati.assoli.site',
+			github: 'https://github.com/haithamassoli/hadanati',
+		},
+		overview: {
+			en: [
+				'Most nurseries here run on a paper register, a WhatsApp group and a notebook of who has paid. It works until a parent asks a question about last month.',
+				"Hadanati replaces the three of them with one system: attendance, assessments and fees on the staff side, and a parent portal on the other, so the answer to 'how was he today' does not require a phone call.",
+			],
+			ar: [
+				'تدير معظم الحضانات هنا سجلًا ورقيًا ومجموعة واتساب ودفترًا لمن دفع. وهذا يصلح حتى يسأل ولي أمر عن الشهر الماضي.',
+				'تستبدل «حضانتي» الثلاثة بنظام واحد: حضور وتقييمات ورسوم من جهة الطاقم، وبوابة لأولياء الأمور من الجهة الأخرى، فلا يحتاج جواب «كيف كان اليوم» إلى مكالمة.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'The staff using it are not computer users',
+					ar: 'الطاقم الذي يستخدمه ليسوا مستخدمي حواسيب',
+				},
+				problem: {
+					en: 'Nursery staff are with children all day. Any workflow that takes more than a few taps, or that punishes a mistake, gets abandoned for the paper register within a week.',
+					ar: 'طاقم الحضانة مع الأطفال طوال اليوم. وأي مسار يتطلب أكثر من نقرات قليلة، أو يعاقب على الخطأ، يُهجَر إلى السجل الورقي خلال أسبوع.',
+				},
+				solution: {
+					en: 'Attendance is a single tap per child from one list, corrections are always available rather than locked after submit, and nothing requires leaving the screen you are on.',
+					ar: 'الحضور نقرة واحدة لكل طفل من قائمة واحدة، والتصحيح متاح دائمًا لا مقفل بعد الإرسال، ولا شيء يتطلب مغادرة الشاشة التي أنت فيها.',
+				},
+			},
+			{
+				title: {
+					en: 'Parents must see enough, and not too much',
+					ar: 'على أولياء الأمور أن يروا ما يكفي، لا أكثر',
+				},
+				problem: {
+					en: "A parent portal that exposes a shared class view leaks other children's attendance, assessments and fee status to every family in the room.",
+					ar: 'بوابة تعرض رؤية صفّية مشتركة تُسرّب حضور أطفال آخرين وتقييماتهم وحالة رسومهم لكل أسرة في الغرفة.',
+				},
+				solution: {
+					en: "Every parent-facing query is scoped to their own children on the server, so the portal cannot return another family's data regardless of what the client asks for.",
+					ar: 'كل استعلام موجّه لولي الأمر محصور بأطفاله على الخادم، فلا تستطيع البوابة إعادة بيانات أسرة أخرى مهما طلب العميل.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Attendance, assessments, fees and a parent portal in one Arabic-first platform.',
+			],
+			ar: ['حضور وتقييمات ورسوم وبوابة أولياء أمور في منصة عربية أولًا.'],
+		},
+		sourced: false,
+	},
+	{
+		slug: 'hirfati',
+		title: { en: 'Hirfati', ar: 'حرفتي' },
+		tagline: {
+			en: 'Find a trusted tradesperson in Jordan and get free quotes.',
+			ar: 'اعثر على حرفي موثوق في الأردن واحصل على عروض أسعار مجانية.',
+		},
+		summary: {
+			en: 'A marketplace for skilled trades across Jordan: plumbing, electrical, carpentry, metalwork, painting, air conditioning, tiling and general maintenance. Describe the job, receive quotes, choose.',
+			ar: 'سوق للحرف المهنية في الأردن: سباكة وكهرباء ونجارة وحدادة ودهان وتكييف وبلاط وصيانة عامة. صِف العمل، واستقبل العروض، واختر.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'SEO', 'RTL'],
+		cover: '/projects/hirfati.png',
+		gallery: ['/projects/hirfati.png'],
+		links: {
+			live: 'https://hirfati-jo.vercel.app',
+			github: 'https://github.com/haithamassoli/hirfati',
+		},
+		overview: {
+			en: [
+				'Finding a plumber in Jordan means asking a neighbour, calling a number written on a wall, or taking whoever answers. There is no way to compare, no way to check anyone, and no price until they are already in your house.',
+				'Hirfati puts the job first: describe what needs doing, and tradespeople quote for it. The comparison happens before anyone shows up.',
+			],
+			ar: [
+				'إيجاد سبّاك في الأردن يعني سؤال جار، أو الاتصال برقم مكتوب على جدار، أو أخذ من يردّ. لا سبيل للمقارنة، ولا للتحقق من أحد، ولا سعر قبل أن يكون في بيتك أصلًا.',
+				'يضع «حرفتي» العمل أولًا: صِف ما ينبغي عمله، فيقدّم الحرفيون عروضهم. وتقع المقارنة قبل أن يحضر أحد.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'A marketplace with nobody on it is useless to both sides',
+					ar: 'سوق بلا أحد لا ينفع الطرفين',
+				},
+				problem: {
+					en: 'Customers will not post jobs where no tradespeople are, and tradespeople will not sign up where there are no jobs. Launching an empty two-sided marketplace stalls immediately.',
+					ar: 'لن ينشر الزبائن أعمالًا حيث لا حرفيين، ولن يسجّل الحرفيون حيث لا أعمال. وإطلاق سوق ثنائي فارغ يتوقف فورًا.',
+				},
+				solution: {
+					en: 'The site is useful before it has liquidity: it works as a searchable, SEO-indexed directory by trade and governorate, so a customer arriving from search finds someone to call even when quoting is quiet.',
+					ar: 'الموقع نافع قبل أن تكون فيه سيولة: يعمل كدليل قابل للبحث ومُفهرس لمحركات البحث حسب الحرفة والمحافظة، فيجد الزبون القادم من البحث من يتصل به حتى حين تهدأ العروض.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'Live and indexed by trade and governorate across Jordan.',
+				'Free quote requests without an account.',
+			],
+			ar: [
+				'مباشر ومُفهرس حسب الحرفة والمحافظة في الأردن.',
+				'طلبات عروض أسعار مجانية بلا حساب.',
+			],
+		},
+		sourced: false,
+	},
+	{
+		slug: 'service',
+		title: { en: 'Service', ar: 'سيرفيس' },
+		tagline: {
+			en: "Post a trip or book a seat between Jordan's governorates.",
+			ar: 'انشر رحلتك أو احجز مقعدك بين محافظات الأردن.',
+		},
+		summary: {
+			en: 'Intercity ride sharing for Jordan: Amman, Irbid, Zarqa, Aqaba and everywhere else. Drivers post the trip they are already making; passengers book a seat on it.',
+			ar: 'مشاركة رحلات بين مدن الأردن: عمّان وإربد والزرقاء والعقبة وسائر المحافظات. ينشر السائقون الرحلة التي سيقومون بها أصلًا، ويحجز الركاب مقعدًا فيها.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'RTL'],
+		cover: '/projects/sarfees.png',
+		gallery: ['/projects/sarfees.png'],
+		links: {
+			live: 'https://sarfees.vercel.app',
+			github: 'https://github.com/haithamassoli/sarfees',
+		},
+		overview: {
+			en: [
+				"Intercity travel in Jordan runs on 'service' cars that leave when they fill. You go to the station and wait, with no way to know whether that is ten minutes or an hour.",
+				'This moves the matching online: a driver posts the trip they are making anyway, passengers book seats on it, and both sides know the departure before anyone leaves the house.',
+			],
+			ar: [
+				'يقوم التنقّل بين مدن الأردن على سيارات «السرفيس» التي تنطلق حين تمتلئ. تذهب إلى المجمّع وتنتظر، بلا سبيل لمعرفة أهي عشر دقائق أم ساعة.',
+				'ينقل هذا المطابقة إلى الإنترنت: ينشر السائق الرحلة التي سيقوم بها على أي حال، ويحجز الركاب مقاعد فيها، ويعرف الطرفان موعد الانطلاق قبل أن يغادر أحد بيته.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Seats are a shared, racing resource',
+					ar: 'المقاعد مورد مشترك متسابَق عليه',
+				},
+				problem: {
+					en: 'A seven-seat car with two people booking the last seat at once is the normal case on a popular route, and overselling means someone is left at the station.',
+					ar: 'سيارة بسبعة مقاعد يحجز شخصان آخر مقعد فيها في اللحظة ذاتها حالة طبيعية على خط مزدحم، والبيع الزائد يعني أن أحدهم يبقى في المجمّع.',
+				},
+				solution: {
+					en: "Remaining seats are decremented in a single server-side operation rather than read-then-write, so a race resolves to one winner and a clean 'full' state for the other.",
+					ar: 'تُنقَص المقاعد المتبقية في عملية واحدة على الخادم بدل قراءة ثم كتابة، فيُحسم السباق بفائز واحد وحالة «مكتمل» نظيفة للآخر.',
+				},
+			},
+		],
+		outcomes: {
+			en: ['Trip posting and seat booking across all Jordanian governorates.'],
+			ar: ['نشر الرحلات وحجز المقاعد في كل محافظات الأردن.'],
+		},
+		sourced: false,
+	},
+	{
+		slug: 'ghurza',
+		title: { en: 'Ghurza', ar: 'غُرزة' },
+		tagline: {
+			en: 'Learn crochet in Arabic, from the first stitch upward.',
+			ar: 'تعلّم الكروشيه بالعربية، من أول غرزة صعودًا.',
+		},
+		summary: {
+			en: 'A complete Arabic learning path for crochet: ordered lessons from the very first stitch through to advanced work, plus references for yarns, hooks and tools, and a curated set of the best Arabic and international sources.',
+			ar: 'مسار تعلّم عربي متكامل للكروشيه: دروس مرتّبة من أول غرزة حتى الأعمال المتقدمة، مع مراجع للخيوط والإبر والأدوات، ومجموعة منتقاة من أفضل المصادر العربية والعالمية.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: {
+			en: 'Solo: content structure and build',
+			ar: 'منفردًا: بنية المحتوى والتطوير',
+		},
+		stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'RTL', 'SEO'],
+		cover: '/projects/crochet.png',
+		gallery: ['/projects/crochet.png'],
+		links: {
+			live: 'https://crochet.assoli.site',
+			github: 'https://github.com/haithamassoli/crochet',
+		},
+		overview: {
+			en: [
+				'Arabic crochet material exists, but it is scattered across videos with no ordering. A beginner has no way to know what to learn after the first stitch, or which of forty videos is the right next one.',
+				'This is the missing structure: a single ordered path where each lesson assumes only what came before it, with the reference material a learner keeps needing, like yarn weights, hook sizes and tools, kept separate from the path itself.',
+			],
+			ar: [
+				'المادة العربية عن الكروشيه موجودة، لكنها متناثرة في فيديوهات بلا ترتيب، فلا سبيل للمبتدئ ليعرف ما يتعلّمه بعد أول غرزة، ولا أيّ الأربعين فيديو هو التالي الصحيح.',
+				'هذه هي البنية الناقصة: مسار واحد مرتّب يفترض كل درس فيه ما سبقه فقط، مع إبقاء المادة المرجعية التي يظل المتعلم يحتاجها، كأوزان الخيوط ومقاسات الإبر والأدوات، منفصلة عن المسار نفسه.',
+			],
+		},
+		challenges: [
+			{
+				title: { en: 'Ordering is the product', ar: 'الترتيب هو المنتج' },
+				problem: {
+					en: 'The content already exists on the internet. Publishing another list of it adds nothing. The reason beginners stall is that no source tells them what order to do things in.',
+					ar: 'المحتوى موجود أصلًا على الإنترنت. ونشر قائمة أخرى به لا يضيف شيئًا، فسبب تعثّر المبتدئين أن لا مصدر يخبرهم بأي ترتيب يفعلون الأشياء.',
+				},
+				solution: {
+					en: 'The site is built around a strict prerequisite chain rather than a category listing, and the references are deliberately kept off that chain so they can be consulted at any point without breaking the sequence.',
+					ar: 'بُني الموقع حول سلسلة متطلبات صارمة لا حول تصنيف قوائم، وأُبقيت المراجع عمدًا خارج تلك السلسلة ليُرجَع إليها في أي وقت دون كسر التسلسل.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'An ordered Arabic curriculum with separate tool and material references.',
+			],
+			ar: ['منهج عربي مرتّب مع مراجع منفصلة للأدوات والخامات.'],
+		},
+		sourced: false,
+	},
+	{
+		slug: 'hijabk',
+		title: { en: 'Hijabk', ar: 'حجابك' },
+		tagline: {
+			en: 'A Jordanian atelier for khimars and abayas, ordered over WhatsApp.',
+			ar: 'مشغل أردني للخُمُر والعبايات، الطلب عبر واتساب.',
+		},
+		summary: {
+			en: 'A storefront for a workshop in Amman making khimars, veils and abayas from Korean and Turkish fabrics. Orders go through WhatsApp, payment is cash on delivery, and shipping covers every governorate.',
+			ar: 'واجهة متجر لمشغل في عمّان يخيط الخُمُر والطُرَح والنُقُب والعبايات من أقمشة كورية وتركية. الطلب عبر واتساب، والدفع عند الاستلام، والتوصيل لكل المحافظات.',
+		},
+		category: 'web',
+		status: 'live',
+		featured: false,
+		year: '2026',
+		role: { en: 'Solo', ar: 'منفردًا' },
+		stack: [
+			'Next.js',
+			'TypeScript',
+			'Tailwind CSS',
+			'RTL',
+			'SEO',
+			'WhatsApp ordering',
+		],
+		cover: '/projects/7jabk.png',
+		gallery: ['/projects/7jabk.png'],
+		links: {
+			live: 'https://7jabk.vercel.app',
+			github: 'https://github.com/haithamassoli/7jabk',
+		},
+		overview: {
+			en: [
+				'The client sells through Instagram, where every order is a DM conversation and nothing is browsable. Customers cannot see the range, and the workshop retypes the same answers all day.',
+				'The site gives the catalogue a permanent home while leaving the ordering exactly where the customer is already comfortable. A tap opens WhatsApp with the item pre-filled, so nothing about the sales process had to change.',
+			],
+			ar: [
+				'تبيع صاحبة المشروع عبر إنستغرام، حيث كل طلب محادثة خاصة ولا شيء قابل للتصفح. لا يرى الزبائن التشكيلة، ويعيد المشغل كتابة الأجوبة نفسها طوال اليوم.',
+				'يمنح الموقع الكتالوج بيتًا دائمًا مع إبقاء الطلب حيث يرتاح الزبون أصلًا. نقرة تفتح واتساب والمنتج مُعبّأ مسبقًا، فلم يتغيّر شيء في عملية البيع.',
+			],
+		},
+		challenges: [
+			{
+				title: {
+					en: 'Do not replace a checkout that works',
+					ar: 'لا تستبدل عملية شراء ناجحة',
+				},
+				problem: {
+					en: 'The obvious move is a real cart and online payment. But the customers here expect cash on delivery and a conversation before buying. A card form would have lost sales, not added them.',
+					ar: 'الخطوة البديهية سلة حقيقية ودفع إلكتروني. لكن زبائن هنا يتوقعون الدفع عند الاستلام ومحادثة قبل الشراء، ونموذج بطاقة كان سيخسر مبيعات لا يضيفها.',
+				},
+				solution: {
+					en: 'The site is a catalogue that hands off to WhatsApp with the item and size already written into the message. It removes the browsing friction and keeps the part that was already working.',
+					ar: 'الموقع كتالوج يُسلّم إلى واتساب والمنتج والمقاس مكتوبان في الرسالة مسبقًا. فيزيل عناء التصفح ويُبقي الجزء الذي كان يعمل أصلًا.',
+				},
+			},
+		],
+		outcomes: {
+			en: [
+				'A browsable catalogue feeding WhatsApp orders, with delivery across Jordan.',
+			],
+			ar: ['كتالوج قابل للتصفح يغذّي طلبات واتساب، مع توصيل لكل الأردن.'],
+		},
+		sourced: false,
 	},
 	{
 		slug: 'rooh-al-jouf',
@@ -938,276 +1991,6 @@ export const projects: Project[] = [
 				'صدر على App Store وGoogle Play لعميل سعودي.',
 				'ثنائي اللغة بالكامل مع تخطيط منعكس بشكل صحيح من اليمين إلى اليسار.',
 				'محتوى يديره العميل دون إصدارات جديدة للتطبيق.',
-			],
-		},
-		sourced: true,
-	},
-	{
-		slug: 'fazuwjuh',
-		title: { en: 'Fazawwijuhu', ar: 'فَزَوِّجُوهُ' },
-		tagline: {
-			en: 'A supervised platform for lawful marriage introductions.',
-			ar: 'منصة لتيسير الزواج الشرعي بإشراف إداري.',
-		},
-		summary: {
-			en: 'A platform that introduces people seeking marriage under explicit, published conditions with administrative supervision throughout, deliberately structured to keep the process within religious bounds rather than reproducing a dating app.',
-			ar: 'منصة تُعرِّف الراغبين والراغبات في الزواج وفق شروط واضحة معلنة مع إشراف إداري في كل مرحلة، مبنيّة عمدًا لإبقاء العملية ضمن الحدود الشرعية بدل استنساخ تطبيقات المواعدة.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: [
-			'Next.js 16',
-			'React 19',
-			'TypeScript',
-			'Convex',
-			'Better Auth',
-			'Tailwind v4',
-			'shadcn',
-			'Base UI',
-		],
-		cover: '/projects/fazuwjuh.png',
-		gallery: ['/projects/fazuwjuh.png'],
-		links: {
-			live: 'https://fazuwjuh.vercel.app',
-			github: 'https://github.com/haithamassoli/fazuwjuh',
-		},
-		overview: {
-			en: [
-				'The default shape of this product is a dating app, and the default shape is exactly what the users this is for want to avoid. The design problem was structural rather than visual: what does the flow look like when open browsing and private messaging are the things you are trying to prevent?',
-				'The answer was a form-driven, admin-supervised pipeline. Applicants answer a structured questionnaire that differs by gender, agree to explicit published conditions, and every introduction passes through administrative review rather than happening directly between two users.',
-				'Built on Convex with Better Auth, where the server holds the rules and the client is only a view of them.',
-			],
-			ar: [
-				'الشكل الافتراضي لهذا المنتج تطبيق مواعدة، والشكل الافتراضي هو بالضبط ما يريد مستخدموه تجنّبه. فكانت مشكلة التصميم بنيوية لا بصرية: كيف يبدو المسار حين يكون التصفح المفتوح والمراسلة الخاصة هما ما تحاول منعه؟',
-				'كان الجواب مسارًا قائمًا على استمارات وبإشراف إداري. يجيب المتقدمون عن استبيان منظّم يختلف بحسب الجنس، ويوافقون على شروط معلنة صريحة، وتمرّ كل تعريفة عبر مراجعة إدارية بدل أن تقع مباشرة بين طرفين.',
-				'بُنيت على Convex مع Better Auth، حيث تُحفظ القواعد على الخادم ولا يكون العميل إلا عرضًا لها.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'The rules are the product, so they cannot live in the UI',
-					ar: 'القواعد هي المنتج، فلا يمكن أن تسكن الواجهة',
-				},
-				problem: {
-					en: 'If eligibility and visibility rules are enforced by which screens the client renders, anyone who inspects the network can step around them. For this product that is not a bug class, it is a breach of the entire premise.',
-					ar: 'إن فُرضت قواعد الأهلية والظهور عبر الشاشات التي يعرضها العميل، أمكن لمن يفحص الاتصال تجاوزها. وهذا في هذا المنتج ليس صنفًا من الأخطاء، بل خرق للفكرة كلها.',
-				},
-				solution: {
-					en: 'Convex functions are the source of truth and the enforcement point. The client cannot request what it is not entitled to see, regardless of what it renders.',
-					ar: 'دوال Convex هي مصدر الحقيقة ونقطة الفرض. فلا يستطيع العميل طلب ما لا يحق له رؤيته، مهما عرض.',
-				},
-			},
-			{
-				title: {
-					en: 'The questions must change without a deploy',
-					ar: 'يجب أن تتغير الأسئلة دون نشر',
-				},
-				problem: {
-					en: 'The form questions and the published conditions are religious and editorial content, not engineering decisions. Having them hard-coded means the person who owns that content has to go through me to change a sentence.',
-					ar: 'أسئلة الاستمارة والشروط المعلنة محتوى شرعي وتحريري، لا قرارات هندسية. وترميزها في الشيفرة يعني أن صاحب هذا المحتوى مضطر للمرور بي لتعديل جملة.',
-				},
-				solution: {
-					en: 'Questions and Arabic copy live in dedicated, owner-editable config modules, separate from application code and marked as such in the repo layout.',
-					ar: 'توجد الأسئلة والنصوص العربية في وحدات إعدادات مخصصة قابلة لتحرير صاحب المنتج، منفصلة عن شيفرة التطبيق ومُعلَّمة كذلك في بنية المستودع.',
-				},
-			},
-			{
-				title: {
-					en: "Publishing someone's details is irreversible",
-					ar: 'نشر بيانات شخص لا رجعة فيه',
-				},
-				problem: {
-					en: "An accidental disclosure here is not a UI bug. It affects a real person's reputation and family, and it cannot be undone by deleting a record afterwards.",
-					ar: 'الإفشاء العارض هنا ليس خللًا في الواجهة، بل يمسّ سمعة شخص حقيقي وأسرته، ولا يُلغى بحذف سجل بعد وقوعه.',
-				},
-				solution: {
-					en: 'Nothing is visible by default. Publication requires explicit, recorded consent from the applicant plus administrative approval, so disclosure needs two deliberate acts rather than one missing check.',
-					ar: 'لا شيء ظاهر افتراضيًا. ويتطلب النشر موافقة صريحة موثّقة من المتقدّم مع اعتماد إداري، فيحتاج الإفشاء فعلين مقصودين لا فحصًا واحدًا غائبًا.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Server-enforced visibility rules. The client cannot request what it may not see.',
-				'Questions and religious copy editable by the product owner without a deploy.',
-				'Publication gated behind recorded consent plus admin approval.',
-			],
-			ar: [
-				'قواعد ظهور مفروضة على الخادم. لا يستطيع العميل طلب ما لا يحق له رؤيته.',
-				'أسئلة ونصوص شرعية قابلة للتحرير من صاحب المنتج دون نشر.',
-				'النشر محكوم بموافقة موثّقة واعتماد إداري.',
-			],
-		},
-		sourced: true,
-	},
-	{
-		slug: 'gift',
-		title: { en: 'Gift', ar: 'هديّة' },
-		tagline: {
-			en: 'Animated 3D gifts you send as a link.',
-			ar: 'هدايا ثلاثية الأبعاد متحركة تُرسَل كرابط.',
-		},
-		summary: {
-			en: 'Pick a gift, record a voice note, send a link. The recipient opens a 3D scene that unwraps in the browser. Free, no accounts, and the sender gets an email when it is opened.',
-			ar: 'اختر هدية، وسجّل رسالة صوتية، وأرسل رابطًا. يفتح المستلم مشهدًا ثلاثي الأبعاد يُفكّ غلافه في المتصفح. مجاني وبلا حسابات، ويصل المرسِل بريد حين تُفتح.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: [
-			'Next.js 16',
-			'React Three Fiber',
-			'drei',
-			'Convex',
-			'Tailwind CSS',
-			'Turbopack',
-			'React Compiler',
-		],
-		cover: '/projects/gift.png',
-		gallery: ['/projects/gift.png'],
-		links: {
-			live: 'https://gift.assoli.site',
-			github: 'https://github.com/haithamassoli/gift',
-		},
-		overview: {
-			en: [
-				'A greeting sent as a link is usually a static page with a name interpolated into it. This one is a real 3D scene: the gift sits there wrapped, and opening it is an animation rather than a page load.',
-				'Senders can attach a voice note, and get an email when the gift is actually opened, which turns out to be the part people care about most.',
-			],
-			ar: [
-				'التهنئة المُرسَلة كرابط عادةً صفحة ثابتة أُدرج فيها اسم. أما هنا فمشهد ثلاثي الأبعاد حقيقي: الهدية موضوعة مغلَّفة، وفتحها حركة لا تحميل صفحة.',
-				'يستطيع المرسِل إرفاق رسالة صوتية، ويصله بريد حين تُفتح الهدية فعلًا، وتبيّن أن هذا أكثر ما يهتم به الناس.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'A shared link that previews as a grey box does not get opened',
-					ar: 'رابط يُعاين كمربع رمادي لا يُفتح',
-				},
-				problem: {
-					en: 'The entire distribution model is someone pasting the link into a chat. A client-rendered 3D app gives crawlers an empty shell, so the preview is blank and the link looks like spam.',
-					ar: 'نموذج التوزيع كله أن يلصق أحدهم الرابط في محادثة. والتطبيق ثلاثي الأبعاد المعروض من طرف العميل يعطي الزواحف هيكلًا فارغًا، فتأتي المعاينة خالية ويبدو الرابط كرسالة مزعجة.',
-				},
-				solution: {
-					en: 'Crawlers hitting a gift URL are rewritten to a server function that returns per-gift Open Graph tags, while real visitors get the full 3D app. The preview is correct without server-rendering a WebGL scene.',
-					ar: 'تُحوَّل الزواحف التي تصل رابط هدية إلى دالة على الخادم تعيد وسوم Open Graph خاصة بتلك الهدية، بينما يحصل الزائر الحقيقي على التطبيق ثلاثي الأبعاد كاملًا. فتصحّ المعاينة دون عرض مشهد WebGL على الخادم.',
-				},
-			},
-			{
-				title: {
-					en: '3D scenes and server rendering do not mix',
-					ar: 'المشاهد ثلاثية الأبعاد والعرض من الخادم لا يمتزجان',
-				},
-				problem: {
-					en: 'React Three Fiber needs a canvas and a browser; server rendering it produces hydration mismatches and a flash of broken layout before the scene appears.',
-					ar: 'يحتاج React Three Fiber لوحةً ومتصفحًا؛ وعرضه من الخادم ينتج عدم تطابق في الترطيب ووميض تخطيط مكسور قبل ظهور المشهد.',
-				},
-				solution: {
-					en: 'The app tree renders client-only behind a mounted gate, so it behaves like a single-page app while the routes around it stay server-rendered. Fighting the framework here would have cost more than accepting the boundary.',
-					ar: 'تُعرَض شجرة التطبيق من طرف العميل فقط خلف بوابة تركيب، فتتصرّف كتطبيق أحادي الصفحة بينما تبقى المسارات حولها معروضة من الخادم. ومصارعة الإطار هنا كانت ستكلّف أكثر من قبول الحد.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Per-gift link previews without server-rendering WebGL.',
-				'Voice notes and open-notification emails, with no account required.',
-			],
-			ar: [
-				'معاينات روابط خاصة بكل هدية دون عرض WebGL على الخادم.',
-				'رسائل صوتية وإشعارات بريدية عند الفتح، بلا حاجة إلى حساب.',
-			],
-		},
-		sourced: true,
-	},
-	{
-		slug: 'devcards',
-		title: { en: 'DevCards', ar: 'بطاقات المقابلات' },
-		tagline: {
-			en: 'Spaced-repetition flashcards for engineering interviews.',
-			ar: 'بطاقات مراجعة متباعدة للتحضير لمقابلات الهندسة.',
-		},
-		summary: {
-			en: 'Hundreds of multiple-choice questions across thirteen topics, each with a full explanation, scheduled by a Leitner system so the cards you get wrong keep coming back until they stick. Entirely frontend: no backend, no account, no network calls.',
-			ar: 'مئات الأسئلة متعددة الخيارات في ثلاثة عشر موضوعًا، لكل سؤال شرح كامل، مجدولة بنظام لايتنر بحيث تعود البطاقات التي تخطئ فيها حتى ترسخ. واجهة أمامية بالكامل: بلا خادم وبلا حساب وبلا اتصالات شبكية.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo: content and app', ar: 'منفردًا: المحتوى والتطبيق' },
-		stack: [
-			'Next.js',
-			'TypeScript',
-			'Tailwind CSS',
-			'localStorage',
-			'Leitner scheduling',
-		],
-		cover: '/projects/devcards.png',
-		gallery: ['/projects/devcards.png'],
-		links: {
-			live: 'https://flashcards.assoli.site',
-			github: 'https://github.com/haithamassoli/Interview-Flashcards-Game',
-		},
-		overview: {
-			en: [
-				'Interview prep material is either a list of questions with one-line answers you forget immediately, or a course you never finish. Neither does the thing that actually works, which is being asked the question again a few days after getting it wrong.',
-				"DevCards covers thirteen areas at three difficulty levels: software engineering, frontend, backend, system design, microservices, caching, databases, security, React, PHP, Laravel, Next.js and Node.js. Every card is multiple choice and graded instantly, with a short answer and a deeper 'behind the scenes' explanation.",
-				'There is no backend at all. Progress lives in the browser, which means it opens instantly and costs nothing to run.',
-			],
-			ar: [
-				'مواد التحضير للمقابلات إما قائمة أسئلة بإجابات من سطر تُنسى فورًا، وإما دورة لا تُنهيها أبدًا. ولا يفعل أيٌّ منهما ما ينفع فعلًا: أن يُطرح عليك السؤال ثانيةً بعد أيام من خطئك فيه.',
-				'تغطي DevCards ثلاثة عشر مجالًا بثلاثة مستويات صعوبة: هندسة البرمجيات، والواجهات الأمامية والخلفية، وتصميم الأنظمة، والخدمات المصغّرة، والتخزين المؤقت، وقواعد البيانات، والأمان، وReact وPHP وLaravel وNext.js وNode.js. كل بطاقة متعددة الخيارات وتُصحَّح فورًا، مع إجابة قصيرة وشرح أعمق لما يجري خلف الكواليس.',
-				'لا خادم إطلاقًا. يبقى التقدّم في المتصفح، فيُفتح فورًا وبلا كلفة تشغيل.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'Getting it right once is not learning it',
-					ar: 'الإصابة مرة ليست تعلّمًا',
-				},
-				problem: {
-					en: 'A plain quiz shuffles and moves on, so a question you guessed correctly and a question you actually know are treated identically, and the ones you got wrong are the ones you never see again.',
-					ar: 'الاختبار العادي يخلط ويمضي، فيُعامَل السؤال الذي خمّنته صوابًا والسؤال الذي تعرفه فعلًا معاملةً واحدة، وتكون الأسئلة التي أخطأت فيها هي ما لا تراه ثانيةً أبدًا.',
-				},
-				solution: {
-					en: 'A Leitner system with self-rating. A missed card drops to box zero and returns almost immediately, both later in the same session and in future ones, while cards you know climb to longer intervals.',
-					ar: 'نظام لايتنر مع تقييم ذاتي. تهبط البطاقة المُخطأة إلى الصندوق صفر وتعود بعد قليل، في الجلسة نفسها وفي الجلسات اللاحقة، بينما تصعد البطاقات التي تعرفها إلى فواصل أطول.',
-				},
-			},
-			{
-				title: {
-					en: 'No backend means no account to restore from',
-					ar: 'بلا خادم يعني بلا حساب تستعيد منه',
-				},
-				problem: {
-					en: 'Keeping everything client-side is what makes the app free and instant, but it also means progress is tied to one browser and can be cleared without warning.',
-					ar: 'إبقاء كل شيء على العميل هو ما يجعل التطبيق مجانيًا وفوريًا، لكنه يعني أيضًا أن التقدّم مرتبط بمتصفح واحد وقد يُمسح دون إنذار.',
-				},
-				solution: {
-					en: 'I took the trade deliberately rather than adding accounts for a study tool. Storage reads and writes are defensive so a cleared or blocked store degrades to a fresh session instead of a crash.',
-					ar: 'قبلت المقايضة عمدًا بدل إضافة حسابات لأداة مذاكرة. وعمليات القراءة والكتابة في التخزين دفاعية، فيتحوّل التخزين الممسوح أو المحظور إلى جلسة جديدة بدل انهيار.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Thirteen categories, hundreds of graded questions with explanations.',
-				'Leitner scheduling plus in-session re-queueing of missed cards.',
-				'Fully offline-capable; keyboard-driven throughout.',
-			],
-			ar: [
-				'ثلاثة عشر تصنيفًا، ومئات الأسئلة المُصحَّحة مع شروح.',
-				'جدولة لايتنر مع إعادة إدراج البطاقات المُخطأة داخل الجلسة.',
-				'قادر على العمل دون اتصال بالكامل، ويُدار بالكامل من لوحة المفاتيح.',
 			],
 		},
 		sourced: true,
@@ -1450,118 +2233,6 @@ export const projects: Project[] = [
 				'يعمل على مستوى النظام في كل التطبيقات، لا في متصفح فقط.',
 				'كشف على الجهاز بلا سحابة وبلا تتبّع.',
 				'سقف موثّق: قوي على الصور الثابتة، وأفضل جهد على الفيديو.',
-			],
-		},
-		sourced: true,
-	},
-	{
-		slug: 'azkari',
-		title: { en: 'Azkari / Dhikr', ar: 'أذكاري / ذِكر' },
-		tagline: {
-			en: 'One remembrance, every so often, on whichever screen you are at.',
-			ar: 'ذِكر واحد، بين حين وآخر، على أي شاشة تكون أمامها.',
-		},
-		summary: {
-			en: 'A remembrance reminder that has followed me onto every platform I use: a VS Code extension, a macOS app, a Windows tray app, a standalone Apple Watch app, and a Wear OS watch face companion. Each one is native, offline, and deliberately tiny.',
-			ar: 'تذكير بالذِّكر تبعني إلى كل منصة أستخدمها: إضافة VS Code، وتطبيق macOS، وتطبيق شريط مهام لويندوز، وتطبيق مستقل لساعة Apple، ورفيق لساعات Wear OS. كل منها أصلي وبلا اتصال وصغير عمدًا.',
-		},
-		category: 'desktop',
-		status: 'shipped',
-		featured: false,
-		year: '2023 to 2026',
-		role: { en: 'Solo: five platforms', ar: 'منفردًا: خمس منصات' },
-		stack: [
-			'JavaScript',
-			'Swift',
-			'SwiftUI',
-			'Kotlin',
-			'C#',
-			'WPF',
-			'VS Code API',
-			'WatchKit',
-			'UserNotifications',
-		],
-		cover: '/projects/azkari-mac.png',
-		gallery: [
-			'/projects/azkari-mac.png',
-			'/projects/azkari-preview.png',
-			'/projects/azkari-logo.png',
-			'/apps/dhikr-android-icon.png',
-		],
-		links: {
-			vscode:
-				'https://marketplace.visualstudio.com/items?itemName=HaithamAssoli.azkari',
-			playGoogle:
-				'https://play.google.com/store/apps/details?id=com.haithamassoli.dhikr',
-			github: 'https://github.com/haithamassoli/Azkari',
-			live: 'https://dhikr.assoli.site',
-		},
-		overview: {
-			en: [
-				'This started as a VS Code extension: a small notification during a coding session, dismissible with a keystroke, gone by itself after six seconds. It is the most-starred thing I have written, which says something about how many developers wanted exactly that and nothing more.',
-				'Since then it has gone everywhere I work: a macOS app, a Windows tray app in C# and WPF with zero NuGet dependencies, a standalone watchOS app that needs no iPhone companion, and a Wear OS version. The Windows build even ships a self-test flag that prints PASS/FAIL for its own logic.',
-				'The design constraint is the same on all five: it must never become an app you have to manage. Interval, list, and nothing else.',
-			],
-			ar: [
-				'بدأ هذا إضافةً لـ VS Code: إشعار صغير أثناء جلسة برمجة، يُغلق بضغطة، ويختفي وحده بعد ست ثوانٍ. وهو أكثر ما كتبته نجومًا، وفي ذلك دلالة على عدد المطورين الذين أرادوا هذا بالضبط ولا شيء أكثر.',
-				'ومنذ ذلك الحين ذهب إلى كل مكان أعمل فيه: تطبيق macOS، وتطبيق شريط مهام لويندوز بـ C# وWPF بلا أي اعتمادية NuGet، وتطبيق watchOS مستقل لا يحتاج رفيقًا على iPhone، ونسخة Wear OS. بل تأتي نسخة ويندوز براية اختبار ذاتي تطبع نجاح/فشل لمنطقها.',
-				'قيد التصميم واحد في الخمسة: يجب ألا يصير تطبيقًا مضطرًا لإدارته. فاصل زمني، وقائمة، ولا شيء غير ذلك.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'A reminder that interrupts stops being used',
-					ar: 'التذكير الذي يقاطع يُهجَر',
-				},
-				problem: {
-					en: 'The whole value is frequency, but anything that steals focus while you are typing gets uninstalled within a day. A native system toast is too intrusive and stacks up in notification history.',
-					ar: 'القيمة كلها في التكرار، لكن ما يخطف التركيز أثناء الكتابة يُحذف خلال يوم. والإشعار النظامي الأصلي مقتحم أكثر مما ينبغي ويتراكم في سجل الإشعارات.',
-				},
-				solution: {
-					en: 'Each platform interrupts as little as it can: a frameless transparent popup that fades in over all windows without taking focus or blocking clicks on desktop, a wrist tap on the watch, an editor notification in VS Code. It auto-dismisses, so ignoring it is a valid response.',
-					ar: 'تقاطعك كل منصة بأقل ما تستطيع: نافذة منبثقة بلا إطار وشفافة تظهر فوق كل النوافذ دون أخذ التركيز أو حجب النقر على سطح المكتب، ونقرة على المعصم في الساعة، وإشعار محرر في VS Code. ويختفي تلقائيًا، فيكون التجاهل استجابة صحيحة.',
-				},
-			},
-			{
-				title: {
-					en: 'Battery on a watch is the whole product',
-					ar: 'البطارية في الساعة هي المنتج كله',
-				},
-				problem: {
-					en: 'A watch app that fires reminders all day and costs noticeable battery gets removed regardless of how good the reminders are. Extended runtime sessions and complications were the obvious route and the wrong one.',
-					ar: 'تطبيق ساعة يطلق تذكيرات طوال اليوم ويستهلك بطارية ملحوظة يُحذف مهما كانت تذكيراته جيدة. وجلسات التشغيل الممتد والمضاعفات كانت الطريق البديهي والخاطئ.',
-				},
-				solution: {
-					en: 'The watchOS build uses only system-scheduled local notifications plus opportunistic background refresh: no workout sessions, no complication, no network at all. Reminders survive a reboot and an app update without the user doing anything.',
-					ar: 'تستخدم نسخة watchOS إشعارات محلية مجدولة من النظام فقط مع تحديث خلفي انتهازي: بلا جلسات تمرين ولا مضاعفات ولا شبكة إطلاقًا. وتنجو التذكيرات من إعادة التشغيل ومن تحديث التطبيق دون أن يفعل المستخدم شيئًا.',
-				},
-			},
-			{
-				title: {
-					en: 'Five platforms is five times the maintenance',
-					ar: 'خمس منصات تعني صيانة خمسة أضعاف',
-				},
-				problem: {
-					en: 'Writing the same tiny app five times in five languages is how side projects die. Every dependency upgrade multiplies by five.',
-					ar: 'كتابة التطبيق الصغير نفسه خمس مرات بخمس لغات هي كيف تموت المشاريع الجانبية، فكل ترقية اعتمادية تتضاعف خمس مرات.',
-				},
-				solution: {
-					en: 'Each build depends on almost nothing. The Windows version has zero NuGet packages: tray via in-box WinForms, JSON via System.Text.Json, startup via the registry, chime via SystemSounds. Nothing to upgrade means nothing to break.',
-					ar: 'لا تكاد كل نسخة تعتمد على شيء. فنسخة ويندوز بلا أي حزمة NuGet: شريط المهام عبر WinForms المدمج، وJSON عبر System.Text.Json، والإقلاع عبر السجل، والتنبيه عبر SystemSounds. ولا شيء يُرقّى يعني لا شيء ينكسر.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Published on the VS Code Marketplace and Google Play.',
-				'Five native builds: VS Code, macOS, Windows, watchOS, Wear OS.',
-				'Fully offline everywhere; no accounts, no analytics, no data collected.',
-			],
-			ar: [
-				'منشور على متجر VS Code وعلى Google Play.',
-				'خمس نسخ أصلية: VS Code وmacOS وويندوز وwatchOS وWear OS.',
-				'يعمل دون اتصال في كل مكان؛ بلا حسابات ولا تحليلات ولا جمع بيانات.',
 			],
 		},
 		sourced: true,
@@ -1945,77 +2616,6 @@ export const projects: Project[] = [
 		sourced: true,
 	},
 	{
-		slug: 'tawsilah-abshir',
-		title: { en: 'Tawsilah Abshir', ar: 'توصيلة ابشر' },
-		tagline: {
-			en: 'Ride-hailing built for Ajloun, not adapted to it.',
-			ar: 'تطبيق توصيل مبني لعجلون، لا مُكيَّف عليها.',
-		},
-		summary: {
-			en: 'A ride service for Ajloun and the surrounding governorates, with vetted drivers who know the area. Built for daily local trips as much as long runs to other governorates.',
-			ar: 'خدمة توصيل لعجلون والمحافظات المحيطة، بسائقين معتمدين يعرفون المنطقة. مبنية للمشاوير اليومية المحلية كما للرحلات الطويلة إلى محافظات أخرى.',
-		},
-		category: 'mobile',
-		status: 'shipped',
-		featured: false,
-		year: '2026',
-		role: {
-			en: 'Client project: mobile development',
-			ar: 'مشروع لعميل: تطوير الموبايل',
-		},
-		stack: [
-			'React Native',
-			'Expo',
-			'TypeScript',
-			'Maps',
-			'Push Notifications',
-			'React Query',
-		],
-		cover: '/apps/tawsilah-1.png',
-		gallery: [
-			'/apps/tawsilah-1.png',
-			'/apps/tawsilah-2.png',
-			'/apps/tawsilah-3.png',
-			'/apps/tawsilah-4.png',
-			'/apps/tawsilah-5.png',
-		],
-		links: {
-			playGoogle:
-				'https://play.google.com/store/apps/details?id=com.assoliindustries.tawsilah',
-			github: 'https://github.com/haithamassoli/tawseel',
-		},
-		overview: {
-			en: [
-				'The large ride-hailing apps work in Amman and thin out fast outside it. In a governorate like Ajloun that leaves people back on calling a driver they know, which works until he is busy.',
-				'This is the local version: drivers vetted for the area, pricing that makes sense for both short in-town trips and inter-governorate runs, and an interface aimed at people who have never used a ride app before.',
-			],
-			ar: [
-				'تعمل تطبيقات التوصيل الكبرى في عمّان وتتلاشى بسرعة خارجها. وفي محافظة كعجلون يترك ذلك الناس عائدين إلى الاتصال بسائق يعرفونه، وهو حلّ يصلح حتى ينشغل.',
-				'هذه هي النسخة المحلية: سائقون معتمدون للمنطقة، وتسعير منطقي للمشاوير القصيرة داخل المدينة وللرحلات بين المحافظات، وواجهة موجّهة لمن لم يستخدم تطبيق توصيل من قبل.',
-			],
-		},
-		challenges: [
-			{
-				title: { en: 'Addresses that do not exist', ar: 'عناوين غير موجودة' },
-				problem: {
-					en: 'Outside the capital, street addressing is unreliable and many destinations are known by landmark rather than by any address a geocoder recognises.',
-					ar: 'خارج العاصمة، عنونة الشوارع غير موثوقة، وكثير من الوجهات تُعرف بمعلم بارز لا بعنوان يعرفه أي مُرمِّز جغرافي.',
-				},
-				solution: {
-					en: 'Pickup and destination are set by dropping a pin and optionally naming a landmark, so a rider never has to produce an address that does not exist.',
-					ar: 'يُحدَّد موضع الانطلاق والوجهة بوضع دبوس مع تسمية اختيارية لمعلم، فلا يضطر الراكب أبدًا إلى إنتاج عنوان غير موجود.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Published on Google Play, serving Ajloun and inter-governorate trips.',
-			],
-			ar: ['منشور على Google Play، ويخدم عجلون والرحلات بين المحافظات.'],
-		},
-		sourced: true,
-	},
-	{
 		slug: 'kheir',
 		title: { en: 'Kheir', ar: 'خير' },
 		tagline: {
@@ -2148,314 +2748,6 @@ export const projects: Project[] = [
 		sourced: true,
 	},
 	{
-		slug: 'hirfati',
-		title: { en: 'Hirfati', ar: 'حرفتي' },
-		tagline: {
-			en: 'Find a trusted tradesperson in Jordan and get free quotes.',
-			ar: 'اعثر على حرفي موثوق في الأردن واحصل على عروض أسعار مجانية.',
-		},
-		summary: {
-			en: 'A marketplace for skilled trades across Jordan: plumbing, electrical, carpentry, metalwork, painting, air conditioning, tiling and general maintenance. Describe the job, receive quotes, choose.',
-			ar: 'سوق للحرف المهنية في الأردن: سباكة وكهرباء ونجارة وحدادة ودهان وتكييف وبلاط وصيانة عامة. صِف العمل، واستقبل العروض، واختر.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'SEO', 'RTL'],
-		cover: '/projects/hirfati.png',
-		gallery: ['/projects/hirfati.png'],
-		links: {
-			live: 'https://hirfati-jo.vercel.app',
-			github: 'https://github.com/haithamassoli/hirfati',
-		},
-		overview: {
-			en: [
-				'Finding a plumber in Jordan means asking a neighbour, calling a number written on a wall, or taking whoever answers. There is no way to compare, no way to check anyone, and no price until they are already in your house.',
-				'Hirfati puts the job first: describe what needs doing, and tradespeople quote for it. The comparison happens before anyone shows up.',
-			],
-			ar: [
-				'إيجاد سبّاك في الأردن يعني سؤال جار، أو الاتصال برقم مكتوب على جدار، أو أخذ من يردّ. لا سبيل للمقارنة، ولا للتحقق من أحد، ولا سعر قبل أن يكون في بيتك أصلًا.',
-				'يضع «حرفتي» العمل أولًا: صِف ما ينبغي عمله، فيقدّم الحرفيون عروضهم. وتقع المقارنة قبل أن يحضر أحد.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'A marketplace with nobody on it is useless to both sides',
-					ar: 'سوق بلا أحد لا ينفع الطرفين',
-				},
-				problem: {
-					en: 'Customers will not post jobs where no tradespeople are, and tradespeople will not sign up where there are no jobs. Launching an empty two-sided marketplace stalls immediately.',
-					ar: 'لن ينشر الزبائن أعمالًا حيث لا حرفيين، ولن يسجّل الحرفيون حيث لا أعمال. وإطلاق سوق ثنائي فارغ يتوقف فورًا.',
-				},
-				solution: {
-					en: 'The site is useful before it has liquidity: it works as a searchable, SEO-indexed directory by trade and governorate, so a customer arriving from search finds someone to call even when quoting is quiet.',
-					ar: 'الموقع نافع قبل أن تكون فيه سيولة: يعمل كدليل قابل للبحث ومُفهرس لمحركات البحث حسب الحرفة والمحافظة، فيجد الزبون القادم من البحث من يتصل به حتى حين تهدأ العروض.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Live and indexed by trade and governorate across Jordan.',
-				'Free quote requests without an account.',
-			],
-			ar: [
-				'مباشر ومُفهرس حسب الحرفة والمحافظة في الأردن.',
-				'طلبات عروض أسعار مجانية بلا حساب.',
-			],
-		},
-		sourced: false,
-	},
-	{
-		slug: 'hadanati',
-		title: { en: 'Hadanati', ar: 'حضانتي' },
-		tagline: {
-			en: 'Run a nursery: attendance, assessments, fees and a parent portal.',
-			ar: 'إدارة حضانة: حضور وتقييمات ورسوم وبوابة لأولياء الأمور.',
-		},
-		summary: {
-			en: "An Arabic platform for nurseries in Jordan covering daily attendance, child assessments, fee tracking and a portal that lets parents see their child's day without phoning the nursery.",
-			ar: 'منصة عربية لحضانات الأردن تغطي الحضور اليومي وتقييمات الأطفال ومتابعة الرسوم، وبوابة تُطلع أولياء الأمور على يوم أطفالهم دون الاتصال بالحضانة.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'RTL'],
-		cover: '/projects/hadanati.png',
-		gallery: ['/projects/hadanati.png'],
-		links: {
-			live: 'https://hadanati.assoli.site',
-			github: 'https://github.com/haithamassoli/hadanati',
-		},
-		overview: {
-			en: [
-				'Most nurseries here run on a paper register, a WhatsApp group and a notebook of who has paid. It works until a parent asks a question about last month.',
-				"Hadanati replaces the three of them with one system: attendance, assessments and fees on the staff side, and a parent portal on the other, so the answer to 'how was he today' does not require a phone call.",
-			],
-			ar: [
-				'تدير معظم الحضانات هنا سجلًا ورقيًا ومجموعة واتساب ودفترًا لمن دفع. وهذا يصلح حتى يسأل ولي أمر عن الشهر الماضي.',
-				'تستبدل «حضانتي» الثلاثة بنظام واحد: حضور وتقييمات ورسوم من جهة الطاقم، وبوابة لأولياء الأمور من الجهة الأخرى، فلا يحتاج جواب «كيف كان اليوم» إلى مكالمة.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'The staff using it are not computer users',
-					ar: 'الطاقم الذي يستخدمه ليسوا مستخدمي حواسيب',
-				},
-				problem: {
-					en: 'Nursery staff are with children all day. Any workflow that takes more than a few taps, or that punishes a mistake, gets abandoned for the paper register within a week.',
-					ar: 'طاقم الحضانة مع الأطفال طوال اليوم. وأي مسار يتطلب أكثر من نقرات قليلة، أو يعاقب على الخطأ، يُهجَر إلى السجل الورقي خلال أسبوع.',
-				},
-				solution: {
-					en: 'Attendance is a single tap per child from one list, corrections are always available rather than locked after submit, and nothing requires leaving the screen you are on.',
-					ar: 'الحضور نقرة واحدة لكل طفل من قائمة واحدة، والتصحيح متاح دائمًا لا مقفل بعد الإرسال، ولا شيء يتطلب مغادرة الشاشة التي أنت فيها.',
-				},
-			},
-			{
-				title: {
-					en: 'Parents must see enough, and not too much',
-					ar: 'على أولياء الأمور أن يروا ما يكفي، لا أكثر',
-				},
-				problem: {
-					en: "A parent portal that exposes a shared class view leaks other children's attendance, assessments and fee status to every family in the room.",
-					ar: 'بوابة تعرض رؤية صفّية مشتركة تُسرّب حضور أطفال آخرين وتقييماتهم وحالة رسومهم لكل أسرة في الغرفة.',
-				},
-				solution: {
-					en: "Every parent-facing query is scoped to their own children on the server, so the portal cannot return another family's data regardless of what the client asks for.",
-					ar: 'كل استعلام موجّه لولي الأمر محصور بأطفاله على الخادم، فلا تستطيع البوابة إعادة بيانات أسرة أخرى مهما طلب العميل.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Attendance, assessments, fees and a parent portal in one Arabic-first platform.',
-			],
-			ar: ['حضور وتقييمات ورسوم وبوابة أولياء أمور في منصة عربية أولًا.'],
-		},
-		sourced: false,
-	},
-	{
-		slug: 'ghurza',
-		title: { en: 'Ghurza', ar: 'غُرزة' },
-		tagline: {
-			en: 'Learn crochet in Arabic, from the first stitch upward.',
-			ar: 'تعلّم الكروشيه بالعربية، من أول غرزة صعودًا.',
-		},
-		summary: {
-			en: 'A complete Arabic learning path for crochet: ordered lessons from the very first stitch through to advanced work, plus references for yarns, hooks and tools, and a curated set of the best Arabic and international sources.',
-			ar: 'مسار تعلّم عربي متكامل للكروشيه: دروس مرتّبة من أول غرزة حتى الأعمال المتقدمة، مع مراجع للخيوط والإبر والأدوات، ومجموعة منتقاة من أفضل المصادر العربية والعالمية.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: {
-			en: 'Solo: content structure and build',
-			ar: 'منفردًا: بنية المحتوى والتطوير',
-		},
-		stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'RTL', 'SEO'],
-		cover: '/projects/crochet.png',
-		gallery: ['/projects/crochet.png'],
-		links: {
-			live: 'https://crochet.assoli.site',
-			github: 'https://github.com/haithamassoli/crochet',
-		},
-		overview: {
-			en: [
-				'Arabic crochet material exists, but it is scattered across videos with no ordering. A beginner has no way to know what to learn after the first stitch, or which of forty videos is the right next one.',
-				'This is the missing structure: a single ordered path where each lesson assumes only what came before it, with the reference material a learner keeps needing, like yarn weights, hook sizes and tools, kept separate from the path itself.',
-			],
-			ar: [
-				'المادة العربية عن الكروشيه موجودة، لكنها متناثرة في فيديوهات بلا ترتيب، فلا سبيل للمبتدئ ليعرف ما يتعلّمه بعد أول غرزة، ولا أيّ الأربعين فيديو هو التالي الصحيح.',
-				'هذه هي البنية الناقصة: مسار واحد مرتّب يفترض كل درس فيه ما سبقه فقط، مع إبقاء المادة المرجعية التي يظل المتعلم يحتاجها، كأوزان الخيوط ومقاسات الإبر والأدوات، منفصلة عن المسار نفسه.',
-			],
-		},
-		challenges: [
-			{
-				title: { en: 'Ordering is the product', ar: 'الترتيب هو المنتج' },
-				problem: {
-					en: 'The content already exists on the internet. Publishing another list of it adds nothing. The reason beginners stall is that no source tells them what order to do things in.',
-					ar: 'المحتوى موجود أصلًا على الإنترنت. ونشر قائمة أخرى به لا يضيف شيئًا، فسبب تعثّر المبتدئين أن لا مصدر يخبرهم بأي ترتيب يفعلون الأشياء.',
-				},
-				solution: {
-					en: 'The site is built around a strict prerequisite chain rather than a category listing, and the references are deliberately kept off that chain so they can be consulted at any point without breaking the sequence.',
-					ar: 'بُني الموقع حول سلسلة متطلبات صارمة لا حول تصنيف قوائم، وأُبقيت المراجع عمدًا خارج تلك السلسلة ليُرجَع إليها في أي وقت دون كسر التسلسل.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'An ordered Arabic curriculum with separate tool and material references.',
-			],
-			ar: ['منهج عربي مرتّب مع مراجع منفصلة للأدوات والخامات.'],
-		},
-		sourced: false,
-	},
-	{
-		slug: 'service',
-		title: { en: 'Service', ar: 'سيرفيس' },
-		tagline: {
-			en: "Post a trip or book a seat between Jordan's governorates.",
-			ar: 'انشر رحلتك أو احجز مقعدك بين محافظات الأردن.',
-		},
-		summary: {
-			en: 'Intercity ride sharing for Jordan: Amman, Irbid, Zarqa, Aqaba and everywhere else. Drivers post the trip they are already making; passengers book a seat on it.',
-			ar: 'مشاركة رحلات بين مدن الأردن: عمّان وإربد والزرقاء والعقبة وسائر المحافظات. ينشر السائقون الرحلة التي سيقومون بها أصلًا، ويحجز الركاب مقعدًا فيها.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'RTL'],
-		cover: '/projects/sarfees.png',
-		gallery: ['/projects/sarfees.png'],
-		links: {
-			live: 'https://sarfees.vercel.app',
-			github: 'https://github.com/haithamassoli/sarfees',
-		},
-		overview: {
-			en: [
-				"Intercity travel in Jordan runs on 'service' cars that leave when they fill. You go to the station and wait, with no way to know whether that is ten minutes or an hour.",
-				'This moves the matching online: a driver posts the trip they are making anyway, passengers book seats on it, and both sides know the departure before anyone leaves the house.',
-			],
-			ar: [
-				'يقوم التنقّل بين مدن الأردن على سيارات «السرفيس» التي تنطلق حين تمتلئ. تذهب إلى المجمّع وتنتظر، بلا سبيل لمعرفة أهي عشر دقائق أم ساعة.',
-				'ينقل هذا المطابقة إلى الإنترنت: ينشر السائق الرحلة التي سيقوم بها على أي حال، ويحجز الركاب مقاعد فيها، ويعرف الطرفان موعد الانطلاق قبل أن يغادر أحد بيته.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'Seats are a shared, racing resource',
-					ar: 'المقاعد مورد مشترك متسابَق عليه',
-				},
-				problem: {
-					en: 'A seven-seat car with two people booking the last seat at once is the normal case on a popular route, and overselling means someone is left at the station.',
-					ar: 'سيارة بسبعة مقاعد يحجز شخصان آخر مقعد فيها في اللحظة ذاتها حالة طبيعية على خط مزدحم، والبيع الزائد يعني أن أحدهم يبقى في المجمّع.',
-				},
-				solution: {
-					en: "Remaining seats are decremented in a single server-side operation rather than read-then-write, so a race resolves to one winner and a clean 'full' state for the other.",
-					ar: 'تُنقَص المقاعد المتبقية في عملية واحدة على الخادم بدل قراءة ثم كتابة، فيُحسم السباق بفائز واحد وحالة «مكتمل» نظيفة للآخر.',
-				},
-			},
-		],
-		outcomes: {
-			en: ['Trip posting and seat booking across all Jordanian governorates.'],
-			ar: ['نشر الرحلات وحجز المقاعد في كل محافظات الأردن.'],
-		},
-		sourced: false,
-	},
-	{
-		slug: 'hijabk',
-		title: { en: 'Hijabk', ar: 'حجابك' },
-		tagline: {
-			en: 'A Jordanian atelier for khimars and abayas, ordered over WhatsApp.',
-			ar: 'مشغل أردني للخُمُر والعبايات، الطلب عبر واتساب.',
-		},
-		summary: {
-			en: 'A storefront for a workshop in Amman making khimars, veils and abayas from Korean and Turkish fabrics. Orders go through WhatsApp, payment is cash on delivery, and shipping covers every governorate.',
-			ar: 'واجهة متجر لمشغل في عمّان يخيط الخُمُر والطُرَح والنُقُب والعبايات من أقمشة كورية وتركية. الطلب عبر واتساب، والدفع عند الاستلام، والتوصيل لكل المحافظات.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: [
-			'Next.js',
-			'TypeScript',
-			'Tailwind CSS',
-			'RTL',
-			'SEO',
-			'WhatsApp ordering',
-		],
-		cover: '/projects/7jabk.png',
-		gallery: ['/projects/7jabk.png'],
-		links: {
-			live: 'https://7jabk.vercel.app',
-			github: 'https://github.com/haithamassoli/7jabk',
-		},
-		overview: {
-			en: [
-				'The client sells through Instagram, where every order is a DM conversation and nothing is browsable. Customers cannot see the range, and the workshop retypes the same answers all day.',
-				'The site gives the catalogue a permanent home while leaving the ordering exactly where the customer is already comfortable. A tap opens WhatsApp with the item pre-filled, so nothing about the sales process had to change.',
-			],
-			ar: [
-				'تبيع صاحبة المشروع عبر إنستغرام، حيث كل طلب محادثة خاصة ولا شيء قابل للتصفح. لا يرى الزبائن التشكيلة، ويعيد المشغل كتابة الأجوبة نفسها طوال اليوم.',
-				'يمنح الموقع الكتالوج بيتًا دائمًا مع إبقاء الطلب حيث يرتاح الزبون أصلًا. نقرة تفتح واتساب والمنتج مُعبّأ مسبقًا، فلم يتغيّر شيء في عملية البيع.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'Do not replace a checkout that works',
-					ar: 'لا تستبدل عملية شراء ناجحة',
-				},
-				problem: {
-					en: 'The obvious move is a real cart and online payment. But the customers here expect cash on delivery and a conversation before buying. A card form would have lost sales, not added them.',
-					ar: 'الخطوة البديهية سلة حقيقية ودفع إلكتروني. لكن زبائن هنا يتوقعون الدفع عند الاستلام ومحادثة قبل الشراء، ونموذج بطاقة كان سيخسر مبيعات لا يضيفها.',
-				},
-				solution: {
-					en: 'The site is a catalogue that hands off to WhatsApp with the item and size already written into the message. It removes the browsing friction and keeps the part that was already working.',
-					ar: 'الموقع كتالوج يُسلّم إلى واتساب والمنتج والمقاس مكتوبان في الرسالة مسبقًا. فيزيل عناء التصفح ويُبقي الجزء الذي كان يعمل أصلًا.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'A browsable catalogue feeding WhatsApp orders, with delivery across Jordan.',
-			],
-			ar: ['كتالوج قابل للتصفح يغذّي طلبات واتساب، مع توصيل لكل الأردن.'],
-		},
-		sourced: false,
-	},
-	{
 		slug: 'al-manal',
 		title: { en: 'Al-Manal', ar: 'المنال' },
 		tagline: {
@@ -2514,61 +2806,6 @@ export const projects: Project[] = [
 		sourced: false,
 	},
 	{
-		slug: 'telestream',
-		title: { en: 'TeleStream & FeedGram', ar: 'تيليستريم وفيدجرام' },
-		tagline: {
-			en: 'Read public Telegram channels as one clean timeline.',
-			ar: 'اقرأ قنوات تيليجرام العامة كخط زمني واحد نظيف.',
-		},
-		summary: {
-			en: 'Two takes on the same idea: aggregate posts from public Telegram channels into a single unified feed you can read in a browser, without the app and without joining anything.',
-			ar: 'مقاربتان للفكرة نفسها: تجميع منشورات قنوات تيليجرام العامة في خط زمني موحّد تقرأه في المتصفح، بلا تطبيق وبلا انضمام إلى شيء.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'Tailwind CSS'],
-		cover: '/projects/telegram-feed.png',
-		gallery: ['/projects/telegram-feed.png', '/projects/feed-gram.png'],
-		links: {
-			live: 'https://tele-timeline.vercel.app',
-			github: 'https://github.com/haithamassoli/telegram-feed',
-		},
-		overview: {
-			en: [
-				'Following a dozen Telegram channels means a dozen separate chats, each buffering unread counts, mixed in with actual conversations with people. There is no way to just read them.',
-				'These aggregate public channels into one chronological feed in the browser, a reader rather than a client. FeedGram is the second pass at the same problem.',
-			],
-			ar: [
-				'متابعة اثنتي عشرة قناة على تيليجرام تعني اثنتي عشرة محادثة منفصلة، كلٌّ تُراكم عدّادات غير مقروء، مختلطة بمحادثات حقيقية مع أشخاص. ولا سبيل لمجرّد قراءتها.',
-				'يجمع هذان قنوات عامة في خط زمني واحد مرتّب زمنيًا داخل المتصفح، قارئ لا عميل. وFeedGram هو المحاولة الثانية للمشكلة نفسها.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'Reading public channels without an account',
-					ar: 'قراءة القنوات العامة بلا حساب',
-				},
-				problem: {
-					en: 'The obvious route is the bot API, which requires the bot to be a member of every channel, impossible for channels you do not control, and the whole point was to read without joining.',
-					ar: 'الطريق البديهي واجهة البوتات، وهي تتطلب أن يكون البوت عضوًا في كل قناة، وهذا مستحيل لقنوات لا تملكها، والغاية كلها كانت القراءة دون انضمام.',
-				},
-				solution: {
-					en: 'The reader works from the public web preview each channel already exposes, so it only ever sees what is public anyway and needs no credentials at all.',
-					ar: 'يعمل القارئ من المعاينة العامة التي تكشفها كل قناة أصلًا، فلا يرى إلا ما هو عام على أي حال ولا يحتاج أي بيانات اعتماد.',
-				},
-			},
-		],
-		outcomes: {
-			en: ['A unified, credential-free reader for public Telegram channels.'],
-			ar: ['قارئ موحّد بلا بيانات اعتماد لقنوات تيليجرام العامة.'],
-		},
-		sourced: false,
-	},
-	{
 		slug: 'wedding-invitation',
 		title: { en: 'Wedding Invitation', ar: 'دعوة زفاف' },
 		tagline: {
@@ -2622,63 +2859,6 @@ export const projects: Project[] = [
 			ar: [
 				'دعوة قابلة للمشاركة مع خريطة وعدّاد تنازلي وأعداد تأكيد حضور حيّة.',
 			],
-		},
-		sourced: false,
-	},
-	{
-		slug: 'almadrsa',
-		title: { en: 'Almadrsa', ar: 'المدرسة' },
-		tagline: {
-			en: 'An e-learning platform for schools.',
-			ar: 'منصة تعليم إلكتروني للمدارس.',
-		},
-		summary: {
-			en: "An online school platform bringing courses, materials and student progress into one place for a school's teachers and students.",
-			ar: 'منصة مدرسية إلكترونية تجمع المساقات والمواد وتقدّم الطلاب في مكان واحد لمعلمي المدرسة وطلابها.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'React', 'Tailwind CSS', 'RTL'],
-		cover: '/projects/almadrsa.png',
-		gallery: ['/projects/almadrsa.png'],
-		links: {
-			live: 'https://almadrsa.vercel.app',
-			github: 'https://github.com/haithamassoli/almadrsa',
-		},
-		overview: {
-			en: [
-				'Schools that went online during the pandemic mostly ended up with a mix of a video call link, a WhatsApp group and a shared drive. None of it survives a change of teacher.',
-				'Almadrsa gives the same activity a structure that outlasts the term: courses hold their material, students have progress, and nothing depends on somebody still being in the right group chat.',
-			],
-			ar: [
-				'المدارس التي انتقلت إلى الإنترنت في الجائحة انتهت في معظمها إلى خليط من رابط مكالمة مرئية ومجموعة واتساب ومجلد مشترك. ولا شيء من ذلك ينجو من تغيير معلّم.',
-				'تمنح «المدرسة» النشاط نفسه بنيةً تدوم بعد الفصل: تحتفظ المساقات بموادها، وللطلاب تقدّم، ولا يعتمد شيء على بقاء أحدهم في المجموعة الصحيحة.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'Teachers will not learn a new tool mid-term',
-					ar: 'لن يتعلم المعلمون أداة جديدة في منتصف الفصل',
-				},
-				problem: {
-					en: 'Any platform that asks a teacher to restructure how they already work gets used for one week and abandoned. Adoption fails on effort, not features.',
-					ar: 'أي منصة تطلب من المعلّم إعادة هيكلة طريقة عمله الحالية تُستخدم أسبوعًا ثم تُهجَر. ويفشل التبنّي بسبب الجهد لا الميزات.',
-				},
-				solution: {
-					en: 'The model mirrors what a school already has, a course with its material and its students, so nothing needs to be rethought to start using it.',
-					ar: 'يحاكي النموذج ما لدى المدرسة أصلًا، من مساق ومواده وطلابه، فلا يحتاج شيء إلى إعادة تفكير للبدء باستخدامه.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Courses, materials and student progress in one Arabic-first platform.',
-			],
-			ar: ['مساقات ومواد وتقدّم الطلاب في منصة عربية أولًا.'],
 		},
 		sourced: false,
 	},
@@ -3004,77 +3184,6 @@ export const projects: Project[] = [
 		sourced: true,
 	},
 	{
-		slug: 'personal-sites',
-		title: {
-			en: 'assoli.site & cv.assoli.site',
-			ar: 'assoli.site وcv.assoli.site',
-		},
-		tagline: {
-			en: 'My portfolio and my web résumé.',
-			ar: 'معرض أعمالي وسيرتي الذاتية على الويب.',
-		},
-		summary: {
-			en: 'The previous portfolio and the standalone web résumé: an animated single-page portfolio with a command menu, and a print-friendly CV with a keyboard-driven interface.',
-			ar: 'معرض الأعمال السابق والسيرة الذاتية المستقلة على الويب: معرض أعمال أحادي الصفحة متحرك بقائمة أوامر، وسيرة ذاتية صالحة للطباعة بواجهة تُدار من لوحة المفاتيح.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2026',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: [
-			'Next.js',
-			'TypeScript',
-			'React',
-			'Framer Motion',
-			'Tailwind CSS',
-			'SEO',
-		],
-		cover: '/projects/cv.png',
-		gallery: ['/projects/cv.png', '/projects/portfolio-old.png'],
-		links: {
-			live: 'https://assoli.site',
-			github: 'https://github.com/haithamassoli/nextjs-portfolio',
-		},
-		overview: {
-			en: [
-				'Two separate sites doing two different jobs. The portfolio is the pitch, animated, opinionated, built to be looked at. The résumé is the reference, dense, scannable, and something a recruiter can print.',
-				'Keeping them apart meant neither had to compromise: the portfolio can be heavy on motion without hurting the CV, and the CV can be plain without making the portfolio look dull.',
-			],
-			ar: [
-				'موقعان منفصلان يؤديان مهمتين مختلفتين. المعرض هو العرض التقديمي، متحرك وذو رأي ومبني ليُنظر إليه. والسيرة هي المرجع، كثيفة وسهلة المسح، ويستطيع مسؤول التوظيف طباعتها.',
-				'وفصلهما عنى ألا يتنازل أيٌّ منهما: فيستطيع المعرض الإكثار من الحركة دون الإضرار بالسيرة، وتستطيع السيرة أن تكون بسيطة دون أن تجعل المعرض باهتًا.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'Motion that does not cost the first impression',
-					ar: 'حركة لا تكلّف الانطباع الأول',
-				},
-				problem: {
-					en: 'A portfolio is judged in the first two seconds, and that is exactly the window that heavy animation and font loading spend on themselves.',
-					ar: 'يُحكَم على معرض الأعمال في أول ثانيتين، وهي بالضبط النافذة التي تنفقها الحركة الثقيلة وتحميل الخطوط على نفسها.',
-				},
-				solution: {
-					en: 'Content is readable before the animation resolves rather than gated behind it, so a slow connection degrades to a plain page instead of a blank one.',
-					ar: 'المحتوى مقروء قبل انتهاء الحركة لا محجوب خلفها، فيتحوّل الاتصال البطيء إلى صفحة بسيطة بدل صفحة فارغة.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'A motion-led portfolio and a separate, printable web résumé.',
-				'Now being replaced by this bilingual rebuild.',
-			],
-			ar: [
-				'معرض أعمال تقوده الحركة وسيرة ذاتية منفصلة قابلة للطباعة.',
-				'ويجري الآن استبدالهما بهذه النسخة ثنائية اللغة.',
-			],
-		},
-		sourced: true,
-	},
-	{
 		slug: 'tafrigh',
 		title: { en: 'Tafrigh', ar: 'تفريغ' },
 		tagline: {
@@ -3128,59 +3237,5 @@ export const projects: Project[] = [
 			ar: ['نص عادي مع مخرج SRT/VTT موقوت للصوت العربي.'],
 		},
 		sourced: true,
-	},
-	{
-		slug: 'web-archive-fetcher',
-		title: { en: 'Web Archive Data Fetcher', ar: 'جالب بيانات أرشيف الويب' },
-		tagline: {
-			en: 'Recover pages that are no longer online.',
-			ar: 'استرجاع صفحات لم تعد على الإنترنت.',
-		},
-		summary: {
-			en: 'A tool for pulling archived snapshots of a site out of the Wayback Machine and extracting structured data from them, built to recover content from a site that had gone offline.',
-			ar: 'أداة لسحب اللقطات المؤرشفة لموقع من Wayback Machine واستخراج بيانات منظّمة منها، بُنيت لاسترجاع محتوى موقع توقّف عن العمل.',
-		},
-		category: 'web',
-		status: 'live',
-		featured: false,
-		year: '2025',
-		role: { en: 'Solo', ar: 'منفردًا' },
-		stack: ['Next.js', 'TypeScript', 'Wayback Machine API', 'HTML parsing'],
-		cover: '/projects/shahed-abu-hussein.png',
-		gallery: ['/projects/shahed-abu-hussein.png'],
-		links: { live: 'https://shahed-abu-hussein.vercel.app' },
-		overview: {
-			en: [
-				'When a site disappears, its content often still exists in the Internet Archive, but as thousands of individual snapshots that are painful to go through by hand.',
-				"This walks the archive's index for a domain, fetches the snapshots, and extracts the structured content out of them, turning a scattered archive back into usable data.",
-			],
-			ar: [
-				'حين يختفي موقع، يظل محتواه موجودًا غالبًا في أرشيف الإنترنت، لكن كآلاف اللقطات المفردة التي يشقّ المرور عليها يدويًا.',
-				'تمرّ هذه الأداة على فهرس الأرشيف لنطاق ما، وتجلب اللقطات، وتستخرج المحتوى المنظّم منها، فتعيد أرشيفًا متناثرًا إلى بيانات قابلة للاستخدام.',
-			],
-		},
-		challenges: [
-			{
-				title: {
-					en: 'The archive rate-limits you long before you finish',
-					ar: 'يحدّ الأرشيف معدّل طلباتك قبل أن تنتهي بوقت طويل',
-				},
-				problem: {
-					en: 'Fetching thousands of snapshots as fast as possible gets throttled almost immediately, and a naive retry loop makes it worse rather than better.',
-					ar: 'جلب آلاف اللقطات بأقصى سرعة يُخنَق فورًا تقريبًا، وحلقة إعادة محاولة ساذجة تزيد الأمر سوءًا لا تحسّنه.',
-				},
-				solution: {
-					en: 'Requests are paced and retried with backoff, and progress is checkpointed so an interrupted run resumes instead of starting the whole crawl again.',
-					ar: 'تُوزَّع الطلبات زمنيًا وتُعاد بتراجع تدريجي، ويُحفَظ التقدّم بنقاط تفتيش فيُستأنف التشغيل المنقطع بدل إعادة الزحف من أوله.',
-				},
-			},
-		],
-		outcomes: {
-			en: [
-				'Recovered structured content from an offline site via archived snapshots.',
-			],
-			ar: ['استرجاع محتوى منظّم من موقع متوقف عبر لقطات مؤرشفة.'],
-		},
-		sourced: false,
 	},
 ];

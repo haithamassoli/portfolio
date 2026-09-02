@@ -2,7 +2,7 @@
 import type { Design } from '../registry';
 import { url as designUrl } from '../routes';
 import type { Lang } from '../../i18n';
-/* 目録 — the catalogue. Thirty-nine entries in six 部, each part opened by a
+/* 目録 — the catalogue. Forty entries in six 部, each part opened by a
    vertical rail, each entry carrying its catalogue number set 縦中横. The
    eight written up in full are raised onto washi and marked 選. */
 import { Image } from 'astro:assets';
@@ -68,12 +68,12 @@ const isTall = (img: ImageMetadata) => img.height / img.width > 1.2;
 	design={design}
 	lang={lang}
 	title={pair(
-		'Catalogue — 39 projects — Haitham Assoli 目録',
-		'الفهرس — 39 مشروعًا — هيثم العسولي 目録',
+		'Catalogue — 40 projects — Haitham Assoli 目録',
+		'الفهرس — 40 مشروعًا — هيثم العسولي 目録',
 	)[lang]}
 	description={pair(
-		'Every project Haitham Assoli has shipped, catalogued in six parts: web, mobile, on-device AI, desktop, client work and extensions. Thirty-nine entries, each with its own page.',
-		'كل مشروع أصدره هيثم العسولي، مفهرسًا في ستة أقسام: الويب، والجوّال، والذكاء الاصطناعي على الجهاز، وسطح المكتب، وأعمال العملاء، والإضافات. تسعة وثلاثون مدخلًا، لكلٍّ صفحته.',
+		'Every project Haitham Assoli has shipped, catalogued in six parts: web, mobile, on-device AI, desktop, client work and extensions. Forty entries, each with its own page.',
+		'كل مشروع أصدره هيثم العسولي، مفهرسًا في ستة أقسام: الويب، والجوّال، والذكاء الاصطناعي على الجهاز، وسطح المكتب، وأعمال العملاء، والإضافات. أربعون مدخلًا، لكلٍّ صفحته.',
 	)[lang]}
 	current="projects"
 >
@@ -467,7 +467,7 @@ const isTall = (img: ImageMetadata) => img.height / img.width > 1.2;
 			width: 100%;
 			aspect-ratio: 4 / 3;
 			object-fit: cover;
-			object-position: top center;
+			object-position: center;
 			background: #dedbd2;
 			border: 1px solid var(--rule-soft);
 			filter: saturate(0.86) contrast(1.02);

@@ -43,6 +43,6 @@ test('the work page lists every project, grouped', async ({ page }) => {
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText(
 		'All projects',
 	);
-	await expect(page.locator('.card')).toHaveCount(39);
+	await expect(page.locator('.card')).toHaveCount(40);
 	await expect(page.locator('.group')).toHaveCount(6);
 });

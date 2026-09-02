@@ -2,7 +2,7 @@
 import type { Design } from '../registry';
 import { url as designUrl } from '../routes';
 import type { Lang } from '../../i18n';
-/* /4/projects — the long listing. Thirty-nine entries as `ls -la` output,
+/* /4/projects — the long listing. Forty entries as `ls -la` output,
    where the mode string is not decoration: every flag in it is read off the
    project's real data, and the legend says which. */
 import Shell from './Shell.astro';
@@ -88,8 +88,8 @@ const flags = [
 		'ls -la ~/projects — haitham@amman',
 	)[lang]}
 	description={pair(
-		'All thirty-nine projects by Haitham Assoli as a long directory listing: year, category, status, stack size and a write-up for each.',
-		'المشاريع التسعة والثلاثون لهيثم العسولي في قائمة دليل طويلة: السنة والفئة والحالة وحجم الأدوات وصفحة شرح لكل منها.',
+		'All forty projects by Haitham Assoli as a long directory listing: year, category, status, stack size and a write-up for each.',
+		'المشاريع الأربعون لهيثم العسولي في قائمة دليل طويلة: السنة والفئة والحالة وحجم الأدوات وصفحة شرح لكل منها.',
 	)[lang]}
 	path="~/portfolio/projects"
 	tab="projects"
@@ -98,10 +98,7 @@ const flags = [
 		<p class="cmdline"><span class="cmdline__q">ls</span> -la ~/projects</p>
 		<h1 class="h2" id="ls-h">
 			<T
-				v={pair(
-					'Thirty-nine entries, newest first',
-					'تسعة وثلاثون مدخلًا، الأحدث أولًا',
-				)}
+				v={pair('Forty entries, newest first', 'أربعون مدخلًا، الأحدث أولًا')}
 			/>
 		</h1>
 		<T

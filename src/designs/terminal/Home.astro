@@ -25,7 +25,7 @@ const { design, lang } = Astro.props;
 /** A link inside this design, in this language: u('/work/aoun'). */
 const u = (page = '') => designUrl(design, lang, page);
 
-/* The filesystem: 39 projects, grouped the way `tree` would group them. */
+/* The filesystem: 40 projects, grouped the way `tree` would group them. */
 const catOrder = [
 	'web',
 	'mobile',
@@ -75,7 +75,7 @@ const legend = [
 /* Static figures. dev-stats.ts is a network call at build time; not here. */
 const figures = [
 	{
-		v: '39',
+		v: '40',
 		k: pair('projects shipped', 'مشروعًا صدر'),
 		n: pair('over four years', 'على مدى أربع سنوات'),
 	},
@@ -126,8 +126,8 @@ const linkOrder = [
 	lang={lang}
 	title={pair('haitham@amman — session', 'haitham@amman — الجلسة')[lang]}
 	description={pair(
-		'Haitham Assoli, full-stack web and mobile engineer in Amman. 39 products shipped, including 13 on the app stores.',
-		'هيثم العسولي، مهندس برمجيات متكامل للويب والجوال في عمّان. أطلق 39 منتجًا، منها 13 على متاجر التطبيقات.',
+		'Haitham Assoli, full-stack web and mobile engineer in Amman. 40 products shipped, including 13 on the app stores.',
+		'هيثم العسولي، مهندس برمجيات متكامل للويب والجوال في عمّان. أطلق 40 منتجًا، منها 13 على متاجر التطبيقات.',
 	)[lang]}
 	path="~/portfolio"
 	tab="home"
@@ -197,7 +197,7 @@ const linkOrder = [
 				<T v={pair('shipped', 'المُنجَز')} as="dt" />
 				<dd class="kv__tally">
 					<span
-						><span class="tty"><b>39</b></span>{' '}<T
+						><span class="tty"><b>40</b></span>{' '}<T
 							v={pair('projects', 'مشروعًا')}
 						/></span
 					>
@@ -380,12 +380,7 @@ const linkOrder = [
 	<section class="block" id="fs" aria-labelledby="fs-h">
 		<p class="cmdline"><span class="cmdline__q">tree</span> ~/projects</p>
 		<h2 class="h2" id="fs-h">
-			<T
-				v={pair(
-					'Thirty-nine, as a directory',
-					'تسعة وثلاثون، على هيئة مجلّدات',
-				)}
-			/>
+			<T v={pair('Forty, as a directory', 'أربعون، على هيئة مجلّدات')} />
 		</h2>
 		<T
 			v={pair(
@@ -433,7 +428,7 @@ const linkOrder = [
 			<span class="tty">6</span>{' '}<T v={pair('directories,', 'مجلدات،')} />{
 				' '
 			}
-			<span class="tty">39</span>{' '}<T v={pair('files ·', 'ملفًا ·')} />{' '}
+			<span class="tty">40</span>{' '}<T v={pair('files ·', 'ملفًا ·')} />{' '}
 			<span class="tree__star tty">*</span>{' '}<T
 				v={pair('= written up in full', '= مكتوب بالكامل')}
 			/>

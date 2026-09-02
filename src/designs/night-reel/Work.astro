@@ -4,7 +4,7 @@ import { url as designUrl } from '../routes';
 import type { Lang } from '../../i18n';
 /* /6/projects — the contact sheet.
 
-   Thirty-nine projects is a roll of film, not a card grid. Everything shot
+   Forty projects is a roll of film, not a card grid. Everything shot
    gets printed on one sheet at thumbnail size, cut into rolls by what the
    thing is, and the eight that were worth printing big are circled in grease
    pencil. The circle is the whole organising idea: it says "these are the
@@ -68,10 +68,10 @@ const selects = projects.filter((p) => p.featured).length;
 		'ورقة اللقطات — بكرة الليل — هيثم العسولي',
 	)[lang]}
 	description={pair(
-		'All thirty-nine projects Haitham Assoli has shipped, printed on one contact sheet and cut into rolls by what each one is. The eight written up in full are circled.',
-		'المشاريع التسعة والثلاثون التي أصدرها هيثم العسولي، مطبوعة على ورقة لقطات واحدة ومقطّعة إلى بكرات بحسب نوع كل منها. الثمانية المشروحة بالكامل محاطة بدائرة.',
+		'All forty projects Haitham Assoli has shipped, printed on one contact sheet and cut into rolls by what each one is. The eight written up in full are circled.',
+		'المشاريع الأربعون التي أصدرها هيثم العسولي، مطبوعة على ورقة لقطات واحدة ومقطّعة إلى بكرات بحسب نوع كل منها. الثمانية المشروحة بالكامل محاطة بدائرة.',
 	)[lang]}
-	mark={pair('39 frames', '39 كادرًا')}
+	mark={pair('40 frames', '40 كادرًا')}
 	current="sheet"
 >
 	<section class="band sheet">
@@ -81,10 +81,10 @@ const selects = projects.filter((p) => p.featured).length;
 					<T v={pair('Contact sheet', 'ورقة اللقطات')} />
 				</p>
 				<h1 class="head__title" data-l="en" lang="en">
-					Thirty-nine frames, one sheet
+					Forty frames, one sheet
 				</h1>
 				<h1 class="head__title" data-l="ar" lang="ar">
-					تسعة وثلاثون كادرًا على ورقة واحدة
+					أربعون كادرًا على ورقة واحدة
 				</h1>
 				<p class="head__lede" data-l="en" lang="en">
 					Everything printed at thumbnail size and cut into rolls by what the
@@ -388,7 +388,7 @@ const selects = projects.filter((p) => p.featured).length;
 		margin: 0;
 		padding-block: 1.1rem;
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 		gap: 1.4rem 0.9rem;
 	}
 
@@ -402,7 +402,17 @@ const selects = projects.filter((p) => p.featured).length;
 	}
 
 	.frame .plate {
-		aspect-ratio: 4 / 3;
+		aspect-ratio: 16 / 9;
+	}
+
+	/* The sheet is read, not just looked at: the night grade is pulled back so a
+	   thumbnail still shows what the thing is. */
+	.frame .plate::after {
+		opacity: 0.45;
+	}
+
+	.frame .plate__gel {
+		opacity: 0.22;
 	}
 
 	/* The sheet sits in the dark and comes up one frame at a time under the
@@ -410,7 +420,7 @@ const selects = projects.filter((p) => p.featured).length;
 	   raise a frame with, the whole sheet prints at readable density instead. */
 	@media (hover: hover) {
 		.frame .plate__img {
-			filter: brightness(0.66) saturate(0.74) contrast(1.06);
+			filter: brightness(0.88) saturate(0.9) contrast(1.03);
 		}
 	}
 
@@ -540,14 +550,14 @@ const selects = projects.filter((p) => p.featured).length;
 
 	@media (min-width: 40rem) {
 		.frames {
-			grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
 			gap: 1.8rem 1.2rem;
 		}
 	}
 
 	@media (min-width: 62rem) {
 		.frames {
-			grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
 			gap: 2.2rem 1.5rem;
 		}
 

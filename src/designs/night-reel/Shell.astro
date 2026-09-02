@@ -44,7 +44,7 @@ const nav: [string, string, I18n][] = [
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
 	<Head {design} {lang} {title} {description} />
 
-	<body>
+	<body data-page={current}>
 		<script is:inline>
 			/* The router copies <html> off the incoming page, so the flag goes
 			   back on before that page paints. */
