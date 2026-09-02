@@ -34,13 +34,14 @@ Each project carries enough for a full page:
 
 | field                                                 | what it is                                            |
 | ----------------------------------------------------- | ----------------------------------------------------- |
-| `summary`                                             | 2–4 sentences under the title                         |
-| `overview`                                            | long-form paragraphs, the story                      |
-| `challenges`                                          | `{ title, problem, solution }[]`, the problems faced |
-| `outcomes`                                            | result bullets                                        |
+| `summary`                                             | two sentences at most, under the title                |
+| `overview`                                            | one paragraph of context the summary does not carry  |
+| `challenges`                                          | `{ title, problem, solution }[]`, featured only      |
+| `outcomes`                                            | result bullets, three at most                         |
 | `stack`, `links`, `gallery`, `year`, `role`, `status` | metadata                                              |
 
-74 challenge entries across 39 projects.
+16 challenge entries, two on each of the 8 featured projects. The other 31 are
+short factual entries: what it is, what it ran on, where to find it.
 
 ## The `sourced` flag
 
@@ -49,11 +50,11 @@ Each project carries enough for a full page:
   Aoun, the store-listed apps, and the rest of the documented ones.
 - `sourced: false` (12) is reconstructed from the stack and shape of the repo,
   because the repo only had a `create-next-app` README. The stack and what the
-  product does are accurate; the _specific_ engineering problems are plausible
-  reconstruction, not recovered fact.
+  product does are accurate. The reconstructed problem/solution narratives have
+  been removed from these entries rather than published as fact.
 
-Read the 12 `sourced: false` ones before publishing and correct anything that
-misremembers the work:
+Check the 12 `sourced: false` ones against the real work before adding anything
+back to them:
 
 `hirfati` · `hadanati` · `ghurza` · `service` · `hijabk` · `al-manal` ·
 `telestream` · `wedding-invitation` · `almadrsa` · `hafiz-platform` ·

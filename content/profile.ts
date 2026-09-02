@@ -18,8 +18,8 @@ export const profile = {
 	} satisfies I18n,
 
 	tagline: {
-		en: 'I build fast, accessible products from design to release.',
-		ar: 'أبني منتجات سريعة وسهلة الوصول من التصميم حتى الإطلاق.',
+		en: 'I build Arabic-first web and mobile products, from the data model to the interface.',
+		ar: 'أبني منتجات ويب وجوال تبدأ بالعربية، من نموذج البيانات حتى الواجهة.',
 	} satisfies I18n,
 
 	location: { en: 'Amman, Jordan', ar: 'عمّان، الأردن' } satisfies I18n,
@@ -37,14 +37,12 @@ export const profile = {
 
 	about: {
 		en: [
-			'I build web and mobile products from the data model to the final interface. Most are bilingual and right-to-left first because my users read Arabic.',
-			'I work on constraints that shape the product: models that run on the device, search that answers in milliseconds without a backend, and booking flows that prevent double-selling a time slot.',
-			'My recent work focuses on on-device AI for video and audio on a phone or laptop, without cloud processing or telemetry.',
+			'I work across the stack: React Native apps on Google Play and the App Store, Next.js and Astro on the web, and the Node, NestJS and Convex services behind them. Most of it ships in Arabic and English, right-to-left first.',
+			'The problems that keep coming back are Arabic search that tolerates how people actually type, booking logic that will not sell the same slot twice, reads that survive campus Wi-Fi dropping mid-lecture, and inference that runs on the device so video and audio never leave it.',
 		],
 		ar: [
-			'أبني منتجات ويب وموبايل من نموذج البيانات حتى الواجهة النهائية. معظمها ثنائي اللغة ومبني للاتجاه من اليمين إلى اليسار أولًا لأن مستخدميّ يقرؤون بالعربية.',
-			'أعمل على قيود تؤثر في المنتج: نماذج تعمل على الجهاز، وبحث يجيب خلال أجزاء من الثانية بلا خادم، ومسارات حجز تمنع بيع الموعد نفسه مرتين.',
-			'يركز عملي الأخير على ذكاء اصطناعي يعمل على الجهاز لمعالجة الفيديو والصوت على الهاتف أو الحاسوب، بلا معالجة سحابية أو تتبع.',
+			'أعمل على المنظومة كاملة: تطبيقات React Native على متجري جوجل وآبل، وتطبيقات Next.js وAstro على الويب، وخدمات Node وNestJS وConvex خلفها. ومعظمها يصدر بالعربية والإنجليزية، وبالاتجاه من اليمين إلى اليسار أولًا.',
+			'المشكلات التي تتكرر: بحث عربي يحتمل طريقة الكتابة الفعلية، ومنطق حجز لا يبيع الموعد نفسه مرتين، وقراءة تصمد أمام انقطاع شبكة الجامعة في منتصف المحاضرة، واستدلال يعمل على الجهاز فلا يغادره الفيديو ولا الصوت.',
 		],
 	} satisfies I18nBlocks,
 
@@ -55,14 +53,12 @@ export const profile = {
 			period: 'Since 2026',
 			highlights: {
 				en: [
-					'Building multi-vendor e-commerce systems with NestJS, Next.js and React Native.',
-					'Built backend services for reliable, high-throughput vendor concurrency.',
-					'Built responsive storefronts and a shared mobile client on the same API.',
+					'Building the NestJS services behind a multi-vendor marketplace, where many sellers write to the same catalogue and stock at once.',
+					'Building the storefront and the mobile client against that one API, so a change lands in both.',
 				],
 				ar: [
-					'بناء أنظمة تجارة إلكترونية متعددة البائعين باستخدام NestJS وNext.js وReact Native.',
-					'بناء خدمات خلفية موثوقة وعالية الإنتاجية لتزامن البائعين.',
-					'بناء واجهات متجر متجاوبة وعميل موبايل مشترك على واجهة API نفسها.',
+					'بناء خدمات NestJS خلف سوق متعدد البائعين، حيث يكتب بائعون كثر على الفهرس والمخزون نفسه في الوقت ذاته.',
+					'بناء واجهة المتجر وعميل الجوال على واجهة API واحدة، فيصل التغيير إليهما معًا.',
 				],
 			},
 		},
@@ -73,20 +69,14 @@ export const profile = {
 			location: { en: 'Remote', ar: 'عن بُعد' },
 			highlights: {
 				en: [
-					'Built bioinformatics applications in a monorepo with React and React Native sharing one codebase.',
-					'Used TypeScript, Zod, and Prisma for type-safe validation and data access.',
-					'Server state and forms on TanStack Query and TanStack Form; API endpoints on Hono.',
-					'Contributed to a no-code platform used by 8,000+ researchers worldwide.',
-					'Shipped GenAI-powered data analysis, literature search, and customisable bioinformatics pipelines.',
-					'Built to HIPAA, GDPR, and SOC 2 Type 2 requirements.',
+					'Shipped GenAI data analysis, literature search and customisable pipelines on a no-code platform used by 8,000+ researchers.',
+					'Built the web and mobile clients from one monorepo, so React and React Native share the same typed data layer.',
+					'Worked to HIPAA, GDPR and SOC 2 Type 2 requirements.',
 				],
 				ar: [
-					'بناء تطبيقات معلوماتية حيوية داخل monorepo يتشارك فيه React وReact Native قاعدة شيفرة واحدة.',
-					'استخدام TypeScript وZod وPrisma للتحقق من البيانات والوصول إليها بأمان الأنواع.',
-					'إدارة حالة الخادم والنماذج عبر TanStack Query وTanStack Form، ونقاط الـ API على Hono.',
-					'المساهمة في منصة بلا شيفرة يستخدمها أكثر من 8,000 باحث حول العالم.',
-					'إطلاق تحليل بيانات مدعوم بالذكاء التوليدي، وبحث في الأدبيات العلمية، وخطوط معالجة قابلة للتخصيص.',
-					'بناء الميزات وفق متطلبات HIPAA وGDPR وSOC 2 Type 2.',
+					'إطلاق تحليل بيانات بالذكاء التوليدي وبحث في الأدبيات العلمية وخطوط معالجة قابلة للتخصيص، على منصة بلا شيفرة يستخدمها أكثر من 8,000 باحث.',
+					'بناء عميلي الويب والجوال من monorepo واحد، فيتشارك React وReact Native طبقة البيانات نفسها بأنواعها.',
+					'العمل وفق متطلبات HIPAA وGDPR وSOC 2 Type 2.',
 				],
 			},
 		},
@@ -129,14 +119,12 @@ export const profile = {
 			period: '2022 to 2023',
 			highlights: {
 				en: [
-					'Built and maintained a large operational dashboard in TypeScript and React.',
-					'Updated dependencies and code to improve security and runtime speed.',
-					'Backend work on Node.js with Express.',
+					'Built and maintained a large operational dashboard in TypeScript and React, with the Node and Express endpoints behind it.',
+					'Migrated ageing dependencies and the code that called them, closing known vulnerabilities and cutting render cost.',
 				],
 				ar: [
-					'بناء وصيانة لوحة تحكم تشغيلية كبيرة باستخدام TypeScript وReact.',
-					'تحديث الاعتماديات والشيفرة لتحسين الأمان وسرعة التشغيل.',
-					'عمل على الخادم باستخدام Node.js وExpress.',
+					'بناء وصيانة لوحة تحكم تشغيلية كبيرة بـ TypeScript وReact، مع نقاط Node وExpress خلفها.',
+					'ترحيل اعتماديات قديمة والشيفرة التي تستدعيها، فأُغلقت ثغرات معروفة وانخفضت كلفة الرسم.',
 				],
 			},
 		},
@@ -214,12 +202,15 @@ export const profile = {
 			},
 		},
 		{
-			name: { en: 'Data Structures Decode', ar: 'Data Structures Decode' },
-			issuer: { en: 'Cloud Native Base Camp', ar: 'Cloud Native Base Camp' },
-			date: 'Oct 2024',
+			name: {
+				en: 'Fundamentals of Database Engineering',
+				ar: 'أساسيات هندسة قواعد البيانات',
+			},
+			issuer: { en: 'Udemy', ar: 'Udemy' },
+			date: 'Feb 2023',
 			description: {
-				en: 'Data structures and algorithms, and applying them to real problems.',
-				ar: 'هياكل البيانات والخوارزميات وتطبيقها على مشكلات واقعية.',
+				en: 'Indexing, partitioning, sharding, replication, B-trees, concurrency control and database engines.',
+				ar: 'الفهرسة والتقسيم والتجزئة والنسخ وأشجار B والتحكم بالتزامن ومحركات قواعد البيانات.',
 			},
 		},
 		{
@@ -230,41 +221,8 @@ export const profile = {
 			issuer: { en: 'Cloud Native Base Camp', ar: 'Cloud Native Base Camp' },
 			date: 'Oct 2024',
 			description: {
-				en: 'Reasoning through code before writing it, and the common approaches worth reaching for.',
-				ar: 'التفكير في الشيفرة قبل كتابتها، والمقاربات الشائعة التي تستحق الاستخدام.',
-			},
-		},
-		{
-			name: { en: 'Node.js From Scratch', ar: 'Node.js من الصفر' },
-			issuer: { en: 'Cloud Native Base Camp', ar: 'Cloud Native Base Camp' },
-			date: 'Oct 2024',
-			description: {
-				en: 'How Node.js works under the hood.',
-				ar: 'كيف يعمل Node.js داخليًا.',
-			},
-		},
-		{
-			name: {
-				en: 'Fundamentals of Database Engineering',
-				ar: 'أساسيات هندسة قواعد البيانات',
-			},
-			issuer: { en: 'Udemy', ar: 'Udemy' },
-			date: 'Feb 2023',
-			description: {
-				en: '24 hours on indexing, partitioning, sharding, replication, B-trees, concurrency control, database engines and security, engineering, not SQL syntax.',
-				ar: '24 ساعة في الفهرسة والتقسيم والتجزئة والنسخ وأشجار B والتحكم بالتزامن ومحركات قواعد البيانات والأمان، هندسة لا صياغة SQL.',
-			},
-		},
-		{
-			name: {
-				en: 'JavaScript Algorithms and Data Structures Masterclass',
-				ar: 'خوارزميات وهياكل بيانات JavaScript',
-			},
-			issuer: { en: 'Udemy', ar: 'Udemy' },
-			date: 'Feb 2022',
-			description: {
-				en: '22 hours covering Big O, algorithms and data structures from foundations upward.',
-				ar: '22 ساعة تغطي Big O والخوارزميات وهياكل البيانات من الأساسيات صعودًا.',
+				en: 'Data structures, algorithm analysis, and applying them to real problems.',
+				ar: 'هياكل البيانات وتحليل الخوارزميات وتطبيقها على مشكلات واقعية.',
 			},
 		},
 		{
@@ -275,87 +233,35 @@ export const profile = {
 			issuer: { en: 'Udemy', ar: 'Udemy' },
 			date: 'Apr 2022',
 			description: {
-				en: '58 hours across the React Native ecosystem: core concepts, responsive layout, navigation, maps and camera.',
-				ar: '58 ساعة في منظومة React Native: المفاهيم الأساسية والتخطيط المتجاوب والتنقل والخرائط والكاميرا.',
-			},
-		},
-		{
-			name: { en: 'Linux Basics', ar: 'أساسيات لينكس' },
-			issuer: { en: 'Flex Courses', ar: 'Flex Courses' },
-			date: 'Apr 2022',
-			description: {
-				en: 'Command-line proficiency and system fundamentals.',
-				ar: 'إتقان سطر الأوامر وأساسيات النظام.',
+				en: 'The React Native ecosystem end to end: layout, navigation, maps and camera.',
+				ar: 'منظومة React Native كاملة: التخطيط والتنقل والخرائط والكاميرا.',
 			},
 		},
 	] satisfies Certification[],
 
 	skills: {
-		languages: [
-			'TypeScript',
-			'JavaScript',
-			'Swift',
-			'Kotlin',
-			'Python',
-			'C++',
-			'C#',
-			'PHP',
-		],
+		languages: ['TypeScript', 'JavaScript', 'Swift', 'Kotlin', 'Python'],
 		frontend: [
 			'React',
 			'Next.js',
 			'Astro',
 			'Tailwind CSS',
-			'Framer Motion',
-			'Redux',
 			'TanStack Query',
+			'Motion',
 		],
-		mobile: [
-			'React Native',
-			'Expo',
-			'Expo Router',
-			'Reanimated',
-			'Skia',
-			'Restyle',
-			'SwiftUI',
-			'Jetpack Compose',
-		],
-		backend: [
-			'Node.js',
-			'NestJS',
-			'Express',
-			'Hono',
-			'Laravel',
-			'Convex',
-			'Prisma',
-			'REST APIs',
-		],
+		mobile: ['React Native', 'Expo', 'Expo Router', 'Reanimated', 'Skia'],
+		backend: ['Node.js', 'NestJS', 'Hono', 'Convex', 'Prisma', 'REST APIs'],
 		data: [
 			'PostgreSQL',
-			'MySQL',
 			'MongoDB',
 			'Redis',
 			'Firebase',
 			'Supabase',
 			'Meilisearch',
 		],
-		ai: [
-			'On-device inference',
-			'ONNX Runtime',
-			'transformers.js',
-			'Whisper',
-			'Demucs',
-			'YOLO / NudeNet',
-		],
+		ai: ['On-device inference', 'ONNX Runtime', 'transformers.js', 'Whisper'],
 		infra: ['AWS', 'Docker', 'Vercel', 'Linux', 'Git', 'CI/CD', 'EAS'],
-		craft: [
-			'UI/UX',
-			'Figma',
-			'Accessibility',
-			'SEO',
-			'i18n & RTL',
-			'Performance',
-		],
+		craft: ['UI/UX', 'Figma', 'Accessibility', 'i18n & RTL', 'Performance'],
 	},
 
 	interests: [

@@ -57,4 +57,10 @@ export type Project = (typeof projects)[number];
 export const featured = projects.filter((p) => p.featured);
 export const rest = projects.filter((p) => !p.featured);
 
+/* Counted, not typed out, so the figures cannot drift from the work. */
+export const shipped = projects.length;
+export const onStores = projects.filter(
+	(p) => p.links.playGoogle ?? p.links.appStore,
+).length;
+
 export const bySlug = (slug: string) => projects.find((p) => p.slug === slug);

@@ -38,7 +38,7 @@ export type Project = {
 	title: I18n;
 	/** One line, used on cards. */
 	tagline: I18n;
-	/** 2–4 sentences, used at the top of the detail page. */
+	/** Two sentences at most, used at the top of the detail page. */
 	summary: I18n;
 	category: ProjectCategory;
 	status: ProjectStatus;
@@ -51,7 +51,7 @@ export type Project = {
 	cover: string;
 	gallery: string[];
 	links: ProjectLinks;
-	/** Long-form body for the detail page. */
+	/** One paragraph of context the summary does not already carry. */
 	overview: I18nBlocks;
 	challenges: Challenge[];
 	outcomes: I18nBlocks;

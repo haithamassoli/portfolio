@@ -6,7 +6,7 @@ import { Image } from 'astro:assets';
 import Shell from './Shell.astro';
 import T from '../../components/T.astro';
 import { profile } from '../../../content/profile';
-import { featured, projects } from '../../data/projects';
+import { featured, onStores, projects, shipped } from '../../data/projects';
 import { toolbox } from '../../i18n';
 import { s, pair, yearPair } from '../../data/variant-ui';
 import profilePhoto from '../../assets/images/profile.png';
@@ -41,10 +41,10 @@ const tiles = [
 
 /* Five counters, five true numbers. */
 const counters = [
-	{ n: '39', label: s('stat.shipped'), hue: 'sun' },
-	{ n: '13', label: s('stat.stores'), hue: 'melon' },
+	{ n: String(shipped), label: s('stat.shipped'), hue: 'sun' },
+	{ n: String(onStores), label: s('stat.stores'), hue: 'melon' },
 	{
-		n: '8',
+		n: String(featured.length),
 		label: pair('written up in full', 'مشروحة بالكامل'),
 		hue: 'bubble',
 	},
@@ -436,7 +436,6 @@ const elsewhere = [
 			<header class="section__head">
 				<T v={pair('The toy chest', 'صندوق العدّة')} as="p" class="eyebrow" />
 				<T v={s('about.stackTitle')} as="h2" class="section__title" />
-				<T v={s('about.stackLede')} as="p" class="section__lede" />
 			</header>
 
 			<ul class="tools">

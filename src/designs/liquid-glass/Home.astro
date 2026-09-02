@@ -4,7 +4,7 @@ import { otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 import { Image } from 'astro:assets';
 import { profile } from '../../../content/profile';
-import { featured, projects } from '../../data/projects';
+import { featured, onStores, projects, shipped } from '../../data/projects';
 import { toolbox } from '../../i18n';
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
@@ -64,11 +64,9 @@ const orderedLinks = [
 
 const rest = projects.length - featured.length;
 
-/* Static figures. dev-stats.ts fetches at build time and is deliberately not
-   imported here. */
 const figures = [
 	{
-		n: '39',
+		n: String(shipped),
 		label: s('stat.shipped'),
 		note: pair(
 			'web, mobile, desktop, extensions',
@@ -76,12 +74,12 @@ const figures = [
 		),
 	},
 	{
-		n: '13',
+		n: String(onStores),
 		label: s('stat.stores'),
 		note: pair('App Store and Google Play', 'آب ستور وجوجل بلاي'),
 	},
 	{
-		n: '08',
+		n: String(featured.length).padStart(2, '0'),
 		label: pair('written up in full', 'مشروحة بالكامل'),
 		note: pair('problem, decision, outcome', 'المشكلة، ثم القرار، ثم النتيجة'),
 	},
@@ -234,7 +232,7 @@ const widthsFor = (img: ImageMetadata) =>
 					<p class="type type--en sizer" aria-hidden="true">
 						<span>Web.</span>
 						<span>Mobile.</span>
-						<span>Built to last.</span>
+						<span>Arabic first.</span>
 					</p>
 
 					<p
@@ -245,7 +243,7 @@ const widthsFor = (img: ImageMetadata) =>
 					>
 						<span>ويب.</span>
 						<span>جوّال.</span>
-						<span>مصمّم ليدوم.</span>
+						<span>بالعربية أولًا.</span>
 					</p>
 					<p
 						class="type type--en layer echo echo--en"
@@ -255,18 +253,18 @@ const widthsFor = (img: ImageMetadata) =>
 					>
 						<span>Web.</span>
 						<span>Mobile.</span>
-						<span>Built to last.</span>
+						<span>Arabic first.</span>
 					</p>
 
 					<h1 class="type type--en layer head" data-l="en" lang="en" dir="ltr">
 						<span>Web.</span>
 						<span>Mobile.</span>
-						<span>Built to last.</span>
+						<span>Arabic first.</span>
 					</h1>
 					<h1 class="type type--ar layer head" data-l="ar" lang="ar" dir="rtl">
 						<span>ويب.</span>
 						<span>جوّال.</span>
-						<span>مصمّم ليدوم.</span>
+						<span>بالعربية أولًا.</span>
 					</h1>
 
 					<p
@@ -277,7 +275,7 @@ const widthsFor = (img: ImageMetadata) =>
 					>
 						<span>ويب.</span>
 						<span>جوّال.</span>
-						<span>مصمّم ليدوم.</span>
+						<span>بالعربية أولًا.</span>
 					</p>
 					<p
 						class="type type--en layer lit lit--en"
@@ -287,7 +285,7 @@ const widthsFor = (img: ImageMetadata) =>
 					>
 						<span>Web.</span>
 						<span>Mobile.</span>
-						<span>Built to last.</span>
+						<span>Arabic first.</span>
 					</p>
 
 					<div class="lens" id="lens" aria-hidden="true">
@@ -534,7 +532,6 @@ const widthsFor = (img: ImageMetadata) =>
 						/>
 					</p>
 					<h2 class="h2" id="stack-h"><T v={s('about.stackTitle')} /></h2>
-					<T v={s('about.stackLede')} as="p" class="sub" />
 				</div>
 
 				<ul class="tools">

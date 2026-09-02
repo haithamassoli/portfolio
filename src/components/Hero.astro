@@ -45,9 +45,7 @@ const mirrorRole = ui[other]['hero.role'];
 			<DesignSwitch design={byId('main')} lang={lang} class="enter" />
 		</div>
 
-		<div class="hero__seam" aria-hidden="true">
-			<span class="hero__seam-label mono">{t('hero.seam')}</span>
-		</div>
+		<div class="hero__seam" aria-hidden="true"></div>
 
 		<div
 			class="hero__field hero__field--mirror"
@@ -120,8 +118,6 @@ const mirrorRole = ui[other]['hero.role'];
 
 	.hero__seam {
 		position: relative;
-		/* the mirror field animates clip-path, which would otherwise paint over
-		   the label straddling the line */
 		z-index: 2;
 		background: var(--signal);
 		block-size: 1px;
@@ -132,37 +128,6 @@ const mirrorRole = ui[other]['hero.role'];
 		.hero__seam {
 			inline-size: 1px;
 			block-size: auto;
-		}
-	}
-
-	/* Physical properties on purpose: the label centres on the line itself, and
-	   `inset-inline-start` follows the vertical writing mode instead. */
-	.hero__seam-label {
-		position: absolute;
-		top: 50%;
-		inset-inline-start: var(--gutter);
-		translate: 0 -50%;
-		background: var(--ink);
-		color: var(--signal);
-		padding: 0.3rem 0.7rem;
-		border: 1px solid var(--signal);
-		border-radius: 999px;
-		white-space: nowrap;
-		font-size: 0.62rem;
-	}
-
-	@media (min-width: 56rem) {
-		.hero__seam-label {
-			writing-mode: vertical-rl;
-			padding: 0.7rem 0.3rem;
-			/* cleared first: in a vertical writing mode it resolves to `top` */
-			inset-inline-start: auto;
-			top: 50%;
-			left: 0;
-			translate: -50% -50%;
-		}
-		:global([dir='rtl']) .hero__seam-label {
-			writing-mode: vertical-lr;
 		}
 	}
 

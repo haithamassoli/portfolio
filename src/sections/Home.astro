@@ -2,9 +2,7 @@
 import { Image } from 'astro:assets';
 import profile from '../assets/images/profile.png';
 import { featured, rest } from '../data/projects';
-import { devStats } from '../data/dev-stats';
 import { href, toolbox, useT, type Lang } from '../i18n';
-import { DevStatsCharts } from '../components/DevStatsCharts';
 import Hero from '../components/Hero.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 
@@ -18,13 +16,6 @@ const t = useT(lang);
 /* The grid is deliberately uneven: a wide one, then a pair, then a wide one.
    Nothing here is a uniform three-up card wall. */
 const spans = [12, 7, 5, 12, 5, 7, 7, 5];
-
-/* Read once at build time, in the frontmatter, so nothing here ships to the
-   browser except the handful of rows the charts draw. */
-const stats = await devStats();
-/* Western digits in both languages: the chart axes use them, and a mixed pair
-   in one sentence reads worse than either on its own. */
-const number = new Intl.NumberFormat('en-US');
 ---
 
 <Hero lang={lang} />
@@ -34,7 +25,6 @@ const number = new Intl.NumberFormat('en-US');
 		<header class="head reveal-fast">
 			<p class="mono eyebrow">{t('work.eyebrow')}</p>
 			<h2 class="head__title">{t('work.title')}</h2>
-			<p class="lede">{t('work.lede')}</p>
 		</header>
 
 		<div class="grid">
@@ -62,8 +52,7 @@ const number = new Intl.NumberFormat('en-US');
 			</summary>
 
 			<header class="head more__head">
-				<p class="mono eyebrow">{t('work.archive')}</p>
-				<p class="lede">{t('work.archiveLede')}</p>
+				<h2 class="mono eyebrow">{t('work.archive')}</h2>
 			</header>
 
 			<div class="grid">
@@ -93,7 +82,6 @@ const number = new Intl.NumberFormat('en-US');
 			<div class="prose reveal-fast">
 				<p>{t('about.p1')}</p>
 				<p>{t('about.p2')}</p>
-				<p>{t('about.p3')}</p>
 			</div>
 		</div>
 	</div>
@@ -101,7 +89,6 @@ const number = new Intl.NumberFormat('en-US');
 	<div class="toolbox reveal-fast">
 		<div class="wrap toolbox__head">
 			<p class="mono eyebrow">{t('about.stackTitle')}</p>
-			<p class="toolbox__lede">{t('about.stackLede')}</p>
 		</div>
 
 		<div class="ticker" aria-hidden="true">
@@ -124,75 +111,11 @@ const number = new Intl.NumberFormat('en-US');
 		<ul class="sr-list">{toolbox.map((item) => <li>{item}</li>)}</ul>
 	</div>
 
-	<div class="wrap" id="stats">
-		<div class="stats reveal-fast">
-			<header class="head stats__head">
-				<p class="mono eyebrow">{t('stats.eyebrow')}</p>
-				<h2 class="head__title">{t('stats.title')}</h2>
-				<p class="lede">{t('stats.lede')}</p>
-			</header>
-
-			<dl class="figures">
-				<div class="figure">
-					<dt class="figure__value">{number.format(stats.contributions)}</dt>
-					<dd class="mono figure__label">{t('stats.contribCount')}</dd>
-				</div>
-				<div class="figure">
-					<dt class="figure__value">{number.format(stats.currentStreak)}</dt>
-					<dd class="mono figure__label">{t('stats.streak')}</dd>
-				</div>
-				<div class="figure">
-					<dt class="figure__value">{number.format(stats.activeDays)}</dt>
-					<dd class="mono figure__label">{t('stats.activeDays')}</dd>
-				</div>
-				<div class="figure">
-					<dt class="figure__value">{number.format(stats.totalHours)}</dt>
-					<dd class="mono figure__label">{t('stats.total')}</dd>
-				</div>
-			</dl>
-
-			{stats.stale && <p class="mono stats__stale">{t('stats.stale')}</p>}
-
-			<DevStatsCharts
-				client:visible
-				stats={stats}
-				labels={{
-					calendar: t('stats.calendar'),
-					cumulative: t('stats.cumulative'),
-					languages: t('stats.languages'),
-					contributions: t('stats.contributions'),
-					hours: t('stats.hours'),
-					day: t('stats.day'),
-					less: t('stats.less'),
-					more: t('stats.more'),
-					calendarDesc: t('stats.calendarDesc'),
-					cumulativeDesc: t('stats.cumulativeDesc'),
-					languagesDesc: t('stats.languagesDesc'),
-				}}
-			/>
-
-			<p class="mono stats__source">
-				{t('stats.source')}:
-				<a
-					href="https://github.com/haithamassoli"
-					rel="noopener"
-					target="_blank">GitHub</a
-				>
-				<span aria-hidden="true">·</span>
-				<a
-					href="https://wakatime.com/@haithamassoli"
-					rel="noopener"
-					target="_blank">WakaTime</a
-				>
-			</p>
-		</div>
-	</div>
-
 	<div class="wrap">
 		<div class="closer reveal-fast">
-			<p class="closer__text">{t('hire.lede')}</p>
+			<p class="closer__text">{t('cta.line')}</p>
 			<a class="btn" href={href(lang, 'hire')}
-				>{t('nav.hire')}<span class="arrow">→</span></a
+				>{t('hero.cta2')}<span class="arrow">→</span></a
 			>
 		</div>
 	</div>
@@ -268,150 +191,6 @@ const number = new Intl.NumberFormat('en-US');
 		margin-block: clamp(2rem, 5vw, 3rem);
 	}
 
-	/* ---- by the numbers ---- */
-
-	.stats {
-		margin-block-start: clamp(3rem, 8vw, 6rem);
-	}
-
-	.stats__head {
-		margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
-	}
-
-	.figures {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: clamp(1rem, 3vw, 2rem);
-		margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
-	}
-
-	@media (min-width: 46rem) {
-		.figures {
-			grid-template-columns: repeat(4, 1fr);
-		}
-	}
-
-	.figure {
-		display: grid;
-		gap: 0.35rem;
-		padding-inline-start: 0.9rem;
-		border-inline-start: 2px solid var(--signal);
-	}
-
-	.figure__value {
-		font-size: var(--step-2);
-		font-weight: 900;
-		line-height: 1;
-		letter-spacing: -0.03em;
-	}
-
-	.figure__label {
-		margin: 0;
-		color: var(--muted);
-		font-size: var(--step--1);
-		line-height: 1.35;
-	}
-
-	.stats__stale {
-		margin-block-end: 1rem;
-		color: var(--muted);
-		font-size: var(--step--1);
-	}
-
-	.stats :global(.charts) {
-		display: grid;
-		gap: clamp(1rem, 2.5vw, 1.5rem);
-		grid-template-columns: 1fr;
-	}
-
-	@media (min-width: 60rem) {
-		.stats :global(.charts) {
-			grid-template-columns: 1fr 1fr;
-		}
-		.stats :global(.panel--wide) {
-			grid-column: 1 / -1;
-		}
-	}
-
-	.stats :global(.panel) {
-		margin: 0;
-		/* Grid items default to min-content width, which would let the
-		   calendar's scroll track widen the whole column instead of scrolling. */
-		min-inline-size: 0;
-		padding: clamp(1rem, 2.5vw, 1.5rem);
-		background: var(--ink-2);
-		border: 1px solid var(--rule);
-		border-radius: 0.9rem;
-	}
-
-	.stats :global(.panel__title) {
-		color: var(--muted);
-		font-size: var(--step--1);
-		margin-block-end: 0.75rem;
-	}
-
-	.stats :global(.scroller) {
-		overflow-x: auto;
-		overscroll-behavior-x: contain;
-		scrollbar-width: thin;
-	}
-
-	.stats :global(.scroller__track) {
-		min-inline-size: 44rem;
-	}
-
-	/* ---- calendar key ---- */
-
-	.stats :global(.key) {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		gap: 0.4rem;
-		margin: 0.5rem 0 0;
-		color: var(--muted);
-		font-size: var(--step--1);
-	}
-
-	.stats :global(.key--names) {
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		list-style: none;
-		padding: 0;
-	}
-
-	.stats :global(.key--names li) {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5ch;
-		margin-inline-end: 1.2ch;
-	}
-
-	.stats :global(.key__swatch) {
-		inline-size: 0.7rem;
-		block-size: 0.7rem;
-		border-radius: 2px;
-	}
-
-	.stats__source {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.9ch;
-		margin-block-start: 0.2rem;
-		margin-block-end: 1rem;
-		color: var(--muted);
-		font-size: var(--step--1);
-	}
-
-	.stats__source a {
-		color: var(--bone);
-		text-decoration-color: var(--rule-strong);
-		text-underline-offset: 0.3em;
-	}
-
-	.stats__source a:hover {
-		color: var(--signal);
-	}
-
 	/* ---- about ---- */
 
 	/* the grid gap spaces this one; the section-level head margin would double it */
@@ -481,11 +260,6 @@ const number = new Intl.NumberFormat('en-US');
 		display: grid;
 		gap: 0.4rem;
 		margin-block-end: 1.5rem;
-	}
-
-	.toolbox__lede {
-		color: var(--muted);
-		font-size: var(--step--1);
 	}
 
 	.ticker {

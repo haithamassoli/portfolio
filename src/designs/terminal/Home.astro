@@ -12,7 +12,7 @@ import { pair, s } from '../../data/variant-ui';
 import { dateSpan } from './_dates';
 import type { I18n } from '../../../content/types';
 import { profile } from '../../../content/profile';
-import { featured, projects } from '../../data/projects';
+import { featured, onStores, projects, shipped } from '../../data/projects';
 import { toolbox } from '../../i18n';
 import profilePhoto from '../../assets/images/profile.png';
 interface Props {
@@ -72,20 +72,19 @@ const legend = [
 	{ key: 'none', label: pair('not shipped code', 'ليست شيفرة تُشحن') },
 ];
 
-/* Static figures. dev-stats.ts is a network call at build time; not here. */
 const figures = [
 	{
-		v: '39',
+		v: String(shipped),
 		k: pair('projects shipped', 'مشروعًا صدر'),
 		n: pair('over four years', 'على مدى أربع سنوات'),
 	},
 	{
-		v: '13',
+		v: String(onStores),
 		k: pair('on the app stores', 'على متاجر التطبيقات'),
 		n: pair('iOS, Android, or both', 'iOS أو أندرويد أو كلاهما'),
 	},
 	{
-		v: '8',
+		v: String(featured.length),
 		k: pair('written up in full', 'مكتوبة بالكامل'),
 		n: pair('problem, decision, outcome', 'المشكلة، والقرار، والنتيجة'),
 	},
