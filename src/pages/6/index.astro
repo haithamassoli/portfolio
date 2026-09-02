@@ -1,16 +1,13 @@
 ---
 import { Image } from 'astro:assets';
-import { profile } from '../../content/profile';
-import { featured, projects } from '../data/projects';
-import { toolbox } from '../i18n';
-import LangBoot from '../components/LangBoot.astro';
-import Logo from '../components/Logo.astro';
-import Seam from '../components/Seam.astro';
-import StyleSwitcher from '../components/StyleSwitcher.astro';
-import T from '../components/T.astro';
-import { s, pair, yearPair } from '../data/variant-ui';
-import profilePhoto from '../assets/images/profile.png';
-import type { I18n, ProjectCategory, ProjectStatus } from '../../content/types';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import Layout from './_layout.astro';
+import T from '../../components/T.astro';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import profilePhoto from '../../assets/images/profile.png';
+import type { I18n, ProjectCategory, ProjectStatus } from '../../../content/types';
 
 /* Plain words for the data. The film language lives in the type, not in
    euphemisms for what actually shipped. The one exception earns it: a build
@@ -85,78 +82,16 @@ const booking: [I18n, string, string][] = [
 ];
 ---
 
-<!doctype html>
-<html lang="en" dir="ltr">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — Night Reel</title>
-		<meta
-			name="description"
-			content="Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products, including thirteen on the app stores."
-		/>
-		<LangBoot />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
-			rel="stylesheet"
-		/>
-		<Seam />
-	</head>
-
-	<body>
-		<script is:inline>
-			/* The router copies <html> off the incoming page, so the flag goes
-			   back on before that page paints. */
-			document.documentElement.classList.add('js');
-			document.addEventListener('astro:after-swap', () =>
-				document.documentElement.classList.add('js'),
-			);
-		</script>
-
-		<a class="skip" href="#reel">
-			<T v={s('nav.skip')} />
-		</a>
-
-		<div class="shutter" aria-hidden="true">
-			<span class="shutter__leaf shutter__leaf--top"></span>
-			<span class="shutter__leaf shutter__leaf--bottom"></span>
-		</div>
-
-		<div class="key" aria-hidden="true"></div>
-		<div class="grain" aria-hidden="true"></div>
-		<div class="vignette" aria-hidden="true"></div>
-
-		<div class="gate gate--top">
-			<a class="gate__brand" href="#top">
-				<Logo labelled={false} />
-				<T class="vh" v={pair('Haitham Assoli', 'هيثم العسولي')} />
-			</a>
-
-			<button class="slate" type="button" data-lang-toggle>
-				<span class="slate__sticks" aria-hidden="true"></span>
-				<span class="slate__fields" aria-hidden="true">
-					<span class="slate__field slate__field--en">EN</span>
-					<span class="slate__field slate__field--ar">ع</span>
-				</span>
-				<span class="vh" data-l="en" lang="en">Read this reel in Arabic</span>
-				<span class="vh" data-l="ar" lang="ar">اقرأ هذه البكرة بالإنجليزية</span
-				>
-			</button>
-		</div>
-
-		<div class="gate gate--bottom" aria-hidden="true">
-			<span class="gate__mark" data-now>
-				<span data-l="en" lang="en">Reel 2022 — 2026</span>
-				<span data-l="ar" lang="ar">بكرة 2022 — 2026</span>
-			</span>
-			<span class="gate__mark gate__mark--end">
-				<T v={profile.location} />
-			</span>
-		</div>
-
-		<main>
+<Layout
+	title="Haitham Assoli — Night Reel"
+	description="Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products, including thirteen on the app stores."
+	mark={pair('Reel 2022 — 2026', 'بكرة 2022 — 2026')}
+	current="reel"
+>
+	<div class="shutter" aria-hidden="true">
+		<span class="shutter__leaf shutter__leaf--top"></span>
+		<span class="shutter__leaf shutter__leaf--bottom"></span>
+	</div>
 			<section class="card" id="top">
 				<div class="wrap">
 					<p class="eyebrow rise" style="--d: 0.1s">
@@ -618,27 +553,7 @@ const booking: [I18n, string, string][] = [
 					</dl>
 				</div>
 			</section>
-		</main>
-
-		<footer class="tail" data-tail>
-			<div class="wrap">
-				<T v={pair('The end', 'النهاية')} as="p" class="tail__end" />
-				<p class="tail__line" data-l="en" lang="en">
-					© 2026 Haitham Assoli. {profile.tagline.en}
-				</p>
-				<p class="tail__line" data-l="ar" lang="ar">
-					© 2026 هيثم العسولي. {profile.tagline.ar}
-				</p>
-				<p class="tail__line tail__line--fine" data-l="en" lang="en">
-					Shot in Amman. Set in Archivo, Newsreader and Barlow Condensed.
-				</p>
-				<p class="tail__line tail__line--fine" data-l="ar" lang="ar">
-					صُوِّر في عمّان. صُفّ بخطوط Cairo وTajawal وAmiri.
-				</p>
-			</div>
-		</footer>
-
-		<script is:inline>
+	<script is:inline>
 			(function () {
 				const root = document.documentElement;
 				const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -770,11 +685,8 @@ const booking: [I18n, string, string][] = [
 
 				document.addEventListener('astro:page-load', wire);
 			})();
-		</script>
-
-		<StyleSwitcher n={6} />
-	</body>
-</html>
+	</script>
+</Layout>
 
 <style is:global>
 	/* ── Night Reel ────────────────────────────────────────────────────────

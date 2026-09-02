@@ -2,7 +2,7 @@
 /* The brief form. Nothing posts anywhere: the shared composer turns the
    fields into a mail draft in the reader's language and the reader presses
    send. Native validation only. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import HireCompose from '../../components/HireCompose.astro';
 import T from '../../components/T.astro';
 import { s, pair } from '../../data/variant-ui';
@@ -65,7 +65,7 @@ const steps = [
 ];
 ---
 
-<Shell
+<Layout
 	title="Start a project — Haitham Assoli"
 	description="Tell Haitham Assoli what you are building. The form writes a pre-filled email; nothing is sent until you press send in your own mail app. Replies within two business days."
 	here="hire"
@@ -344,7 +344,7 @@ const steps = [
 			document.addEventListener('astro:page-load', apply);
 		})();
 	</script>
-</Shell>
+</Layout>
 
 <style is:global>
 	.hire-head {

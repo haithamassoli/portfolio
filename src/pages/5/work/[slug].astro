@@ -7,7 +7,7 @@ import { projects } from '../../../data/projects';
 import type { Key } from '../../../i18n';
 import { pair, s } from '../../../data/variant-ui';
 import T from '../../../components/T.astro';
-import Shell from '../_shell.astro';
+import Layout from '../_layout.astro';
 
 export function getStaticPaths() {
 	return projects.map((p, index) => ({
@@ -73,7 +73,7 @@ const chWidth = (i: number, n: number) => {
 };
 ---
 
-<Shell
+<Layout
 	page="work"
 	title={`${p.title.en} — Haitham Assoli`}
 	description={p.tagline.en}
@@ -398,7 +398,7 @@ const chWidth = (i: number, n: number) => {
 			/>
 		</a>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ---------------- head + cover ---------------- */

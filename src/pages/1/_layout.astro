@@ -7,7 +7,7 @@
    different room, it is a different variant. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
+import StyleTransition from '../../components/StyleTransition.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -25,6 +25,7 @@ const { title, description } = Astro.props;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -56,7 +57,7 @@ const { title, description } = Astro.props;
 				document.addEventListener('astro:after-swap', apply);
 			})();
 		</script>
-		<Seam />
+		<StyleTransition />
 	</head>
 	<body>
 		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>

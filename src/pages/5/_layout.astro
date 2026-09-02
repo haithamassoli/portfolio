@@ -4,7 +4,7 @@
    language switch; the compartments below are each page's own composition. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
+import StyleTransition from '../../components/StyleTransition.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -24,6 +24,7 @@ const { title, description, page } = Astro.props;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="light" />
@@ -34,7 +35,7 @@ const { title, description, page } = Astro.props;
 			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
 		/>
 		<LangBoot />
-		<Seam />
+		<StyleTransition />
 	</head>
 
 	<body>

@@ -6,7 +6,7 @@
    do all the validating; the shared composer turns the answers into a mail
    draft in whichever language the page is reading. Nothing leaves the browser
    until the visitor presses send themselves, and the page says so twice. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import HireCompose from '../../components/HireCompose.astro';
 import { profile } from '../../../content/profile';
@@ -70,7 +70,7 @@ const nothingSent = pair(
 );
 ---
 
-<Shell
+<Layout
 	title="Start a project — Haitham Assoli"
 	description="Tell Haitham Assoli what you are building. The brief form writes a pre-filled email you send yourself; replies come within two business days."
 	active="hire"
@@ -351,7 +351,7 @@ const nothingSent = pair(
 			</div>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	.playroom .hire-head__lede {

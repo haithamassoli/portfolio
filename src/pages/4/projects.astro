@@ -2,7 +2,7 @@
 /* /4/projects — the long listing. Thirty-nine entries as `ls -la` output,
    where the mode string is not decoration: every flag in it is read off the
    project's real data, and the legend says which. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
 import { dateSpan } from './_dates';
@@ -69,7 +69,7 @@ const flags = [
 ];
 ---
 
-<Shell
+<Layout
 	title="ls -la ~/projects — haitham@amman"
 	description="All thirty-nine projects by Haitham Assoli as a long directory listing: year, category, status, stack size and a write-up for each."
 	path="~/portfolio/projects"
@@ -222,7 +222,7 @@ const flags = [
 			</p>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <script is:inline data-astro-rerun>
 	/* Only this page's own rows and buttons, so re-run it per navigation. */

@@ -4,7 +4,7 @@
    A call sheet is the one piece of paper a production actually runs on: who,
    where, what, and by when. This is that, for a project that has not started
    yet. The form posts nowhere; it chalks a slate and opens a draft. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import HireCompose from '../../components/HireCompose.astro';
 import T from '../../components/T.astro';
 import { profile } from '../../../content/profile';
@@ -45,7 +45,7 @@ const terms: [I18n, I18n][] = [
 ];
 ---
 
-<Shell
+<Layout
 	title="Booking — Night Reel — Haitham Assoli"
 	description="Brief Haitham Assoli on a web or mobile project. The form opens a pre-written email in your own mail app; nothing is sent until you press send."
 	mark={pair('Call sheet', 'ورقة النداء')}
@@ -283,7 +283,7 @@ const terms: [I18n, I18n][] = [
 			</div>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	.booking {

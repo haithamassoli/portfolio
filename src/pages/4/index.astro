@@ -1,17 +1,17 @@
 ---
 /* Variant 4 — "Terminal". The session page: MANIFEST, the eight opened
    records, the project tree, and the man-page facts about the person.
-   Chrome, tokens and the command line come from ./4/_shell.astro. */
+   Chrome, tokens and the command line come from ./_layout.astro. */
 import { Image } from 'astro:assets';
-import Shell from './4/_shell.astro';
-import T from '../components/T.astro';
-import { pair, s } from '../data/variant-ui';
-import { dateSpan } from './4/_dates';
-import type { I18n } from '../../content/types';
-import { profile } from '../../content/profile';
-import { featured, projects } from '../data/projects';
-import { toolbox } from '../i18n';
-import profilePhoto from '../assets/images/profile.png';
+import Layout from './_layout.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+import { dateSpan } from './_dates';
+import type { I18n } from '../../../content/types';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import profilePhoto from '../../assets/images/profile.png';
 
 /* The filesystem: 39 projects, grouped the way `tree` would group them. */
 const catOrder = [
@@ -112,7 +112,7 @@ const linkOrder = [
 ] as const;
 ---
 
-<Shell
+<Layout
 	title="haitham@amman — session"
 	description="Haitham Assoli, web and mobile full-stack engineer in Amman. Bilingual Arabic-first apps, 39 shipped, 13 on the app stores."
 	path="~/portfolio"
@@ -622,7 +622,7 @@ const linkOrder = [
 			}
 		</ul>
 	</section>
-</Shell>
+</Layout>
 
 <script is:inline data-astro-rerun>
 	/* One small piece of theatre: the first command types itself. It wires

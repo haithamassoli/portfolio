@@ -1,7 +1,7 @@
 ---
 /* /4/hire — the brief form, set as a man page and a prompt. The form posts
    nowhere: HireCompose turns it into a mail draft in the reader's language. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import HireCompose from '../../components/HireCompose.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
@@ -52,7 +52,7 @@ const exits = [
 ];
 ---
 
-<Shell
+<Layout
 	title="man hire — haitham@amman"
 	description="Send Haitham Assoli a project brief. The form writes the email for you; nothing is sent until you press send in your own mail app."
 	path="~/portfolio/hire"
@@ -341,7 +341,7 @@ const exits = [
 	</section>
 
 	<HireCompose />
-</Shell>
+</Layout>
 
 <style is:global>
 	.block--man {

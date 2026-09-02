@@ -8,7 +8,7 @@ import { projects } from '../../data/projects';
 import type { Key } from '../../i18n';
 import { pair, s, yearPair } from '../../data/variant-ui';
 import T from '../../components/T.astro';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 
 const categoryJa: Record<string, string> = {
 	web: 'ウェブ',
@@ -53,7 +53,7 @@ const parts = order
 const isTall = (img: ImageMetadata) => img.height / img.width > 1.2;
 ---
 
-<Shell
+<Layout
 	title="Catalogue — 39 projects — Haitham Assoli 目録"
 	description="Every project Haitham Assoli has shipped, catalogued in six parts: web, mobile, on-device AI, desktop, client work and extensions. Thirty-nine entries, each with its own page."
 	current="projects"
@@ -622,4 +622,4 @@ const isTall = (img: ImageMetadata) => img.height / img.width > 1.2;
 			}
 		}
 	</style>
-</Shell>
+</Layout>

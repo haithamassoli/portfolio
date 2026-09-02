@@ -8,7 +8,7 @@
    readable under it. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
+import StyleTransition from '../../components/StyleTransition.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { profile } from '../../../content/profile';
@@ -37,6 +37,7 @@ const nav: [string, string, I18n][] = [
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<LangBoot />
@@ -46,7 +47,7 @@ const nav: [string, string, I18n][] = [
 			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
 			rel="stylesheet"
 		/>
-		<Seam />
+		<StyleTransition />
 	</head>
 
 	<body>

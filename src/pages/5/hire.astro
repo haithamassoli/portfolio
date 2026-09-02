@@ -8,7 +8,7 @@ import type { Key } from '../../i18n';
 import { pair, s } from '../../data/variant-ui';
 import HireCompose from '../../components/HireCompose.astro';
 import T from '../../components/T.astro';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 
 const dealLabel = (d: string) => s(`deal.${d}` as Key);
 const locLabel = (l: string) => s(`loc.${l}` as Key);
@@ -32,7 +32,7 @@ const skills = [
 ];
 ---
 
-<Shell
+<Layout
 	page="hire"
 	title="Start a project — Haitham Assoli"
 	description="Tell Haitham Assoli what you are building. The form writes a pre-filled email and hands it to your own mail app; nothing is sent until you press send."
@@ -322,7 +322,7 @@ const skills = [
 			</div>
 		</section>
 	</form>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ---------------- the pitch pair ---------------- */

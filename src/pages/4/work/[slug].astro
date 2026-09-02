@@ -2,7 +2,7 @@
 /* /4/work/<slug> — `cat` on one project. The challenges are set as a diff
    because that is what they are: a line taken out, a line put in. */
 import { Image } from 'astro:assets';
-import Shell from '../_shell.astro';
+import Layout from '../_layout.astro';
 import T from '../../../components/T.astro';
 import { pair, s } from '../../../data/variant-ui';
 import { dateSpan } from '../_dates';
@@ -44,7 +44,7 @@ const frames = p.shots
 const tall = (img: ImageMetadata) => img.height > img.width;
 ---
 
-<Shell
+<Layout
 	title={`${p.title.en} — haitham@amman`}
 	description={p.tagline.en}
 	path={`~/portfolio/work/${p.slug}`}
@@ -270,7 +270,7 @@ const tall = (img: ImageMetadata) => img.height > img.width;
 			</p>
 		</section>
 	</article>
-</Shell>
+</Layout>
 
 <style is:global>
 	.case__title {

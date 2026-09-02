@@ -1,10 +1,12 @@
 ---
 import { Font, getImage } from 'astro:assets';
-import { ClientRouter } from 'astro:transitions';
 import { canonical as canonicalUrl, dirOf, useT, type Lang } from '../i18n';
 import { profile } from '../../content/profile';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import StyleEntry from '../components/StyleEntry.astro';
+import StyleSwitcher from '../components/StyleSwitcher.astro';
+import StyleTransition from '../components/StyleTransition.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -16,9 +18,12 @@ interface Props {
 	image?: ImageMetadata;
 	/** Error pages set this so they never turn up in a search result. */
 	noindex?: boolean;
+	/** Canonical portfolio pages participate in automatic style rotation. */
+	rotate?: boolean;
 }
 
-const { lang, title, description, accent, image, noindex } = Astro.props;
+const { lang, title, description, accent, image, noindex, rotate } =
+	Astro.props;
 const t = useT(lang);
 const dir = dirOf(lang);
 const siteName = lang === 'ar' ? t('name.arabic') : t('name.latin');
@@ -72,6 +77,7 @@ const person = {
 		<title>{pageTitle}</title>
 		<meta name="description" content={desc} />
 		<meta name="theme-color" content="#16183a" />
+		{rotate && <StyleEntry />}
 		<link rel="canonical" href={canonical} />
 		{noindex && <meta name="robots" content="noindex, follow" />}
 
@@ -116,12 +122,13 @@ const person = {
 			preload={[{ weight: 400 }, { weight: 900 }]}
 		/>
 		<Font cssVariable="--font-mono" preload={[{ weight: 400 }]} />
-		<ClientRouter />
+		<StyleTransition />
 	</head>
 	<body>
 		<a class="skip mono" href="#main">{t('nav.skip')}</a>
 		<Nav lang={lang} />
 		<main id="main" tabindex="-1"><slot /></main>
 		<Footer lang={lang} />
+		{rotate && <StyleSwitcher n={8} />}
 	</body>
 </html>

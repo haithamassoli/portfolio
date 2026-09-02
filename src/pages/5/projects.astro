@@ -7,7 +7,7 @@ import { projects } from '../../data/projects';
 import type { Key } from '../../i18n';
 import { pair, s } from '../../data/variant-ui';
 import T from '../../components/T.astro';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 
 const cat = (c: string) => s(`cat.${c}` as Key);
 const stat = (st: string) => s(`status.${st}` as Key);
@@ -126,7 +126,7 @@ const widest = Math.max(...shelf.map((t) => t.list.length));
 const total = projects.length;
 ---
 
-<Shell
+<Layout
 	page="projects"
 	title="All 39 projects — Haitham Assoli"
 	description="Every project Haitham Assoli has shipped, sorted into six compartments: web, mobile, on-device AI, client work, desktop and browser extensions."
@@ -276,7 +276,7 @@ const total = projects.length;
 			</a>
 		</article>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ---------------- the opening pair ---------------- */

@@ -3,7 +3,7 @@
    paper, one field to a line, and it posts nowhere. */
 import { profile } from '../../../content/profile';
 import HireCompose from '../../components/HireCompose.astro';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
 
@@ -35,7 +35,7 @@ const takes = [
 ];
 ---
 
-<Shell
+<Layout
 	title="Start a project — Haitham Assoli"
 	description="Tell Haitham Assoli what you are building. The brief fills a pre-written email; nothing is sent until you press send in your own mail app."
 >
@@ -236,7 +236,7 @@ const takes = [
 			</p>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	.hire__lede {

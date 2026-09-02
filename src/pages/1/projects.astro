@@ -1,7 +1,7 @@
 ---
 /* All thirty-nine, shelved by what they are. The category label is the only
    thing in the margin, and it stays there while its own shelf scrolls past. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import { projects } from '../../data/projects';
 import { pair, s, yearPair } from '../../data/variant-ui';
@@ -50,7 +50,7 @@ const shelves = order.map((cat) => ({
 }));
 ---
 
-<Shell
+<Layout
 	title="All projects — Haitham Assoli"
 	description="Thirty-nine shipped projects by Haitham Assoli, shelved by what they are: web, mobile, on-device AI, client work, desktop and extensions."
 >
@@ -115,7 +115,7 @@ const shelves = order.map((cat) => ({
 			</section>
 		))
 	}
-</Shell>
+</Layout>
 
 <style is:global>
 	.idx__lede {

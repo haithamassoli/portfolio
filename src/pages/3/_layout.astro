@@ -9,7 +9,7 @@
    cannot tell, and the compositor can. */
 import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
+import StyleTransition from '../../components/StyleTransition.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import T from '../../components/T.astro';
 import { s, pair } from '../../data/variant-ui';
@@ -36,6 +36,7 @@ const nav = [
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,7 +46,7 @@ const nav = [
 			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
 		/>
 		<LangBoot />
-		<Seam />
+		<StyleTransition />
 	</head>
 	<body>
 		<!-- One turbulence field, displaced. The language switch drinks from it. -->

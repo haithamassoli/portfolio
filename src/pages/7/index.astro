@@ -1,13 +1,13 @@
 ---
 import { Image } from 'astro:assets';
-import Shell from './7/_shell.astro';
-import T from '../components/T.astro';
-import { profile } from '../../content/profile';
-import { featured, projects } from '../data/projects';
-import { toolbox } from '../i18n';
-import { s, pair, yearPair } from '../data/variant-ui';
-import profilePhoto from '../assets/images/profile.png';
-import type { I18n, ProjectCategory, ProjectStatus } from '../../content/types';
+import Layout from './_layout.astro';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import profilePhoto from '../../assets/images/profile.png';
+import type { I18n, ProjectCategory, ProjectStatus } from '../../../content/types';
 
 /* The signature toy. Front faces spell HAITHAM left to right; back faces spell
    العسولي right to left. Seven tiles either way, so the board mirrors without
@@ -93,7 +93,7 @@ const elsewhere = [
 ];
 ---
 
-<Shell
+<Layout
 	title="Haitham Assoli — web & mobile engineer"
 	description="Haitham Assoli builds bilingual web and mobile products in Amman: React Native and Expo on both stores, Next.js and Astro on the web, and on-device AI that never phones home."
 	active="home"
@@ -494,7 +494,7 @@ const elsewhere = [
 			</ul>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <script is:inline data-astro-rerun>
 	/* The cursor moves the light: the hero glow follows the pointer. Everything

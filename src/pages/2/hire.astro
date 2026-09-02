@@ -9,7 +9,7 @@ import type { I18n } from '../../../content/types';
 import { pair, s } from '../../data/variant-ui';
 import HireCompose from '../../components/HireCompose.astro';
 import T from '../../components/T.astro';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 
 const dealT = (d: string): I18n => s(`deal.${d}` as Key);
 const locT = (l: string): I18n => s(`loc.${l}` as Key);
@@ -61,7 +61,7 @@ const notSent = pair(
 );
 ---
 
-<Shell
+<Layout
 	title="Tell me about the project — Haitham Assoli 依頼"
 	description="Send Haitham Assoli a project brief. The form writes the email for you and opens it in your own mail app; nothing is sent until you press send."
 	current="hire"
@@ -806,4 +806,4 @@ const notSent = pair(
 			}
 		}
 	</style>
-</Shell>
+</Layout>

@@ -7,7 +7,7 @@
    pencil. The circle is the whole organising idea: it says "these are the
    selects", which is exactly what `featured` means. */
 import { Image } from 'astro:assets';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import { projects } from '../../data/projects';
 import { s, pair, yearPair } from '../../data/variant-ui';
@@ -49,7 +49,7 @@ const isPortrait = (img?: ImageMetadata) => !!img && img.height > img.width;
 const selects = projects.filter((p) => p.featured).length;
 ---
 
-<Shell
+<Layout
 	title="Contact sheet — Night Reel — Haitham Assoli"
 	description="All thirty-nine projects Haitham Assoli has shipped, printed on one contact sheet and cut into rolls by what each one is. The eight written up in full are circled."
 	mark={pair('39 frames', '39 كادرًا')}
@@ -215,7 +215,7 @@ const selects = projects.filter((p) => p.featured).length;
 			))
 		}
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ── The sheet ─────────────────────────────────────────────────────── */

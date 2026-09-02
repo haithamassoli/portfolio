@@ -13,7 +13,7 @@ import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
 import T from '../../components/T.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
-import Seam from '../../components/Seam.astro';
+import StyleTransition from '../../components/StyleTransition.astro';
 import { profile } from '../../../content/profile';
 import { s, pair } from '../../data/variant-ui';
 
@@ -46,6 +46,7 @@ const footLinks = [
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -67,7 +68,7 @@ const footLinks = [
 				document.addEventListener('astro:after-swap', apply);
 			})();
 		</script>
-		<Seam />
+		<StyleTransition />
 	</head>
 
 	<body class="playroom">

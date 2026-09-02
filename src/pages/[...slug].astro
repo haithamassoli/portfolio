@@ -41,7 +41,7 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 
 {
 	kind === 'home' && (
-		<Base lang={lang}>
+		<Base lang={lang} rotate>
 			<Home lang={lang} />
 		</Base>
 	)
@@ -49,7 +49,12 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 
 {
 	kind === 'work' && (
-		<Base lang={lang} title={t('work.all')} description={t('work.allLede')}>
+		<Base
+			lang={lang}
+			rotate
+			title={t('work.all')}
+			description={t('work.allLede')}
+		>
 			<WorkPage lang={lang} />
 		</Base>
 	)
@@ -57,7 +62,12 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 
 {
 	kind === 'hire' && (
-		<Base lang={lang} title={t('hire.eyebrow')} description={t('hire.lede')}>
+		<Base
+			lang={lang}
+			rotate
+			title={t('hire.eyebrow')}
+			description={t('hire.lede')}
+		>
 			<HirePage lang={lang} />
 		</Base>
 	)
@@ -67,6 +77,7 @@ const next = project ? projects[(index + 1) % projects.length] : undefined;
 	project && next && (
 		<Base
 			lang={lang}
+			rotate
 			title={project.title[lang]}
 			description={project.summary[lang]}
 			accent={project.accent}

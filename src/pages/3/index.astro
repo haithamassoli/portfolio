@@ -1,15 +1,13 @@
 ---
 import { Image } from 'astro:assets';
-import { profile } from '../../content/profile';
-import { featured, projects } from '../data/projects';
-import { toolbox } from '../i18n';
-import LangBoot from '../components/LangBoot.astro';
-import Logo from '../components/Logo.astro';
-import Seam from '../components/Seam.astro';
-import StyleSwitcher from '../components/StyleSwitcher.astro';
-import T from '../components/T.astro';
-import { s, pair, yearPair } from '../data/variant-ui';
-import profilePhoto from '../assets/images/profile.png';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import Layout from './_layout.astro';
+import Logo from '../../components/Logo.astro';
+import T from '../../components/T.astro';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import profilePhoto from '../../assets/images/profile.png';
 
 /* The grid is uneven on purpose, and the spans follow the covers: the three
    landscape screenshots get the wide slots, the five phone shots get narrow
@@ -99,90 +97,10 @@ const widthsFor = (img: ImageMetadata) =>
 	);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — web & mobile engineer</title>
-		<meta
-			name="description"
-			content="Haitham Assoli builds bilingual Arabic-first web and mobile products from Amman, Jordan. 39 shipped, 13 on the app stores, recent work in on-device AI."
-		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-	</head>
-	<body>
-		<!-- The refraction filter. One turbulence field, displaced gently, used
-		     by the hero lens and by the language switch: it is expensive and it
-		     is the signature. -->
-		<svg
-			class="filters"
-			aria-hidden="true"
-			focusable="false"
-			width="0"
-			height="0"
-		>
-			<filter
-				id="liquid"
-				x="-25%"
-				y="-25%"
-				width="150%"
-				height="150%"
-				color-interpolation-filters="sRGB"
-			>
-				<feTurbulence
-					type="fractalNoise"
-					baseFrequency="0.011 0.017"
-					numOctaves="2"
-					seed="7"
-					result="noise"></feTurbulence>
-				<feGaussianBlur in="noise" stdDeviation="1.4" result="soft"
-				></feGaussianBlur>
-				<feDisplacementMap
-					in="SourceGraphic"
-					in2="soft"
-					scale="26"
-					xChannelSelector="R"
-					yChannelSelector="G"></feDisplacementMap>
-			</filter>
-		</svg>
-
-		<div class="field" aria-hidden="true">
-			<div class="blobs"></div>
-		</div>
-		<div class="grain" aria-hidden="true"></div>
-
-		<a class="skip" href="#work"><T v={s('nav.skip')} /></a>
-
-		<!-- The switch is a lens on a rail: the glass slides to the other
-		     language and bends the letter it lands on. -->
-		<div class="dock">
-			<nav class="dock__nav" aria-label="Pages — الصفحات">
-				<a href="/3/projects"><T v={s('work.all')} /></a>
-				<a href="/3/hire"><T v={s('nav.hire')} /></a>
-			</nav>
-			<button type="button" class="lang" data-lang-toggle>
-				<span class="lang__slot" aria-hidden="true">
-					<span class="lang__side lang__side--en">EN</span>
-					<span class="lang__side lang__side--ar" lang="ar">ع</span>
-					<span class="lang__puck">
-						<span class="lang__glass"></span>
-						<span class="lang__rim"></span>
-					</span>
-				</span>
-				<span class="sr" data-l="en" lang="ar">اقرأ بالعربية</span>
-				<span class="sr" data-l="ar" lang="en">Read in English</span>
-			</button>
-		</div>
-
-		<main id="top">
+<Layout
+	title="Haitham Assoli — web & mobile engineer"
+	description="Haitham Assoli builds bilingual Arabic-first web and mobile products from Amman, Jordan. 39 shipped, 13 on the app stores, recent work in on-device AI."
+>
 			<!-- ── HERO ─────────────────────────────────────────────────────── -->
 			<header class="hero" id="hero">
 				<!-- The mark at cover scale: frost letters, lagoon rule and the same
@@ -623,23 +541,7 @@ const widthsFor = (img: ImageMetadata) =>
 					</ul>
 				</div>
 			</section>
-		</main>
-
-		<footer class="foot">
-			<p class="foot__name">
-				<span data-l="en" lang="en">Haitham Assoli</span>
-				<span data-l="ar" lang="ar">هيثم العسولي</span>
-			</p>
-			<p class="foot__line">
-				<T v={profile.title} /> · <T v={profile.location} /> ·{' '}
-				<T v={pair('variant 3, liquid glass', 'التصميم الثالث، زجاج سائل')} />
-			</p>
-			<p class="foot__back">
-				<a href="#top"><T v={pair('Back to the top', 'عد إلى الأعلى')} /></a>
-			</p>
-		</footer>
-
-		<script>
+	<script>
 			/* A bundled script runs once per session and loses
 			   `data-astro-rerun` on the way out, so the lens is rewired on
 			   every navigation from the document instead. */
@@ -680,11 +582,8 @@ const widthsFor = (img: ImageMetadata) =>
 
 			/* Fires on the first load too, so this is the only hook needed. */
 			document.addEventListener('astro:page-load', wire);
-		</script>
-
-		<StyleSwitcher n={3} />
-	</body>
-</html>
+	</script>
+</Layout>
 
 <style is:global>
 	/* ══ tokens ══════════════════════════════════════════════════════════ */

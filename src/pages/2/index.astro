@@ -1,17 +1,15 @@
 ---
 import { Image } from 'astro:assets';
-import { profile } from '../../content/profile';
-import type { I18n } from '../../content/types';
-import { featured, projects } from '../data/projects';
-import { toolbox } from '../i18n';
-import type { Key } from '../i18n';
-import { pair, s, yearPair } from '../data/variant-ui';
-import LangBoot from '../components/LangBoot.astro';
-import Seam from '../components/Seam.astro';
-import T from '../components/T.astro';
-import StyleSwitcher from '../components/StyleSwitcher.astro';
-import Logo from '../components/Logo.astro';
-import profilePhoto from '../assets/images/profile.png';
+import { profile } from '../../../content/profile';
+import type { I18n } from '../../../content/types';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import type { Key } from '../../i18n';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import Layout from './_layout.astro';
+import Logo from '../../components/Logo.astro';
+import T from '../../components/T.astro';
+import profilePhoto from '../../assets/images/profile.png';
 
 /* Category and status, said properly in Japanese rather than transliterated.
    受託 is the ordinary word for contract work; 端末内 means "inside the
@@ -96,18 +94,6 @@ const ledger = [
 	},
 ];
 
-const nav = [
-	{ href: '#sakuhin', ja: '作品', t: s('nav.work') },
-	{ href: '#keireki', ja: '経歴', t: s('nav.about') },
-	{ href: '#dogu', ja: '道具', t: pair('Tools', 'الأدوات') },
-	{ href: '#renraku', ja: '連絡', t: pair('Contact', 'التواصل') },
-];
-
-const pages = [
-	{ href: '/2/projects', ja: '目録', t: pair('Catalogue', 'الفهرس') },
-	{ href: '/2/hire', ja: '依頼', t: s('nav.hire') },
-];
-
 const about = [
 	pair(
 		'I take products from schema to store listing. I build Arabic-first products for Arabic readers, with the copy, layout and direction designed together.',
@@ -126,58 +112,11 @@ const about = [
 const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project enquiry')}`;
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — 丁寧につくられた画面。</title>
-		<meta
-			name="description"
-			content="Haitham Assoli builds web and mobile products in Amman. Thirty-nine shipped projects, including thirteen on the app stores."
-		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-	</head>
-
-	<body>
-		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
-
-		<header class="topbar">
-			<div class="wrap topbar__in">
-				<a class="mark" href="#main">
-					<span class="mark__ja" lang="ja">ハイサム</span>
-					<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="mark__en" />
-				</a>
-				<nav class="nav" aria-label="Sections">
-					{
-						nav.map((item) => (
-							<a class="nav__a" href={item.href}>
-								<span lang="ja">{item.ja}</span>
-								<T v={item.t} class="nav__lat" />
-							</a>
-						))
-					}
-					<span class="nav__sep" aria-hidden="true"></span>
-					{
-						pages.map((item) => (
-							<a class="nav__a nav__a--page" href={item.href}>
-								<span lang="ja">{item.ja}</span>
-								<T v={item.t} class="nav__lat" />
-							</a>
-						))
-					}
-				</nav>
-			</div>
-		</header>
-
-		<main id="main">
+<Layout
+	title="Haitham Assoli — 丁寧につくられた画面。"
+	description="Haitham Assoli builds web and mobile products in Amman. Thirty-nine shipped projects, including thirteen on the app stores."
+	current="home"
+>
 			<!-- 序 — the thesis, stated on three axes -->
 			<section class="hero" aria-labelledby="h1">
 				<div class="wrap hero__in">
@@ -660,79 +599,9 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 					</div>
 				</div>
 			</section>
-		</main>
+</Layout>
 
-		<footer class="foot">
-			<div class="wrap foot__in">
-				<p class="foot__ja" lang="ja">以上</p>
-				<p class="foot__en">
-					<span lang="ja">作</span>
-					<T v={pair('Haitham Assoli', 'هيثم العسولي')} />
-					<span aria-hidden="true">·</span>
-					<T v={profile.location} />
-					<span aria-hidden="true">·</span>
-					<T
-						v={pair(
-							'Set in Shippori Mincho, Newsreader and Amiri',
-							'بخطوط Shippori Mincho وNewsreader وAmiri',
-						)}
-					/>
-				</p>
-				<button
-					class="voice voice--foot"
-					type="button"
-					data-lang-toggle
-					data-l="en"
-					lang="ar"
-					dir="rtl"
-				>
-					<span class="voice__ja" lang="ja" aria-hidden="true">語</span>
-					اقرأ بالعربية
-				</button>
-				<button
-					class="voice voice--foot"
-					type="button"
-					data-lang-toggle
-					data-l="ar"
-					lang="en"
-					dir="ltr"
-				>
-					<span class="voice__ja" lang="ja" aria-hidden="true">語</span>
-					Read in English
-				</button>
-			</div>
-		</footer>
-
-		<!-- Nothing but this page's own elements, so the router is told to
-		     run it again: a script it has already executed is otherwise
-		     skipped for the rest of the session. Held in a function because a
-		     second run at the top level would redeclare its own names. -->
-		<script data-astro-rerun>
-			(function () {
-				const targets = document.querySelectorAll('.rise');
-				const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-				if (reduce.matches || !('IntersectionObserver' in window)) {
-					targets.forEach((el) => el.classList.add('is-in'));
-				} else {
-					const io = new IntersectionObserver(
-						(entries) => {
-							entries.forEach((entry) => {
-								if (!entry.isIntersecting) return;
-								entry.target.classList.add('is-in');
-								io.unobserve(entry.target);
-							});
-						},
-						{ rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-					);
-					targets.forEach((el) => io.observe(el));
-				}
-			})();
-		</script>
-
-		<StyleSwitcher n={2} />
-
-		<style is:global>
+<style is:global>
 			/* ── 静けさ ─────────────────────────────────────────────
 			   Aoboku (blue-toned sumi) on kinari washi, indigo for the
 			   working type, one vermilion seal. Everything else is 間. */
@@ -2393,6 +2262,4 @@ const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project en
 					animation: none;
 				}
 			}
-		</style>
-	</body>
-</html>
+</style>

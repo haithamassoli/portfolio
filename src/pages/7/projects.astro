@@ -7,7 +7,7 @@
    visible before a single title is read. The eight with a full write-up are
    printed in reverse — ink stock, sun ink — so they read as the special ones
    rather than merely the first ones. */
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import { projects } from '../../data/projects';
 import { s, pair, yearPair } from '../../data/variant-ui';
@@ -75,7 +75,7 @@ const panels = order
 const hues = ['melon', 'sky', 'bubble', 'sun', 'mint'];
 ---
 
-<Shell
+<Layout
 	title="All 39 projects — Haitham Assoli"
 	description="Every project Haitham Assoli has shipped, laid out as a sticker sheet and grouped by what it is: web, mobile, on-device AI, desktop, client work and editor extensions."
 	active="work"
@@ -214,7 +214,7 @@ const hues = ['melon', 'sky', 'bubble', 'sun', 'mint'];
 			</a>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <script is:inline data-astro-rerun>
 	/* Rerun: the punches and panels are fresh elements after every

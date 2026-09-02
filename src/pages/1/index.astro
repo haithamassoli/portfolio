@@ -1,13 +1,13 @@
 ---
 /* Variant 1 — "Quiet Room": a single ruled column with generous space. */
 import { Image } from 'astro:assets';
-import { profile } from '../../content/profile';
-import Shell from './1/_shell.astro';
-import T from '../components/T.astro';
-import { featured, projects } from '../data/projects';
-import { pair, s, yearPair } from '../data/variant-ui';
-import { toolbox } from '../i18n';
-import profilePhoto from '../assets/images/profile.png';
+import { profile } from '../../../content/profile';
+import Layout from './_layout.astro';
+import T from '../../components/T.astro';
+import { featured, projects } from '../../data/projects';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import { toolbox } from '../../i18n';
+import profilePhoto from '../../assets/images/profile.png';
 
 const statusWord = {
 	live: s('status.live'),
@@ -55,7 +55,7 @@ const elsewhere = [
 ];
 ---
 
-<Shell
+<Layout
 	title="Haitham Assoli — web and mobile engineer, Amman"
 	description="Haitham Assoli builds web and mobile products from Amman, Jordan. Thirty-nine shipped, thirteen on the app stores, and every screen written in Arabic and English."
 >
@@ -398,7 +398,7 @@ const elsewhere = [
 			</ul>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ── Hero ──────────────────────────────────────────────────────────────*/

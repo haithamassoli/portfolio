@@ -8,7 +8,7 @@ import { projects } from '../../../data/projects';
 import type { Key } from '../../../i18n';
 import { pair, s, yearPair } from '../../../data/variant-ui';
 import T from '../../../components/T.astro';
-import Shell from '../_shell.astro';
+import Layout from '../_layout.astro';
 
 export function getStaticPaths() {
 	return projects.map((project, i) => ({
@@ -69,7 +69,7 @@ const outcomes = project.outcomes.en.map((_, i) =>
 );
 ---
 
-<Shell
+<Layout
 	title={`${project.title.en} — Haitham Assoli`}
 	description={project.tagline.en}
 	current="projects"
@@ -829,4 +829,4 @@ const outcomes = project.outcomes.en.map((_, i) =>
 			}
 		}
 	</style>
-</Shell>
+</Layout>

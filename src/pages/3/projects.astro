@@ -3,7 +3,7 @@
    out, and each band is as wide as its share of the work. The widths are not
    decoration — they are the census. */
 import { Image } from 'astro:assets';
-import Shell from './_shell.astro';
+import Layout from './_layout.astro';
 import T from '../../components/T.astro';
 import { projects } from '../../data/projects';
 import { s, pair, yearPair } from '../../data/variant-ui';
@@ -62,7 +62,7 @@ const widthsFor = (img: ImageMetadata) =>
 	);
 ---
 
-<Shell
+<Layout
 	title="All 39 projects — Haitham Assoli"
 	description="Every project Haitham Assoli has shipped, split by kind: 18 web, 9 mobile, 7 AI, 2 client, 2 desktop and 1 editor extension. Each one has its own write-up."
 	here="projects"
@@ -196,7 +196,7 @@ const widthsFor = (img: ImageMetadata) =>
 			<a class="btn btn--go" href="/3/hire"><T v={s('hire.title')} /></a>
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ══ the prism head ══════════════════════════════════════════════════ */

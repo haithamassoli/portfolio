@@ -1,13 +1,5 @@
 ---
-/* Floating switcher for the design variants at /1 … /7. Prototype-only: it is
-   deliberately isolated from whatever styles the host page sets, so a variant
-   can be as maximalist as it likes without swallowing the navigation.
-
-   It sits closed by default — a <details> disclosure, so it is one small pill
-   in the corner rather than a bar lying across the bottom of the content, and
-   it opens on click or keyboard with no script at all.
-   ponytail: drop this file and the /N pages once a direction is picked. */
-import { styleVariants } from '../data/style-variants';
+import { styles } from '../data/styles';
 
 interface Props {
 	n: number;
@@ -15,44 +7,163 @@ interface Props {
 const { n } = Astro.props;
 ---
 
-<details class="sx">
-	<summary
-		class="sx-tab"
-		aria-label={`Open the design switcher. Variant ${n} of ${styleVariants.length}.`}
-		>{n}<span class="sx-slash">/</span>{styleVariants.length}</summary
-	>
-	<nav class="sx-bar" aria-label="Design variants">
-		<a class="sx-link sx-index" href="/styles">All</a>
-		{
-			styleVariants.map((v) => (
-				<a
-					class="sx-link"
-					href={`/${v.n}`}
-					data-n={v.n}
-					title={`${v.name} — ${v.note}`}
-					aria-current={v.n === n ? 'page' : undefined}
-				>
-					{v.n}
-				</a>
-			))
-		}
-	</nav>
-</details>
-
-<script is:inline>
-	/* On a sub-page, jumping to another variant should land on the same
-	   sub-page: comparing /3/projects against /5/projects is the whole point. */
-	(function () {
-		function retarget() {
-			const tail = location.pathname.match(/^\/[1-9](\/.+?)\/?$/);
-			for (const a of document.querySelectorAll('.sx-bar .sx-link[data-n]')) {
-				a.href = '/' + a.dataset.n + (tail ? tail[1] : '');
+<div class="sx" data-current={n}>
+	<button class="sx-next" type="button" data-style-switch>
+		<span>{n}</span><span aria-hidden="true">→</span><span data-style-next
+			>…</span
+		>
+	</button>
+	<details class="sx-menu">
+		<summary
+			class="sx-tab"
+			aria-label={`Choose a portfolio style. Style ${n} of ${styles.length}.`}
+			>{n}<span class="sx-slash">/</span>{styles.length}</summary
+		>
+		<nav class="sx-bar" aria-label="Portfolio styles">
+			<a class="sx-link sx-index" href="/styles">All</a>
+			{
+				styles.map((style) => (
+					<a
+						class="sx-link"
+						href={`/${style.id}`}
+						data-n={style.id}
+						title={`${style.name} — ${style.note}`}
+						aria-current={style.id === n ? 'page' : undefined}
+					>
+						{style.id}
+					</a>
+				))
 			}
+		</nav>
+	</details>
+</div>
+
+<script>
+	import { navigate } from 'astro:transitions/client';
+	import { styleIds, styles } from '../data/styles';
+	import {
+		drawStyle,
+		parseStyleState,
+		STYLE_STATE_KEY,
+		today,
+		type StyleState,
+	} from '../lib/style-selection';
+
+	const prepared = new WeakMap<Element, StyleState>();
+	const equivalentPath = (
+		style: number,
+		pathname = location.pathname,
+		explicit = false,
+	) => {
+		const canonical = pathname.replace(/^\/ar(?=\/|$)/, '') || '/';
+		const match = pathname.match(
+			/^\/\d+(?:\/(projects|hire|work\/[^/]+))?\/?$/,
+		);
+		const tail =
+			match?.[1] ??
+			(canonical === '/work'
+				? 'projects'
+				: canonical === '/hire'
+					? 'hire'
+					: canonical.match(/^\/work\/[^/]+$/)?.[0].slice(1));
+		if (style === 8) {
+			const prefix = document.documentElement.lang === 'ar' ? '/ar' : '';
+			const path =
+				tail === 'projects'
+					? '/work'
+					: tail === 'hire'
+						? '/hire'
+						: tail
+							? `/${tail}`
+							: '';
+			return `${prefix}${path || '/'}${explicit ? '?style=8' : ''}`;
 		}
-		retarget();
-		/* Fires on the first load too, so this is the only hook needed. */
-		document.addEventListener('astro:page-load', retarget);
-	})();
+		return `/${style}${tail ? `/${tail}` : ''}`;
+	};
+
+	function setup() {
+		const switcher = document.querySelector<HTMLElement>('.sx');
+		const current = Number(switcher?.dataset.current);
+		if (!styleIds.includes(current)) return;
+		const canonical = location.pathname.replace(/^\/ar(?=\/|$)/, '') || '/';
+		switcher?.classList.toggle(
+			'sx--hero',
+			/^\/\d+\/?$/.test(location.pathname) || canonical === '/',
+		);
+
+		let previous = null;
+		try {
+			previous = parseStyleState(
+				localStorage.getItem(STYLE_STATE_KEY),
+				styleIds,
+			);
+		} catch {
+			// Storage may be blocked; drawing still works for this navigation.
+		}
+		const base: StyleState = {
+			version: 1,
+			registry: styleIds.join(','),
+			day: today(),
+			current,
+			queue: previous
+				? (previous.current === current
+						? previous.queue
+						: [previous.current, ...previous.queue]
+					).filter((id) => id !== current)
+				: [],
+		};
+		const next = drawStyle(base, styleIds);
+		const destination = styles.find(({ id }) => id === next.current);
+		const button = document.querySelector('[data-style-switch]');
+		if (!(button instanceof HTMLButtonElement) || !destination) return;
+		button.dataset.href = equivalentPath(destination.id);
+		button.setAttribute('aria-label', `Switch to ${destination.name} style`);
+		button.querySelector('[data-style-next]')!.textContent = String(
+			destination.id,
+		);
+		prepared.set(button, next);
+
+		for (const link of document.querySelectorAll<HTMLAnchorElement>(
+			'.sx-bar .sx-link[data-n]',
+		)) {
+			const target = Number(link.dataset.n);
+			if (styleIds.includes(target))
+				link.href = equivalentPath(target, location.pathname, true);
+		}
+	}
+
+	document.addEventListener('click', (event) => {
+		const button = (event.target as Element | null)?.closest?.(
+			'[data-style-switch]',
+		);
+		if (!(button instanceof HTMLButtonElement)) return;
+		const next = prepared.get(button);
+		const destination = button.dataset.href;
+		if (!next || !destination) return;
+		event.preventDefault();
+
+		const rect = button.getBoundingClientRect();
+		const x = rect.left + rect.width / 2;
+		const y = rect.top + rect.height / 2;
+		const root = document.documentElement;
+		root.dataset.styleSwitch = '';
+		root.style.setProperty('--reveal-x', `${x}px`);
+		root.style.setProperty('--reveal-y', `${y}px`);
+		root.style.setProperty(
+			'--reveal-radius',
+			`${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`,
+		);
+		window.styleSwitchPending = true;
+		try {
+			localStorage.setItem(STYLE_STATE_KEY, JSON.stringify(next));
+		} catch {
+			// Navigation is still useful when persistence is unavailable.
+		}
+		navigate(destination);
+	});
+
+	setup();
+	document.addEventListener('astro:page-load', setup);
 </script>
 
 <style is:global>
@@ -62,18 +173,33 @@ const { n } = Astro.props;
 		z-index: 2147483647;
 		inset-block-end: max(0.75rem, env(safe-area-inset-bottom));
 		inset-inline-end: max(0.75rem, env(safe-area-inset-right));
-		/* column-reverse so the open bar rises above the tab instead of
-		   shoving it up the screen. */
 		display: flex;
-		flex-direction: column-reverse;
+		flex-direction: row;
 		align-items: flex-end;
+		gap: 0.35rem;
 		direction: ltr;
 		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 		font-size: 0.75rem;
 		line-height: 1;
 	}
 
-	.sx .sx-tab {
+	.sx.sx--hero {
+		position: absolute;
+		inset-block-start: 50svh;
+		inset-inline-start: 50%;
+		inset-inline-end: auto;
+		translate: -50% -50%;
+		align-items: center;
+	}
+
+	.sx.sx--hero .sx-menu {
+		position: absolute;
+		inset-inline-start: calc(100% + 0.35rem);
+		inset-block-end: 0;
+	}
+
+	.sx .sx-tab,
+	.sx .sx-next {
 		all: unset;
 		display: grid;
 		place-items: center;
@@ -94,17 +220,26 @@ const { n } = Astro.props;
 			color 0.15s;
 	}
 
+	.sx .sx-next {
+		width: auto;
+		min-width: 3.5rem;
+		padding-inline: 0.75rem;
+		gap: 0.35rem;
+	}
+
 	.sx .sx-tab::-webkit-details-marker {
 		display: none;
 	}
 
 	.sx .sx-tab:hover,
-	.sx[open] .sx-tab {
+	.sx-menu[open] .sx-tab,
+	.sx .sx-next:hover {
 		opacity: 1;
 		color: #fff;
 	}
 
-	.sx .sx-tab:focus-visible {
+	.sx .sx-tab:focus-visible,
+	.sx .sx-next:focus-visible {
 		opacity: 1;
 		outline: 2px solid #fff;
 		outline-offset: 2px;
@@ -120,7 +255,9 @@ const { n } = Astro.props;
 		display: flex;
 		align-items: center;
 		gap: 0.125rem;
-		margin-block-end: 0.4rem;
+		position: absolute;
+		inset-block-end: calc(100% + 0.4rem);
+		inset-inline-end: 0;
 		padding: 0.3rem;
 		border-radius: 999px;
 		border: 1px solid rgba(255, 255, 255, 0.14);
@@ -169,14 +306,14 @@ const { n } = Astro.props;
 	   spans the width rather than running off both edges. */
 	@media (max-width: 26rem) {
 		.sx {
-			inset-inline: 0.5rem;
+			inset-inline-end: 0.5rem;
 			font-size: 0.7rem;
 		}
 
 		.sx .sx-bar {
-			align-self: stretch;
 			justify-content: space-between;
 			gap: 0;
+			max-width: calc(100vw - 1rem);
 		}
 
 		.sx .sx-link {

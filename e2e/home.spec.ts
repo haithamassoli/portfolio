@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-test('the hero holds both scripts', async ({ page }) => {
+test('the no-JavaScript fallback holds both scripts', async ({ browser }) => {
+	const page = await browser.newPage({ javaScriptEnabled: false });
 	await page.goto('/');
 	await expect(
 		page.getByRole('heading', { name: 'Haitham Assoli' }),
@@ -8,16 +9,19 @@ test('the hero holds both scripts', async ({ page }) => {
 	await expect(page.locator('.hero__field--mirror')).toContainText('هيثم');
 });
 
-test('switching language mirrors the page', async ({ page }) => {
-	await page.goto('/');
-	await page.getByRole('link', { name: /اقرأ بالعربية/ }).click();
-	await expect(page).toHaveURL(/\/ar\/?$/);
+test('the Arabic entry keeps its language in the selected style', async ({
+	page,
+}) => {
+	await page.goto('/ar');
+	expect(new URL(page.url()).pathname).toMatch(/^\/(?:[1-7]|ar)\/?$/);
+	await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
 	await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-	// the nav must follow the language, not persist from the previous page
-	await expect(page.locator('.links')).toContainText('الأعمال');
 });
 
-test('a project card opens its own page', async ({ page }) => {
+test('a fallback project card opens its canonical page', async ({
+	browser,
+}) => {
+	const page = await browser.newPage({ javaScriptEnabled: false });
 	await page.goto('/');
 	await page.locator('.card').first().click();
 	await expect(page).toHaveURL(/\/work\/aoun$/);
@@ -28,17 +32,21 @@ test('a project card opens its own page', async ({ page }) => {
 });
 
 test('the hire form blocks an incomplete brief', async ({ page }) => {
-	await page.goto('/hire');
-	await page.getByLabel('Email').fill('not-an-email');
-	await expect(
-		page.getByRole('alert').filter({ hasText: 'will not reach you' }),
-	).toBeVisible();
-	await expect(
-		page.getByRole('button', { name: /Compose the email/i }),
-	).toBeDisabled();
+	await page.goto('/1/hire');
+	const email = page.getByLabel('Email');
+	await email.fill('not-an-email');
+	expect(
+		await email.evaluate((input: HTMLInputElement) => input.checkValidity()),
+	).toBe(false);
+	const url = page.url();
+	await page.getByRole('button', { name: /Compose the email/i }).click();
+	await expect(page).toHaveURL(url);
 });
 
-test('the work page lists every project, grouped', async ({ page }) => {
+test('the fallback work page lists every project, grouped', async ({
+	browser,
+}) => {
+	const page = await browser.newPage({ javaScriptEnabled: false });
 	await page.goto('/work');
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText(
 		'All projects',

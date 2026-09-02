@@ -2,7 +2,7 @@
 /* One project, read top to bottom in a single column: what it is, what it is
    built out of, what went wrong, and what came of it. */
 import { Image } from 'astro:assets';
-import Shell from '../_shell.astro';
+import Layout from '../_layout.astro';
 import T from '../../../components/T.astro';
 import { projects } from '../../../data/projects';
 import { pair, s, yearPair } from '../../../data/variant-ui';
@@ -50,7 +50,7 @@ const outcomes = p.outcomes.en.map((en, i) => pair(en, p.outcomes.ar[i]));
 const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
 ---
 
-<Shell title={`${p.title.en} — Haitham Assoli`} description={p.tagline.en}>
+<Layout title={`${p.title.en} — Haitham Assoli`} description={p.tagline.en}>
 	<section class="band band--top">
 		<p class="rail"><T v={pair('the project', 'المشروع')} /></p>
 		<div class="col col--top">
@@ -226,7 +226,7 @@ const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
 			<T as="p" class="measure" v={next.tagline} />
 		</div>
 	</section>
-</Shell>
+</Layout>
 
 <style is:global>
 	.back {

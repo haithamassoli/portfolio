@@ -1,16 +1,13 @@
 ---
 import { Image } from 'astro:assets';
-import { profile } from '../../content/profile';
-import { featured, projects } from '../data/projects';
-import { toolbox } from '../i18n';
-import type { Key } from '../i18n';
-import { pair, s } from '../data/variant-ui';
-import LangBoot from '../components/LangBoot.astro';
-import Logo from '../components/Logo.astro';
-import Seam from '../components/Seam.astro';
-import T from '../components/T.astro';
-import StyleSwitcher from '../components/StyleSwitcher.astro';
-import profilePhoto from '../assets/images/profile.png';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import type { Key } from '../../i18n';
+import { pair, s } from '../../data/variant-ui';
+import Layout from './_layout.astro';
+import T from '../../components/T.astro';
+import profilePhoto from '../../assets/images/profile.png';
 
 /* The bento is a tray, not a wall: every tile has its own job, its own
    material and its own internal composition. Sizes are assigned here, once,
@@ -65,45 +62,10 @@ const ammanTime = new Intl.DateTimeFormat('en-GB', {
 const nowISO = new Date().toISOString();
 ---
 
-<!doctype html>
-<html lang="en" dir="ltr">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Haitham Assoli — Arabic-first apps, laid out as a tray</title>
-		<meta
-			name="description"
-			content="Haitham Assoli builds Arabic-first web and mobile products from Amman: React Native on both app stores, Next.js and Astro on the web, and AI that runs on the phone. Readable in Arabic or English."
-		/>
-		<meta name="color-scheme" content="light" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-	</head>
-
-	<body>
-		<a class="skip" href="#main">
-			<T v={s('nav.skip')} />
-		</a>
-
-		<div class="tray">
-			<header class="topbar">
-				<p class="topbar__name">
-					<Logo class="topbar__logo" labelled={false} />
-					<T class="sr-only" v={pair('Haitham Assoli', 'هيثم العسولي')} />
-				</p>
-				<nav class="topbar__nav mono">
-					<a class="ilink" href="/5/projects"><T v={s('work.all')} /></a>
-					<a class="ilink" href="/5/hire"><T v={s('nav.hire')} /></a>
-				</nav>
-			</header>
-
-			<main id="main">
+<Layout
+	title="Haitham Assoli — Arabic-first apps, laid out as a tray"
+	description="Haitham Assoli builds Arabic-first web and mobile products from Amman: React Native on both app stores, Next.js and Astro on the web, and AI that runs on the phone. Readable in Arabic or English."
+>
 				<!-- ===================== BOARD ONE: THE POINT ===================== -->
 				<section class="board board--hero">
 					<!-- thesis -->
@@ -639,75 +601,7 @@ const nowISO = new Date().toISOString();
 						</ul>
 					</article>
 				</section>
-			</main>
-
-			<footer class="foot">
-				<p class="mono">
-					<span data-l="en" lang="en">Haitham Assoli — Amman, Jordan.</span>
-					<span data-l="ar" lang="ar">هيثم العسولي — عمّان، الأردن.</span>
-				</p>
-				<T v={s('footer.line')} as="p" class="mono" />
-			</footer>
-		</div>
-
-		<script is:inline>
-			/* The tray's wiring, written out the same way here and on /5, so the
-			   router recognises it and runs it once for the whole section rather
-			   than again on every arrival. */
-			(function () {
-				const mark = () => document.documentElement.classList.add('js');
-				mark();
-				/* The router copies <html> off the incoming page, so the class goes
-				   back on before that page paints. */
-				document.addEventListener('astro:after-swap', mark);
-
-				const revealAll = () =>
-					document
-						.querySelectorAll('.board')
-						.forEach((b) => b.classList.add('is-in'));
-				document.addEventListener('visibilitychange', revealAll);
-
-				/* The rest hangs off whichever tray is on screen, so it is wired
-				   again on every arrival; the two listeners above are set once. */
-				function wire() {
-					/* Cursor-tracked highlight: one listener for the whole tray. */
-					const tray = document.querySelector('.tray');
-					if (tray) {
-						tray.addEventListener('pointermove', (e) => {
-							const tile = e.target.closest('.tile');
-							if (!tile) return;
-							const r = tile.getBoundingClientRect();
-							tile.style.setProperty('--mx', `${e.clientX - r.left}px`);
-							tile.style.setProperty('--my', `${e.clientY - r.top}px`);
-						});
-					}
-
-					/* Boards settle in as they arrive. */
-					if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-						revealAll();
-						return;
-					}
-
-					const io = new IntersectionObserver(
-						(entries) => {
-							entries.forEach((entry) => {
-								if (!entry.isIntersecting) return;
-								entry.target.classList.add('is-in');
-								io.unobserve(entry.target);
-							});
-						},
-						{ rootMargin: '0px 0px -8% 0px' },
-					);
-					document.querySelectorAll('.board').forEach((b) => io.observe(b));
-					/* Whatever happens, nothing stays hidden. */
-					setTimeout(revealAll, 2000);
-				}
-				wire();
-				document.addEventListener('astro:after-swap', wire);
-			})();
-		</script>
-
-		<script is:inline>
+	<script is:inline>
 			/* The two parts only /5 has. Both live in this page's own DOM, so they
 			   are found again on arrival and simply sit idle on the sub-pages. */
 			(function () {
@@ -749,11 +643,8 @@ const nowISO = new Date().toISOString();
 				wire();
 				document.addEventListener('astro:after-swap', wire);
 			})();
-		</script>
-
-		<StyleSwitcher n={5} />
-	</body>
-</html>
+	</script>
+</Layout>
 
 <style is:global>
 	/* ============================================================

@@ -1,0 +1,64 @@
+---
+---
+
+<script>
+	import { styleIds } from '../data/styles';
+	import {
+		STYLE_STATE_KEY,
+		fallbackStyleId,
+		parseStyleState,
+		selectStyle,
+		today,
+	} from '../lib/style-selection';
+
+	const pathname = location.pathname.replace(/\/$/, '') || '/';
+	const params = new URLSearchParams(location.search);
+	const preview = params.get('preview') === 'main';
+	const arabic = pathname === '/ar' || pathname.startsWith('/ar/');
+	const canonical = arabic ? pathname.slice(3) || '/' : pathname;
+	const tail =
+		canonical === '/'
+			? ''
+			: canonical === '/work'
+				? '/projects'
+				: canonical === '/hire'
+					? '/hire'
+					: canonical.startsWith('/work/')
+						? canonical
+						: null;
+
+	if (tail !== null && !preview) {
+		const explicit = params.get('style') === '8';
+		let style = explicit ? 8 : fallbackStyleId(styleIds);
+		if (explicit) history.replaceState(null, '', pathname);
+		try {
+			const raw = localStorage.getItem(STYLE_STATE_KEY);
+			const previous = parseStyleState(raw, styleIds);
+			if (explicit) {
+				const queue = previous
+					? [previous.current, ...previous.queue].filter(
+							(id, index, all) => id !== 8 && all.indexOf(id) === index,
+						)
+					: styleIds.filter((id) => id !== 8);
+				localStorage.setItem(
+					STYLE_STATE_KEY,
+					JSON.stringify({
+						version: 1,
+						registry: styleIds.join(','),
+						day: today(),
+						current: 8,
+						queue,
+					}),
+				);
+			} else if (raw === null || previous) {
+				const state = selectStyle(previous, styleIds);
+				localStorage.setItem(STYLE_STATE_KEY, JSON.stringify(state));
+				style = state.current;
+			}
+			localStorage.setItem('vx-lang', arabic ? 'ar' : 'en');
+		} catch {
+			// Storage can be unavailable; the date-based fallback stays stable.
+		}
+		if (style !== 8) location.replace(`/${style}${tail}`);
+	}
+</script>

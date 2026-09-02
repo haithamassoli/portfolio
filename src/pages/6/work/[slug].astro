@@ -6,7 +6,7 @@
    credits, a wide still, then a narrow column of type you can actually read
    two thousand words in. Stills are wide, prose is narrow. */
 import { Image } from 'astro:assets';
-import Shell from '../_shell.astro';
+import Layout from '../_layout.astro';
 import T from '../../../components/T.astro';
 import { projects } from '../../../data/projects';
 import { s, pair, yearPair } from '../../../data/variant-ui';
@@ -63,7 +63,7 @@ const fields: [I18n, I18n][] = [
 ];
 ---
 
-<Shell
+<Layout
 	title={`${p.title.en} — Night Reel — Haitham Assoli`}
 	description={p.summary.en}
 	mark={pair(
@@ -340,7 +340,7 @@ const fields: [I18n, I18n][] = [
 			</a>
 		</div>
 	</article>
-</Shell>
+</Layout>
 
 <style is:global>
 	/* ── Head ──────────────────────────────────────────────────────────── */

@@ -5,7 +5,7 @@
 import { profile } from '../../../content/profile';
 import { pair, s } from '../../data/variant-ui';
 import LangBoot from '../../components/LangBoot.astro';
-import Seam from '../../components/Seam.astro';
+import StyleTransition from '../../components/StyleTransition.astro';
 import T from '../../components/T.astro';
 import StyleSwitcher from '../../components/StyleSwitcher.astro';
 import Logo from '../../components/Logo.astro';
@@ -32,6 +32,7 @@ const nav = [
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, follow" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,7 +42,7 @@ const nav = [
 			href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
 		/>
 		<LangBoot />
-		<Seam />
+		<StyleTransition />
 	</head>
 
 	<body>

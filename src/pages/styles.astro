@@ -1,9 +1,12 @@
 ---
-/* Contact sheet for the design variants. Each tile is the real page, scaled
-   down in an iframe, so what you pick is what you saw.
-   ponytail: delete alongside /1 … /7 once a direction is chosen. */
-import Seam from '../components/Seam.astro';
-import { styleVariants } from '../data/style-variants';
+/* Each tile is the real page, scaled down in an iframe. */
+import StyleTransition from '../components/StyleTransition.astro';
+import { styles } from '../data/styles';
+
+const route = (id: number, page = '') =>
+	id === 8
+		? `${page === '/projects' ? '/work' : page || '/'}?style=8`
+		: `/${id}${page}`;
 ---
 
 <!doctype html>
@@ -11,18 +14,18 @@ import { styleVariants } from '../data/style-variants';
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Design variants · Haitham Assoli</title>
+		<title>Portfolio styles · Haitham Assoli</title>
 		<meta name="robots" content="noindex" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<Seam />
+		<StyleTransition />
 	</head>
 	<body>
 		<header class="head">
 			<p class="kicker">Contact sheet</p>
-			<h1>Seven directions for one portfolio</h1>
+			<h1>Eight styles for one portfolio</h1>
 			<p class="sub">
 				Every tile below is the page itself, running live. Open one, scroll it,
-				then use the switcher at the bottom of any variant to jump between them
+				then use the switcher at the bottom of any style to jump between them
 				&mdash; it keeps you on the same sub-page as you move across. Each
 				direction carries the home page, the full project index, a project
 				write-up and the hire form, all of them in Arabic and English.
@@ -31,20 +34,19 @@ import { styleVariants } from '../data/style-variants';
 
 		<ul class="grid">
 			{
-				styleVariants.map((v) => (
+				styles.map((v) => (
 					<li class="card">
-						<a class="hit" href={`/${v.n}`}>
+						<a class="hit" href={route(v.id)}>
 							<span class="frame">
 								<iframe
-									src={`/${v.n}`}
+									src={v.id === 8 ? '/?preview=main' : `/${v.id}`}
 									title={`${v.name} preview`}
 									loading="lazy"
 									tabindex="-1"
-									scrolling="no"
 								/>
 							</span>
 							<span class="meta">
-								<span class="num">{String(v.n).padStart(2, '0')}</span>
+								<span class="num">{String(v.id).padStart(2, '0')}</span>
 								<span class="text">
 									<span class="name">{v.name}</span>
 									<span class="note">{v.note}</span>
@@ -52,16 +54,18 @@ import { styleVariants } from '../data/style-variants';
 							</span>
 						</a>
 						<nav class="jump" aria-label={`${v.name} pages`}>
-							<a href={`/${v.n}/projects`}>Projects</a>
-							<a href={`/${v.n}/work/aoun`}>A project</a>
-							<a href={`/${v.n}/hire`}>Hire me</a>
+							<a href={route(v.id, '/projects')}>Projects</a>
+							<a href={route(v.id, '/work/aoun')}>A project</a>
+							<a href={route(v.id, '/hire')}>Hire me</a>
 						</nav>
 					</li>
 				))
 			}
 		</ul>
 
-		<footer class="foot">Prototypes. The live site is still at /.</footer>
+		<footer class="foot">
+			Eight complete styles. The automatic entry is at /.
+		</footer>
 	</body>
 </html>
 

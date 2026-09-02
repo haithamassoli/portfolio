@@ -1,0 +1,86 @@
+---
+import { ClientRouter } from 'astro:transitions';
+---
+
+<ClientRouter fallback="swap" />
+
+<script>
+	declare global {
+		interface Window {
+			styleSwitchPending?: boolean;
+		}
+	}
+
+	document.addEventListener('astro:before-swap', (event) => {
+		if (!window.styleSwitchPending) return;
+		const source = document.documentElement;
+		const target = event.newDocument.documentElement;
+		target.dataset.styleSwitch = '';
+		for (const name of ['--reveal-x', '--reveal-y', '--reveal-radius']) {
+			target.style.setProperty(name, source.style.getPropertyValue(name));
+		}
+	});
+
+	document.addEventListener('astro:page-load', () => {
+		if (!window.styleSwitchPending) return;
+		window.styleSwitchPending = false;
+		document.documentElement.removeAttribute('data-style-switch');
+		document
+			.querySelector<HTMLElement>('[data-style-switch]')
+			?.focus({ preventScroll: true });
+	});
+</script>
+
+<style is:global>
+	::view-transition-old(root) {
+		animation: seam-out 0.4s cubic-bezier(0.7, 0, 0.84, 0) both;
+	}
+
+	::view-transition-new(root) {
+		animation: seam-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+	}
+
+	html[data-style-switch]::view-transition-old(root) {
+		animation: none;
+	}
+
+	html[data-style-switch]::view-transition-new(root) {
+		animation: style-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	@keyframes seam-out {
+		to {
+			clip-path: inset(0 50% 0 50%);
+			opacity: 0.4;
+		}
+	}
+
+	@keyframes seam-in {
+		from {
+			clip-path: inset(0 50% 0 50%);
+			opacity: 0.4;
+		}
+		to {
+			clip-path: inset(0);
+			opacity: 1;
+		}
+	}
+
+	@keyframes style-reveal {
+		from {
+			clip-path: circle(0 at var(--reveal-x) var(--reveal-y));
+		}
+		to {
+			clip-path: circle(
+				var(--reveal-radius) at var(--reveal-x) var(--reveal-y)
+			);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-old(root),
+		::view-transition-new(root) {
+			animation: none !important;
+		}
+	}
+</style>
