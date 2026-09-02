@@ -1,0 +1,87 @@
+---
+/* Every variant's hire form posts nowhere: it opens a pre-written mail draft.
+   One copy of that logic for all seven.
+
+   Contract: <form data-hire> containing named controls
+   fullName, email, phone, deal, location, budget, techStack[], summary.
+   Native `required` does the validating. On success the form gets `data-sent`,
+   so a variant can reveal its own confirmation with [data-sent] .whatever.
+
+   ponytail: no backend, no validation library, no state. */
+import { profile } from '../../content/profile';
+import { ui } from '../i18n';
+
+const keys = [
+	'hire.fullName',
+	'hire.email',
+	'hire.phone',
+	'hire.deal',
+	'hire.location',
+	'hire.budget',
+	'hire.techStack',
+	'hire.summary',
+	'deal.part',
+	'deal.full',
+	'deal.contract',
+	'deal.freelance',
+	'deal.hourly',
+	'loc.remote',
+	'loc.onsite',
+	'tech.frontend',
+	'tech.backend',
+	'tech.mobile',
+	'tech.other',
+] as const;
+
+const pick = (d: Record<string, string>) =>
+	Object.fromEntries(keys.map((k) => [k, d[k]]));
+
+const labels = { en: pick(ui.en), ar: pick(ui.ar) };
+---
+
+<script define:vars={{ labels, to: profile.email }}>
+	/* Capture phase, so the draft is composed before the client router's own
+	   submit listener can mistake this form for a GET it should navigate. */
+	document.addEventListener(
+		'submit',
+		(ev) => {
+			const form = ev.target;
+			if (!form.matches || !form.matches('form[data-hire]')) return;
+			ev.preventDefault();
+
+			const lang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+			const L = labels[lang];
+			const d = new FormData(form);
+			const listSep = lang === 'ar' ? '، ' : ', ';
+			const opt = (group, v) => L[group + '.' + v] || v;
+
+			const rows = [
+				[L['hire.fullName'], d.get('fullName')],
+				[L['hire.email'], d.get('email')],
+				[L['hire.phone'], d.get('phone')],
+				[L['hire.deal'], opt('deal', d.get('deal'))],
+				[L['hire.location'], opt('loc', d.get('location'))],
+				[L['hire.budget'], d.get('budget')],
+				[
+					L['hire.techStack'],
+					d
+						.getAll('techStack')
+						.map((v) => opt('tech', v))
+						.join(listSep),
+				],
+			];
+
+			const subject =
+				lang === 'ar'
+					? `مشروع جديد: ${d.get('fullName')}`
+					: `New project: ${d.get('fullName')}`;
+			const body =
+				rows.map(([k, v]) => `${k}: ${v ?? ''}`).join('\n') +
+				`\n\n${L['hire.summary']}:\n${d.get('summary') ?? ''}\n`;
+
+			form.setAttribute('data-sent', '');
+			window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+		},
+		true,
+	);
+</script>

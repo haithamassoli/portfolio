@@ -1,0 +1,355 @@
+---
+/* All eight, on one sheet. Each tile is the real page, running live in an
+   iframe, so what you pick is what you saw — and each link keeps the language
+   you are reading in.
+
+   This is where "see all eight" from the hero switch lands, and the one place
+   a visitor can hand the rotation back to the site after pinning a design. */
+import { designs, pad } from '../registry';
+import { url } from '../routes';
+import { KEY } from '../boot';
+import Seam from '../../components/Seam.astro';
+import { dirOf, type Lang } from '../../i18n';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = {
+	en: {
+		kicker: 'Contact sheet',
+		title: 'One portfolio, eight designs',
+		lede: 'Every tile below is the page itself, running live. Open one, then use the switch in its hero to move on — it keeps you on the same page and in the same language as you go. Each design carries the home page, the full project index, a project write-up and the hire form, in Arabic and in English.',
+		work: 'Projects',
+		project: 'A project',
+		hire: 'Hire me',
+		resume: 'Let the site choose for me again',
+		resumed: 'Done — the next visit picks up the tour.',
+		foot: 'The main design is the one search engines see. The other seven are noindex.',
+		other: 'العربية',
+	},
+	ar: {
+		kicker: 'ورقة اللقطات',
+		title: 'ملف واحد، ثمانية تصاميم',
+		lede: 'كل بطاقة أدناه هي الصفحة نفسها وهي تعمل. افتح واحدة، ثم استخدم زر التبديل في مقدّمتها للانتقال — يبقيك على الصفحة نفسها وباللغة نفسها. يحمل كل تصميم الصفحة الرئيسية وفهرس المشاريع كاملًا وصفحة مشروع ونموذج التوظيف، بالعربية والإنجليزية.',
+		work: 'المشاريع',
+		project: 'مشروع',
+		hire: 'وظّفني',
+		resume: 'دع الموقع يختار لي من جديد',
+		resumed: 'تم — الزيارة القادمة تكمل الجولة.',
+		foot: 'التصميم الأساسي هو ما تراه محركات البحث. والسبعة الأخرى غير مفهرسة.',
+		other: 'English',
+	},
+}[lang];
+
+const other = lang === 'ar' ? 'en' : 'ar';
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design="main">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{t.title}</title>
+		<meta name="robots" content="noindex, follow" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<Seam />
+	</head>
+	<body>
+		<header class="head">
+			<p class="kicker">{t.kicker}</p>
+			<h1>{t.title}</h1>
+			<p class="sub">{t.lede}</p>
+			<p class="acts">
+				<button class="reset" type="button" data-resume>{t.resume}</button>
+				<a class="lang" href={other === 'ar' ? '/ar/styles' : '/styles'}
+					>{t.other}</a
+				>
+			</p>
+		</header>
+
+		<ul class="grid">
+			{
+				designs.map((d) => (
+					<li class="card">
+						<a class="hit" href={url(d, lang, '')} style={`--to:${d.accent}`}>
+							<span class="frame">
+								<iframe
+									src={url(d, lang, '')}
+									title={d.name[lang]}
+									loading="lazy"
+									tabindex="-1"
+								/>
+							</span>
+							<span class="meta">
+								<span class="num">{pad(designs.indexOf(d) + 1)}</span>
+								<span class="text">
+									<span class="name">{d.name[lang]}</span>
+									<span class="note">{d.note[lang]}</span>
+								</span>
+								<span class="dot" aria-hidden="true" />
+							</span>
+						</a>
+						<nav class="jump" aria-label={d.name[lang]}>
+							<a href={url(d, lang, '/work')}>{t.work}</a>
+							<a href={url(d, lang, '/work/aoun')}>{t.project}</a>
+							<a href={url(d, lang, '/hire')}>{t.hire}</a>
+						</nav>
+					</li>
+				))
+			}
+		</ul>
+
+		<footer class="foot">{t.foot}</footer>
+
+		<script is:inline define:vars={{ KEY, DONE: t.resumed }}>
+			/* Pressing the hero switch pins a design; this is the way back to the
+			   rotation. One key, one line. */
+			document.addEventListener('click', function (e) {
+				const b = e.target.closest && e.target.closest('[data-resume]');
+				if (!b) return;
+				try {
+					const v = JSON.parse(localStorage.getItem(KEY) || 'null');
+					if (v) {
+						v.pinned = false;
+						v.at = 0;
+						localStorage.setItem(KEY, JSON.stringify(v));
+					} else {
+						localStorage.removeItem(KEY);
+					}
+				} catch {
+					/* nothing stored, nothing to unpin */
+				}
+				b.textContent = DONE;
+				b.disabled = true;
+			});
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		color-scheme: dark;
+		/* A tile is a fixed width so the preview scale is a plain number:
+		   --shot is --tile ÷ 1440, the width the iframe renders at. */
+		--tile: 22rem;
+		--shot: 0.2444;
+	}
+
+	@media (max-width: 30rem) {
+		:root {
+			--tile: 15rem;
+			--shot: 0.1667;
+		}
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		margin: 0;
+		padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 3.5rem) 7rem;
+		background: #0b0b0f;
+		color: #e9e9ee;
+		font-family:
+			ui-sans-serif,
+			system-ui,
+			-apple-system,
+			'Segoe UI',
+			sans-serif;
+		line-height: 1.6;
+	}
+
+	.head {
+		max-width: 44rem;
+		margin-bottom: clamp(2.5rem, 6vw, 4rem);
+	}
+
+	.kicker {
+		margin: 0 0 1rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.72rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: #7c7c8a;
+	}
+
+	.head h1 {
+		margin: 0 0 0.75rem;
+		font-size: clamp(2rem, 5vw, 3.25rem);
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		line-height: 1.05;
+	}
+
+	.sub {
+		margin: 0;
+		color: #9c9caa;
+		max-width: 36rem;
+	}
+
+	.acts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		align-items: center;
+		margin: 1.5rem 0 0;
+	}
+
+	.reset,
+	.lang {
+		font: inherit;
+		font-size: 0.85rem;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		border: 1px solid #2b2b36;
+		background: transparent;
+		color: #c9c9d6;
+		cursor: pointer;
+		text-decoration: none;
+	}
+
+	.reset:hover,
+	.lang:hover {
+		border-color: #55556a;
+		color: #fff;
+	}
+
+	.reset:disabled {
+		cursor: default;
+		opacity: 0.6;
+	}
+
+	.grid {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: clamp(1rem, 2.5vw, 2rem);
+		grid-template-columns: repeat(auto-fill, var(--tile));
+		justify-content: center;
+	}
+
+	.hit {
+		display: block;
+		text-decoration: none;
+		color: inherit;
+		border-radius: 0.9rem;
+	}
+
+	.hit:focus-visible {
+		outline: 2px solid #fff;
+		outline-offset: 4px;
+	}
+
+	.frame {
+		display: block;
+		position: relative;
+		aspect-ratio: 4 / 3;
+		overflow: hidden;
+		border: 1px solid #24242e;
+		border-radius: 0.9rem;
+		background: #131319;
+		transition:
+			border-color 0.2s,
+			transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+	}
+
+	.hit:hover .frame {
+		border-color: var(--to, #4a4a5c);
+		transform: translateY(-3px);
+	}
+
+	/* A desktop-width render, shrunk to the tile. pointer-events off so the
+	   whole card stays one link. */
+	.frame iframe {
+		position: absolute;
+		inset: 0;
+		width: 1440px;
+		height: 1080px;
+		border: 0;
+		transform-origin: 0 0;
+		transform: scale(var(--shot));
+		pointer-events: none;
+	}
+
+	[dir='rtl'] .frame iframe {
+		transform-origin: 100% 0;
+	}
+
+	.meta {
+		display: flex;
+		gap: 0.9rem;
+		align-items: baseline;
+		padding: 0.9rem 0.25rem 0;
+	}
+
+	.num {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.75rem;
+		color: #63636f;
+	}
+
+	.text {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.name {
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.note {
+		font-size: 0.85rem;
+		color: #8c8c9a;
+	}
+
+	.dot {
+		margin-inline-start: auto;
+		width: 0.7rem;
+		height: 0.7rem;
+		border-radius: 999px;
+		background: var(--to);
+		box-shadow: 0 0 0 1px #2b2b36;
+	}
+
+	.jump {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.9rem;
+		padding: 0.55rem 0.25rem 0;
+		font-size: 0.8rem;
+	}
+
+	.jump a {
+		color: #8c8c9a;
+		text-decoration: none;
+		border-bottom: 1px solid #2b2b36;
+		padding-bottom: 1px;
+	}
+
+	.jump a:hover {
+		color: #e9e9ee;
+		border-bottom-color: #6b6b80;
+	}
+
+	.jump a:focus-visible {
+		outline: 2px solid #fff;
+		outline-offset: 3px;
+	}
+
+	.foot {
+		margin-top: 3.5rem;
+		font-size: 0.85rem;
+		color: #63636f;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.frame {
+			transition: none;
+		}
+	}
+</style>

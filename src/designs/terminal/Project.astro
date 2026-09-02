@@ -1,0 +1,509 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* /4/work/<slug> — `cat` on one project. The challenges are set as a diff
+   because that is what they are: a line taken out, a line put in. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+import { dateSpan } from './_dates';
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const { project: p, next } = Astro.props;
+
+const linkOrder = [
+	['live', s('project.live')],
+	['appStore', s('project.apple')],
+	['playGoogle', s('project.play')],
+	['github', s('project.github')],
+	['vscode', s('project.vscode')],
+] as const;
+
+/* `shots` drops any gallery path with no asset behind it, so the two arrays
+   can fall out of step. Pair each resolved image back to the filename the
+   pane bar prints, on the one part of the path a build cannot rewrite. */
+const stem = (path: string) =>
+	path
+		.split('/')
+		.pop()
+		?.replace(/\.\w+$/, '') ?? '';
+const frames = p.shots
+	.map((img) => ({
+		img,
+		path: p.gallery.find((g) => img.src.includes(`/${stem(g)}.`)) ?? '',
+	}))
+	/* The cover is usually the first gallery frame too; do not print it twice. */
+	.filter((f) => f.img !== p.image);
+
+const tall = (img: ImageMetadata) => img.height > img.width;
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={`${p.title[lang]} — haitham@amman`}
+	description={p.tagline[lang]}
+	path={`~/portfolio/work/${p.slug}`}
+	tab="work"
+>
+	<article class="case">
+		<section class="block--head block" aria-labelledby="case-h">
+			<p class="cmdline">
+				<span class="cmdline__q">cat</span> ~/projects/{p.slug}.md
+			</p>
+
+			<h1 class="case__title" id="case-h"><T v={p.title} /></h1>
+			<T v={p.tagline} as="p" class="case__tag" />
+			<T v={p.summary} as="p" class="case__sum" />
+
+			<dl class="kv case__front">
+				<div class="kv__row">
+					<T v={s('project.role')} as="dt" />
+					<dd><T v={p.role} /></dd>
+				</div>
+				<div class="kv__row">
+					<T v={s('project.year')} as="dt" />
+					<dd class="tty">{dateSpan(p.year)}</dd>
+				</div>
+				<div class="kv__row">
+					<T v={s('project.status')} as="dt" />
+					<dd>
+						<T
+							v={s(`status.${p.status}` as 'status.live')}
+							class={`st st--${p.status}`}
+						/>
+					</dd>
+				</div>
+				<div class="kv__row">
+					<T v={pair('type', 'الفئة')} as="dt" />
+					<dd><T v={s(`cat.${p.category}` as 'cat.web')} /></dd>
+				</div>
+				<div class="kv__row">
+					<T v={s('project.stack')} as="dt" />
+					<dd class="chips">
+						{p.stack.map((t) => <span class="chip">{t}</span>)}
+					</dd>
+				</div>
+				{
+					Object.keys(p.links).length > 0 && (
+						<div class="kv__row">
+							<T v={s('project.links')} as="dt" />
+							<dd class="case__links">
+								{linkOrder.map(([k, label]) =>
+									p.links[k] ? (
+										<a
+											class="go go--out"
+											href={p.links[k]}
+											rel="noopener noreferrer"
+											target="_blank"
+										>
+											<T v={label} />
+										</a>
+									) : null,
+								)}
+							</dd>
+						</div>
+					)
+				}
+			</dl>
+
+			{
+				p.image && (
+					<figure
+						class={`pane case__cover${tall(p.image) ? ' pane--tall' : ''}`}
+					>
+						<figcaption class="pane__bar tty">
+							<span class="pane__name">{p.cover.replace(/^\//, '')}</span>
+							<span class="pane__meta">
+								{p.image.width}×{p.image.height}
+							</span>
+						</figcaption>
+						<div class="pane__view">
+							<Image
+								src={p.image}
+								alt={`${pair('Interface of', 'واجهة')[lang]} ${p.title[lang]}`}
+								widths={[480, 960]}
+								sizes="(min-width: 62rem) 42rem, 90vw"
+								loading="eager"
+							/>
+						</div>
+					</figure>
+				)
+			}
+		</section>
+
+		<section class="block" aria-labelledby="ov-h">
+			<p class="cmdline cmdline--tight">
+				<span class="cmdline__q">head</span> -n 40 overview
+			</p>
+			<h2 class="h2" id="ov-h">
+				<T v={pair('What it is', 'ما هو')} />
+			</h2>
+			<div class="prose">
+				{
+					p.overview.en.map((_, i) => (
+						<T v={{ en: p.overview.en[i], ar: p.overview.ar[i] }} as="p" />
+					))
+				}
+			</div>
+		</section>
+
+		{
+			p.challenges.length > 0 && (
+				<section class="block" aria-labelledby="ch-h">
+					<p class="cmdline cmdline--tight">
+						<span class="cmdline__q">diff</span> before after
+					</p>
+					<h2 class="h2" id="ch-h">
+						<T v={s('project.challenges')} />
+					</h2>
+					<T
+						v={pair(
+							'A line taken out, a line put in. The problem first, then what actually replaced it.',
+							'سطر يُحذف وسطر يحلّ محلّه. المشكلة أولًا، ثم ما الذي حلّ مكانها فعلًا.',
+						)}
+						as="p"
+						class="lede"
+					/>
+
+					<ol class="hunks">
+						{p.challenges.map((c, i) => (
+							<li class="hunk">
+								<p class="hunk__at tty" aria-hidden="true">
+									@@ -{i + 1} +{i + 1} @@
+								</p>
+								<h3 class="hunk__title">
+									<T v={c.title} />
+								</h3>
+								<div class="hunk__line hunk__line--out">
+									<span class="hunk__sign tty" aria-hidden="true">
+										-
+									</span>
+									<T v={c.problem} as="p" class="hunk__text" />
+								</div>
+								<div class="hunk__line hunk__line--in">
+									<span class="hunk__sign tty" aria-hidden="true">
+										+
+									</span>
+									<T v={c.solution} as="p" class="hunk__text" />
+								</div>
+							</li>
+						))}
+					</ol>
+				</section>
+			)
+		}
+
+		<section class="block" aria-labelledby="out-h">
+			<p class="cmdline cmdline--tight">
+				<span class="cmdline__q">tail</span> outcomes
+			</p>
+			<h2 class="h2" id="out-h"><T v={s('project.outcomes')} /></h2>
+			<ul class="checks">
+				{
+					p.outcomes.en.map((_, i) => (
+						<li class="check">
+							<span class="check__box tty" aria-hidden="true">
+								[x]
+							</span>
+							<T v={{ en: p.outcomes.en[i], ar: p.outcomes.ar[i] }} />
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		{
+			frames.length > 0 && (
+				<section class="block" aria-labelledby="sh-h">
+					<p class="cmdline cmdline--tight">
+						<span class="cmdline__q">open</span> ./shots/*
+					</p>
+					<h2 class="h2" id="sh-h">
+						<T v={pair('The screens themselves', 'الشاشات نفسها')} />
+					</h2>
+					<div class="gallery">
+						{frames.map((f, i) => (
+							<figure class={`pane${tall(f.img) ? ' pane--tall' : ''}`}>
+								<figcaption class="pane__bar tty">
+									<span class="pane__name">{f.path.replace(/^\//, '')}</span>
+									<span class="pane__meta">
+										{f.img.width}×{f.img.height}
+									</span>
+								</figcaption>
+								<div class="pane__view">
+									<Image
+										src={f.img}
+										alt={`${p.title[lang]} — ${pair('screen', 'لقطة')[lang]} ${i + 1}`}
+										widths={[360, 720]}
+										sizes="(min-width: 62rem) 22rem, 88vw"
+										loading="lazy"
+									/>
+								</div>
+							</figure>
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		<section class="block--next block" aria-labelledby="nx-h">
+			<h2 class="sr-only" id="nx-h">
+				<span data-l="en">Keep reading</span>
+				<span data-l="ar" lang="ar">تابع القراءة</span>
+			</h2>
+			<p class="cmdline cmdline--tight">
+				<span class="cmdline__q">open</span>
+				{next.slug}
+			</p>
+			<a class="next" href={u(`/work/${next.slug}`)}>
+				<T v={s('project.next')} class="next__lbl" />
+				<T v={next.title} class="next__title" />
+				<T v={next.tagline} class="next__tag" />
+			</a>
+			<p class="case__back">
+				<a class="go" href={u('/work')}><T v={s('project.back')} /></a>
+			</p>
+		</section>
+	</article>
+</Shell>
+
+<style is:global>
+	.case__title {
+		margin: 0 0 0.5rem;
+		font-size: clamp(1.6rem, 1.1rem + 2.6vw, 2.7rem);
+		line-height: 1.15;
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		text-wrap: balance;
+	}
+
+	html[lang='ar'] .case__title {
+		letter-spacing: normal;
+		line-height: 1.35;
+	}
+
+	.case__tag {
+		margin: 0 0 1.25rem;
+		color: var(--amber);
+		font-size: clamp(0.95rem, 0.88rem + 0.4vw, 1.1rem);
+		max-width: 52ch;
+	}
+
+	.case__sum {
+		margin: 0 0 2rem;
+		color: var(--ash);
+		max-width: 66ch;
+	}
+
+	.case__front {
+		margin-block-end: 2rem;
+	}
+
+	.case__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 1.25rem;
+	}
+
+	.case__cover {
+		max-width: 46rem;
+	}
+
+	/* A wide cover fills its pane; a phone screenshot is not stretched to
+	   match it, it just gets a taller, narrower pane of its own. */
+	.case__cover:not(.pane--tall) .pane__view img {
+		width: 100%;
+		max-height: none;
+	}
+
+	.case__front .kv__row {
+		grid-template-columns: 13ch minmax(0, 1fr);
+	}
+
+	html[lang='ar'] .case__front .kv__row {
+		grid-template-columns: 14ch minmax(0, 1fr);
+	}
+
+	@media (max-width: 30rem) {
+		.case__front .kv__row,
+		html[lang='ar'] .case__front .kv__row {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	.case__cover.pane--tall {
+		max-width: 22rem;
+	}
+
+	.block--head {
+		padding-block-start: clamp(1.75rem, 4vw, 3rem);
+	}
+
+	/* ── the diff ───────────────────────────────────────────────────── */
+	.hunks {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 1.75rem;
+		max-width: 70rem;
+	}
+
+	.hunk {
+		border: 1px solid var(--rule);
+		background: var(--panel);
+		padding: 0.85rem 1rem 1rem;
+	}
+
+	.hunk__at {
+		margin: 0 0 0.35rem;
+		color: var(--rule);
+		font-size: 0.72rem;
+	}
+
+	html[dir='rtl'] .hunk__at {
+		text-align: right;
+	}
+
+	.hunk__title {
+		margin: 0 0 0.75rem;
+		font-size: 1rem;
+		font-weight: 600;
+	}
+
+	.hunk__line {
+		display: grid;
+		grid-template-columns: 2ch minmax(0, 1fr);
+		gap: 0 1ch;
+		padding: 0.35rem 0.5rem;
+		border-inline-start: 2px solid transparent;
+	}
+
+	.hunk__line + .hunk__line {
+		margin-block-start: 0.35rem;
+	}
+
+	.hunk__line--out {
+		background: color-mix(in srgb, var(--rose) 8%, transparent);
+		border-inline-start-color: var(--rose);
+	}
+
+	.hunk__line--in {
+		background: color-mix(in srgb, var(--jade) 8%, transparent);
+		border-inline-start-color: var(--jade);
+	}
+
+	.hunk__sign {
+		font-weight: 600;
+	}
+
+	.hunk__line--out .hunk__sign {
+		color: var(--rose);
+	}
+
+	.hunk__line--in .hunk__sign {
+		color: var(--jade);
+	}
+
+	.hunk__text {
+		margin: 0;
+		max-width: 68ch;
+	}
+
+	.hunk__line--out .hunk__text {
+		color: var(--ash);
+	}
+
+	/* ── outcomes ───────────────────────────────────────────────────── */
+	.checks {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.5rem;
+		max-width: 66ch;
+	}
+
+	.check {
+		display: grid;
+		grid-template-columns: 4ch minmax(0, 1fr);
+		gap: 0 1ch;
+		align-items: baseline;
+	}
+
+	.check__box {
+		color: var(--jade);
+	}
+
+	/* ── gallery ────────────────────────────────────────────────────── */
+	.gallery {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+		gap: 1rem;
+		align-items: start;
+	}
+
+	/* ── next ───────────────────────────────────────────────────────── */
+	.block--next {
+		border-block-end: 0;
+	}
+
+	.next {
+		display: block;
+		max-width: 46rem;
+		border: 1px solid var(--rule);
+		border-inline-start: 3px solid var(--amber);
+		background: var(--panel);
+		padding: 0.9rem 1.1rem;
+		text-decoration: none;
+	}
+
+	.next:hover {
+		background: var(--panel-2);
+	}
+
+	.next__lbl {
+		display: block;
+		color: var(--ash);
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+	}
+
+	.next__lbl[data-l='en'] {
+		text-transform: uppercase;
+	}
+
+	.next__title {
+		display: block;
+		font-size: 1.15rem;
+		font-weight: 600;
+		color: var(--bone);
+	}
+
+	.next:hover .next__title {
+		color: var(--amber);
+	}
+
+	.next__tag {
+		display: block;
+		color: var(--ash);
+		font-size: 0.8rem;
+	}
+
+	.case__back {
+		margin: 1.25rem 0 0;
+	}
+</style>

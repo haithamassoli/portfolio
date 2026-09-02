@@ -1,0 +1,27 @@
+---
+/* What a crawler is told about a design that is not the main one.
+
+   `noindex, follow`: eight copies of thirty-nine project pages would compete
+   with each other and with the page that should win. `follow` so the links out
+   of them still count. The canonical points at the same page in the same
+   language on the main design — the one spelling worth ranking. */
+import { designs, type Design } from '../registry';
+import { parse, url } from '../routes';
+import type { Lang } from '../../i18n';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const { page } = parse(Astro.url.pathname);
+const site = Astro.site ?? Astro.url.origin;
+const abs = (path: string) =>
+	new URL(path, site).href.replace(/(?<=[^/])\/$/, '');
+---
+
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href={abs(url(designs[0], lang, page))} />
+<link rel="alternate" hreflang="en" href={abs(url(design, 'en', page))} />
+<link rel="alternate" hreflang="ar" href={abs(url(design, 'ar', page))} />

@@ -1,0 +1,1129 @@
+---
+import type { Design } from '../registry';
+import { parse, otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+/* Night Reel — the shared print for /6/projects, /6/work/… and /6/hire.
+
+   The home page is the title card: full rig, shutter open, key light carried
+   on the pointer. These pages are the paperwork that comes with the film, so
+   the same equipment is here at half power: the gate is thinner, the grain is
+   quieter, the key is a wash rather than a beam. Two thousand words have to be
+   readable under it. */
+import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
+import Reveal from '../_shared/Reveal.astro';
+import Meta from '../_shared/Meta.astro';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import { s, pair } from '../../data/variant-ui';
+import type { I18n } from '../../../content/types';
+interface Props {
+	design: Design;
+	lang: Lang;
+	title: string;
+	description: string;
+	/** The mark printed at the end of the top gate, in place of a timecode. */
+	mark: I18n;
+	current: 'reel' | 'sheet' | 'booking';
+}
+
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+const { design, lang } = Astro.props;
+const { page } = parse(Astro.url.pathname);
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const { title, description, mark, current } = Astro.props;
+
+const nav: [string, string, I18n][] = [
+	['reel', u(), pair('The reel', 'البكرة')],
+	['sheet', u('/work'), pair('Contact sheet', 'ورقة اللقطات')],
+	['booking', u('/hire'), pair('Booking', 'الحجز')],
+];
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<LangBoot />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<Seam />
+		<Reveal />
+		<Meta design={design} lang={lang} />
+	</head>
+
+	<body>
+		<script is:inline>
+			/* The router copies <html> off the incoming page, so the flag goes
+			   back on before that page paints. */
+			document.documentElement.classList.add('js');
+			document.addEventListener('astro:after-swap', () =>
+				document.documentElement.classList.add('js'),
+			);
+		</script>
+
+		<a class="skip" href="#content">
+			<T v={s('nav.skip')} />
+		</a>
+
+		<div class="key" aria-hidden="true"></div>
+		<div class="grain" aria-hidden="true"></div>
+		<div class="vignette" aria-hidden="true"></div>
+
+		<div class="gate gate--top">
+			<a class="gate__brand" href={u()}>
+				<Logo labelled={false} />
+				<T class="vh" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+			</a>
+
+			<a href={otherLang(Astro.url.pathname)} class="slate" data-lang-link>
+				<span class="slate__sticks" aria-hidden="true"></span>
+				<span class="slate__fields" aria-hidden="true">
+					<span class="slate__field slate__field--en">EN</span>
+					<span class="slate__field slate__field--ar">ع</span>
+				</span>
+				<span class="vh" data-l="en" lang="en">Read this in Arabic</span>
+				<span class="vh" data-l="ar" lang="ar">اقرأ هذه الصفحة بالإنجليزية</span
+				>
+			</a>
+
+			<span class="gate__mark gate__mark--end" aria-hidden="true">
+				<T v={mark} />
+			</span>
+		</div>
+
+		<div class="gate gate--bottom" aria-hidden="true">
+			<span class="gate__mark">
+				<T v={pair('Reel 2022 — 2026', 'بكرة 2022 — 2026')} />
+			</span>
+			<span class="gate__mark gate__mark--end">
+				<T v={profile.location} />
+			</span>
+		</div>
+
+		<header class="rack">
+			<nav class="rack__nav" aria-label="Night Reel">
+				{
+					nav.map(([key, href, label]) => (
+						<a
+							class="tab"
+							href={href}
+							aria-current={key === current ? 'page' : undefined}
+						>
+							<T v={label} />
+						</a>
+					))
+				}
+			</nav>
+		</header>
+
+		<main id="content">
+			<slot />
+			{
+				/* Sub-pages get the same switch, kept out of the way at the foot
+				   of the content instead of at the top: the hero already carries
+				   it on the home page, and one design gets one switch. */
+				page !== '' && (
+					<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+				)
+			}
+		</main>
+
+		<footer class="tail">
+			<div class="wrap tail__grid">
+				<div>
+					<p class="tail__end">
+						<T v={pair('End of reel', 'نهاية البكرة')} />
+					</p>
+					<T v={profile.tagline} as="p" class="tail__line" />
+				</div>
+
+				<dl class="tail__contact">
+					<dt><T v={pair('Mail', 'البريد')} /></dt>
+					<dd>
+						<a class="tail__link" href={`mailto:${profile.email}`}
+							>{profile.email}</a
+						>
+					</dd>
+					<dt><T v={pair('Elsewhere', 'مواقع أخرى')} /></dt>
+					<dd>
+						<a class="tail__link" href={profile.links.github} rel="noopener"
+							>GitHub</a
+						>
+						<span aria-hidden="true"> · </span>
+						<a class="tail__link" href={profile.links.linkedin} rel="noopener"
+							>LinkedIn</a
+						>
+						<span aria-hidden="true"> · </span>
+						<a class="tail__link" href={profile.links.resume} rel="noopener">
+							<T v={s('nav.cv')} />
+						</a>
+					</dd>
+				</dl>
+			</div>
+
+			<div class="wrap">
+				<p class="tail__line tail__line--fine" data-l="en" lang="en">
+					Shot in Amman. Set in Archivo, Barlow Condensed and Newsreader.
+				</p>
+				<p class="tail__line tail__line--fine" data-l="ar" lang="ar">
+					صُوِّر في عمّان. صُفّ بخطوط Cairo وTajawal وAmiri.
+				</p>
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style is:global>
+	/* ── Night Reel ────────────────────────────────────────────────────────
+	   Crushed cool black, a tungsten key, an indigo shadow. Light is the only
+	   material. On these pages the rig runs at --rig, roughly half the home
+	   page, because the job here is reading, not the poster.
+
+	   Two type systems, not one font swapped for another. Latin runs Archivo's
+	   `wdth` axis as its loudness ladder: 125 on a title card down to 96 on a
+	   spec line. Arabic has no width axis, so the same ladder is carried by
+	   two families and a weight ramp — Cairo (wide, geometric, 900 → 600) for
+	   anything that shouts, and Tajawal, a genuinely narrower face, wherever
+	   Latin would have gone condensed and letterspaced. Amiri answers
+	   Newsreader for prose, and stands in for the italic that Arabic does not
+	   have.                                                                 */
+
+	:root {
+		--crush: #05060a; /* the gate: bars, mattes, deepest black */
+		--stock: #0e1016; /* page base, lifted black with a blue toe */
+		--night: #151925; /* raised surfaces, the inside of a frame */
+		--indigo: #2a3557; /* the cool shadow */
+		--key: #ffc27a; /* tungsten highlight, the beam */
+		--sodium: #ff8c42; /* the one saturated source */
+		--print: #f2e8db; /* warm print white */
+		--mist: #a3abbd; /* secondary type */
+
+		--gel: var(--key);
+		--bar: 2rem; /* tall enough for the slate to sit inside the gate */
+		--rig: 0.55; /* the rig, stopped down for reading */
+		--mx: 50vw;
+		--my: 30vh;
+		--upos: 0%; /* underline growth origin; flipped under RTL */
+
+		--display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+		--credit: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+		--prose: 'Newsreader', Georgia, 'Times New Roman', serif;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		scroll-behavior: smooth;
+		scroll-padding-top: calc(var(--bar) + 4.5rem);
+	}
+
+	html,
+	body {
+		overflow-x: clip;
+	}
+
+	body {
+		margin: 0;
+		background: var(--stock);
+		color: var(--print);
+		font-family: var(--prose);
+		font-size: 1.0625rem;
+		line-height: 1.72;
+		font-optical-sizing: auto;
+		text-rendering: optimizeLegibility;
+		padding-bottom: 7rem;
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	a:focus-visible,
+	button:focus-visible,
+	input:focus-visible,
+	select:focus-visible,
+	textarea:focus-visible,
+	summary:focus-visible {
+		outline: 2px solid var(--key);
+		outline-offset: 3px;
+		border-radius: 2px;
+	}
+
+	::selection {
+		background: var(--sodium);
+		color: var(--crush);
+	}
+
+	.wrap {
+		width: min(100% - 2.5rem, 76rem);
+		margin-inline: auto;
+	}
+
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.skip {
+		position: fixed;
+		z-index: 20;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		transform: translateY(-120%);
+		padding: 0.7rem 1.2rem;
+		background: var(--key);
+		color: var(--crush);
+		font-family: var(--credit);
+		font-size: 0.85rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-decoration: none;
+		transition: transform 0.2s;
+	}
+
+	.skip:focus-visible {
+		transform: none;
+	}
+
+	/* ── The rig ───────────────────────────────────────────────────────── */
+
+	.key {
+		position: fixed;
+		/* physical, deliberately: --mx/--my are viewport coordinates and must
+		   not flip with the writing direction */
+		left: 0;
+		top: 0;
+		width: 62rem;
+		height: 62rem;
+		z-index: 4;
+		pointer-events: none;
+		transform: translate3d(calc(var(--mx) - 50%), calc(var(--my) - 50%), 0);
+		background:
+			radial-gradient(
+				circle at 50% 50%,
+				rgba(255, 194, 122, calc(0.14 * var(--rig))),
+				rgba(255, 140, 66, calc(0.06 * var(--rig))) 34%,
+				transparent 62%
+			),
+			radial-gradient(
+				circle at 50% 50%,
+				rgba(255, 235, 210, calc(0.16 * var(--rig))),
+				transparent 12%
+			);
+		mix-blend-mode: screen;
+	}
+
+	.vignette {
+		position: fixed;
+		inset: 0;
+		z-index: 3;
+		pointer-events: none;
+		background: radial-gradient(
+			150% 110% at 50% 26%,
+			transparent 50%,
+			rgba(3, 4, 8, 0.58) 100%
+		);
+	}
+
+	.grain {
+		position: fixed;
+		inset: -12%;
+		z-index: 5;
+		pointer-events: none;
+		opacity: 0.1;
+		mix-blend-mode: overlay;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+		animation: weave 0.7s steps(4) infinite;
+	}
+
+	@keyframes weave {
+		0% {
+			transform: translate3d(0, 0, 0);
+		}
+		25% {
+			transform: translate3d(-2%, 1%, 0);
+		}
+		50% {
+			transform: translate3d(1%, -2%, 0);
+		}
+		75% {
+			transform: translate3d(-1%, -1%, 0);
+		}
+		100% {
+			transform: translate3d(0, 0, 0);
+		}
+	}
+
+	/* ── The gate ──────────────────────────────────────────────────────── */
+
+	.gate {
+		position: fixed;
+		inset-inline: 0;
+		height: var(--bar);
+		z-index: 6;
+		background: var(--crush);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding-inline: clamp(0.6rem, 3vw, 2rem);
+	}
+
+	.gate--top {
+		inset-block-start: 0;
+		border-bottom: 1px solid rgba(255, 194, 122, 0.12);
+	}
+
+	.gate--bottom {
+		inset-block-end: 0;
+		border-top: 1px solid rgba(255, 194, 122, 0.12);
+		/* The shared variant switcher is pinned to the physical bottom-right
+		   corner in both directions, so the bottom gate keeps that corner
+		   clear rather than printing a mark underneath it. */
+		padding-right: 4.25rem;
+	}
+
+	.gate__mark {
+		font-family: var(--credit);
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(163, 171, 189, 0.72);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 0;
+	}
+
+	.gate__mark--end {
+		color: rgba(255, 194, 122, 0.66);
+		font-variant-numeric: tabular-nums;
+		text-align: end;
+	}
+
+	/* The wordmark stands in for the name slug: print white letters over a
+	   tungsten rule, the same two colours the slate is chalked in. It sits
+	   inside the bar in both directions — the gate is flexed, not floated. */
+	.gate__brand {
+		display: inline-flex;
+		flex: none;
+		--logo-rule: var(--key);
+		color: var(--print);
+		transition: color 0.2s;
+	}
+
+	.gate__brand .logo {
+		block-size: 1rem;
+		width: auto;
+	}
+
+	.gate__brand:hover {
+		--logo-rule: var(--sodium);
+		color: var(--key);
+	}
+
+	/* ── The slate: the language switch ────────────────────────────────────
+	   Not a pill bolted onto a header. It is the clapperboard the gate would
+	   already be carrying: sticks on top, two fields below, the one in use
+	   filled in the way a loader chalks the take. It sits in the top gate on
+	   every page, home included, so it reads as part of the equipment.     */
+
+	.slate {
+		appearance: none;
+		flex: none;
+		display: inline-flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: 2px;
+		margin: 0;
+		border: 1px solid rgba(242, 232, 219, 0.36);
+		background: var(--crush);
+		cursor: pointer;
+		line-height: 1;
+		direction: ltr; /* a physical object: it does not mirror */
+	}
+
+	.slate__sticks {
+		display: block;
+		height: 0.42rem;
+		background: repeating-linear-gradient(
+			116deg,
+			rgba(242, 232, 219, 0.9) 0 0.3rem,
+			var(--crush) 0.3rem 0.6rem
+		);
+		transform-origin: left center;
+		transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+	}
+
+	.slate:hover .slate__sticks,
+	.slate:focus-visible .slate__sticks {
+		transform: rotate(-8deg);
+	}
+
+	.slate:active .slate__sticks {
+		transform: rotate(0deg);
+		transition-duration: 0.06s;
+	}
+
+	.slate__fields {
+		display: flex;
+		gap: 2px;
+	}
+
+	.slate__field {
+		min-width: 1.7rem;
+		padding: 0.16rem 0.3rem;
+		text-align: center;
+		font-family: var(--credit);
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: rgba(163, 171, 189, 0.5);
+		background: rgba(163, 171, 189, 0.08);
+		transition:
+			background-color 0.2s,
+			color 0.2s;
+	}
+
+	.slate__field--ar {
+		font-family: 'Tajawal', var(--credit);
+		letter-spacing: 0;
+		font-size: 0.8rem;
+	}
+
+	html[lang='en'] .slate__field--en,
+	html[lang='ar'] .slate__field--ar {
+		color: var(--crush);
+		background: var(--key);
+	}
+
+	.slate:hover .slate__field {
+		color: rgba(242, 232, 219, 0.8);
+	}
+
+	html[lang='en'] .slate:hover .slate__field--en,
+	html[lang='ar'] .slate:hover .slate__field--ar {
+		color: var(--crush);
+		background: var(--sodium);
+	}
+
+	/* No pointer to lift the sticks with, so they sit half-open for good. */
+	@media (hover: none) {
+		.slate__sticks {
+			transform: rotate(-6deg);
+		}
+	}
+
+	/* ── The rack: page navigation as film-can labels ──────────────────── */
+
+	.rack {
+		position: relative;
+		z-index: 2;
+		padding-block: calc(var(--bar) + 1.5rem) 0;
+	}
+
+	.rack__nav {
+		width: min(100% - 2.5rem, 76rem);
+		margin-inline: auto;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.tab {
+		font-family: var(--credit);
+		font-size: 0.78rem;
+		font-weight: 500;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--mist);
+		padding: 0.42rem 0.9rem;
+		border: 1px solid rgba(163, 171, 189, 0.2);
+		background: rgba(21, 25, 37, 0.5);
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.tab:hover {
+		color: var(--key);
+		border-color: rgba(255, 194, 122, 0.5);
+	}
+
+	.tab[aria-current='page'] {
+		color: var(--crush);
+		background: var(--key);
+		border-color: var(--key);
+	}
+
+	/* ── Type ──────────────────────────────────────────────────────────── */
+
+	.eyebrow {
+		margin: 0 0 1.1rem;
+		font-family: var(--credit);
+		font-size: 0.78rem;
+		font-weight: 500;
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		color: var(--key);
+	}
+
+	.head {
+		max-width: 46rem;
+		margin-bottom: clamp(2.25rem, 5vw, 3.5rem);
+	}
+
+	.head__title {
+		margin: 0 0 1rem;
+		font-family: var(--display);
+		font-stretch: 118%;
+		font-variation-settings:
+			'wdth' 118,
+			'wght' 620;
+		font-weight: 620;
+		font-size: clamp(1.75rem, 4.4vw, 3rem);
+		line-height: 1.02;
+		letter-spacing: -0.015em;
+		text-transform: uppercase;
+		color: var(--print);
+	}
+
+	.head__lede {
+		margin: 0;
+		max-width: 38rem;
+		color: var(--mist);
+	}
+
+	.band {
+		position: relative;
+		z-index: 2;
+		padding-block: clamp(2.5rem, 7vh, 4.5rem);
+	}
+
+	.prose {
+		margin: 0 0 1.15rem;
+		max-width: 36rem;
+		color: rgba(242, 232, 219, 0.92);
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 0.72rem 1.5rem;
+		border: 1px solid rgba(242, 232, 219, 0.28);
+		border-radius: 999px;
+		font-family: var(--credit);
+		font-size: 0.85rem;
+		font-weight: 500;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-decoration: none;
+		color: var(--print);
+		background: rgba(21, 25, 37, 0.6);
+		cursor: pointer;
+		transition:
+			border-color 0.25s,
+			color 0.25s,
+			background-color 0.25s;
+	}
+
+	.btn:hover {
+		border-color: var(--key);
+		color: var(--key);
+	}
+
+	.btn--key {
+		background: var(--key);
+		border-color: var(--key);
+		color: var(--crush);
+	}
+
+	.btn--key:hover {
+		background: var(--sodium);
+		border-color: var(--sodium);
+		color: var(--crush);
+	}
+
+	.state--live,
+	.state--shipped {
+		color: var(--key);
+	}
+
+	.state--delisted,
+	.state--archived {
+		color: var(--mist);
+	}
+
+	.state--wip {
+		color: var(--sodium);
+	}
+
+	/* ── The plate: any still, sat back into the night ─────────────────── */
+
+	.plate {
+		position: relative;
+		display: block;
+		overflow: hidden;
+		background:
+			radial-gradient(
+				90% 80% at 50% 50%,
+				rgba(42, 53, 87, 0.5),
+				var(--crush) 78%
+			),
+			var(--crush);
+		border: 1px solid rgba(163, 171, 189, 0.14);
+	}
+
+	.plate::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background:
+			linear-gradient(
+				to top,
+				rgba(5, 6, 10, 0.72),
+				rgba(5, 6, 10, 0.1) 46%,
+				rgba(42, 53, 87, 0.24)
+			),
+			radial-gradient(78% 74% at 50% 44%, transparent 38%, rgba(5, 6, 10, 0.55));
+		transition: opacity 0.5s ease;
+	}
+
+	.plate__img {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: brightness(0.82) saturate(0.94) contrast(1.02);
+		transition: filter 0.5s ease;
+	}
+
+	/* A 1080×2340 phone capture is not a landscape still. It stands inside
+	   the frame at full height and keeps its own shape. */
+	.plate__img--stand {
+		width: auto;
+		height: 88%;
+		margin-inline: auto;
+		margin-block: 6%;
+		object-fit: contain;
+		border-radius: 0.5rem;
+		box-shadow:
+			0 1.5rem 3rem rgba(0, 0, 0, 0.6),
+			0 0 0 1px rgba(242, 232, 219, 0.08);
+	}
+
+	.plate--stand {
+		background:
+			radial-gradient(
+				52% 54% at 50% 54%,
+				color-mix(in srgb, var(--gel) 26%, transparent),
+				transparent 78%
+			),
+			radial-gradient(
+				90% 80% at 50% 50%,
+				rgba(42, 53, 87, 0.4),
+				var(--crush) 76%
+			),
+			var(--crush);
+	}
+
+	.plate__gel {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		pointer-events: none;
+		background: radial-gradient(
+			62% 62% at 50% 46%,
+			color-mix(in srgb, var(--gel) 62%, transparent),
+			transparent 74%
+		);
+		mix-blend-mode: soft-light;
+		opacity: 0.42;
+		transition: opacity 0.5s ease;
+	}
+
+	.plate__empty {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+		text-align: center;
+		font-family: var(--credit);
+		font-size: 0.76rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(163, 171, 189, 0.7);
+	}
+
+	/* ── Sprockets: the edge of the stock ──────────────────────────────── */
+
+	.sprocket {
+		height: 0.7rem;
+		background:
+			repeating-linear-gradient(
+					to right,
+					transparent 0 0.55rem,
+					rgba(163, 171, 189, 0.22) 0.55rem 1.05rem
+				)
+				center / auto 0.34rem no-repeat,
+			linear-gradient(rgba(163, 171, 189, 0.09), rgba(163, 171, 189, 0.09));
+		background-blend-mode: normal;
+	}
+
+	/* ── Credits table ─────────────────────────────────────────────────── */
+
+	.credits {
+		margin: 0;
+		display: grid;
+		grid-template-columns: minmax(6rem, 9rem) 1fr;
+		column-gap: 1.25rem;
+		row-gap: 0.75rem;
+		border-top: 1px solid rgba(163, 171, 189, 0.16);
+		padding-top: 1.1rem;
+	}
+
+	.credits dt {
+		font-family: var(--credit);
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-align: end;
+		color: var(--mist);
+		line-height: 1.65;
+		padding-top: 0.1rem;
+	}
+
+	.credits dd {
+		margin: 0;
+		font-family: var(--credit);
+		font-size: 0.98rem;
+		letter-spacing: 0.08em;
+		line-height: 1.55;
+		color: var(--print);
+	}
+
+	/* ── Tail ──────────────────────────────────────────────────────────── */
+
+	.tail {
+		position: relative;
+		z-index: 2;
+		margin-top: clamp(3rem, 9vh, 6rem);
+		padding-block: clamp(2.5rem, 7vh, 4rem) clamp(2rem, 5vh, 3rem);
+		border-top: 1px solid rgba(163, 171, 189, 0.14);
+		background: linear-gradient(to bottom, transparent, rgba(5, 6, 10, 0.9));
+	}
+
+	.tail__grid {
+		display: grid;
+		gap: 2rem;
+		margin-bottom: 2rem;
+	}
+
+	.tail__end {
+		margin: 0 0 0.6rem;
+		font-family: var(--display);
+		font-stretch: 125%;
+		font-variation-settings:
+			'wdth' 125,
+			'wght' 700;
+		font-weight: 700;
+		font-size: clamp(1.3rem, 4vw, 2rem);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--key);
+	}
+
+	.tail__line {
+		margin: 0 0 0.4rem;
+		max-width: 34rem;
+		font-family: var(--credit);
+		font-size: 0.85rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--mist);
+	}
+
+	.tail__line--fine {
+		color: rgba(163, 171, 189, 0.6);
+	}
+
+	.tail__contact {
+		margin: 0;
+		display: grid;
+		grid-template-columns: minmax(5rem, 7rem) 1fr;
+		column-gap: 1.25rem;
+		row-gap: 0.6rem;
+		align-content: start;
+	}
+
+	.tail__contact dt {
+		font-family: var(--credit);
+		font-size: 0.75rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-align: end;
+		color: var(--mist);
+	}
+
+	.tail__contact dd {
+		margin: 0;
+		font-family: var(--credit);
+		font-size: 0.9rem;
+		letter-spacing: 0.06em;
+		color: var(--print);
+		word-break: break-word;
+	}
+
+	.tail__link {
+		text-decoration: none;
+		border-bottom: 1px solid rgba(163, 171, 189, 0.3);
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.tail__link:hover {
+		color: var(--key);
+		border-color: var(--key);
+	}
+
+	/* ── The Arabic voice ──────────────────────────────────────────────────
+	   Archivo's `wdth` axis is the loudness ladder on the Latin side: 125 on
+	   the title card, 118 on a section head, 104 on a slate field, 96 on a
+	   spec line. No Arabic face has a width axis, so the ladder is carried by
+	   two families instead of one axis — and the families really are different
+	   widths, which is the point.
+
+	   Tajawal is the default: narrow, geometric, the answer to Barlow
+	   Condensed, and it takes every label and field on the page. Cairo, wider
+	   and heavier, is promoted onto anything that would have gone extended in
+	   Latin, and runs a weight ramp (900 → 600) where Latin ran a width ramp.
+	   Amiri, a naskh, answers Newsreader for the long read and stands in for
+	   the italic that Arabic does not have.
+
+	   No letterspacing anywhere: it breaks the joins. */
+
+	[lang='ar'] {
+		font-family: 'Tajawal', 'Segoe UI', sans-serif;
+		font-weight: 500;
+		line-height: 1.75;
+		letter-spacing: 0 !important;
+		font-style: normal !important;
+		font-variant: normal;
+	}
+
+	/* Promoted to Cairo: the loud voice. */
+	[lang='ar'].head__title,
+	.head__title [lang='ar'],
+	[lang='ar'].tail__end,
+	.tail__end [lang='ar'] {
+		font-family: 'Cairo', 'Segoe UI', sans-serif;
+		font-variation-settings: 'wght' 800;
+		font-weight: 800;
+		font-stretch: normal;
+		line-height: 1.3;
+		word-spacing: 0.03em;
+	}
+
+	[lang='ar'].tail__end,
+	.tail__end [lang='ar'] {
+		font-variation-settings: 'wght' 900;
+		font-weight: 900;
+	}
+
+	/* Promoted to Amiri: anything read for longer than a line. */
+	[lang='ar'].head__lede,
+	[lang='ar'].prose {
+		font-family: 'Amiri', 'Times New Roman', serif;
+		font-weight: 400;
+		font-size: 1.12rem;
+		line-height: 2;
+	}
+
+	[lang='ar'].eyebrow,
+	.eyebrow [lang='ar'] {
+		font-weight: 700;
+		font-size: 0.9rem;
+	}
+
+	[lang='ar'].tab,
+	[lang='ar'].btn,
+	[lang='ar'].gate__mark,
+	.gate__mark [lang='ar'],
+	[lang='ar'].tail__line,
+	.credits dt [lang='ar'],
+	.credits dd [lang='ar'],
+	.tail__contact dt [lang='ar'],
+	.tail__contact dd [lang='ar'],
+	[lang='ar'].plate__empty,
+	.plate__empty [lang='ar'] {
+		font-size: 0.9rem;
+	}
+
+	/* Under RTL the underline has to grow from the right edge. */
+	html[dir='rtl'] {
+		--upos: 100%;
+	}
+
+	/* ── Wider frames ──────────────────────────────────────────────────── */
+
+	@media (min-width: 62rem) {
+		:root {
+			--bar: 2.25rem;
+		}
+
+		.tail__grid {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+			gap: 3rem;
+		}
+	}
+
+	@media (max-width: 40rem) {
+		.gate--bottom .gate__mark {
+			display: none;
+		}
+	}
+
+	@media (max-width: 30rem) {
+		.credits {
+			grid-template-columns: 1fr;
+			row-gap: 0.2rem;
+		}
+
+		.credits dt {
+			text-align: start;
+			padding-top: 0.65rem;
+		}
+
+		.tail__contact {
+			grid-template-columns: 1fr;
+			row-gap: 0.2rem;
+		}
+
+		.tail__contact dt {
+			text-align: start;
+			padding-top: 0.5rem;
+		}
+	}
+
+	/* ── Touch: the key light is rigged, not carried ───────────────────── */
+
+	@media (hover: none) {
+		.key {
+			width: 140vw;
+			height: 80vh;
+			transform: translate3d(-20vw, -16vh, 0);
+			background: radial-gradient(
+				50% 50% at 50% 50%,
+				rgba(255, 194, 122, calc(0.16 * var(--rig))),
+				rgba(255, 140, 66, calc(0.05 * var(--rig))) 40%,
+				transparent 70%
+			);
+		}
+
+		.plate__img {
+			filter: brightness(0.94) saturate(0.98) contrast(1.01);
+		}
+	}
+
+	/* ── Stillness ─────────────────────────────────────────────────────── */
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+
+		.grain {
+			animation: none;
+			opacity: 0.07;
+		}
+
+		.slate__sticks,
+		.gate__brand,
+		.plate::after,
+		.plate__img,
+		.plate__gel,
+		.tab,
+		.btn,
+		.tail__link,
+		.skip {
+			transition: none;
+		}
+	}
+
+	@media print {
+		.key,
+		.grain,
+		.vignette,
+		.gate,
+		.rack,
+		.skip {
+			display: none;
+		}
+	}
+</style>
+
+<script is:inline>
+	/* One key light, carried by the pointer. Nothing else on these pages
+	   moves; the rig is at half power so long copy stays readable. */
+	(function () {
+		const root = document.documentElement;
+		let px = window.innerWidth / 2;
+		let py = window.innerHeight * 0.3;
+		let queued = 0;
+		const place = () => {
+			queued = 0;
+			root.style.setProperty('--mx', px + 'px');
+			root.style.setProperty('--my', py + 'px');
+		};
+		place();
+		window.addEventListener(
+			'pointermove',
+			(e) => {
+				if (e.pointerType === 'touch') return;
+				px = e.clientX;
+				py = e.clientY;
+				if (!queued) queued = requestAnimationFrame(place);
+			},
+			{ passive: true },
+		);
+		/* The router overwrites the <html> style attribute, so the key is put
+		   back before the incoming page paints. */
+		document.addEventListener('astro:after-swap', place);
+	})();
+</script>

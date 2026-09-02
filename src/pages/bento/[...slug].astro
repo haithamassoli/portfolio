@@ -1,0 +1,24 @@
+---
+/* bento, in English. Thin on purpose: the only reason this file exists is to
+   keep bento's stylesheet off the other seven designs' pages. */
+import Home from '../../designs/bento/Home.astro';
+import Work from '../../designs/bento/Work.astro';
+import Hire from '../../designs/bento/Hire.astro';
+import Project from '../../designs/bento/Project.astro';
+import { designPaths, resolve, type RouteProps } from '../../designs/paths';
+
+export const getStaticPaths = () => designPaths('bento', 'en');
+
+const props = Astro.props as RouteProps;
+const { design, project, next } = resolve(props);
+const lang = props.lang;
+---
+
+{props.kind === 'home' && <Home design={design} lang={lang} />}
+{props.kind === 'work' && <Work design={design} lang={lang} />}
+{props.kind === 'hire' && <Hire design={design} lang={lang} />}
+{
+	props.kind === 'project' && project && next && (
+		<Project design={design} lang={lang} project={project} next={next} />
+	)
+}

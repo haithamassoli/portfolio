@@ -1,24 +1,28 @@
 import type { APIRoute } from 'astro';
-import { projects } from '../data/projects';
-import { canonical, languages, href, type Lang } from '../i18n';
+import { designs } from '../designs/registry';
+import { langs, pages, url } from '../designs/routes';
+import { canonical } from '../i18n';
 
-/* The route table lives in [...slug].astro; this mirrors it. Two languages of
-   home, hire, and every project, no dependency needed for eighty URLs. */
-const paths = ['', 'work', 'hire', ...projects.map((p) => `work/${p.slug}`)];
+/* The main design only: the other seven are noindex copies of these pages, and
+   a sitemap that offered eight spellings of one URL would be asking Google to
+   pick. Generated from the same route table [...slug].astro builds from, so it
+   cannot drift. */
+const main = designs[0];
 
 export const GET: APIRoute = ({ site }) => {
-	const url = (lang: Lang, path: string) => canonical(href(lang, path), site!);
+	const abs = (lang: (typeof langs)[number], path: string) =>
+		canonical(url(main, lang, path), site!);
 
 	const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${paths
+${pages()
 	.map(
-		(path) => `	<url>
-		<loc>${url('en', path)}</loc>
-${(Object.keys(languages) as Lang[])
+		(page) => `	<url>
+		<loc>${abs('en', page.path)}</loc>
+${langs
 	.map(
 		(lang) =>
-			`		<xhtml:link rel="alternate" hreflang="${lang}" href="${url(lang, path)}"/>`,
+			`		<xhtml:link rel="alternate" hreflang="${lang}" href="${abs(lang, page.path)}"/>`,
 	)
 	.join('\n')}
 	</url>`,

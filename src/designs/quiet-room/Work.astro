@@ -1,0 +1,303 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* All thirty-nine, shelved by what they are. The category label is the only
+   thing in the margin, and it stays there while its own shelf scrolls past. */
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { pair, s, yearPair } from '../../data/variant-ui';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const statusWord = {
+	live: s('status.live'),
+	shipped: s('status.shipped'),
+	delisted: s('status.delisted'),
+	wip: s('status.wip'),
+	archived: s('status.archived'),
+};
+
+/* Biggest shelf first, then the ones with a handful on them. */
+const order = [
+	'web',
+	'mobile',
+	'ai',
+	'client',
+	'desktop',
+	'extension',
+] as const;
+
+const catWord = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	client: s('cat.client'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+};
+
+/** "Since 2022", "2023 to 2026" — sort on the latest year in the string. */
+const yearOf = (year: string) =>
+	Math.max(...(year.match(/\d{4}/g) ?? ['0']).map(Number));
+
+const shelves = order.map((cat) => ({
+	cat,
+	items: projects
+		.filter((p) => p.category === cat)
+		.sort(
+			(a, b) =>
+				Number(b.featured) - Number(a.featured) ||
+				yearOf(b.year) - yearOf(a.year) ||
+				a.title.en.localeCompare(b.title.en),
+		),
+}));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair('All projects — Haitham Assoli', 'كل المشاريع — هيثم العسولي')[
+		lang
+	]}
+	description={pair(
+		'Thirty-nine shipped projects by Haitham Assoli, shelved by what they are: web, mobile, on-device AI, client work, desktop and extensions.',
+		'تسعة وثلاثون مشروعًا أصدرها هيثم العسولي، مرصوفة على رفوف بحسب نوعها: الويب، والجوّال، والذكاء الاصطناعي على الجهاز، وأعمال العملاء، وسطح المكتب، والإضافات.',
+	)[lang]}
+>
+	<section class="band band--top">
+		<p class="rail"><T v={pair('the shelves', 'الرفوف')} /></p>
+		<div class="col col--top">
+			<T as="h1" v={s('work.all')} />
+			<T as="p" class="lede idx__lede" v={s('work.allLede')} />
+			<nav class="idx" aria-label={pair('Categories', 'التصنيفات')[lang]}>
+				{
+					shelves.map((shelf) => (
+						<a class="k idx__a" href={`#cat-${shelf.cat}`}>
+							<T v={catWord[shelf.cat]} />
+							<span class="idx__n" lang="en" dir="ltr">
+								{shelf.items.length}
+							</span>
+						</a>
+					))
+				}
+			</nav>
+		</div>
+	</section>
+
+	{
+		shelves.map((shelf) => (
+			<section class="band band--shelf" id={`cat-${shelf.cat}`}>
+				<h2 class="grp">
+					<T v={catWord[shelf.cat]} />
+				</h2>
+				<div class="col">
+					<ol class="entries">
+						{shelf.items.map((p) => (
+							<li class={`entry${p.featured ? ' entry--full' : ''}`}>
+								<span class="entry__mark" aria-hidden="true" />
+								<p class="entry__head">
+									<a class="entry__title" href={u(`/work/${p.slug}`)}>
+										<T v={p.title} />
+									</a>
+									<span class="entry__lead" aria-hidden="true" />
+									<T v={yearPair(p.year)} as="span" class="k entry__year" />
+								</p>
+								<T as="p" class="entry__tag" v={p.tagline} />
+								<p class="k entry__meta">
+									<span>
+										<T v={statusWord[p.status]} />
+									</span>
+									{p.featured && (
+										<span class="entry__full">
+											<T v={pair('written up in full', 'مشروح بالكامل')} />
+										</span>
+									)}
+								</p>
+							</li>
+						))}
+					</ol>
+				</div>
+			</section>
+		))
+	}
+</Shell>
+
+<style is:global>
+	.idx__lede {
+		margin-block: 1.6rem 0;
+	}
+
+	/* A small contents card: six shelves and how much is on each. */
+	.idx {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-start: 2.25rem;
+	}
+
+	.idx__a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		padding: 0.4rem 0.75rem;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+		text-decoration: none;
+		transition:
+			border-color 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.idx__a:hover {
+		border-color: var(--signal);
+	}
+
+	.idx__n {
+		color: var(--ink);
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* The shelf label: a heading that lives in the margin on a wide screen and
+	   above the shelf on a narrow one. */
+	.grp {
+		margin: 0;
+		padding-block: var(--band) 0.85rem;
+		font-family: var(--mono);
+		font-size: var(--s-meta);
+		font-weight: 400;
+		letter-spacing: 0.07em;
+		line-height: 1.4;
+		color: var(--graphite);
+		text-transform: lowercase;
+	}
+
+	.grp[lang='ar'],
+	.grp [lang='ar'] {
+		font-family: var(--mono-ar);
+		font-size: var(--s-meta-ar);
+		letter-spacing: normal;
+	}
+
+	.band--shelf .col {
+		padding-block-start: 0;
+	}
+
+	@media (min-width: 760px) {
+		.grp {
+			padding-block: calc(var(--band) + 0.42rem) 0;
+			text-align: end;
+		}
+
+		.band--shelf .col {
+			padding-block-start: var(--band);
+		}
+
+		/* The label holds its place while its own shelf goes by. */
+		.band--shelf {
+			align-items: start;
+		}
+
+		.grp {
+			position: sticky;
+			inset-block-start: 1.25rem;
+			padding-block-start: 1.25rem;
+		}
+	}
+
+	.entries {
+		display: grid;
+		gap: 2.5rem;
+		margin: 0;
+		padding: 0;
+		max-width: 40rem;
+		list-style: none;
+	}
+
+	.entry {
+		position: relative;
+	}
+
+	/* Featured work gets the one accent on the page, out in the margin. */
+	.entry--full .entry__mark {
+		position: absolute;
+		inset-block-start: 0.62em;
+		inset-inline-start: calc(-1 * var(--gutter) / 2);
+		width: 0.3rem;
+		height: 0.3rem;
+		background: var(--signal);
+		transform: translateX(-50%);
+	}
+
+	[dir='rtl'] .entry--full .entry__mark {
+		transform: translateX(50%);
+	}
+
+	.entry__head {
+		display: flex;
+		align-items: baseline;
+		gap: 0.7rem;
+		margin: 0;
+		max-width: none;
+	}
+
+	.entry__title {
+		font-size: var(--s-lede);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.entry__title[lang='ar'],
+	.entry__title [lang='ar'] {
+		font-size: var(--s-lede-ar);
+	}
+
+	.entry__lead {
+		flex: 1 1 1.5rem;
+		min-width: 1rem;
+		border-block-end: 1px dotted var(--rule);
+		transform: translateY(-0.28em);
+	}
+
+	.entry__year {
+		flex: 0 0 auto;
+		white-space: nowrap;
+	}
+
+	.entry__tag {
+		margin: 0.4rem 0 0.55rem;
+		max-width: 34rem;
+		color: var(--graphite);
+	}
+
+	.entry__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.55rem;
+		margin: 0;
+		max-width: none;
+	}
+
+	.entry__meta span + span::before {
+		content: '·';
+		padding-inline-end: 0.5rem;
+		color: var(--rule);
+	}
+
+	/* The violet square in the margin is the mark; the words just say what it
+	   means, so they stay quiet. */
+	.entry__full {
+		color: var(--graphite);
+	}
+
+	.entry:hover .entry__lead {
+		border-block-end-color: var(--graphite);
+	}
+</style>

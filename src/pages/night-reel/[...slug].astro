@@ -1,0 +1,24 @@
+---
+/* night-reel, in English. Thin on purpose: the only reason this file exists is to
+   keep night-reel's stylesheet off the other seven designs' pages. */
+import Home from '../../designs/night-reel/Home.astro';
+import Work from '../../designs/night-reel/Work.astro';
+import Hire from '../../designs/night-reel/Hire.astro';
+import Project from '../../designs/night-reel/Project.astro';
+import { designPaths, resolve, type RouteProps } from '../../designs/paths';
+
+export const getStaticPaths = () => designPaths('night-reel', 'en');
+
+const props = Astro.props as RouteProps;
+const { design, project, next } = resolve(props);
+const lang = props.lang;
+---
+
+{props.kind === 'home' && <Home design={design} lang={lang} />}
+{props.kind === 'work' && <Work design={design} lang={lang} />}
+{props.kind === 'hire' && <Hire design={design} lang={lang} />}
+{
+	props.kind === 'project' && project && next && (
+		<Project design={design} lang={lang} project={project} next={next} />
+	)
+}

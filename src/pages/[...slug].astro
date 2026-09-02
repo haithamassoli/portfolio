@@ -1,39 +1,31 @@
 ---
+/* The main design, in both languages. Every other design has its own route
+   file under src/pages/<design>/ — see src/designs/paths.ts for why. */
 import { projects } from '../data/projects';
-import { languages, useT, type Lang } from '../i18n';
+import { langs, pages } from '../designs/routes';
+import { useT, type Lang } from '../i18n';
 import Base from '../layouts/Base.astro';
 import Home from '../sections/Home.astro';
 import HirePage from '../sections/HirePage.astro';
 import ProjectPage from '../sections/ProjectPage.astro';
 import WorkPage from '../sections/WorkPage.astro';
 
-/* Every page in both languages comes from here. Adding a project adds two
-   routes; there is nothing else to wire up. */
 export function getStaticPaths() {
-	return (Object.keys(languages) as Lang[]).flatMap((lang) => {
-		const prefix = lang === 'en' ? '' : 'ar/';
-		return [
-			{
-				params: { slug: lang === 'en' ? undefined : 'ar' },
-				props: { lang, kind: 'home' as const, index: -1 },
+	return langs.flatMap((lang) =>
+		pages().map((page) => ({
+			params: {
+				slug: ((lang === 'ar' ? '/ar' : '') + page.path).slice(1) || undefined,
 			},
-			{
-				params: { slug: `${prefix}work` },
-				props: { lang, kind: 'work' as const, index: -1 },
-			},
-			{
-				params: { slug: `${prefix}hire` },
-				props: { lang, kind: 'hire' as const, index: -1 },
-			},
-			...projects.map((p, index) => ({
-				params: { slug: `${prefix}work/${p.slug}` },
-				props: { lang, kind: 'project' as const, index },
-			})),
-		];
-	});
+			props: { lang, kind: page.kind, index: page.index },
+		})),
+	);
 }
 
-const { lang, kind, index } = Astro.props;
+const { lang, kind, index } = Astro.props as {
+	lang: Lang;
+	kind: 'home' | 'work' | 'hire' | 'project';
+	index: number;
+};
 const t = useT(lang);
 const project = kind === 'project' ? projects[index] : undefined;
 const next = project ? projects[(index + 1) % projects.length] : undefined;

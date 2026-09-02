@@ -1,0 +1,204 @@
+---
+/* The switch. It is the feature, not a utility, so it stands in the hero of
+   all eight designs at the same size, in the same place, saying the same thing
+   — that is what makes it read as one site-wide mechanism instead of eight
+   ornaments. The corner switcher it replaces is gone.
+
+   An <a>, not a <button>: it is a navigation. It works with scripting off,
+   middle-click opens the next design in a tab, and `data-astro-reload` forces a
+   real page load, which is what hands the circular reveal to the browser
+   instead of to the client router. */
+import { designs, nextOf, pad, indexOf, type Design } from '../registry';
+import { sameRoute, url } from '../routes';
+import type { Lang } from '../../i18n';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	class?: string;
+}
+
+const { design, lang, class: cls } = Astro.props;
+const next = nextOf(design.id);
+const to = sameRoute(next, Astro.url.pathname);
+const gallery = url(designs[0], lang, '/styles');
+
+const t = {
+	en: { next: 'Next design', all: `See all ${designs.length}` },
+	ar: { next: 'التصميم التالي', all: `شاهد التصاميم الـ${designs.length}` },
+}[lang];
+---
+
+<div class:list={['dsw-row', cls]} style={`--to:${next.accent}`}>
+	<a
+		class="dsw"
+		href={to}
+		data-astro-reload
+		data-design-switch
+		data-to={next.id}
+		data-accent={next.accent}
+		title={next.note[lang]}
+	>
+		<span class="dsw__count" aria-hidden="true"
+			>{pad(indexOf(design.id) + 1)} / {pad(designs.length)}</span
+		>
+		<span class="dsw__label"
+			>{t.next} — <b class="dsw__name">{next.name[lang]}</b></span
+		>
+		<span class="dsw__go" aria-hidden="true">
+			<span class="dsw__swatch"></span>
+			<span class="dsw__arrow">→</span>
+		</span>
+	</a>
+	<a class="dsw-all" href={gallery}>{t.all}</a>
+</div>
+
+<style is:global>
+	/* Deliberately unarmoured — no `all: unset`, no !important. It is meant to
+	   pick up the type and colour of whichever room it is standing in; only the
+	   silhouette, the size and the wording are fixed. */
+	.dsw-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1rem;
+		margin-block-start: 1.75rem;
+		padding-block-start: 1.35rem;
+		border-block-start: 1px solid
+			color-mix(in oklab, currentColor 20%, transparent);
+	}
+
+	.dsw {
+		position: relative;
+		overflow: hidden;
+		flex: 1 1 19rem;
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		min-height: 52px;
+		padding: 0.7rem 1.05rem;
+		border: 1px solid color-mix(in oklab, currentColor 32%, transparent);
+		border-radius: 0.65rem;
+		color: inherit;
+		text-decoration: none;
+		line-height: 1.25;
+		transition:
+			border-color 0.2s,
+			transform 0.2s;
+	}
+
+	.dsw::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--to);
+		opacity: 0.1;
+		transition: opacity 0.25s;
+	}
+
+	.dsw > * {
+		position: relative;
+	}
+
+	.dsw:hover {
+		border-color: color-mix(in oklab, currentColor 60%, transparent);
+		transform: translateY(-1px);
+	}
+
+	.dsw:hover::before {
+		opacity: 0.24;
+	}
+
+	.dsw:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
+	}
+
+	.dsw__count {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.74rem;
+		letter-spacing: 0.09em;
+		opacity: 0.6;
+		white-space: nowrap;
+	}
+
+	.dsw__label {
+		font-size: 0.98rem;
+	}
+
+	.dsw__name {
+		font-weight: 700;
+	}
+
+	.dsw__go {
+		margin-inline-start: auto;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.dsw__swatch {
+		width: 1.15rem;
+		height: 1.15rem;
+		border-radius: 999px;
+		background: var(--to);
+		box-shadow: 0 0 0 1px color-mix(in oklab, currentColor 30%, transparent);
+	}
+
+	.dsw__arrow {
+		font-size: 1.05rem;
+		opacity: 0.7;
+		transition: translate 0.2s;
+	}
+
+	.dsw:hover .dsw__arrow {
+		translate: 0.15rem 0;
+	}
+
+	[dir='rtl'] .dsw__arrow {
+		scale: -1 1;
+	}
+
+	[dir='rtl'] .dsw:hover .dsw__arrow {
+		translate: -0.15rem 0;
+	}
+
+	.dsw-all {
+		font-size: 0.85rem;
+		opacity: 0.7;
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+
+	.dsw-all:hover {
+		opacity: 1;
+	}
+
+	/* At the foot of a sub-page it is the last thing on the page, so it gets
+	   room around it and stops short of full bleed on a wide screen. */
+	.dsw-row--tail {
+		max-width: 44rem;
+		margin-inline: auto;
+		margin-block: 3.5rem 1rem;
+		padding-inline: clamp(1rem, 4vw, 2rem);
+	}
+
+	@media (max-width: 30rem) {
+		.dsw {
+			flex: 1 1 100%;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dsw,
+		.dsw::before,
+		.dsw__arrow {
+			transition: none;
+		}
+
+		.dsw:hover {
+			transform: none;
+		}
+	}
+</style>

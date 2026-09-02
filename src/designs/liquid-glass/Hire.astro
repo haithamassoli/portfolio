@@ -1,0 +1,712 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+/* The brief form. Nothing posts anywhere: the shared composer turns the
+   fields into a mail draft in the reader's language and the reader presses
+   send. Native validation only. */
+import Shell from './Shell.astro';
+import HireCompose from '../../components/HireCompose.astro';
+import T from '../../components/T.astro';
+import { s, pair } from '../../data/variant-ui';
+import { profile } from '../../../content/profile';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+
+const deals = ['part', 'full', 'contract', 'freelance', 'hourly'] as const;
+const places = ['remote', 'onsite'] as const;
+const stacks = ['frontend', 'backend', 'mobile', 'other'] as const;
+
+const dealKey = {
+	part: 'deal.part',
+	full: 'deal.full',
+	contract: 'deal.contract',
+	freelance: 'deal.freelance',
+	hourly: 'deal.hourly',
+} as const;
+
+const placeKey = { remote: 'loc.remote', onsite: 'loc.onsite' } as const;
+
+const stackKey = {
+	frontend: 'tech.frontend',
+	backend: 'tech.backend',
+	mobile: 'tech.mobile',
+	other: 'tech.other',
+} as const;
+
+const takes = [
+	{ t: s('skill.web'), d: s('skill.webDesc'), hue: '#1FB6C8' },
+	{ t: s('skill.mobile'), d: s('skill.mobileDesc'), hue: '#4E8AE8' },
+	{ t: s('skill.backend'), d: s('skill.backendDesc'), hue: '#6B5BFF' },
+	{ t: s('skill.other'), d: s('skill.otherDesc'), hue: '#FF8A3D' },
+];
+
+/* A real sequence, so it is numbered. */
+const steps = [
+	{
+		t: pair('You send the brief', 'ترسل الوصف'),
+		d: pair(
+			'The form writes the email for you. Nothing leaves your machine until you press send in your own mail app.',
+			'النموذج يكتب الرسالة عنك. لا يغادر شيء جهازك حتى تضغط إرسال في تطبيق بريدك.',
+		),
+	},
+	{
+		t: pair('I answer within two business days', 'أرد خلال يومي عمل'),
+		d: pair(
+			'With what I would build first, roughly what it costs, and where I think the hard part actually is.',
+			'بما سأبنيه أولًا، وبكلفة تقريبية، وبرأيي أين يقع الجزء الصعب فعلًا.',
+		),
+	},
+	{
+		t: pair(
+			'We start with the smallest shippable thing',
+			'نبدأ بأصغر شيء قابل للإصدار',
+		),
+		d: pair(
+			'One screen or one endpoint that works end to end, in both languages, before anything else is added.',
+			'شاشة واحدة أو نقطة نهاية واحدة تعمل من طرف إلى طرف، وباللغتين، قبل إضافة أي شيء آخر.',
+		),
+	},
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Start a project — Haitham Assoli',
+		'ابدأ مشروعًا — هيثم العسولي',
+	)[lang]}
+	description={pair(
+		'Tell Haitham Assoli what you are building. The form writes a pre-filled email; nothing is sent until you press send in your own mail app. Replies within two business days.',
+		'أخبر هيثم العسولي بما تبنيه. يكتب النموذج رسالة جاهزة، ولا يُرسل شيء حتى تضغط إرسال من تطبيق بريدك. الرد خلال يومي عمل.',
+	)[lang]}
+	here="hire"
+>
+	<HireCompose />
+
+	<header class="hire-head wrap">
+		<p class="eyebrow"><span class="dot"></span><T v={s('hire.eyebrow')} /></p>
+		<h1 class="h1"><T v={s('hire.title')} /></h1>
+		<T v={s('hire.lede')} as="p" class="lede hire-head__lede" />
+		<p class="hire-head__meta mono">
+			<T v={s('hire.note')} />
+			<span class="hire-head__sep" aria-hidden="true">/</span>
+			<T v={profile.location} />
+		</p>
+	</header>
+
+	<section class="wrap block" aria-labelledby="takes-h">
+		<h2 class="h2" id="takes-h"><T v={s('skills.title')} /></h2>
+		<ul class="takes">
+			{
+				takes.map((k) => (
+					<li class="take pane" style={`--band:${k.hue}`}>
+						<span class="take__edge" aria-hidden="true" />
+						<h3 class="h3">
+							<T v={k.t} />
+						</h3>
+						<T v={k.d} as="p" class="take__d" />
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<section class="wrap block" aria-labelledby="steps-h">
+		<h2 class="h2" id="steps-h">
+			<T v={pair('How this goes', 'كيف تسير الأمور')} />
+		</h2>
+		<ol class="steps">
+			{
+				steps.map((st, i) => (
+					<li class="step">
+						<span class="step__n" aria-hidden="true">
+							{String(i + 1).padStart(2, '0')}
+						</span>
+						<div>
+							<h3 class="h3">
+								<T v={st.t} />
+							</h3>
+							<T v={st.d} as="p" class="step__d" />
+						</div>
+					</li>
+				))
+			}
+		</ol>
+		<T
+			v={pair(
+				'Rates follow scope, not hours guessed in advance. Once the brief is clear I quote a fixed price per milestone; hourly is for open-ended maintenance only.',
+				'الأجر يتبع نطاق العمل لا ساعاتٍ تُخمَّن سلفًا. حين يتضح الوصف أعطي سعرًا ثابتًا لكل مرحلة، والعمل بالساعة للصيانة المفتوحة وحدها.',
+			)}
+			as="p"
+			class="rates"
+		/>
+	</section>
+
+	<section class="wrap block" aria-labelledby="form-h">
+		<h2 class="h2" id="form-h">
+			<T v={pair('The brief', 'الوصف')} />
+		</h2>
+
+		<form class="brief pane" data-hire>
+			<div class="brief__grid">
+				<p class="row">
+					<label class="row__label" for="h-name"
+						><T v={s('hire.fullName')} /></label
+					>
+					<input
+						class="well"
+						id="h-name"
+						name="fullName"
+						type="text"
+						autocomplete="name"
+						required
+					/>
+				</p>
+
+				<p class="row">
+					<label class="row__label" for="h-email"
+						><T v={s('hire.email')} /></label
+					>
+					<input
+						class="well"
+						id="h-email"
+						name="email"
+						type="email"
+						autocomplete="email"
+						dir="ltr"
+						required
+					/>
+				</p>
+
+				<p class="row">
+					<label class="row__label" for="h-phone"
+						><T v={s('hire.phone')} /></label
+					>
+					<input
+						class="well"
+						id="h-phone"
+						name="phone"
+						type="tel"
+						autocomplete="tel"
+						dir="ltr"
+						required
+					/>
+				</p>
+
+				<p class="row">
+					<label class="row__label" for="h-budget"
+						><T v={s('hire.budget')} /></label
+					>
+					<input
+						class="well"
+						id="h-budget"
+						name="budget"
+						type="text"
+						inputmode="text"
+						data-ph-en="e.g. 5,000 USD, or a range"
+						data-ph-ar="مثلًا 5,000 دولار، أو نطاق"
+						required
+					/>
+					<T
+						v={pair(
+							'A range is fine. It tells me the shape of the project, not the price.',
+							'النطاق يكفي. هو يدلّني على حجم المشروع لا على سعره.',
+						)}
+						as="span"
+						class="row__hint"
+					/>
+				</p>
+			</div>
+
+			<fieldset class="set">
+				<legend class="row__label"><T v={s('hire.deal')} /></legend>
+				<div class="gelset">
+					{
+						deals.map((d, i) => (
+							<label class="gelchip">
+								<input
+									class="tick"
+									type="radio"
+									name="deal"
+									value={d}
+									checked={i === 0}
+									required
+								/>
+								<T v={s(dealKey[d])} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="set">
+				<legend class="row__label"><T v={s('hire.location')} /></legend>
+				<div class="gelset">
+					{
+						places.map((l, i) => (
+							<label class="gelchip">
+								<input
+									class="tick"
+									type="radio"
+									name="location"
+									value={l}
+									checked={i === 0}
+									required
+								/>
+								<T v={s(placeKey[l])} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="set">
+				<legend class="row__label"><T v={s('hire.techStack')} /></legend>
+				<div class="gelset">
+					{
+						stacks.map((st) => (
+							<label class="gelchip">
+								<input
+									class="tick"
+									type="checkbox"
+									name="techStack"
+									value={st}
+								/>
+								<T v={s(stackKey[st])} />
+							</label>
+						))
+					}
+				</div>
+				<T
+					v={pair('Tick as many as apply.', 'اختر ما ينطبق، ولو أكثر من واحد.')}
+					as="span"
+					class="row__hint"
+				/>
+			</fieldset>
+
+			<p class="row">
+				<label class="row__label" for="h-summary"
+					><T v={s('hire.summary')} /></label
+				>
+				<textarea
+					class="well well--tall"
+					id="h-summary"
+					name="summary"
+					rows="6"
+					data-ph-en="What it does, who it is for, and where it is at right now."
+					data-ph-ar="ماذا يفعل، ولمن، وأين وصل الآن."
+					required></textarea>
+				<T
+					v={pair(
+						'Two or three sentences is plenty. I will ask about the rest.',
+						'جملتان أو ثلاث تكفي. سأسأل عن الباقي.',
+					)}
+					as="span"
+					class="row__hint"
+				/>
+			</p>
+
+			<div class="brief__foot">
+				<button class="send" type="submit">
+					<span class="send__glass" aria-hidden="true"></span>
+					<span class="send__rim" aria-hidden="true"></span>
+					<span class="send__text"><T v={s('hire.submit')} /></span>
+				</button>
+				<T
+					v={pair(
+						'This opens a draft in your mail app. Nothing is sent until you press send there.',
+						'هذا يفتح مسودة في تطبيق بريدك. لا يُرسل شيء حتى تضغط إرسال هناك.',
+					)}
+					as="p"
+					class="brief__note"
+				/>
+			</div>
+
+			<div class="sent">
+				<span class="pip" aria-hidden="true"></span>
+				<T v={s('hire.sent')} as="p" class="sent__text" />
+				<a class="sent__addr" href={`mailto:${profile.email}`} dir="ltr"
+					>{profile.email}</a
+				>
+			</div>
+		</form>
+	</section>
+
+	<script is:inline>
+		/* Placeholders are the one string that cannot be written twice in the
+		   DOM, so they follow html[lang] instead. */
+		(function () {
+			const root = document.documentElement;
+			const apply = function () {
+				const ar = root.lang === 'ar';
+				document.querySelectorAll('[data-ph-en]').forEach(function (el) {
+					el.setAttribute(
+						'placeholder',
+						(ar
+							? el.getAttribute('data-ph-ar')
+							: el.getAttribute('data-ph-en')) || '',
+					);
+				});
+			};
+			apply();
+			/* <html> and document both outlive a swap, so these two are
+			   registered once; the fields themselves are new every time. */
+			new MutationObserver(apply).observe(root, { attributeFilter: ['lang'] });
+			document.addEventListener('astro:page-load', apply);
+		})();
+	</script>
+</Shell>
+
+<style is:global>
+	.hire-head {
+		padding-block-start: clamp(2.5rem, 8vw, 4.5rem);
+	}
+
+	.hire-head__lede {
+		margin-block-start: 1.4rem;
+	}
+
+	.hire-head__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		margin: 1.5rem 0 0;
+		color: rgba(160, 232, 242, 0.9);
+	}
+
+	.hire-head__sep {
+		color: rgba(234, 242, 255, 0.3);
+	}
+
+	/* ══ what I take on ══════════════════════════════════════════════════ */
+	.takes {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+		gap: clamp(0.7rem, 1.8vw, 1.1rem);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.take {
+		--radius: 18px;
+		position: relative;
+		padding: clamp(1.1rem, 2.6vw, 1.6rem);
+		overflow: hidden;
+	}
+
+	.take__edge {
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		width: 3px;
+		background: linear-gradient(
+			180deg,
+			transparent,
+			var(--band) 40%,
+			color-mix(in srgb, var(--band) 40%, white) 70%,
+			transparent
+		);
+	}
+
+	.take__d {
+		margin: 0.6rem 0 0;
+		font-size: 0.96rem;
+		line-height: 1.6;
+		color: var(--haze);
+	}
+
+	/* ══ how this goes ═══════════════════════════════════════════════════ */
+	.steps {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 1.4rem;
+		counter-reset: none;
+	}
+
+	.step {
+		display: flex;
+		gap: clamp(0.9rem, 2.5vw, 1.6rem);
+		align-items: baseline;
+		padding-block-end: 1.4rem;
+		border-block-end: 1px solid rgba(200, 230, 255, 0.1);
+	}
+
+	.step:last-child {
+		border-block-end: 0;
+		padding-block-end: 0;
+	}
+
+	.step__n {
+		flex: none;
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.1em;
+		color: rgba(160, 232, 242, 0.85);
+	}
+
+	.step__d {
+		margin: 0.45rem 0 0;
+		max-width: 60ch;
+		font-size: 1rem;
+		color: var(--haze);
+	}
+
+	.rates {
+		margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+		max-width: 62ch;
+		padding-inline-start: 1.1rem;
+		border-inline-start: 2px solid rgba(31, 182, 200, 0.5);
+		color: #dce8ff;
+	}
+
+	/* ══ the form ════════════════════════════════════════════════════════ */
+	.brief {
+		padding: clamp(1.25rem, 3.5vw, 2.5rem);
+		display: grid;
+		gap: clamp(1.25rem, 3vw, 1.9rem);
+	}
+
+	.brief__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+		gap: clamp(1rem, 2.5vw, 1.5rem);
+	}
+
+	.row {
+		display: grid;
+		gap: 0.45rem;
+		margin: 0;
+	}
+
+	.row__label {
+		font-family: var(--mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.13em;
+		text-transform: uppercase;
+		color: rgba(234, 242, 255, 0.82);
+		padding: 0;
+	}
+
+	.row__hint {
+		font-family: var(--body);
+		font-size: 0.86rem;
+		color: var(--mute);
+	}
+
+	/* an input is a well cut into the glass: inset shadow, no fill */
+	.well {
+		width: 100%;
+		padding: 0.72rem 0.95rem;
+		border: 0;
+		border-radius: 12px;
+		background: rgba(4, 8, 18, 0.5);
+		box-shadow:
+			inset 0 1px 3px rgba(2, 5, 12, 0.9),
+			inset 0 0 0 1px rgba(200, 230, 255, 0.16);
+		color: var(--frost);
+		font-family: var(--body);
+		font-size: 1rem;
+		line-height: 1.5;
+		transition: box-shadow 0.25s ease;
+	}
+
+	.well::placeholder {
+		color: rgba(234, 242, 255, 0.34);
+	}
+
+	.well:hover {
+		box-shadow:
+			inset 0 1px 3px rgba(2, 5, 12, 0.9),
+			inset 0 0 0 1px rgba(200, 230, 255, 0.3);
+	}
+
+	.well:focus {
+		outline: none;
+		box-shadow:
+			inset 0 1px 3px rgba(2, 5, 12, 0.9),
+			inset 0 0 0 1px rgba(31, 182, 200, 0.85),
+			0 0 22px -6px rgba(31, 182, 200, 0.6);
+	}
+
+	.well:focus-visible {
+		outline: 2px solid var(--lagoon);
+		outline-offset: 2px;
+	}
+
+	.well--tall {
+		resize: vertical;
+		min-height: 8.5rem;
+	}
+
+	.set {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		display: grid;
+		gap: 0.6rem;
+	}
+
+	.gelset {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+	}
+
+	/* a choice is a gel: clear until light is behind it */
+	.gelchip {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.5rem;
+		padding: 0.45rem 1rem;
+		border-radius: 999px;
+		background: rgba(4, 8, 18, 0.42);
+		box-shadow: inset 0 0 0 1px rgba(200, 230, 255, 0.16);
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.03em;
+		color: var(--haze);
+		cursor: pointer;
+		transition:
+			color 0.2s,
+			box-shadow 0.25s,
+			background-color 0.25s;
+	}
+
+	.tick {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+
+	.gelchip:hover {
+		color: var(--frost);
+		box-shadow: inset 0 0 0 1px rgba(200, 230, 255, 0.34);
+	}
+
+	.gelchip:has(.tick:checked) {
+		color: #06131c;
+		background: linear-gradient(150deg, #dff6fb, #9fdfe9 60%, #7fc6d8);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.9),
+			0 6px 18px -8px rgba(31, 182, 200, 0.8);
+	}
+
+	.gelchip:has(.tick:focus-visible) {
+		outline: 2px solid var(--lagoon);
+		outline-offset: 3px;
+	}
+
+	/* ══ the send lens ═══════════════════════════════════════════════════ */
+	.brief__foot {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.send {
+		position: relative;
+		flex: none;
+		padding: 0.9rem 1.9rem;
+		border: 0;
+		border-radius: 999px;
+		background: rgba(234, 242, 255, 0.9);
+		color: #061021;
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.06em;
+		cursor: pointer;
+		overflow: hidden;
+		transition:
+			transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+			box-shadow 0.25s ease;
+		box-shadow: 0 16px 34px -18px rgba(2, 6, 14, 0.95);
+	}
+
+	.send__glass {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(
+			120% 130% at 30% 18%,
+			rgba(255, 255, 255, 0.95),
+			rgba(255, 255, 255, 0.2) 46%,
+			rgba(160, 210, 255, 0.35)
+		);
+	}
+
+	.send__rim {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95);
+	}
+
+	.send__text {
+		position: relative;
+		z-index: 1;
+	}
+
+	.send:hover {
+		transform: translateY(-2px);
+		box-shadow:
+			0 20px 40px -18px rgba(2, 6, 14, 0.95),
+			0 0 34px -10px rgba(31, 182, 200, 0.7);
+	}
+
+	.brief__note {
+		margin: 0;
+		max-width: 42ch;
+		font-size: 0.88rem;
+		color: var(--mute);
+	}
+
+	/* ══ confirmation ════════════════════════════════════════════════════ */
+	.sent {
+		display: none;
+	}
+
+	form[data-sent] .sent {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.6rem;
+		padding: 1rem 1.15rem;
+		border-radius: 14px;
+		background: rgba(31, 182, 200, 0.12);
+		box-shadow: inset 0 0 0 1px rgba(31, 182, 200, 0.4);
+	}
+
+	.sent__text {
+		margin: 0;
+		font-size: 0.98rem;
+		color: var(--frost);
+	}
+
+	.sent__addr {
+		font-family: var(--mono);
+		font-size: 0.82rem;
+		color: rgba(160, 232, 242, 0.95);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.send,
+		.well,
+		.gelchip {
+			transition: none !important;
+		}
+	}
+</style>

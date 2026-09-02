@@ -1,0 +1,578 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* The whole shelf. Thirty-nine projects sorted into six compartments, and
+   every compartment laid out by hand: the sizes below are a composition, not
+   a loop. Featured work takes the big slots and carries a marigold band. */
+import { Image } from 'astro:assets';
+import { projects } from '../../data/projects';
+import type { Key } from '../../i18n';
+import { pair, s } from '../../data/variant-ui';
+import T from '../../components/T.astro';
+import Shell from './Shell.astro';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const cat = (c: string) => s(`cat.${c}` as Key);
+const stat = (st: string) => s(`status.${st}` as Key);
+const per = (v: string) =>
+	pair(v, v.replace(/^Since /, 'منذ ').replace(/ to /, ' إلى '));
+
+/* Each compartment's rhythm, written out slot by slot: width, height, and the
+   material the tile is made of. Every row adds up to twelve. */
+const trays: {
+	key: string;
+	note: { en: string; ar: string };
+	slots: [string, string, string][];
+}[] = [
+	{
+		key: 'web',
+		note: pair(
+			'Platforms, catalogues, storefronts and one-page tools. Most of them Next.js, most of them bilingual from the first screen.',
+			'منصات وفهارس ومتاجر وأدوات من صفحة واحدة. أكثرها بـ Next.js، وأكثرها ثنائي اللغة من الشاشة الأولى.',
+		),
+		slots: [
+			['w5', 'h2', 'ink'],
+			['w4', 'h2', 'bone'],
+			['w3', 'h2', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w6', 'h1', 'marigold'],
+			['w4', 'h2', 'bone'],
+			['w4', 'h2', 'cobalt'],
+			['w4', 'h2', 'bone'],
+			['w6', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w3', 'h1', 'bone'],
+			['w3', 'h2', 'bone'],
+			['w5', 'h2', 'bone'],
+			['w4', 'h2', 'ink'],
+			['w4', 'h1', 'bone'],
+			['w4', 'h1', 'bone'],
+			['w4', 'h1', 'bone'],
+		],
+	},
+	{
+		key: 'mobile',
+		note: pair(
+			'React Native and Expo, through review and onto both stores. Booking, transport, education, charity.',
+			'React Native وExpo، مرورًا بالمراجعة وحتى المتجرين. حجز ونقل وتعليم وعمل خيري.',
+		),
+		slots: [
+			['w5', 'h2', 'cobalt'],
+			['w4', 'h2', 'bone'],
+			['w3', 'h2', 'bone'],
+			['w4', 'h1', 'bone'],
+			['w4', 'h1', 'bone'],
+			['w4', 'h1', 'marigold'],
+			['w3', 'h2', 'bone'],
+			['w6', 'h2', 'bone'],
+			['w3', 'h2', 'ink'],
+		],
+	},
+	{
+		key: 'ai',
+		note: pair(
+			'Models that run where the file already is: on the phone, on the laptop, never on a server of mine.',
+			'نماذج تعمل حيث الملف أصلًا: على الهاتف أو على الحاسوب، ولا تمرّ بخادم عندي.',
+		),
+		slots: [
+			['w6', 'h2', 'ink'],
+			['w3', 'h2', 'bone'],
+			['w3', 'h2', 'bone'],
+			['w4', 'h1', 'bone'],
+			['w4', 'h1', 'bone'],
+			['w4', 'h1', 'bone'],
+			['w12', 'h1', 'marigold'],
+		],
+	},
+	{
+		key: 'client',
+		note: pair(
+			'Work done for someone else, to their brief and their deadline.',
+			'عمل لجهة أخرى، وفق طلبها وموعدها.',
+		),
+		slots: [
+			['w7', 'h2', 'bone'],
+			['w5', 'h2', 'cobalt'],
+		],
+	},
+	{
+		key: 'desktop',
+		note: pair(
+			'Things that install. Electron and Tauri, packaged for every platform I could reach.',
+			'برامج تُثبَّت. Electron وTauri، مُحزَّمة لكل منصة استطعت الوصول إليها.',
+		),
+		slots: [
+			['w5', 'h2', 'bone'],
+			['w7', 'h2', 'ink'],
+		],
+	},
+	{
+		key: 'extension',
+		note: pair(
+			'One compartment, one extension. It lives in the browser toolbar.',
+			'خانة واحدة لإضافة واحدة، تسكن شريط أدوات المتصفح.',
+		),
+		slots: [['w12', 'h1', 'cobalt']],
+	},
+];
+
+/* Featured first inside each compartment, so the big slots hold the big work. */
+const shelf = trays.map((tray) => {
+	const list = projects
+		.filter((p) => p.category === tray.key)
+		.sort((a, b) => Number(b.featured) - Number(a.featured));
+	return { ...tray, list };
+});
+
+const widest = Math.max(...shelf.map((t) => t.list.length));
+const total = projects.length;
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	page="projects"
+	title={pair(
+		'All 39 projects — Haitham Assoli',
+		'المشاريع الـ39 كاملة — هيثم العسولي',
+	)[lang]}
+	description={pair(
+		'Every project Haitham Assoli has shipped, sorted into six compartments: web, mobile, on-device AI, client work, desktop and browser extensions.',
+		'كل مشروع أصدره هيثم العسولي، مرتّبًا في ست خانات: الويب، والجوّال، والذكاء الاصطناعي على الجهاز، وأعمال العملاء، وسطح المكتب، وإضافات المتصفح.',
+	)[lang]}
+>
+	<section class="board" aria-labelledby="all-h">
+		<article class="tile tile--bone w7 h2 open" style="--i: 0">
+			<p class="mono lbl"><T v={pair('The whole shelf', 'الرفّ كاملًا')} /></p>
+			<h1 class="tile__h tile__h--big" id="all-h">
+				<span data-l="en" lang="en">Thirty-nine, in six compartments</span>
+				<span data-l="ar" lang="ar">تسعة وثلاثون في ستّ خانات</span>
+			</h1>
+			<T
+				v={pair(
+					'Sorted by what the thing is, not by how it went. Featured work sits in the large slots and carries a marigold edge; everything else keeps its own page all the same.',
+					'مرتّبة بحسب ما هو الشيء، لا بحسب كيف سار. الأعمال المختارة في الخانات الكبيرة وعلى حافّتها خط ذهبي، ولكل ما عداها صفحته كذلك.',
+				)}
+				as="p"
+				class="open__lede"
+			/>
+		</article>
+
+		<article class="tile tile--ink w5 h2 index" style="--i: 1">
+			<p class="mono lbl lbl--on-dark">
+				<T v={pair(`${total} projects`, `${total} مشروعًا`)} />
+			</p>
+			<ul class="index__list">
+				{
+					shelf.map((tray) => (
+						<li>
+							<a href={`#c-${tray.key}`}>
+								<T v={cat(tray.key)} as="span" class="index__name" />
+								<span class="index__bar" aria-hidden="true">
+									<i style={`--w:${(tray.list.length / widest) * 100}%`} />
+								</span>
+								<span class="mono index__n">{tray.list.length}</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</article>
+	</section>
+
+	{
+		shelf.map((tray) => (
+			<section class="board" aria-labelledby={`c-${tray.key}`}>
+				<div class="board__head">
+					<h2 class="board__h" id={`c-${tray.key}`}>
+						<T v={cat(tray.key)} as="span" />
+					</h2>
+					<T v={tray.note} as="p" class="board__lede" />
+					<span class="board__count">
+						<T
+							v={pair(
+								`${tray.list.length} of ${total}`,
+								`${tray.list.length} من ${total}`,
+							)}
+						/>
+					</span>
+				</div>
+
+				{tray.list.map((p, i) => {
+					const [w, h, tone] = tray.slots[i];
+					const strip = h === 'h1';
+					return (
+						<a
+							class:list={[
+								'tile',
+								`tile--${tone}`,
+								w,
+								h,
+								'ptile',
+								strip ? 'ptile--strip' : 'ptile--card',
+								(w === 'w12' || w === 'w6') && strip && 'ptile--row',
+								p.featured && 'ptile--feat',
+							]}
+							href={u(`/work/${p.slug}`)}
+							style={`--i:${i}; --accent:${p.accent}`}
+						>
+							{p.featured && <span class="ptile__band" aria-hidden="true" />}
+
+							{!strip && (
+								<span class="ptile__shot">
+									{p.image ? (
+										<Image
+											src={p.image}
+											alt=""
+											widths={[320, 640, 960]}
+											sizes="(min-width: 64rem) 20rem, 60vw"
+											loading="lazy"
+										/>
+									) : (
+										<span class="ptile__plate mono" lang="en">
+											{p.title[lang]}
+										</span>
+									)}
+								</span>
+							)}
+
+							<span class="ptile__meta">
+								<span class="mono ptile__top">
+									<T v={per(p.year)} as="span" />
+									<T v={cat(p.category)} as="span" class="ptile__cat" />
+									{p.featured && (
+										<T
+											v={pair('Featured', 'مختار')}
+											as="span"
+											class="sr-only"
+										/>
+									)}
+								</span>
+								<T v={p.title} as="span" class="tile__h ptile__title" />
+								<T v={p.tagline} as="span" class="ptile__line" />
+								<span class="ptile__foot">
+									<T v={stat(p.status)} as="span" class="chip chip--status" />
+								</span>
+							</span>
+						</a>
+					);
+				})}
+			</section>
+		))
+	}
+
+	<section class="board" aria-labelledby="ask-h">
+		<article class="tile tile--marigold w12 h2 ask" style="--i: 0">
+			<p class="mono lbl"><T v={s('hire.eyebrow')} /></p>
+			<h2 class="tile__h tile__h--big" id="ask-h">
+				<T
+					v={pair(
+						'None of these is the one you need.',
+						'لا شيء من هذه هو ما تحتاجه.',
+					)}
+				/>
+			</h2>
+			<T
+				v={pair(
+					'That is usually how it starts. Tell me what it has to do and who has to open it.',
+					'هكذا يبدأ الأمر عادة. قل لي ما الذي يجب أن يفعله ومن سيفتحه.',
+				)}
+				as="p"
+				class="ask__lede"
+			/>
+			<a class="ask__cta" href={u('/hire')}>
+				<span data-l="en" lang="en">Fill in the brief →</span>
+				<span data-l="ar" lang="ar">املأ نموذج المشروع ←</span>
+			</a>
+		</article>
+	</section>
+</Shell>
+
+<style is:global>
+	/* ---------------- the opening pair ---------------- */
+
+	.open {
+		justify-content: center;
+		background:
+			radial-gradient(
+				120% 130% at 100% 0%,
+				rgba(233, 164, 38, 0.22),
+				rgba(233, 164, 38, 0) 58%
+			),
+			var(--bone);
+	}
+
+	.open__lede {
+		max-width: 52ch;
+		font-size: 0.88rem;
+		color: rgba(30, 23, 19, 0.75);
+	}
+
+	.index {
+		justify-content: space-between;
+	}
+
+	.index__list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.index__list a {
+		display: grid;
+		grid-template-columns: 7.5rem 1fr auto;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.28rem 0;
+		border-bottom: 1px solid rgba(251, 246, 236, 0.12);
+		font-size: 0.82rem;
+		text-decoration: none;
+		transition: color 0.18s ease;
+	}
+
+	.index__list a:hover {
+		color: var(--marigold);
+	}
+
+	.index__bar {
+		display: block;
+		height: 6px;
+		border-radius: 999px;
+		background: rgba(251, 246, 236, 0.12);
+		overflow: hidden;
+	}
+
+	.index__bar i {
+		display: block;
+		width: var(--w);
+		height: 100%;
+		border-radius: 999px;
+		background: var(--marigold);
+	}
+
+	.index__n {
+		font-size: 0.75rem;
+		color: rgba(251, 246, 236, 0.6);
+	}
+
+	/* ---------------- a project in its slot ---------------- */
+
+	.ptile {
+		gap: 0;
+	}
+
+	.ptile--card {
+		padding: 0;
+	}
+
+	.ptile__band {
+		position: absolute;
+		z-index: 5;
+		inset-block: 0;
+		inset-inline-start: 0;
+		width: 5px;
+		background: var(--marigold);
+	}
+
+	.ptile__shot {
+		position: relative;
+		display: block;
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow: hidden;
+		background: color-mix(in srgb, var(--accent) 16%, #efe6d6);
+	}
+
+	.ptile__shot img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 50% 8%;
+		transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+	}
+
+	.ptile:hover .ptile__shot img {
+		transform: scale(1.045);
+	}
+
+	.ptile__plate {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		padding: 0.6rem;
+		font-size: 0.78rem;
+		text-align: center;
+		color: rgba(30, 23, 19, 0.55);
+	}
+
+	.ptile__meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+		min-width: 0;
+	}
+
+	.ptile--card .ptile__meta {
+		padding: 0.75rem var(--pad) var(--pad);
+	}
+
+	.ptile__top {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		font-size: 0.6rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(30, 23, 19, 0.5);
+	}
+
+	.ptile__cat {
+		color: color-mix(in srgb, var(--accent) 72%, var(--ink));
+	}
+
+	.ptile__line {
+		font-size: 0.8rem;
+		line-height: 1.42;
+		color: rgba(30, 23, 19, 0.72);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.ptile__foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		margin-top: auto;
+		padding-top: 0.5rem;
+	}
+
+	.tile--ink.ptile .ptile__title,
+	.tile--cobalt.ptile .ptile__title {
+		color: var(--bone);
+	}
+
+	.tile--ink.ptile .ptile__top,
+	.tile--cobalt.ptile .ptile__top {
+		color: rgba(251, 246, 236, 0.55);
+	}
+
+	.tile--ink.ptile .ptile__line,
+	.tile--cobalt.ptile .ptile__line {
+		color: rgba(251, 246, 236, 0.75);
+	}
+
+	.tile--ink.ptile .ptile__cat,
+	.tile--cobalt.ptile .ptile__cat {
+		color: color-mix(in srgb, var(--accent) 60%, #ffffff);
+	}
+
+	.tile--marigold.ptile .ptile__line {
+		color: rgba(42, 28, 6, 0.82);
+	}
+
+	.tile--marigold.ptile .ptile__top {
+		color: rgba(42, 28, 6, 0.62);
+	}
+
+	.tile--marigold.ptile .ptile__cat {
+		color: rgba(42, 28, 6, 0.9);
+	}
+
+	/* A strip is a shelf label: one line of project, read across. */
+	.ptile--strip {
+		justify-content: center;
+	}
+
+	.ptile--row .ptile__meta {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: baseline;
+		gap: 0.2rem 1rem;
+	}
+
+	.ptile--row .ptile__top {
+		grid-row: 1;
+	}
+
+	.ptile--row .ptile__line {
+		-webkit-line-clamp: 1;
+		line-clamp: 1;
+	}
+
+	.ptile--row .ptile__foot {
+		margin-top: 0;
+		padding-top: 0;
+	}
+
+	/* ---------------- the closing ask ---------------- */
+
+	.ask {
+		justify-content: center;
+	}
+
+	.ask__lede {
+		max-width: 50ch;
+		font-size: 0.88rem;
+		color: rgba(42, 28, 6, 0.82);
+	}
+
+	.ask__cta {
+		align-self: flex-start;
+		margin-top: 0.5rem;
+		padding: 0.5rem 1rem;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bone);
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 0.95rem;
+		transition:
+			transform 0.18s ease,
+			background 0.18s ease;
+	}
+
+	.ask__cta:hover {
+		transform: translateY(-2px);
+		background: var(--pomegranate);
+	}
+
+	@media (max-width: 68rem) {
+		.index__list a {
+			grid-template-columns: 6.5rem 1fr auto;
+		}
+	}
+
+	@media (max-width: 46rem) {
+		.ptile--card .ptile__shot {
+			height: 10rem;
+			flex: 0 0 auto;
+		}
+
+		.ptile--row .ptile__meta {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.ptile:hover .ptile__shot img {
+			transform: none;
+		}
+	}
+</style>

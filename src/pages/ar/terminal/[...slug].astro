@@ -1,0 +1,24 @@
+---
+/* terminal, in Arabic. Thin on purpose: the only reason this file exists is to
+   keep terminal's stylesheet off the other seven designs' pages. */
+import Home from '../../../designs/terminal/Home.astro';
+import Work from '../../../designs/terminal/Work.astro';
+import Hire from '../../../designs/terminal/Hire.astro';
+import Project from '../../../designs/terminal/Project.astro';
+import { designPaths, resolve, type RouteProps } from '../../../designs/paths';
+
+export const getStaticPaths = () => designPaths('terminal', 'ar');
+
+const props = Astro.props as RouteProps;
+const { design, project, next } = resolve(props);
+const lang = props.lang;
+---
+
+{props.kind === 'home' && <Home design={design} lang={lang} />}
+{props.kind === 'work' && <Work design={design} lang={lang} />}
+{props.kind === 'hire' && <Hire design={design} lang={lang} />}
+{
+	props.kind === 'project' && project && next && (
+		<Project design={design} lang={lang} project={project} next={next} />
+	)
+}

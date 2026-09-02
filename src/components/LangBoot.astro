@@ -1,0 +1,20 @@
+---
+/* The designs write some bilingual copy inline as a `data-l="en"` / `data-l="ar"`
+   pair rather than through <T>, usually where the two languages need different
+   markup around them. Both are in the DOM; this hides the one that is not the
+   page's language.
+
+   ponytail: <T> renders one language now, and <html lang> is set by the route,
+   so this rule is all that is left — no script, no localStorage, no flash.
+   Converting the remaining ~200 inline pairs to <T> would delete this file and
+   halve those blocks; worth doing when one of them next needs editing. */
+---
+
+<style is:global>
+	/* Specificity (0,2,1): beats a two-class rule, so a design's own `display`
+	   never resurrects the hidden language. */
+	html[lang='ar'] [data-l='en'],
+	html[lang='en'] [data-l='ar'] {
+		display: none;
+	}
+</style>

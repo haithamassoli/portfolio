@@ -1,0 +1,45 @@
+---
+/* The main site's page transition, lent to the design variants: Astro's
+   client router plus the seam wipe from global.css, so /N and /N/… swap the
+   same way / and /work do.
+
+   ponytail: one component, one animation, no per-variant motion. */
+import { ClientRouter } from 'astro:transitions';
+---
+
+<ClientRouter />
+
+<style is:global>
+	::view-transition-old(root) {
+		animation: seam-out 0.4s cubic-bezier(0.7, 0, 0.84, 0) both;
+	}
+
+	::view-transition-new(root) {
+		animation: seam-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+	}
+
+	@keyframes seam-out {
+		to {
+			clip-path: inset(0 50% 0 50%);
+			opacity: 0.4;
+		}
+	}
+
+	@keyframes seam-in {
+		from {
+			clip-path: inset(0 50% 0 50%);
+			opacity: 0.4;
+		}
+		to {
+			clip-path: inset(0 0 0 0);
+			opacity: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-old(root),
+		::view-transition-new(root) {
+			animation: none;
+		}
+	}
+</style>

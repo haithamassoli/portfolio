@@ -108,8 +108,8 @@ export default function HireForm(props: HireFormProps) {
 				? `مشروع جديد: ${value.fullName}`
 				: `New project: ${value.fullName}`;
 			const greeting = ar
-				? `مرحبًا هيثم،\n\nأتواصل معك بخصوص مشروع. التفاصيل:\n\n`
-				: `Hi Haitham,\n\nI am getting in touch about a project. The details:\n\n`;
+				? `مرحبًا هيثم،\n\nأتواصل معك بخصوص مشروع. تفاصيل المشروع:\n\n`
+				: `Hi Haitham,\n\nI am contacting you about a project. Project details:\n\n`;
 			const sign = ar
 				? `\n\nبانتظار ردك،\n${value.fullName}`
 				: `\n\nLooking forward to hearing from you,\n${value.fullName}`;
