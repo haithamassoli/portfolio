@@ -76,14 +76,6 @@ async function frame(file) {
 		.png()
 		.toBuffer();
 
-	/* The wash: the shot itself, blown out and blurred, so the frame picks up
-	   the project's own colour instead of imposing one. */
-	const wash = await sharp(raw)
-		.resize(W, H, { fit: 'cover' })
-		.blur(110)
-		.modulate({ brightness: 0.86, saturation: 1.12 })
-		.toBuffer();
-
 	const pad = 28;
 	const shadow = await sharp({
 		create: {
@@ -103,15 +95,21 @@ async function frame(file) {
 				top: pad,
 			},
 		])
-		.blur(24)
+		.blur(20)
+		.linear(0.34, 0)
 		.png()
 		.toBuffer();
 
+	/* Transparent: whatever the design puts behind the image is the frame. */
 	await sharp({
-		create: { width: W, height: H, channels: 4, background: '#101014' },
+		create: {
+			width: W,
+			height: H,
+			channels: 4,
+			background: { r: 0, g: 0, b: 0, alpha: 0 },
+		},
 	})
 		.composite([
-			{ input: wash },
 			{
 				input: shadow,
 				left: Math.round((W - iw) / 2) - pad,

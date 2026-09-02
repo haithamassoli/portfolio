@@ -62,9 +62,10 @@ misremembers the work:
 ## Framed shots
 
 Phone captures and square logos are stored pre-framed: `scripts/frame-shots.mjs`
-sits each one at its own size on a blurred wash of itself in a 2400×1350 plate,
-so no design has to stretch or crop it. Originals live in `src/assets/_raw/` and
-are the input on every run — edit those, then re-run `node scripts/frame-shots.mjs`.
+sits each one at its own size on a transparent 2400×1350 plate, so no design has
+to stretch or crop it and whatever the card puts behind it is the background.
+Originals live in `src/assets/_raw/` and are the input on every run — edit those,
+then re-run `node scripts/frame-shots.mjs`.
 
 ## Missing covers
 
