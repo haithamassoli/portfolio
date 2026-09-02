@@ -95,12 +95,9 @@ const figures = [
 		n: pair('since 2022, freelance onward', 'منذ 2022، من العمل الحر فصاعدًا'),
 	},
 	{
-		v: '2',
-		k: pair('languages per release', 'لغتان في كل إصدار'),
-		n: pair(
-			'Arabic and English, from the first screen',
-			'العربية والإنجليزية، من الشاشة الأولى',
-		),
+		v: '3',
+		k: pair('delivery layers', 'طبقات التسليم'),
+		n: pair('interface, backend, and release', 'الواجهة والخادم والإطلاق'),
 	},
 ];
 
@@ -129,8 +126,8 @@ const linkOrder = [
 	lang={lang}
 	title={pair('haitham@amman — session', 'haitham@amman — الجلسة')[lang]}
 	description={pair(
-		'Haitham Assoli, web and mobile full-stack engineer in Amman. Bilingual Arabic-first apps, 39 shipped, 13 on the app stores.',
-		'هيثم العسولي، مهندس ويب وجوال متكامل في عمّان. تطبيقات بلغتين تبدأ بالعربية، 39 مشروعًا صدر، و13 على متاجر التطبيقات.',
+		'Haitham Assoli, full-stack web and mobile engineer in Amman. 39 products shipped, including 13 on the app stores.',
+		'هيثم العسولي، مهندس برمجيات متكامل للويب والجوال في عمّان. أطلق 39 منتجًا، منها 13 على متاجر التطبيقات.',
 	)[lang]}
 	path="~/portfolio"
 	tab="home"
@@ -144,19 +141,19 @@ const linkOrder = [
 		<h1 class="thesis" id="thesis">
 			<T
 				v={pair(
-					'Every screen I ship has to survive being mirrored.',
-					'كل شاشة أطلقها لا بد أن تصمد وهي معكوسة.',
+					'Build the constraint, not just the happy path.',
+					'ابنِ القيد الحقيقي، لا المسار المثالي فقط.',
 				)}
 			/>
 		</h1>
 
 		<p class="quote" data-l="en" lang="en">
 			<span class="quote__hash" aria-hidden="true">#</span>
-			A mirrored interface is a different interface, not a translation.
+			A release is complete only when users can rely on it.
 		</p>
 		<p class="quote" data-l="ar" lang="ar">
 			<span class="quote__hash" aria-hidden="true">#</span>
-			الواجهة المعكوسة واجهة أخرى، لا ترجمة.
+			لا يكتمل الإصدار حتى يستطيع المستخدم الاعتماد عليه.
 		</p>
 
 		<DesignSwitch design={design} lang={lang} />
@@ -231,8 +228,8 @@ const linkOrder = [
 			</p>
 			<T
 				v={pair(
-					'Arabic is not a setting I add at the end. Set LANG and the session comes back in Arabic: the words, the alignment, the side the eye starts on. Paths, digits and the prompt stay exactly where they were, because a path is not prose.',
-					'العربية ليست إعدادًا أضيفه في آخر الطريق. اضبط LANG فتعود الجلسة بالعربية: الكلمات، والمحاذاة، والجهة التي تبدأ منها العين. أمّا المسارات والأرقام وسطر الأمر فتبقى حيث هي، لأنّ المسار ليس نصًّا.',
+					'Use LANG to read the same evidence in your preferred language. The projects, engineering decisions, links, and results do not change.',
+					'استخدم LANG لقراءة الأدلة نفسها باللغة التي تفضّلها. تبقى المشاريع والقرارات الهندسية والروابط والنتائج كما هي.',
 				)}
 				as="p"
 				class="env__copy"
@@ -251,8 +248,8 @@ const linkOrder = [
 			</a>
 			<T
 				v={pair(
-					'Both languages are already in the page. Nothing reloads, and nothing is fetched.',
-					'اللغتان كلتاهما في الصفحة أصلًا. لا شيء يُعاد تحميله، ولا شيء يُجلب.',
+					'The switch keeps you on the same page.',
+					'يبقيك المفتاح في الصفحة نفسها.',
 				)}
 				as="p"
 				class="env__note"
@@ -612,8 +609,8 @@ const linkOrder = [
 		</h2>
 		<T
 			v={pair(
-				'Tell me what has to be true when it ships and which language it ships in first. I answer from Amman within two business days, in Arabic or English.',
-				'اكتب لي ما الذي يجب أن يتحقق يوم الإطلاق، وبأي لغة يصدر أولًا. أرد من عمّان خلال يومَي عمل، بالعربية أو بالإنجليزية.',
+				'Tell me what must be true at launch, who will use it, the current stage, and the deadline. I answer from Amman within two business days.',
+				'اكتب ما الذي يجب أن يتحقق يوم الإطلاق، ومن سيستخدمه، والمرحلة الحالية، والموعد. أرد من عمّان خلال يومي عمل.',
 			)}
 			as="p"
 			class="lede"

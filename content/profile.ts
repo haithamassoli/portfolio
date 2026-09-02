@@ -18,8 +18,8 @@ export const profile = {
 	} satisfies I18n,
 
 	tagline: {
-		en: 'I build fast, accessible products from design to release.',
-		ar: 'أبني منتجات سريعة وسهلة الوصول من التصميم حتى الإطلاق.',
+		en: 'I turn product requirements into reliable software, from architecture to release.',
+		ar: 'أحوّل متطلبات المنتج إلى برمجيات موثوقة، من المعمارية حتى الإطلاق.',
 	} satisfies I18n,
 
 	location: { en: 'Amman, Jordan', ar: 'عمّان، الأردن' } satisfies I18n,
@@ -37,14 +37,14 @@ export const profile = {
 
 	about: {
 		en: [
-			'I build web and mobile products from the data model to the final interface. Most are bilingual and right-to-left first because my users read Arabic.',
+			'I build web and mobile products across the full delivery path: data model, API, interface, deployment, app-store review, and support.',
 			'I work on constraints that shape the product: models that run on the device, search that answers in milliseconds without a backend, and booking flows that prevent double-selling a time slot.',
-			'My recent work focuses on on-device AI for video and audio on a phone or laptop, without cloud processing or telemetry.',
+			'My recent work includes private on-device AI, multi-vendor commerce, bioinformatics tools used by researchers, and products for education and community services.',
 		],
 		ar: [
-			'أبني منتجات ويب وموبايل من نموذج البيانات حتى الواجهة النهائية. معظمها ثنائي اللغة ومبني للاتجاه من اليمين إلى اليسار أولًا لأن مستخدميّ يقرؤون بالعربية.',
+			'أبني منتجات ويب وجوال عبر مسار التسليم كاملًا: نموذج البيانات وواجهة API والواجهة والنشر ومراجعة المتاجر والدعم.',
 			'أعمل على قيود تؤثر في المنتج: نماذج تعمل على الجهاز، وبحث يجيب خلال أجزاء من الثانية بلا خادم، ومسارات حجز تمنع بيع الموعد نفسه مرتين.',
-			'يركز عملي الأخير على ذكاء اصطناعي يعمل على الجهاز لمعالجة الفيديو والصوت على الهاتف أو الحاسوب، بلا معالجة سحابية أو تتبع.',
+			'تشمل أعمالي الحديثة ذكاءً اصطناعيًا خاصًا يعمل على الجهاز، وتجارة متعددة البائعين، وأدوات معلوماتية حيوية يستخدمها باحثون، ومنتجات للتعليم والخدمات المجتمعية.',
 		],
 	} satisfies I18nBlocks,
 

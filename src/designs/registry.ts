@@ -33,8 +33,8 @@ export const designs: Design[] = [
 		n: 0,
 		name: { en: 'Signal', ar: 'الإشارة' },
 		note: {
-			en: 'The live site: two scripts, one seam',
-			ar: 'الموقع الأساسي: خطّان ودرزة واحدة',
+			en: 'The primary portfolio: work, process, results',
+			ar: 'ملف الأعمال الأساسي: المشاريع والمنهج والنتائج',
 		},
 		accent: '#6c5ce7',
 		weight: 'light',

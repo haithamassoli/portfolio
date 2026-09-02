@@ -86,16 +86,16 @@ const nowISO = new Date().toISOString();
 		<title>
 			{
 				pair(
-					'Haitham Assoli — Arabic-first apps, laid out as a tray',
-					'هيثم العسولي — تطبيقات تبدأ بالعربية، مرتّبة كصينية',
+					'Haitham Assoli — full-stack product engineer',
+					'هيثم العسولي — مهندس منتجات برمجية متكامل',
 				)[lang]
 			}
 		</title>
 		<meta
 			name="description"
 			content={pair(
-				'Haitham Assoli builds Arabic-first web and mobile products from Amman: React Native on both app stores, Next.js and Astro on the web, and AI that runs on the phone. Readable in Arabic or English.',
-				'يبني هيثم العسولي تطبيقات ويب وجوال تبدأ بالعربية من عمّان: React Native على متجري التطبيقات، وNext.js وAstro على الويب، وذكاء اصطناعي يعمل على الهاتف. تقرأ بالعربية أو الإنجليزية.',
+				'Haitham Assoli builds and ships web, iOS, and Android products from Amman, from architecture and backend systems to interfaces and app-store releases.',
+				'يبني هيثم العسولي منتجات الويب وiOS وأندرويد ويطلقها من عمّان، من المعمارية وأنظمة الخادم إلى الواجهات وإصدارات المتاجر.',
 			)[lang]}
 		/>
 		<meta name="color-scheme" content="light" />
@@ -136,18 +136,18 @@ const nowISO = new Date().toISOString();
 						<p class="mono lbl"><T v={pair('The point', 'الخلاصة')} /></p>
 						<h1 class="thesis__h">
 							<span data-l="en" lang="en"
-								>A mirrored interface needs <em>its own design</em>. I build
-								both versions.</span
+								>Useful software starts with <em>the real constraint</em>, not
+								the framework.</span
 							>
 							<span data-l="ar" lang="ar"
-								>تحتاج الواجهة المعكوسة إلى <em>تصميم خاص بها</em>. وأنا أبني
-								النسختين.</span
+								>تبدأ البرمجيات المفيدة من <em>القيد الحقيقي</em>، لا من إطار
+								العمل.</span
 							>
 						</h1>
 						<T
 							v={pair(
-								'Four years of Arabic-first products out of Amman: React Native and Expo on both app stores, Next.js and Astro on the web, NestJS, Convex and Supabase underneath. Thirty-nine of them shipped.',
-								'أربع سنوات من منتجات تبدأ بالعربية، من عمّان: React Native وExpo على المتجرين، وNext.js وAstro على الويب، وتحتها NestJS وConvex وSupabase. تسعة وثلاثون منها صدرت.',
+								'Since 2022 I have shipped 39 products across web and mobile, including 13 app-store releases. I work from product scope and data model through implementation, deployment, and support.',
+								'منذ 2022 أطلقت 39 منتجًا على الويب والجوال، منها 13 إصدارًا على متاجر التطبيقات. أعمل من نطاق المنتج ونموذج البيانات حتى التنفيذ والنشر والدعم.',
 							)}
 							as="p"
 							class="thesis__sub"
@@ -156,7 +156,7 @@ const nowISO = new Date().toISOString();
 							<T v={pair('Web', 'ويب')} as="span" />
 							<T v={pair('Mobile', 'جوّال')} as="span" />
 							<T v={pair('On-device AI', 'ذكاء على الجهاز')} as="span" />
-							<T v={pair('Arabic first', 'العربية أولًا')} as="span" />
+							<T v={pair('Backend systems', 'أنظمة الخادم')} as="span" />
 						</p>
 
 						<DesignSwitch design={design} lang={lang} />
@@ -286,8 +286,8 @@ const nowISO = new Date().toISOString();
 
 						<T
 							v={pair(
-								'The language switch reverses row order, flips the chevron, fills progress from the opposite edge and changes the numeral system. I designed each detail for both languages.',
-								'يعكس مفتاح اللغة ترتيب الصفوف، ويقلب السهم، ويملأ شريط التقدم من الحافة المقابلة، ويغيّر نظام الأرقام. صممت كل تفصيل للغتين.',
+								'This booking flow shows the details that prevent support problems: live availability, a clear time and price, player capacity, and one unambiguous action.',
+								'يوضح مسار الحجز التفاصيل التي تمنع مشكلات الدعم: إتاحة مباشرة ووقت وسعر واضحان وسعة اللاعبين وإجراء واحد لا يلتبس.',
 							)}
 							as="p"
 							class="mirror__note"
@@ -628,8 +628,8 @@ const nowISO = new Date().toISOString();
 						</h2>
 						<T
 							v={pair(
-								'Contract or full time, web or mobile, Arabic or English first. The brief form is the fastest way in; email works too.',
-								'عقد أو دوام كامل، ويب أو جوّال، بالعربية أو بالإنجليزية أولًا. أسرع طريق إليّ نموذج المشروع، والبريد يفي بالغرض أيضًا.',
+								'Contract or full time, web or mobile. Send the goal, current stage, deadline, and budget range; the brief form is the fastest way in.',
+								'عقد أو دوام كامل، ويب أو جوال. أرسل الهدف والمرحلة الحالية والموعد ونطاق الميزانية؛ نموذج المشروع هو الطريق الأسرع.',
 							)}
 							as="p"
 							class="hire__p"
