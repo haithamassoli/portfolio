@@ -187,6 +187,12 @@ const mirrorRole = ui[other]['hero.role'];
 		line-height: 1.08;
 	}
 
+	/* Arabic finals like ي hang their dots below the baseline. Reserve the room on
+	   the word, not the line, so the rise reveal still hides it fully off-screen. */
+	:global([lang='ar']) .name__word {
+		padding-block-end: 0.22em;
+	}
+
 	.name--ghost {
 		color: transparent;
 		-webkit-text-stroke: 1.5px color-mix(in oklab, var(--ink) 45%, var(--bone));
