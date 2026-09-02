@@ -206,16 +206,9 @@ const description = pair(
 					/>
 				</p>
 
-				<!-- The English block sizes the stage in both languages, so the
-				     second reading never overflows it. Everything visible is a
-				     layer on top of it. -->
+				<!-- Both readings share one grid cell, so the stage is as wide as
+				     the widest of them and neither one wraps. -->
 				<div class="stage" id="stage">
-					<p class="type type--en sizer" aria-hidden="true">
-						<span>Web.</span>
-						<span>Mobile.</span>
-						<span>Built to last.</span>
-					</p>
-
 					<p
 						class="type type--ar layer echo echo--ar"
 						aria-hidden="true"
@@ -1205,17 +1198,20 @@ const description = pair(
 		box-shadow: 0 0 20px 2px rgba(31, 182, 200, 0.55);
 	}
 
-	/* fit-content, sized by the English block in both languages, so the second
-	   reading is always inside the box the lens travels across. */
+	/* One grid cell holds every reading, so the box is the widest of them and
+	   the lens travels across the same rectangle in either language. */
 	.stage {
 		position: relative;
 		isolation: isolate;
+		display: grid;
 		width: fit-content;
 		max-width: 100%;
 		margin-block: clamp(1rem, 3vw, 2rem) 0;
 		padding-block-end: 0.6rem;
 		animation: roam 34s linear infinite;
 		--lens-r: clamp(72px, 11vw, 150px);
+		--fs: clamp(2.6rem, 1rem + 9.4vw, 7.4rem);
+		--line: calc(var(--fs) * 0.98);
 	}
 
 	.stage.manual {
@@ -1245,11 +1241,18 @@ const description = pair(
 		}
 	}
 
+	/* Three rows of one fixed height, shared by both readings, so line two of
+	   the Arabic sits on line two of the English however the two fonts differ
+	   in leading. --line is the English size; Arabic is always smaller, so it
+	   centres inside the row. */
 	.type {
 		margin: 0;
+		display: grid;
+		grid-auto-rows: var(--line);
+		align-items: center;
 		font-family: var(--display);
 		font-weight: 800;
-		font-size: clamp(2.6rem, 1rem + 9.4vw, 7.4rem);
+		font-size: var(--fs);
 		line-height: 0.94;
 		letter-spacing: -0.045em;
 		font-variation-settings: 'wdth' 84;
@@ -1257,6 +1260,7 @@ const description = pair(
 
 	.type span {
 		display: block;
+		white-space: nowrap;
 	}
 
 	.type--en {
@@ -1275,16 +1279,8 @@ const description = pair(
 		font-variation-settings: normal;
 	}
 
-	/* the invisible English block that gives the stage its box */
-	.sizer {
-		visibility: hidden;
-	}
-
 	.layer {
-		position: absolute;
-		inset-block-start: 0;
-		left: 0;
-		right: 0;
+		grid-area: 1 / 1;
 	}
 
 	.head {

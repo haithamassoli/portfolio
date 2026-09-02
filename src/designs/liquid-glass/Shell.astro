@@ -837,10 +837,12 @@ const nav = [
 		font-style: normal;
 	}
 
+	/* The ancestor half must skip anything that declares its own language:
+	   html carries lang="ar", so a bare `[lang='ar'] p` was giving Arabic
+	   leading to English paragraphs on every Arabic page. */
 	p[lang='ar'],
 	li[lang='ar'],
-	[lang='ar'] p,
-	[lang='ar'] li {
+	[lang='ar'] :is(p, li):not([lang]) {
 		line-height: 1.85;
 	}
 
