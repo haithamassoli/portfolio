@@ -5,7 +5,7 @@
 
    This is where "see all eight" from the hero switch lands, and the one place
    a visitor can hand the rotation back to the site after pinning a design. */
-import { designs, pad } from '../registry';
+import { designs, pad, type Design } from '../registry';
 import { url } from '../routes';
 import { KEY } from '../boot';
 import Seam from '../../components/Seam.astro';
@@ -44,6 +44,13 @@ const t = {
 }[lang];
 
 const other = lang === 'ar' ? 'en' : 'ar';
+
+/* The main design lives at `/`, where the gate would bounce a returning
+   visitor to whichever design the tour picked — so picking it here would show
+   anything but Signal. `?d=main` is the gate's own "explicit beats everything"
+   escape hatch; the resume button below hands the rotation back. */
+const open = (d: Design) =>
+	url(d, lang, '') + (d.id === 'main' ? '?d=main' : '');
 ---
 
 <!doctype html>
@@ -73,7 +80,7 @@ const other = lang === 'ar' ? 'en' : 'ar';
 			{
 				designs.map((d) => (
 					<li class="card">
-						<a class="hit" href={url(d, lang, '')} style={`--to:${d.accent}`}>
+						<a class="hit" href={open(d)} style={`--to:${d.accent}`}>
 							<span class="frame">
 								<iframe
 									src={url(d, lang, '')}
