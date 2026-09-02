@@ -1,0 +1,2423 @@
+---
+import type { Design } from '../registry';
+import { otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+import { Image } from 'astro:assets';
+import { profile } from '../../../content/profile';
+import type { I18n } from '../../../content/types';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import type { Key } from '../../i18n';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import LangBoot from '../../components/LangBoot.astro';
+import Seam from '../../components/Seam.astro';
+import Reveal from '../_shared/Reveal.astro';
+import Meta from '../_shared/Meta.astro';
+import T from '../../components/T.astro';
+import Logo from '../../components/Logo.astro';
+import profilePhoto from '../../assets/images/profile.png';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+/* Category and status, said properly in Japanese rather than transliterated.
+   受託 is the ordinary word for contract work; 端末内 means "inside the
+   handset", which is exactly what the on-device work is. The Japanese is
+   decoration that stays in both language modes; the reader's own language
+   sits beside it, never instead of it. */
+const categoryJa: Record<string, string> = {
+	web: 'ウェブ',
+	mobile: 'モバイル',
+	desktop: 'デスクトップ',
+	extension: '拡張機能',
+	ai: '端末内AI',
+	client: '受託',
+};
+
+const statusJa: Record<string, string> = {
+	live: '公開中',
+	shipped: '出荷済',
+	delisted: '掲載終了',
+	wip: '制作中',
+	archived: '保管',
+};
+
+const catT = (c: string): I18n => s(`cat.${c}` as Key);
+const statusT = (st: string): I18n => s(`status.${st}` as Key);
+
+/* The card rail is Japanese, so its year stays bare numerals: 2025〜 for an
+   open span, 2023〜2026 for a closed one. 波ダッシュ carries the sense without
+   a word in it, and the digits rotate with the rail the way 算用数字 do in
+   any 縦組み. Not 縦中横: a four-digit year squeezed into one em at this size
+   is unreadable, and 縦中横 is for two digits. "Since" and «منذ» are said in
+   .card__cat instead, horizontally, where Arabic can be set the right way
+   round rather than dragged into a rail pinned ltr for the Japanese. */
+const railYear = (y: string): string =>
+	y.replace(/^Since (\d+)$/, '$1〜').replace(/^(\d+) to (\d+)$/, '$1〜$2');
+
+/* Uneven on purpose: the empty half of a row is 間, not a gap to be filled. */
+const spans = [7, 5, 5, 7, 6, 6, 7, 5];
+
+/* Counters matter in Japanese: 件 for items of work, 本 for released apps,
+   編 for written pieces. Digits stay Arabic and get 縦中横 when set vertically. */
+const ledger = [
+	{
+		ja: '作品',
+		n: String(projects.length),
+		unit: '件',
+		label: s('nav.work'),
+		line: pair(
+			'Products taken from data model to store listing.',
+			'منتجات من نموذج البيانات حتى صفحة المتجر.',
+		),
+	},
+	{
+		ja: '公開',
+		n: '13',
+		unit: '本',
+		label: pair('Released', 'منشور'),
+		line: pair(
+			'Of them live on the App Store or Google Play.',
+			'منها يعمل الآن على آب ستور أو جوجل بلاي.',
+		),
+	},
+	{
+		ja: '事例',
+		n: '8',
+		unit: '編',
+		label: pair('Case studies', 'دراسات حالة'),
+		line: pair(
+			'Written up in full, decisions and all.',
+			'مشروحة بالكامل، بقراراتها كلها.',
+		),
+	},
+	{
+		ja: '経験',
+		n: '4',
+		unit: '年',
+		label: pair('Years', 'سنوات'),
+		line: pair(
+			'Roughly, building for the web and phones.',
+			'تقريبًا، في البناء للويب والهواتف.',
+		),
+	},
+];
+
+const nav = [
+	{ href: '#sakuhin', ja: '作品', t: s('nav.work') },
+	{ href: '#keireki', ja: '経歴', t: s('nav.about') },
+	{ href: '#dogu', ja: '道具', t: pair('Tools', 'الأدوات') },
+	{ href: '#renraku', ja: '連絡', t: pair('Contact', 'التواصل') },
+];
+
+const pages = [
+	{ href: u('/work'), ja: '目録', t: pair('Catalogue', 'الفهرس') },
+	{ href: u('/hire'), ja: '依頼', t: s('nav.hire') },
+];
+
+const about = [
+	pair(
+		'I take products from schema to store listing. I build Arabic-first products for Arabic readers, with the copy, layout and direction designed together.',
+		'آخذ المنتجات من المخطط حتى صفحة المتجر. أبني منتجات تبدأ بالعربية لقرّائها، مع النص والتخطيط والاتجاه كجزء واحد من التصميم.',
+	),
+	pair(
+		'I take on work with clear constraints: models that run on the handset, search indexes that answer in milliseconds, and booking flows that prevent double bookings. The constraint shapes the build.',
+		'أتولى أعمالًا ذات قيود واضحة: نماذج تعمل على الهاتف، وفهارس بحث تجيب في أجزاء من الثانية، ومسارات حجز تمنع حجز الساعة نفسها مرتين. القيد هو ما يشكّل البناء.',
+	),
+	pair(
+		"My recent work uses on-device AI. Video and audio processing finishes on the user's phone or laptop, without cloud processing or telemetry. I also bring four years of client work, a product I founded, and a volunteer app used by several student cohorts.",
+		'تستخدم أعمالي الحديثة الذكاء الاصطناعي على الجهاز. تنتهي معالجة الفيديو والصوت على هاتف المستخدم أو حاسوبه، من دون معالجة سحابية أو تتبّع. وأحمل أيضًا أربع سنوات من عمل العملاء، ومنتجًا أسّسته، وتطبيقًا تطوعيًا استخدمته عدة دفعات من الطلبة.',
+	),
+];
+
+const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project enquiry')}`;
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>
+			{
+				pair(
+					'Haitham Assoli — 丁寧につくられた画面。',
+					'هيثم العسولي — 丁寧につくられた画面。',
+				)[lang]
+			}
+		</title>
+		<meta
+			name="description"
+			content={pair(
+				'Haitham Assoli builds web and mobile products in Amman. Thirty-nine shipped projects, including thirteen on the app stores.',
+				'يبني هيثم العسولي تطبيقات ويب وجوال في عمّان. تسعة وثلاثون مشروعًا صدر، منها ثلاثة عشر على متاجر التطبيقات.',
+			)[lang]}
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
+		/>
+		<LangBoot />
+		<Seam />
+		<Reveal />
+		<Meta design={design} lang={lang} />
+	</head>
+
+	<body>
+		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
+
+		<header class="topbar">
+			<div class="wrap topbar__in">
+				<a class="mark" href="#main">
+					<span class="mark__ja" lang="ja">ハイサム</span>
+					<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="mark__en" />
+				</a>
+				<nav class="nav" aria-label="Sections">
+					{
+						nav.map((item) => (
+							<a class="nav__a" href={item.href}>
+								<span lang="ja">{item.ja}</span>
+								<T v={item.t} class="nav__lat" />
+							</a>
+						))
+					}
+					<span class="nav__sep" aria-hidden="true"></span>
+					{
+						pages.map((item) => (
+							<a class="nav__a nav__a--page" href={item.href}>
+								<span lang="ja">{item.ja}</span>
+								<T v={item.t} class="nav__lat" />
+							</a>
+						))
+					}
+				</nav>
+			</div>
+		</header>
+
+		<main id="main">
+			<!-- 序 — the thesis, stated on three axes -->
+			<section class="hero" aria-labelledby="h1">
+				<div class="wrap hero__in">
+					<p class="hero__thesis tate" lang="ja">丁寧につくられた画面。</p>
+
+					<div class="hero__body">
+						<p class="eyebrow">
+							<span lang="ja">職業</span>
+							<T
+								v={pair(
+									'Web & mobile engineer · Amman, Jordan',
+									'مهندس ويب وتطبيقات جوّال · عمّان، الأردن',
+								)}
+							/>
+						</p>
+
+						<!-- The cover mark: هيثم written once, in sumi on an indigo
+						     rule, exactly as the sub-pages set it — only at a cover's
+						     scale. Nothing is written out under it; the name stays in
+						     the heading, clipped, so it is announced in the language
+						     being read and nothing visible rests on a glyph. -->
+						<h1 class="hero__name" id="h1">
+							<Logo class="hero__logo" labelled={false} />
+							<T v={pair('Haitham Assoli', 'هيثم العسولي')} class="sr-only" />
+							<span class="hero__kana" lang="ja">ハイサム・アッソーリ</span>
+						</h1>
+
+						<T
+							as="p"
+							class="hero__deck"
+							v={pair(
+								'I build complete products. Each screen serves a person and handles a real constraint.',
+								'أبني منتجات مكتملة. تخدم كل شاشة شخصًا وتعالج قيدًا حقيقيًا.',
+							)}
+						/>
+
+						<!-- 三方 — one sentence, three voices. The two horizontal
+						     voices are the language switch: whichever one you are not
+						     reading in offers itself. The vertical Japanese is the
+						     constant third voice and never moves. -->
+						<div class="sanpo rise">
+							<p class="sanpo__label">
+								<span lang="ja">三方</span>
+								<T
+									v={pair(
+										'One sentence, three voices. Take the one you read in.',
+										'جملة واحدة بثلاثة أصوات. خذ الصوت الذي تقرأ به.',
+									)}
+								/>
+							</p>
+
+							<div class="sanpo__rows">
+								<div class="spec spec--en" dir="ltr">
+									<span class="spec__axis" aria-hidden="true">→</span>
+									<p class="spec__line spec__line--en" lang="en">
+										Every screen should earn its place.
+									</p>
+									<p class="spec__note">
+										<span class="spec__script" lang="en"
+											>English · left to right</span
+										>
+										<span class="spec__state" data-l="en" lang="en"
+											>reading now</span
+										>
+										<a
+											href={otherLang(Astro.url.pathname)}
+											class="voice"
+											data-lang-link
+											data-l="ar"
+											lang="en"
+											dir="ltr"
+										>
+											<span class="voice__ja" lang="ja" aria-hidden="true"
+												>語</span
+											>
+											Read in English
+										</a>
+									</p>
+								</div>
+
+								<div class="spec spec--ar" dir="rtl">
+									<span class="spec__axis" aria-hidden="true">←</span>
+									<p class="spec__line spec__line--ar" lang="ar">
+										كل شاشة يجب أن تستحق مكانها.
+									</p>
+									<p class="spec__note">
+										<span class="spec__script" lang="ar"
+											>العربية · من اليمين إلى اليسار</span
+										>
+										<span class="spec__state" data-l="ar" lang="ar"
+											>تقرأ الآن</span
+										>
+										<a
+											href={otherLang(Astro.url.pathname)}
+											class="voice"
+											data-lang-link
+											data-l="en"
+											lang="ar"
+											dir="rtl"
+										>
+											<span class="voice__ja" lang="ja" aria-hidden="true"
+												>語</span
+											>
+											اقرأ بالعربية
+										</a>
+									</p>
+								</div>
+
+								<div class="spec spec--tate" dir="ltr">
+									<span class="spec__axis" aria-hidden="true">↓</span>
+									<p class="spec__line spec__line--ja tate" lang="ja">
+										すべての画面には、理由が必要だ。
+									</p>
+									<p class="spec__note">
+										<span class="spec__script" lang="ja"
+											>日本語 · 上から下へ</span
+										>
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<DesignSwitch design={design} lang={lang} class="rise" />
+
+						<div class="hanko" aria-hidden="true">
+							<span class="hanko__col" lang="ja">ハイ</span>
+							<span class="hanko__col" lang="ja">サム</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div class="fold" aria-hidden="true"></div>
+
+			<!-- 作品 -->
+			<section class="band" id="sakuhin" aria-labelledby="sakuhin-h">
+				<div class="wrap">
+					<div class="head">
+						<p class="marker tate" lang="ja" aria-hidden="true">作品</p>
+						<div class="head__text">
+							<h2 class="head__title" id="sakuhin-h">
+								<T v={s('nav.work')} />
+								<span class="head__ja" lang="ja">作品</span>
+							</h2>
+							<T
+								as="p"
+								class="head__lede"
+								v={pair(
+									`Eight of ${projects.length}, chosen because each one had a constraint worth solving. Every card opens onto the long version.`,
+									`ثمانية من ${projects.length}، اخترتها لأن في كل واحد منها قيدًا يستحق الحل. كل بطاقة تفتح على النسخة الطويلة.`,
+								)}
+							/>
+						</div>
+					</div>
+
+					<ol class="grid">
+						{
+							featured.map((p, i) => (
+								<li class="card rise" style={`--span:${spans[i] ?? 6}`}>
+									<a class="card__link" href={u(`/work/${p.slug}`)}>
+										<span class="card__hit" />
+										<span class="card__titles">
+											<span class="card__title">
+												<T v={p.title} />
+											</span>
+											<span class="card__more" aria-hidden="true">
+												<span lang="ja">詳しく見る</span>
+												<T v={s('work.read')} />
+											</span>
+										</span>
+									</a>
+
+									<div class="card__paper">
+										<p class="card__rail tate" lang="ja">
+											<span class="card__year">{railYear(p.year)}</span>
+											<span class="card__dot" aria-hidden="true">
+												・
+											</span>
+											<span class="card__status">
+												{statusJa[p.status] ?? p.status}
+											</span>
+										</p>
+
+										<div class="card__shot" data-frame={p.frame}>
+											{p.image ? (
+												<Image
+													src={p.image}
+													alt={`${pair('Screen from', 'لقطة من')[lang]} ${p.title[lang]}`}
+													widths={[420, 840]}
+													sizes="(min-width: 62rem) 42vw, 90vw"
+													loading={i === 0 ? 'eager' : 'lazy'}
+													decoding="async"
+												/>
+											) : (
+												<span class="card__noshot" lang="ja">
+													図版なし
+												</span>
+											)}
+										</div>
+									</div>
+
+									<p class="card__cat">
+										<span lang="ja">
+											{categoryJa[p.category] ?? p.category}
+										</span>
+										<T v={catT(p.category)} />
+										<T v={statusT(p.status)} class="card__st" />
+										<T v={yearPair(p.year)} class="card__yr" />
+									</p>
+
+									<T as="p" class="card__tagline" v={p.tagline} />
+									<T as="p" class="card__summary" v={p.summary} />
+
+									<p class="card__stack" lang="en" dir="ltr">
+										{p.stack.slice(0, 7).map((tool, j) => (
+											<>
+												{j > 0 && <span class="sep">、</span>}
+												<span class="tool">{tool}</span>
+											</>
+										))}
+									</p>
+
+									{(p.links.live ||
+										p.links.appStore ||
+										p.links.playGoogle ||
+										p.links.github) && (
+										<p class="card__links">
+											{p.links.live && (
+												<a class="lnk" href={p.links.live} rel="noreferrer">
+													<T v={s('project.live')} />
+												</a>
+											)}
+											{p.links.appStore && (
+												<a class="lnk" href={p.links.appStore} rel="noreferrer">
+													<T v={s('project.apple')} />
+												</a>
+											)}
+											{p.links.playGoogle && (
+												<a
+													class="lnk"
+													href={p.links.playGoogle}
+													rel="noreferrer"
+												>
+													<T v={s('project.play')} />
+												</a>
+											)}
+											{p.links.github && (
+												<a class="lnk" href={p.links.github} rel="noreferrer">
+													<T v={s('project.github')} />
+												</a>
+											)}
+										</p>
+									)}
+								</li>
+							))
+						}
+					</ol>
+
+					<p class="allwork">
+						<a class="allwork__a" href={u('/work')}>
+							<span class="allwork__ja" lang="ja"
+								>目録 — 全{projects.length}件</span
+							>
+							<T v={s('work.all')} class="allwork__lat" />
+						</a>
+					</p>
+				</div>
+			</section>
+
+			<div class="fold" aria-hidden="true"></div>
+
+			<!-- 経歴 -->
+			<section class="band" id="keireki" aria-labelledby="keireki-h">
+				<div class="wrap">
+					<div class="head">
+						<p class="marker tate" lang="ja" aria-hidden="true">経歴</p>
+						<div class="head__text">
+							<h2 class="head__title" id="keireki-h">
+								<T v={s('nav.about')} />
+								<span class="head__ja" lang="ja">経歴</span>
+							</h2>
+						</div>
+					</div>
+
+					<div class="about">
+						<figure class="portrait rise">
+							<Image
+								src={profilePhoto}
+								alt="Haitham Assoli"
+								widths={[260, 520]}
+								sizes="(min-width: 62rem) 16rem, 9rem"
+								loading="lazy"
+							/>
+							<figcaption>
+								<span lang="ja">ハイサム・アッソーリ</span>
+								<T v={profile.location} />
+							</figcaption>
+						</figure>
+
+						<div class="prose rise">
+							{about.map((p) => <T as="p" v={p} />)}
+
+							<blockquote class="pull">
+								<p class="pull__ja tate" lang="ja">
+									制約のない仕事に、面白さはない。
+								</p>
+								<T
+									as="p"
+									class="pull__en"
+									v={pair(
+										'Work without a constraint holds nothing worth doing.',
+										'العمل بلا قيد لا يحمل ما يستحق.',
+									)}
+								/>
+							</blockquote>
+						</div>
+
+						<dl class="track rise">
+							{
+								profile.experience.slice(0, 5).map((job) => (
+									<div class="track__row">
+										<dt class="track__co">
+											<T v={job.company} />
+										</dt>
+										<dd class="track__meta">
+											<T v={job.role} />
+											<T v={yearPair(job.period)} class="track__yr" />
+										</dd>
+									</div>
+								))
+							}
+							{
+								profile.education.slice(0, 1).map((ed) => (
+									<div class="track__row">
+										<dt class="track__co">
+											<T v={ed.school} />
+										</dt>
+										<dd class="track__meta">
+											<T v={ed.degree} />
+											<T v={yearPair(ed.period)} class="track__yr" />
+										</dd>
+									</div>
+								))
+							}
+						</dl>
+					</div>
+				</div>
+			</section>
+
+			<div class="fold" aria-hidden="true"></div>
+
+			<!-- 道具 + 数字 -->
+			<section class="band" id="dogu" aria-labelledby="dogu-h">
+				<div class="wrap">
+					<div class="head">
+						<p class="marker tate" lang="ja" aria-hidden="true">道具</p>
+						<div class="head__text">
+							<h2 class="head__title" id="dogu-h">
+								<T v={pair('Tools', 'الأدوات')} />
+								<span class="head__ja" lang="ja">道具</span>
+							</h2>
+							<T
+								as="p"
+								class="head__lede"
+								v={pair(
+									'Set the way a craftsman lays out a bench: the things reached for daily, in the order they get reached for. Nothing here is on the list because it looked good on a list.',
+									'مرتّبة كما يرتّب الحرفيّ عدّته: ما تمتد إليه اليد يوميًا، بالترتيب الذي تمتد به. لا شيء هنا لأنه يبدو حسنًا في قائمة.',
+								)}
+							/>
+						</div>
+					</div>
+
+					<ul class="dogu rise" lang="en" dir="ltr">
+						{
+							toolbox.map((tool) => (
+								<li class="dogu__item tate">
+									<span>{tool}</span>
+								</li>
+							))
+						}
+					</ul>
+
+					<div class="ledger">
+						<h3 class="sr-only" id="suji-h">
+							<T v={pair('Figures', 'أرقام')} />
+						</h3>
+						<p class="marker marker--inline tate" lang="ja" aria-hidden="true">
+							数字
+						</p>
+						<dl class="ledger__rows" aria-labelledby="suji-h">
+							{
+								ledger.map((row) => (
+									<div class="ledger__row rise">
+										<dt class="ledger__ja tate" lang="ja">
+											<span class="ledger__name">{row.ja}</span>
+											<span class="ledger__count">
+												<span class="tcy">{row.n}</span>
+												{row.unit}
+											</span>
+										</dt>
+										<dd class="ledger__body">
+											<T v={row.label} class="ledger__label" />
+											<T as="p" class="ledger__en" v={row.line} />
+										</dd>
+									</div>
+								))
+							}
+						</dl>
+					</div>
+				</div>
+			</section>
+
+			<!-- 連絡 -->
+			<section class="renraku" id="renraku" aria-labelledby="renraku-h">
+				<div class="wrap renraku__in">
+					<div class="renraku__left">
+						<h2 class="head__title" id="renraku-h">
+							<T v={pair('Contact', 'التواصل')} />
+							<span class="head__ja" lang="ja">連絡</span>
+						</h2>
+						<T
+							as="p"
+							class="renraku__lede"
+							v={pair(
+								'A bilingual product, a mobile build that has to reach both stores, or something that has to run without a server behind it — send the brief, and what it has to do by when. I answer in English or Arabic.',
+								'منتج بلغتين، أو تطبيق جوّال عليه أن يصل إلى المتجرين، أو شيء عليه أن يعمل بلا خادم خلفه — أرسل الوصف، وما المطلوب إنجازه ومتى. أرد بالعربية أو بالإنجليزية.',
+							)}
+						/>
+
+						<a class="cta" href={mailto}>
+							<span class="cta__en" lang="en" dir="ltr">{profile.email}</span>
+							<span class="cta__ja" lang="ja">仕事のご依頼はこちらへ</span>
+							<T v={pair('Write to me', 'راسلني')} class="cta__lat" />
+						</a>
+
+						<p class="renraku__form">
+							<a class="lnk" href={u('/hire')}>
+								<span lang="ja">依頼書</span>
+								<T v={s('hire.title')} />
+							</a>
+						</p>
+
+						<ul class="elsewhere">
+							<li>
+								<a class="lnk" href={profile.links.github} lang="en" dir="ltr"
+									>GitHub</a
+								>
+							</li>
+							<li>
+								<a class="lnk" href={profile.links.linkedin} lang="en" dir="ltr"
+									>LinkedIn</a
+								>
+							</li>
+							<li>
+								<a class="lnk" href={profile.links.playStore}>
+									<T v={s('project.play')} />
+								</a>
+							</li>
+							<li>
+								<a class="lnk" href={profile.links.resume}>
+									<T v={s('nav.cv')} />
+								</a>
+							</li>
+							<li>
+								<a
+									class="lnk"
+									lang="en"
+									dir="ltr"
+									href={`tel:${profile.phone.replace(/\s/g, '')}`}
+								>
+									{profile.phone}
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="renraku__seal" aria-hidden="true">
+						<div class="hanko hanko--static">
+							<span class="hanko__col" lang="ja">ハイ</span>
+							<span class="hanko__col" lang="ja">サム</span>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="foot">
+			<div class="wrap foot__in">
+				<p class="foot__ja" lang="ja">以上</p>
+				<p class="foot__en">
+					<span lang="ja">作</span>
+					<T v={pair('Haitham Assoli', 'هيثم العسولي')} />
+					<span aria-hidden="true">·</span>
+					<T v={profile.location} />
+					<span aria-hidden="true">·</span>
+					<T
+						v={pair(
+							'Set in Shippori Mincho, Newsreader and Amiri',
+							'بخطوط Shippori Mincho وNewsreader وAmiri',
+						)}
+					/>
+				</p>
+				<a
+					href={otherLang(Astro.url.pathname)}
+					class="voice voice--foot"
+					data-lang-link
+					data-l="en"
+					lang="ar"
+					dir="rtl"
+				>
+					<span class="voice__ja" lang="ja" aria-hidden="true">語</span>
+					اقرأ بالعربية
+				</a>
+				<a
+					href={otherLang(Astro.url.pathname)}
+					class="voice voice--foot"
+					data-lang-link
+					data-l="ar"
+					lang="en"
+					dir="ltr"
+				>
+					<span class="voice__ja" lang="ja" aria-hidden="true">語</span>
+					Read in English
+				</a>
+			</div>
+		</footer>
+
+		<!-- Nothing but this page's own elements, so the router is told to
+		     run it again: a script it has already executed is otherwise
+		     skipped for the rest of the session. Held in a function because a
+		     second run at the top level would redeclare its own names. -->
+		<script data-astro-rerun>
+			(function () {
+				const targets = document.querySelectorAll('.rise');
+				const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+				if (reduce.matches || !('IntersectionObserver' in window)) {
+					targets.forEach((el) => el.classList.add('is-in'));
+				} else {
+					const io = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (!entry.isIntersecting) return;
+								entry.target.classList.add('is-in');
+								io.unobserve(entry.target);
+							});
+						},
+						{ rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+					);
+					targets.forEach((el) => io.observe(el));
+				}
+			})();
+		</script>
+
+		<style is:global>
+			/* ── 静けさ ─────────────────────────────────────────────
+			   Aoboku (blue-toned sumi) on kinari washi, indigo for the
+			   working type, one vermilion seal. Everything else is 間. */
+
+			:root {
+				--kinari: #e7e4db; /* 生成り — unbleached paper ground */
+				--washi: #f3f1ea; /* raised sheet */
+				--sumi: #1e252b; /* 青墨 — blue-cast ink */
+				--usuzumi: #6e747a; /* 薄墨 — thin ink */
+				--ai: #2e4257; /* 藍 — indigo, for links and labels */
+				--shu: #c8452c; /* 朱 — vermilion, the seal only */
+				--rule: rgba(30, 37, 43, 0.16);
+				--rule-soft: rgba(30, 37, 43, 0.09);
+
+				--jp: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+				--body:
+					'Newsreader', 'Shippori Mincho', 'Iowan Old Style', Georgia, serif;
+				--gothic: 'Zen Kaku Gothic New', 'Hiragino Sans', system-ui, sans-serif;
+				/* Amiri is a Naskh cut from the Bulaq press: the same unhurried,
+				   pen-made stillness as a Mincho, and no geometry anywhere in it. */
+				--ar: 'Amiri', 'Noto Naskh Arabic', 'Al Bayan', serif;
+
+				--gap: clamp(1.5rem, 4vw, 3.25rem);
+			}
+
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+			}
+
+			html {
+				-webkit-text-size-adjust: 100%;
+				scroll-behavior: smooth;
+			}
+
+			body {
+				margin: 0;
+				padding-bottom: 7rem;
+				background-color: var(--kinari);
+				color: var(--sumi);
+				font-family: var(--body);
+				font-size: clamp(1rem, 0.97rem + 0.2vw, 1.075rem);
+				font-weight: 300;
+				line-height: 1.72;
+				overflow-x: hidden;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			/* Washi is a woven sheet, not a flat colour. Two crossed grains,
+			   almost below the threshold of noticing. */
+			body::before {
+				content: '';
+				position: fixed;
+				inset: 0;
+				z-index: 0;
+				pointer-events: none;
+				background-image:
+					repeating-linear-gradient(
+						93deg,
+						rgba(30, 37, 43, 0.026) 0 1px,
+						transparent 1px 5px
+					),
+					repeating-linear-gradient(
+						3deg,
+						rgba(30, 37, 43, 0.02) 0 1px,
+						transparent 1px 8px
+					);
+			}
+
+			body > * {
+				position: relative;
+				z-index: 1;
+			}
+
+			p,
+			h1,
+			h2,
+			h3,
+			figure,
+			blockquote,
+			dl,
+			dd {
+				margin: 0;
+			}
+
+			ol,
+			ul {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			img {
+				display: block;
+				max-width: 100%;
+				height: auto;
+			}
+
+			a {
+				color: inherit;
+			}
+
+			:focus-visible {
+				outline: 2px solid var(--ai);
+				outline-offset: 3px;
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				margin: -1px;
+				padding: 0;
+				overflow: hidden;
+				clip-path: inset(50%);
+				white-space: nowrap;
+			}
+
+			/* Clipped rather than parked at -9999px: under dir=rtl an
+			   off-canvas element on the left is scrollable, and the whole page
+			   gains eleven thousand pixels of nothing. */
+			.skip {
+				position: absolute;
+				inset-block-start: 0.75rem;
+				inset-inline-start: 0.75rem;
+				z-index: 40;
+				padding: 0.6rem 1rem;
+				background: var(--sumi);
+				color: var(--washi);
+				font-family: var(--gothic);
+				font-size: 0.8rem;
+				clip-path: inset(50%);
+			}
+
+			.skip:focus {
+				clip-path: none;
+			}
+
+			.wrap {
+				width: 100%;
+				max-width: 78rem;
+				margin-inline: auto;
+				padding-inline: clamp(1.15rem, 5vw, 4rem);
+			}
+
+			/* ── the Arabic voice ─────────────────────────────────
+			   Naskh needs air, joins that no tracking can prise apart, and
+			   nothing italic or capitalised anywhere near it. Marking the
+			   element itself (not :lang) keeps the reset off Latin children. */
+
+			[lang='ar'] {
+				font-family: var(--ar);
+				font-style: normal;
+				font-variant: normal;
+				letter-spacing: normal;
+				text-transform: none;
+				line-height: 1.95;
+			}
+
+			[lang='ar'] em,
+			[lang='ar'] i {
+				font-style: normal;
+			}
+
+			/* ── vertical setting ─────────────────────────────────
+			   In a vertical writing mode `direction` sets the *inline*
+			   progression: rtl would run the Japanese bottom-to-top. Every
+			   .tate is Japanese, so it is pinned ltr and survives dir=rtl. */
+
+			.tate {
+				writing-mode: vertical-rl;
+				direction: ltr;
+				text-orientation: mixed; /* kanji upright, Latin rotates — correct */
+				font-family: var(--jp);
+				font-feature-settings:
+					'vkrn' 1,
+					'vpal' 1;
+				line-height: 1.5;
+			}
+
+			.tcy {
+				-webkit-text-combine: horizontal;
+				text-combine-upright: all; /* 縦中横 — two digits sit upright as one */
+			}
+
+			/* ── the language switch ──────────────────────────────
+			   A 短冊: a paper slip offered by the voice you are not reading
+			   in. It only exists in the other language's row, so there is
+			   never a control asking you to switch to where you already are. */
+
+			.voice {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.45rem;
+				margin: 0;
+				padding: 0.32rem 0.75rem;
+				border: 1px solid var(--rule);
+				background: var(--washi);
+				color: var(--ai);
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				font-weight: 500;
+				letter-spacing: 0.08em;
+				line-height: 1.4;
+				cursor: pointer;
+				transition:
+					border-color 0.25s,
+					background-color 0.25s,
+					color 0.25s;
+			}
+
+			.voice[lang='ar'] {
+				font-size: 0.92rem;
+				font-weight: 400;
+				line-height: 1.6;
+			}
+
+			.voice__ja {
+				font-family: var(--jp);
+				font-size: 0.85em;
+				letter-spacing: 0.1em;
+				color: var(--usuzumi);
+			}
+
+			.voice:hover {
+				border-color: var(--ai);
+				background: var(--kinari);
+			}
+
+			.voice:hover .voice__ja {
+				color: var(--ai);
+			}
+
+			.voice--foot {
+				align-self: center;
+			}
+
+			/* ── top bar ──────────────────────────────────────── */
+
+			.topbar {
+				border-bottom: 1px solid var(--rule-soft);
+			}
+
+			.topbar__in {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: space-between;
+				gap: 0.5rem 1rem;
+				min-height: 3.75rem;
+				padding-block: 0.5rem;
+			}
+
+			.mark {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.55rem;
+				text-decoration: none;
+			}
+
+			.mark__ja {
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				letter-spacing: 0.12em;
+				color: var(--ai);
+			}
+
+			.mark__en {
+				font-family: var(--gothic);
+				font-size: 0.78rem;
+				font-weight: 500;
+				letter-spacing: 0.1em;
+				white-space: nowrap;
+			}
+
+			.mark__en[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.95rem;
+				font-weight: 400;
+			}
+
+			.nav {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.35rem clamp(0.8rem, 2.6vw, 1.85rem);
+			}
+
+			.nav__sep {
+				width: 1px;
+				height: 1rem;
+				background: var(--rule);
+			}
+
+			.nav__a {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.4rem;
+				padding-block: 0.35rem;
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				white-space: nowrap;
+				text-decoration: none;
+				border-bottom: 1px solid transparent;
+				transition:
+					border-color 0.25s,
+					color 0.25s;
+			}
+
+			.nav__a:hover {
+				color: var(--ai);
+				border-bottom-color: var(--ai);
+			}
+
+			.nav__a--page {
+				color: var(--ai);
+			}
+
+			.nav__lat {
+				font-family: var(--gothic);
+				font-size: 0.66rem;
+				font-weight: 500;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.nav__lat[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.85rem;
+				font-weight: 400;
+			}
+
+			/* ── hero ─────────────────────────────────────────── */
+
+			.hero {
+				padding-block: clamp(3.5rem, 9vw, 8rem) clamp(3rem, 7vw, 6rem);
+			}
+
+			.hero__in {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: clamp(1.25rem, 5vw, 4rem);
+				align-items: start;
+			}
+
+			.hero__thesis {
+				grid-column: 2;
+				grid-row: 1;
+				margin: 0;
+				font-size: clamp(1.55rem, 1.1rem + 2.6vw, 3.1rem);
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				line-height: 1.35;
+				height: min(84vh, 44rem);
+			}
+
+			.hero__body {
+				grid-column: 1;
+				grid-row: 1;
+				position: relative;
+				max-width: 44rem;
+			}
+
+			.eyebrow {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.7rem;
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.eyebrow [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.9rem;
+				letter-spacing: 0.2em;
+				text-transform: none;
+				color: var(--ai);
+			}
+
+			.eyebrow [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.95rem;
+				font-weight: 400;
+			}
+
+			.hero__name {
+				margin-block: clamp(1.4rem, 3vw, 2.25rem) 0;
+			}
+
+			/* The mark itself. Sumi letters on an indigo rule — the two
+			   colours the sub-pages give it — set to a cover's height, with
+			   the width left to the artwork so it stays true under either
+			   direction. Two classes: the component's own `block-size: auto`
+			   is one, and would otherwise win on order. */
+			.hero__name .hero__logo {
+				block-size: clamp(3.25rem, 1.9rem + 7vw, 6.75rem);
+				inline-size: auto;
+				color: var(--sumi);
+				--logo-rule: var(--ai);
+			}
+
+			.hero__kana {
+				display: block;
+				margin-top: clamp(1rem, 2.5vw, 1.65rem);
+				font-family: var(--jp);
+				font-size: clamp(0.85rem, 0.78rem + 0.4vw, 1.05rem);
+				font-weight: 400;
+				letter-spacing: 0.22em;
+				color: var(--usuzumi);
+			}
+
+			.hero__deck {
+				margin-top: clamp(1.75rem, 4vw, 2.75rem);
+				max-width: 34em;
+				font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+				line-height: 1.68;
+			}
+
+			.hero__deck[lang='ar'] {
+				max-width: 32em;
+				line-height: 2.05;
+			}
+
+			/* ── 三方 — one sentence, three voices, and the switch ── */
+
+			.sanpo {
+				margin-top: clamp(2.5rem, 6vw, 4.5rem);
+				padding-top: 1.5rem;
+				border-top: 1px solid var(--rule);
+			}
+
+			.sanpo__label {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.75rem;
+				margin-bottom: 1.75rem;
+			}
+
+			.sanpo__label [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 1.05rem;
+				letter-spacing: 0.3em;
+				color: var(--ai);
+			}
+
+			.sanpo__label [data-l] {
+				font-family: var(--gothic);
+				font-size: 0.7rem;
+				font-weight: 500;
+				letter-spacing: 0.13em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.sanpo__label [data-l='ar'] {
+				font-family: var(--ar);
+				font-size: 0.92rem;
+				font-weight: 400;
+			}
+
+			.sanpo__rows {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				/* the vertical specimen is tall; let the slack fall into an empty
+				   third row instead of prising the two flat lines apart */
+				grid-template-rows: auto auto 1fr;
+				gap: 1.75rem clamp(1.5rem, 4vw, 2.75rem);
+				align-items: start;
+			}
+
+			.spec {
+				grid-column: 1;
+				display: grid;
+				grid-template-columns: 1.5rem 1fr;
+				gap: 0 0.85rem;
+				align-items: baseline;
+			}
+
+			/* The two horizontal voices carry the switch. The one you are
+			   reading in is inked and ruled; the other one waits. */
+			.spec--en,
+			.spec--ar {
+				padding-inline-start: 0.85rem;
+				border-inline-start: 2px solid transparent;
+				transition:
+					border-color 0.3s,
+					opacity 0.3s;
+			}
+
+			html[lang='en'] .spec--en,
+			html[lang='ar'] .spec--ar {
+				border-inline-start-color: var(--ai);
+			}
+
+			html[lang='ar'] .spec--en,
+			html[lang='en'] .spec--ar {
+				opacity: 0.58;
+			}
+
+			.spec__axis {
+				font-family: var(--gothic);
+				font-size: 0.95rem;
+				color: var(--ai);
+			}
+
+			.spec__line {
+				font-size: clamp(0.98rem, 0.94rem + 0.25vw, 1.12rem);
+				line-height: 1.55;
+			}
+
+			.spec__line--ar {
+				font-family: var(--ar);
+				font-size: clamp(1.05rem, 1rem + 0.35vw, 1.25rem);
+				line-height: 2;
+			}
+
+			.spec__note {
+				grid-column: 2;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.5rem 0.9rem;
+				margin-top: 0.7rem;
+				font-family: var(--gothic);
+				font-size: 0.63rem;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.spec__script[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.85rem;
+				font-weight: 400;
+			}
+
+			.spec__script[lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.8rem;
+				letter-spacing: 0.18em;
+				text-transform: none;
+			}
+
+			.spec__state {
+				color: var(--ai);
+				border-bottom: 1px solid rgba(46, 66, 87, 0.4);
+				padding-bottom: 0.1rem;
+			}
+
+			.spec__state[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.85rem;
+				font-weight: 400;
+			}
+
+			.spec--tate {
+				grid-column: 2;
+				grid-row: 1 / span 3;
+				grid-template-columns: auto 1.5rem;
+				justify-items: center;
+				align-items: start;
+				gap: 0.6rem;
+				padding-inline-start: clamp(1rem, 3vw, 2rem);
+				border-inline-start: 1px solid var(--rule-soft);
+			}
+
+			.spec--tate .spec__axis {
+				grid-column: 2;
+				grid-row: 1;
+			}
+
+			.spec__line--ja {
+				grid-column: 1;
+				grid-row: 1;
+				height: 19rem;
+				font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.12rem);
+				letter-spacing: 0.05em;
+			}
+
+			.spec--tate .spec__note {
+				grid-column: 1 / -1;
+				grid-row: 2;
+				justify-content: center;
+				margin-top: 0;
+			}
+
+			/* ── 判子 — the seal, stamped once ────────────────── */
+
+			.hanko {
+				position: absolute;
+				inset-inline-end: 0.5rem;
+				inset-block-start: 4.5rem;
+				display: flex;
+				flex-direction: row-reverse; /* right column first, as a seal reads */
+				direction: ltr;
+				gap: 0.1rem;
+				padding: 0.5rem 0.45rem;
+				background: var(--shu);
+				color: var(--kinari);
+				box-shadow:
+					0 0 0 1.5px var(--shu),
+					0 0 0 3.5px rgba(200, 69, 44, 0.16);
+				transform: rotate(-7deg);
+				animation: stamp 0.9s 0.5s both cubic-bezier(0.2, 0.9, 0.3, 1);
+			}
+
+			.hanko__col {
+				writing-mode: vertical-rl;
+				direction: ltr;
+				text-orientation: upright;
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+			}
+
+			/* .hanko is direction:ltr so its two columns keep seal order, which
+			   also pins its own inline axis to ltr. Under a right-to-left page
+			   the seal therefore has to be told, in so many words, to move. */
+			html[dir='rtl'] .hanko {
+				inset-inline-end: auto;
+				inset-inline-start: 0.5rem;
+			}
+
+			@keyframes stamp {
+				0% {
+					opacity: 0;
+					transform: rotate(-16deg) scale(1.45);
+				}
+				60% {
+					opacity: 1;
+					transform: rotate(-7deg) scale(0.96);
+				}
+				100% {
+					opacity: 1;
+					transform: rotate(-7deg) scale(1);
+				}
+			}
+
+			/* ── folds and section heads ──────────────────────── */
+
+			.fold {
+				height: 2.75rem;
+				border-top: 1px solid var(--rule);
+				background: linear-gradient(
+					to bottom,
+					rgba(30, 37, 43, 0.075),
+					rgba(30, 37, 43, 0) 62%
+				);
+			}
+
+			.band {
+				padding-block: clamp(3rem, 7vw, 6.5rem);
+			}
+
+			.head {
+				display: grid;
+				grid-template-columns: 3.5rem minmax(0, 1fr);
+				gap: clamp(1rem, 3vw, 2.5rem);
+				margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+			}
+
+			.marker {
+				margin: 0;
+				justify-self: center;
+				font-size: 1.1rem;
+				font-weight: 600;
+				letter-spacing: 0.4em;
+				color: var(--ai);
+			}
+
+			.head__text {
+				max-width: 46rem;
+			}
+
+			.head__title {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.9rem;
+				font-family: var(--body);
+				font-size: clamp(1.9rem, 1.3rem + 2.4vw, 3rem);
+				font-weight: 300;
+				line-height: 1.1;
+				letter-spacing: -0.01em;
+			}
+
+			.head__title [data-l='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9em;
+				font-weight: 400;
+				line-height: 1.5;
+			}
+
+			.head__ja {
+				font-family: var(--jp);
+				font-size: 0.42em;
+				font-weight: 400;
+				letter-spacing: 0.3em;
+				color: var(--usuzumi);
+			}
+
+			.head__lede {
+				margin-top: 1.1rem;
+				max-width: 36em;
+				color: #3a4249;
+			}
+
+			.head__lede[lang='ar'] {
+				max-width: 34em;
+			}
+
+			/* ── 作品 grid ────────────────────────────────────── */
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(12, minmax(0, 1fr));
+				gap: clamp(3rem, 7vw, 5.5rem) var(--gap);
+			}
+
+			.card {
+				grid-column: span var(--span, 6);
+				display: flex;
+				flex-direction: column;
+				position: relative;
+			}
+
+			/* 間: the short cards drop, so no row ever lines up flat */
+			.card:nth-child(2),
+			.card:nth-child(5),
+			.card:nth-child(8) {
+				margin-top: clamp(0rem, 5vw, 4.5rem);
+			}
+
+			.card__link {
+				display: block;
+				text-decoration: none;
+				order: 2;
+			}
+
+			.card__hit {
+				position: absolute;
+				inset: 0;
+			}
+
+			.card__titles {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 0.75rem;
+				margin-top: 1.35rem;
+			}
+
+			.card__title {
+				font-family: var(--body);
+				font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+				font-weight: 400;
+				line-height: 1.15;
+				background-image: linear-gradient(var(--sumi), var(--sumi));
+				background-size: 0% 1px;
+				background-repeat: no-repeat;
+				background-position: 0 100%;
+				transition: background-size 0.35s ease;
+			}
+
+			.card__title [lang='ar'] {
+				font-family: var(--ar);
+				line-height: 1.5;
+			}
+
+			.card:hover .card__title,
+			.card__link:focus-visible .card__title {
+				background-size: 100% 1px;
+			}
+
+			.card__more {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.45rem;
+				font-family: var(--gothic);
+				font-size: 0.7rem;
+				font-weight: 500;
+				letter-spacing: 0.12em;
+				color: var(--ai);
+				opacity: 0.45;
+				transition: opacity 0.3s;
+			}
+
+			.card__more [lang='ja'] {
+				font-family: var(--jp);
+				letter-spacing: 0.16em;
+			}
+
+			.card__more [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+				font-weight: 400;
+			}
+
+			.card:hover .card__more,
+			.card__link:focus-visible .card__more {
+				opacity: 1;
+			}
+
+			/* Nothing to hover on a touch screen: the affordance is just on. */
+			@media (hover: none) {
+				.card__more {
+					opacity: 1;
+				}
+
+				.card__title {
+					background-size: 100% 1px;
+				}
+			}
+
+			.card__link:focus-visible {
+				outline: 2px solid var(--ai);
+				outline-offset: 6px;
+			}
+
+			.card__paper {
+				order: 1;
+				position: relative;
+				display: flex;
+				gap: 0.9rem;
+				padding: 0.9rem;
+				background: var(--washi);
+				border: 1px solid var(--rule-soft);
+				box-shadow:
+					0 1px 0 rgba(255, 255, 255, 0.7) inset,
+					0 14px 28px -22px rgba(30, 37, 43, 0.55);
+			}
+
+			.card__rail {
+				flex: 0 0 auto;
+				display: flex;
+				align-items: center;
+				gap: 0.4rem;
+				margin: 0;
+				padding-block: 0.15rem;
+				font-size: 0.72rem;
+				letter-spacing: 0.12em;
+				color: var(--usuzumi);
+			}
+
+			.card__status {
+				color: var(--ai);
+			}
+
+			.card__shot {
+				flex: 1 1 auto;
+				min-width: 0;
+				overflow: hidden;
+				background: #dedbd2;
+			}
+
+			.card__shot img {
+				width: 100%;
+				aspect-ratio: 16 / 10;
+				object-fit: cover;
+				object-position: top center;
+				filter: saturate(0.86) contrast(1.02);
+				transition:
+					transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+					filter 0.5s ease;
+			}
+
+			.card:hover .card__shot img {
+				transform: scale(1.025);
+				filter: saturate(1) contrast(1.02);
+			}
+
+			/* A phone shot is a tall plate; cropping it to a landscape band
+			   throws away the screen. Mount it whole instead. */
+			.card__shot[data-frame='phone'] {
+				display: grid;
+				place-items: center;
+				padding: clamp(0.75rem, 3vw, 1.6rem);
+				background: linear-gradient(180deg, #e4e1d8, #dcd9d0);
+			}
+
+			.card__shot[data-frame='phone'] img {
+				width: 100%;
+				height: auto;
+				max-height: 26rem;
+				aspect-ratio: auto;
+				object-fit: contain;
+				box-shadow: 0 12px 26px -18px rgba(30, 37, 43, 0.8);
+			}
+
+			.card__noshot {
+				display: grid;
+				place-items: center;
+				aspect-ratio: 16 / 10;
+				font-family: var(--jp);
+				font-size: 0.85rem;
+				letter-spacing: 0.3em;
+				color: var(--usuzumi);
+			}
+
+			.card__cat {
+				order: 3;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.4rem 0.7rem;
+				margin-top: 0.7rem;
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				font-weight: 500;
+				letter-spacing: 0.08em;
+				color: var(--usuzumi);
+			}
+
+			.card__cat [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.82rem;
+				letter-spacing: 0.18em;
+				color: var(--ai);
+			}
+
+			.card__cat [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.88rem;
+				font-weight: 400;
+			}
+
+			.card__st {
+				color: var(--ai);
+			}
+
+			/* The rail says the year in bare numerals; this says it in the
+			   reader's own language, horizontally, so Arabic is never set
+			   vertically inside a rail pinned ltr for the Japanese. */
+			.card__yr {
+				margin-inline-start: auto;
+				font-variant-numeric: tabular-nums;
+			}
+
+			.card__tagline {
+				order: 4;
+				margin-top: 0.9rem;
+				font-size: 1.02rem;
+				font-style: italic;
+			}
+
+			.card__summary {
+				order: 5;
+				margin-top: 0.6rem;
+				max-width: 40em;
+				font-size: 0.96rem;
+				line-height: 1.7;
+				color: #3d454c;
+			}
+
+			.card__summary[lang='ar'] {
+				line-height: 1.95;
+			}
+
+			.card__stack {
+				order: 6;
+				margin-top: 1rem;
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				line-height: 2;
+				color: var(--usuzumi);
+			}
+
+			.card__stack .sep {
+				font-family: var(--jp);
+				color: rgba(30, 37, 43, 0.35);
+			}
+
+			.card__links {
+				order: 7;
+				position: relative;
+				z-index: 2;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1.15rem;
+				margin-top: 0.9rem;
+			}
+
+			.lnk {
+				display: inline-flex;
+				align-items: baseline;
+				gap: 0.4rem;
+				font-family: var(--gothic);
+				font-size: 0.74rem;
+				font-weight: 500;
+				letter-spacing: 0.09em;
+				color: var(--ai);
+				text-decoration: none;
+				border-bottom: 1px solid rgba(46, 66, 87, 0.32);
+				padding-bottom: 0.1rem;
+				transition: border-color 0.25s;
+			}
+
+			.lnk [lang='ja'] {
+				font-family: var(--jp);
+				letter-spacing: 0.16em;
+				color: var(--usuzumi);
+			}
+
+			.lnk [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+				font-weight: 400;
+			}
+
+			.lnk:hover {
+				border-bottom-color: var(--ai);
+			}
+
+			/* The catalogue, offered once the eight are read */
+			.allwork {
+				margin-top: clamp(2.5rem, 6vw, 4rem);
+				padding-top: 1.5rem;
+				border-top: 1px solid var(--rule);
+			}
+
+			.allwork__a {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.9rem;
+				text-decoration: none;
+			}
+
+			.allwork__ja {
+				font-family: var(--jp);
+				font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem);
+				letter-spacing: 0.14em;
+				color: var(--ai);
+				border-bottom: 1px solid transparent;
+				transition: border-color 0.25s;
+			}
+
+			.allwork__a:hover .allwork__ja {
+				border-bottom-color: var(--ai);
+			}
+
+			.allwork__lat {
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				font-weight: 500;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.allwork__lat[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.95rem;
+				font-weight: 400;
+			}
+
+			/* ── 経歴 ─────────────────────────────────────────── */
+
+			.about {
+				display: grid;
+				grid-template-columns: 16rem minmax(0, 1fr);
+				gap: clamp(2rem, 5vw, 4.5rem);
+				align-items: start;
+			}
+
+			.portrait {
+				position: sticky;
+				top: 2.5rem;
+			}
+
+			/* torn from the sheet rather than cropped */
+			.portrait img {
+				width: 100%;
+				filter: grayscale(1) contrast(1.06);
+				mix-blend-mode: multiply;
+				clip-path: polygon(
+					0% 1.5%,
+					13% 0%,
+					27% 2%,
+					41% 0.4%,
+					56% 2.2%,
+					70% 0.6%,
+					86% 2.4%,
+					100% 1%,
+					99% 15%,
+					100% 32%,
+					98.6% 51%,
+					100% 68%,
+					98.8% 86%,
+					100% 99%,
+					84% 97.6%,
+					69% 100%,
+					54% 97.8%,
+					38% 99.6%,
+					23% 97.6%,
+					9% 99.8%,
+					0% 98%,
+					1.4% 80%,
+					0% 62%,
+					1.6% 44%,
+					0% 26%
+				);
+			}
+
+			.portrait figcaption {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+				margin-top: 1rem;
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				letter-spacing: 0.09em;
+				color: var(--usuzumi);
+			}
+
+			.portrait figcaption [lang='ja'] {
+				font-family: var(--jp);
+				font-size: 0.8rem;
+				letter-spacing: 0.2em;
+				color: var(--sumi);
+			}
+
+			.portrait figcaption [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+			}
+
+			.prose p {
+				max-width: 38em;
+			}
+
+			.prose p[lang='ar'] {
+				max-width: 36em;
+			}
+
+			.prose p + p {
+				margin-top: 1.15rem;
+			}
+
+			.pull {
+				display: flex;
+				align-items: flex-start;
+				gap: clamp(1rem, 3vw, 2rem);
+				margin-top: clamp(2rem, 5vw, 3.25rem);
+				padding-inline-start: clamp(1rem, 3vw, 2rem);
+				border-inline-start: 2px solid var(--rule);
+			}
+
+			.pull__ja {
+				margin: 0;
+				height: 22rem;
+				font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.4rem);
+				font-weight: 600;
+				letter-spacing: 0.1em;
+			}
+
+			.pull__en {
+				max-width: 18em;
+				padding-top: 0.35rem;
+				font-size: 1.02rem;
+				font-style: italic;
+				color: #3d454c;
+			}
+
+			.pull__en[lang='ar'] {
+				font-size: 1.15rem;
+			}
+
+			.track {
+				grid-column: 2;
+				margin-top: clamp(2.5rem, 5vw, 3.5rem);
+				border-top: 1px solid var(--rule);
+			}
+
+			.track__row {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+				gap: 0.5rem 1.5rem;
+				padding-block: 0.85rem;
+				border-bottom: 1px solid var(--rule-soft);
+			}
+
+			.track__co {
+				font-size: 1.02rem;
+			}
+
+			.track__meta {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				gap: 0.5rem 1rem;
+				font-family: var(--gothic);
+				font-size: 0.76rem;
+				letter-spacing: 0.05em;
+				color: var(--usuzumi);
+			}
+
+			.track__meta [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.92rem;
+			}
+
+			.track__yr {
+				white-space: nowrap;
+			}
+
+			/* ── 道具 ─────────────────────────────────────────── */
+
+			.dogu {
+				display: flex;
+				flex-direction: row-reverse; /* columns read right to left */
+				flex-wrap: wrap;
+				justify-content: flex-start;
+				gap: clamp(0.9rem, 2.4vw, 1.7rem);
+				padding-block: 1.5rem;
+				border-block: 1px solid var(--rule);
+			}
+
+			.dogu__item {
+				height: 9.5rem;
+				font-family: var(--gothic);
+				font-size: 0.92rem;
+				font-weight: 400;
+				letter-spacing: 0.06em;
+				color: #3d454c;
+			}
+
+			.dogu__item:nth-child(3n) {
+				color: var(--ai);
+			}
+
+			/* ── 数字 ─────────────────────────────────────────── */
+
+			.ledger {
+				display: grid;
+				grid-template-columns: 3.5rem minmax(0, 1fr);
+				gap: clamp(1rem, 3vw, 2.5rem);
+				margin-top: clamp(3rem, 7vw, 5rem);
+			}
+
+			.marker--inline {
+				justify-self: center;
+				align-self: start;
+			}
+
+			.ledger__rows {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+				gap: clamp(1.5rem, 4vw, 3rem);
+			}
+
+			.ledger__row {
+				display: flex;
+				align-items: flex-start;
+				gap: 1rem;
+				padding-top: 1rem;
+				border-top: 1px solid var(--rule);
+			}
+
+			.ledger__ja {
+				margin: 0;
+				display: flex;
+				align-items: center;
+				gap: 0.9rem;
+				height: 9.5rem;
+			}
+
+			.ledger__name {
+				font-size: 0.85rem;
+				letter-spacing: 0.3em;
+				color: var(--usuzumi);
+			}
+
+			.ledger__count {
+				font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem);
+				font-weight: 600;
+				letter-spacing: 0.04em;
+			}
+
+			.ledger__body {
+				flex: 1 1 auto;
+			}
+
+			.ledger__label {
+				display: block;
+				margin-bottom: 0.35rem;
+				font-family: var(--gothic);
+				font-size: 0.66rem;
+				font-weight: 500;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: var(--ai);
+			}
+
+			.ledger__label[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+				font-weight: 400;
+			}
+
+			.ledger__en {
+				font-size: 0.94rem;
+				line-height: 1.65;
+				color: #3d454c;
+			}
+
+			.ledger__en[lang='ar'] {
+				line-height: 1.95;
+			}
+
+			/* ── 連絡 ─────────────────────────────────────────── */
+
+			.renraku {
+				margin-top: clamp(2rem, 6vw, 4rem);
+				padding-block: clamp(3.5rem, 8vw, 6.5rem);
+				background: var(--washi);
+				/* torn along the top, as if lifted off the block */
+				clip-path: polygon(
+					0 14px,
+					4% 5px,
+					9% 15px,
+					15% 6px,
+					22% 17px,
+					29% 5px,
+					36% 14px,
+					44% 3px,
+					51% 13px,
+					58% 6px,
+					66% 16px,
+					73% 5px,
+					80% 14px,
+					87% 4px,
+					94% 15px,
+					100% 6px,
+					100% 100%,
+					0 100%
+				);
+			}
+
+			.renraku__in {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: clamp(2rem, 6vw, 4rem);
+				align-items: center;
+			}
+
+			.renraku__lede {
+				margin-top: 1.25rem;
+				max-width: 34em;
+				font-size: clamp(1.02rem, 0.98rem + 0.3vw, 1.15rem);
+			}
+
+			.renraku__lede[lang='ar'] {
+				max-width: 32em;
+			}
+
+			.cta {
+				display: inline-flex;
+				flex-direction: column;
+				gap: 0.4rem;
+				margin-top: clamp(1.75rem, 4vw, 2.5rem);
+				padding-bottom: 0.5rem;
+				border-bottom: 2px solid var(--shu);
+				text-decoration: none;
+			}
+
+			.cta__en {
+				font-family: var(--body);
+				font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem);
+				font-weight: 300;
+				line-height: 1.1;
+				word-break: break-word;
+			}
+
+			.cta__ja {
+				font-family: var(--jp);
+				font-size: 0.82rem;
+				letter-spacing: 0.2em;
+				color: var(--usuzumi);
+				transition: color 0.25s;
+			}
+
+			.cta__lat {
+				font-family: var(--gothic);
+				font-size: 0.68rem;
+				font-weight: 500;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				color: var(--usuzumi);
+			}
+
+			.cta__lat[lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.92rem;
+				font-weight: 400;
+			}
+
+			.cta:hover .cta__ja {
+				color: var(--shu);
+			}
+
+			.renraku__form {
+				margin-top: 1.5rem;
+			}
+
+			.elsewhere {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.85rem 1.5rem;
+				margin-top: clamp(1.75rem, 4vw, 2.5rem);
+			}
+
+			.renraku__seal {
+				display: grid;
+				place-items: center;
+			}
+
+			.hanko--static {
+				position: static;
+				animation: none;
+				padding: 0.85rem 0.75rem;
+				gap: 0.2rem;
+				transform: rotate(4deg);
+			}
+
+			.hanko--static .hanko__col {
+				font-size: 1.5rem;
+			}
+
+			/* ── footer ───────────────────────────────────────── */
+
+			.foot {
+				padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem;
+			}
+
+			.foot__in {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				padding-top: 1.25rem;
+				border-top: 1px solid var(--rule-soft);
+			}
+
+			.foot__ja {
+				font-family: var(--jp);
+				font-size: 0.95rem;
+				letter-spacing: 0.5em;
+				color: var(--ai);
+			}
+
+			.foot__en {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.4rem;
+				font-family: var(--gothic);
+				font-size: 0.72rem;
+				letter-spacing: 0.06em;
+				color: var(--usuzumi);
+			}
+
+			.foot__en [lang='ja'] {
+				font-family: var(--jp);
+				letter-spacing: 0.2em;
+				color: var(--sumi);
+			}
+
+			.foot__en [lang='ar'] {
+				font-family: var(--ar);
+				font-size: 0.9rem;
+			}
+
+			/* ── entrances ────────────────────────────────────── */
+
+			.rise {
+				opacity: 0;
+				transform: translateY(14px);
+				transition:
+					opacity 0.75s ease,
+					transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+
+			.rise.is-in {
+				opacity: 1;
+				transform: none;
+			}
+
+			/* ── narrower than a hand ─────────────────────────── */
+
+			@media (max-width: 62rem) {
+				.about {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				.portrait {
+					position: static;
+					max-width: 11rem;
+				}
+
+				.track {
+					grid-column: 1;
+				}
+
+				.card {
+					grid-column: span 12;
+				}
+
+				.card:nth-child(2),
+				.card:nth-child(5),
+				.card:nth-child(8) {
+					margin-top: 0;
+				}
+			}
+
+			@media (max-width: 48rem) {
+				.nav__lat,
+				.mark__ja {
+					display: none;
+				}
+
+				.head,
+				.ledger {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				/* The section marker lies down where there is no gutter to hold it. */
+				.marker {
+					writing-mode: horizontal-tb;
+					justify-self: start;
+					margin-bottom: 0.5rem;
+					font-size: 0.95rem;
+					letter-spacing: 0.45em;
+				}
+
+				.sanpo__rows {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				.spec--tate {
+					grid-column: 1;
+					grid-row: auto;
+					grid-template-columns: 1fr 1.5rem;
+					justify-items: start;
+					padding-inline-start: 0;
+					padding-top: 1.25rem;
+					border-inline-start: 0;
+					border-top: 1px solid var(--rule-soft);
+				}
+
+				.spec--tate .spec__note {
+					justify-content: flex-start;
+				}
+
+				.spec__line--ja {
+					height: 17rem;
+				}
+
+				/* 19 rotated tool names would run off a phone: lay them flat. */
+				.dogu__item {
+					writing-mode: horizontal-tb;
+					height: auto;
+					font-size: 0.85rem;
+				}
+
+				.dogu {
+					flex-direction: row;
+					gap: 0.5rem 1.1rem;
+				}
+
+				.pull__ja {
+					height: 17rem;
+				}
+
+				.renraku__in {
+					grid-template-columns: minmax(0, 1fr);
+				}
+
+				.renraku__seal {
+					justify-items: start;
+					place-items: start;
+				}
+			}
+
+			@media (max-width: 30rem) {
+				.hero__in {
+					gap: 0.9rem;
+				}
+
+				.hero__thesis {
+					font-size: 1.5rem;
+					letter-spacing: 0.04em;
+				}
+
+				.card__paper {
+					flex-direction: column-reverse;
+					gap: 0.7rem;
+				}
+
+				.card__rail {
+					writing-mode: horizontal-tb;
+					align-items: baseline;
+				}
+
+				.ledger__ja {
+					writing-mode: horizontal-tb;
+					height: auto;
+					align-items: baseline;
+				}
+
+				.ledger__row {
+					flex-direction: column;
+					gap: 0.4rem;
+				}
+
+				.hanko {
+					inset-inline: auto 0;
+					inset-block-start: auto;
+					inset-block-end: -1.5rem;
+				}
+
+				html[dir='rtl'] .hanko {
+					inset-inline: 0 auto;
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				html {
+					scroll-behavior: auto;
+				}
+
+				*,
+				*::before,
+				*::after {
+					animation-duration: 0.001ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.001ms !important;
+				}
+
+				.rise {
+					opacity: 1;
+					transform: none;
+				}
+
+				.hanko {
+					animation: none;
+				}
+			}
+		</style>
+	</body>
+</html>

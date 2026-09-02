@@ -1,0 +1,441 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+/* The brief. Same column, same hairline: the form is set as a page of ruled
+   paper, one field to a line, and it posts nowhere. */
+import { profile } from '../../../content/profile';
+import HireCompose from '../../components/HireCompose.astro';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+
+const deals = [
+	{ value: 'part', label: s('deal.part') },
+	{ value: 'full', label: s('deal.full') },
+	{ value: 'contract', label: s('deal.contract') },
+	{ value: 'freelance', label: s('deal.freelance') },
+	{ value: 'hourly', label: s('deal.hourly') },
+];
+
+const places = [
+	{ value: 'remote', label: s('loc.remote') },
+	{ value: 'onsite', label: s('loc.onsite') },
+];
+
+const stacks = [
+	{ value: 'frontend', label: s('tech.frontend') },
+	{ value: 'backend', label: s('tech.backend') },
+	{ value: 'mobile', label: s('tech.mobile') },
+	{ value: 'other', label: s('tech.other') },
+];
+
+const takes = [
+	{ title: s('skill.web'), body: s('skill.webDesc') },
+	{ title: s('skill.mobile'), body: s('skill.mobileDesc') },
+	{ title: s('skill.backend'), body: s('skill.backendDesc') },
+	{ title: s('skill.other'), body: s('skill.otherDesc') },
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Start a project — Haitham Assoli',
+		'ابدأ مشروعًا — هيثم العسولي',
+	)[lang]}
+	description={pair(
+		'Tell Haitham Assoli what you are building. The brief fills a pre-written email; nothing is sent until you press send in your own mail app.',
+		'أخبر هيثم العسولي بما تبنيه. يملأ الطلب رسالة مكتوبة مسبقًا، ولا يُرسل شيء حتى تضغط إرسال من تطبيق بريدك.',
+	)[lang]}
+>
+	<HireCompose />
+
+	<section class="band band--top">
+		<p class="rail"><T v={s('hire.eyebrow')} /></p>
+		<div class="col col--top">
+			<T as="h1" v={s('hire.title')} />
+			<T as="p" class="lede hire__lede" v={s('hire.lede')} />
+			<p class="k hire__reply"><T v={s('hire.note')} /></p>
+		</div>
+	</section>
+
+	<section class="band">
+		<p class="rail"><T v={pair('what I take on', 'ما أتولّاه')} /></p>
+		<div class="col">
+			<T as="h2" v={s('skills.title')} />
+			<div class="takes">
+				{
+					takes.map((t) => (
+						<div class="take">
+							<T as="h3" class="take__h" v={t.title} />
+							<T as="p" class="take__p" v={t.body} />
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<section class="band">
+		<p class="rail"><T v={pair('how it goes', 'كيف يسير العمل')} /></p>
+		<div class="col">
+			<T
+				as="h2"
+				v={pair('What the first month looks like.', 'كيف يبدو الشهر الأول.')}
+			/>
+			<T
+				as="p"
+				v={pair(
+					'You get a repository in the first week, a build you can open on your own phone, and a short note every Thursday about what moved. Arabic and English go in from the first screen, never at the end.',
+					'تحصل على مستودع في الأسبوع الأول، ونسخة تفتحها على هاتفك، ورسالة قصيرة كل خميس عمّا أُنجز. والعربية والإنجليزية تدخلان من الشاشة الأولى، لا في آخر الطريق.',
+				)}
+			/>
+			<T
+				as="p"
+				class="measure"
+				v={pair(
+					'Rates follow the scope and the deadline, not the logo. Tell me the budget you have and I will say plainly whether it builds the thing you described.',
+					'الأجر يتبع حجم العمل وموعد التسليم، لا اسم الجهة. أخبرني بالميزانية المتاحة وسأقول بصراحة إن كانت تكفي لبناء ما وصفته.',
+				)}
+			/>
+		</div>
+	</section>
+
+	<section class="band">
+		<p class="rail"><T v={pair('the brief', 'الطلب')} /></p>
+		<div class="col">
+			<T
+				as="h2"
+				v={pair(
+					'Eight lines, and I have enough to answer properly.',
+					'ثماني خانات، وتكفيني لأردّ ردًّا مفيدًا.',
+				)}
+			/>
+
+			<form class="form" data-hire>
+				<div class="f">
+					<label class="k f__l" for="fullName"
+						><T v={s('hire.fullName')} /></label
+					>
+					<input
+						class="f__i"
+						id="fullName"
+						name="fullName"
+						type="text"
+						autocomplete="name"
+						required
+					/>
+				</div>
+
+				<div class="f">
+					<label class="k f__l" for="email"><T v={s('hire.email')} /></label>
+					<input
+						class="f__i"
+						id="email"
+						name="email"
+						type="email"
+						autocomplete="email"
+						dir="ltr"
+						required
+					/>
+				</div>
+
+				<div class="f">
+					<label class="k f__l" for="phone"><T v={s('hire.phone')} /></label>
+					<input
+						class="f__i"
+						id="phone"
+						name="phone"
+						type="tel"
+						autocomplete="tel"
+						dir="ltr"
+						required
+					/>
+				</div>
+
+				<fieldset class="f">
+					<legend class="k f__l"><T v={s('hire.deal')} /></legend>
+					<div class="opts">
+						{
+							deals.map((d, i) => (
+								<label class="opt">
+									<input
+										type="radio"
+										name="deal"
+										value={d.value}
+										required={i === 0}
+									/>
+									<T v={d.label} />
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<fieldset class="f">
+					<legend class="k f__l"><T v={s('hire.location')} /></legend>
+					<div class="opts">
+						{
+							places.map((l, i) => (
+								<label class="opt">
+									<input
+										type="radio"
+										name="location"
+										value={l.value}
+										required={i === 0}
+									/>
+									<T v={l.label} />
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<fieldset class="f">
+					<legend class="k f__l"><T v={s('hire.techStack')} /></legend>
+					<p class="k f__hint">
+						<T
+							v={pair(
+								'Pick as many as apply.',
+								'اختر ما ينطبق، ولو أكثر من واحد.',
+							)}
+						/>
+					</p>
+					<div class="opts">
+						{
+							stacks.map((t) => (
+								<label class="opt">
+									<input type="checkbox" name="techStack" value={t.value} />
+									<T v={t.label} />
+								</label>
+							))
+						}
+					</div>
+				</fieldset>
+
+				<div class="f">
+					<label class="k f__l" for="budget"><T v={s('hire.budget')} /></label>
+					<input class="f__i" id="budget" name="budget" type="text" required />
+					<T as="p" class="k f__hint" v={s('hire.budgetPlaceholder')} />
+				</div>
+
+				<div class="f">
+					<label class="k f__l" for="summary"><T v={s('hire.summary')} /></label
+					>
+					<textarea
+						class="f__i f__t"
+						id="summary"
+						name="summary"
+						rows="5"
+						required></textarea>
+					<T as="p" class="k f__hint" v={s('hire.summaryPlaceholder')} />
+				</div>
+
+				<div class="form__end">
+					<button class="send" type="submit"><T v={s('hire.submit')} /></button>
+					<T as="p" class="k form__note" v={s('hire.sent')} />
+				</div>
+			</form>
+
+			<p class="k form__alt">
+				<T v={pair('Or just write to me:', 'أو راسلني مباشرة:')} />
+				<a class="lnk" href={`mailto:${profile.email}`} lang="en" dir="ltr"
+					>{profile.email}</a
+				>
+			</p>
+		</div>
+	</section>
+</Shell>
+
+<style is:global>
+	.hire__lede {
+		margin-block: 1.6rem 1.2rem;
+	}
+
+	.hire__reply {
+		margin: 0;
+	}
+
+	.takes {
+		display: grid;
+		gap: 2.25rem;
+		max-width: 36rem;
+	}
+
+	.take__h {
+		margin-block-end: 0.55rem;
+	}
+
+	.take__p {
+		margin: 0;
+		color: var(--graphite);
+	}
+
+	/* ── The form ──────────────────────────────────────────────────────────
+	   No boxes. A field is a label and a ruled line, like the rest of the
+	   page. */
+	.form {
+		display: grid;
+		gap: 2rem;
+		max-width: 34rem;
+		margin-block-start: 2.5rem;
+	}
+
+	.f {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+
+	.f__l {
+		display: block;
+		margin-block-end: 0.45rem;
+		padding: 0;
+		color: var(--graphite);
+	}
+
+	.f__i {
+		display: block;
+		width: 100%;
+		padding: 0.35rem 0 0.5rem;
+		border: 0;
+		border-block-end: 1px solid var(--rule);
+		border-radius: 0;
+		background: transparent;
+		color: var(--ink);
+		font-family: var(--serif);
+		font-size: var(--s-body);
+		line-height: 1.5;
+		transition: border-color 0.2s ease;
+	}
+
+	html[lang='ar'] .f__i {
+		font-family: var(--serif-ar);
+		font-size: var(--s-body-ar);
+	}
+
+	.f__i:hover {
+		border-block-end-color: var(--graphite);
+	}
+
+	.f__i:focus {
+		outline: none;
+		border-block-end-color: var(--signal);
+		border-block-end-width: 2px;
+		padding-block-end: calc(0.5rem - 1px);
+	}
+
+	.f__i:focus-visible {
+		outline: none;
+	}
+
+	.f__t {
+		resize: vertical;
+		min-height: 6.5rem;
+	}
+
+	.f__hint {
+		margin: 0.5rem 0 0;
+	}
+
+	fieldset .f__hint {
+		margin-block: 0 0.75rem;
+	}
+
+	.opts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.65rem 1.5rem;
+		margin-block-start: 0.15rem;
+	}
+
+	.opt {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		cursor: pointer;
+	}
+
+	.opt input {
+		accent-color: var(--signal);
+		width: 0.95rem;
+		height: 0.95rem;
+		margin: 0;
+		transform: translateY(0.12rem);
+	}
+
+	.opt:hover {
+		color: var(--signal);
+	}
+
+	.form__end {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 1.5rem;
+	}
+
+	.send {
+		padding: 0.7rem 1.4rem 0.75rem;
+		border: 1px solid var(--ink);
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--paper);
+		font-family: var(--mono);
+		font-size: var(--s-meta);
+		letter-spacing: 0.055em;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			background-color 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.send [lang='ar'] {
+		font-family: var(--mono-ar);
+		font-size: var(--s-meta-ar);
+	}
+
+	.send:hover {
+		background: var(--signal);
+		border-color: var(--signal);
+		color: var(--on-signal);
+	}
+
+	/* The confirmation only exists once the mail draft has been handed over. */
+	.form__note {
+		display: none;
+		margin: 0;
+		max-width: 20rem;
+		color: var(--signal);
+	}
+
+	.form[data-sent] .form__note {
+		display: block;
+	}
+
+	html[lang='ar'] .form[data-sent] .form__note[data-l='en'],
+	html[lang='en'] .form[data-sent] .form__note[data-l='ar'] {
+		display: none;
+	}
+
+	.form__alt {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.5rem;
+		margin-block-start: 2.75rem;
+	}
+
+	.form__alt a {
+		overflow-wrap: anywhere;
+	}
+</style>

@@ -1,0 +1,2534 @@
+---
+import type { Design } from '../registry';
+import { otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+import { Image } from 'astro:assets';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import type { Key } from '../../i18n';
+import { pair, s } from '../../data/variant-ui';
+import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
+import Reveal from '../_shared/Reveal.astro';
+import Meta from '../_shared/Meta.astro';
+import T from '../../components/T.astro';
+import profilePhoto from '../../assets/images/profile.png';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+/* The bento is a tray, not a wall: every tile has its own job, its own
+   material and its own internal composition. Sizes are assigned here, once,
+   so the grid reads as a composition rather than a loop. */
+const bySlug = (slug: string) => featured.find((p) => p.slug === slug)!;
+
+const work = [
+	{ p: bySlug('aoun'), w: 'w6', h: 'h3', shape: 'wide', tone: 'bone' },
+	{ p: bySlug('malabji'), w: 'w3', h: 'h3', shape: 'tall', tone: 'bone' },
+	{ p: bySlug('naqi'), w: 'w3', h: 'h3', shape: 'tall', tone: 'ink' },
+	{
+		p: bySlug('kashaf-alkulify'),
+		w: 'w5',
+		h: 'h3',
+		shape: 'wide',
+		tone: 'bone',
+	},
+	{ p: bySlug('pastehtml'), w: 'w3', h: 'h3', shape: 'tall', tone: 'bone' },
+	{ p: bySlug('majalis'), w: 'w4', h: 'h3', shape: 'tall', tone: 'bone' },
+	{ p: bySlug('eecommittee'), w: 'w3', h: 'h3', shape: 'tall', tone: 'bone' },
+	{ p: bySlug('rooh-al-jouf'), w: 'w5', h: 'h3', shape: 'wide', tone: 'bone' },
+];
+
+/* Category and status are already written in both languages in the site's own
+   dictionary; the tray does not get a second one. */
+const cat = (c: string) => s(`cat.${c}` as Key);
+const stat = (st: string) => s(`status.${st}` as Key);
+
+/* Periods are one string in the data — "Since 2025", "2022 to 2023" — so the
+   only Arabic they need is the joining word. Digits stay Western. */
+const per = (v: string) =>
+	pair(v, v.replace(/^Since /, 'منذ ').replace(/ to /, ' إلى '));
+
+/* The archive tile names real projects and links to their write-ups. */
+const archive = projects.filter((p) => !p.featured).slice(0, 10);
+
+const restCount = projects.length - featured.length;
+
+/* 39 shipped, 13 of them on the App Store or Google Play. The matrix draws
+   exactly that, one square per project. */
+const shipped = 39;
+const onStores = 13;
+const squares = Array.from({ length: shipped }, (_, i) => i < onStores);
+
+/* Rendered at build time so the tile is never blank; the clock in the page
+   corrects it to the reader's own second. */
+const ammanTime = new Intl.DateTimeFormat('en-GB', {
+	timeZone: 'Asia/Amman',
+	hour: '2-digit',
+	minute: '2-digit',
+}).format(new Date());
+const nowISO = new Date().toISOString();
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>
+			{
+				pair(
+					'Haitham Assoli — Arabic-first apps, laid out as a tray',
+					'هيثم العسولي — تطبيقات تبدأ بالعربية، مرتّبة كصينية',
+				)[lang]
+			}
+		</title>
+		<meta
+			name="description"
+			content={pair(
+				'Haitham Assoli builds Arabic-first web and mobile products from Amman: React Native on both app stores, Next.js and Astro on the web, and AI that runs on the phone. Readable in Arabic or English.',
+				'يبني هيثم العسولي تطبيقات ويب وجوال تبدأ بالعربية من عمّان: React Native على متجري التطبيقات، وNext.js وAstro على الويب، وذكاء اصطناعي يعمل على الهاتف. تقرأ بالعربية أو الإنجليزية.',
+			)[lang]}
+		/>
+		<meta name="color-scheme" content="light" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+		/>
+		<LangBoot />
+		<Seam />
+		<Reveal />
+		<Meta design={design} lang={lang} />
+	</head>
+
+	<body>
+		<a class="skip" href="#main">
+			<T v={s('nav.skip')} />
+		</a>
+
+		<div class="tray">
+			<header class="topbar">
+				<p class="topbar__name">
+					<Logo class="topbar__logo" labelled={false} />
+					<T class="sr-only" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+				</p>
+				<nav class="topbar__nav mono">
+					<a class="ilink" href={u('/work')}><T v={s('work.all')} /></a>
+					<a class="ilink" href={u('/hire')}><T v={s('nav.hire')} /></a>
+				</nav>
+			</header>
+
+			<main id="main">
+				<!-- ===================== BOARD ONE: THE POINT ===================== -->
+				<section class="board board--hero">
+					<!-- thesis -->
+					<article class="tile tile--bone w8 h3 thesis" style="--i: 0">
+						<p class="mono lbl"><T v={pair('The point', 'الخلاصة')} /></p>
+						<h1 class="thesis__h">
+							<span data-l="en" lang="en"
+								>A mirrored interface needs <em>its own design</em>. I build
+								both versions.</span
+							>
+							<span data-l="ar" lang="ar"
+								>تحتاج الواجهة المعكوسة إلى <em>تصميم خاص بها</em>. وأنا أبني
+								النسختين.</span
+							>
+						</h1>
+						<T
+							v={pair(
+								'Four years of Arabic-first products out of Amman: React Native and Expo on both app stores, Next.js and Astro on the web, NestJS, Convex and Supabase underneath. Thirty-nine of them shipped.',
+								'أربع سنوات من منتجات تبدأ بالعربية، من عمّان: React Native وExpo على المتجرين، وNext.js وAstro على الويب، وتحتها NestJS وConvex وSupabase. تسعة وثلاثون منها صدرت.',
+							)}
+							as="p"
+							class="thesis__sub"
+						/>
+						<p class="mono thesis__tags">
+							<T v={pair('Web', 'ويب')} as="span" />
+							<T v={pair('Mobile', 'جوّال')} as="span" />
+							<T v={pair('On-device AI', 'ذكاء على الجهاز')} as="span" />
+							<T v={pair('Arabic first', 'العربية أولًا')} as="span" />
+						</p>
+
+						<DesignSwitch design={design} lang={lang} />
+					</article>
+
+					<!-- portrait -->
+					<article class="tile tile--cobalt w4 h3 who" style="--i: 1">
+						<div class="who__photo">
+							<Image
+								src={profilePhoto}
+								alt="Haitham Assoli"
+								widths={[240, 480]}
+								sizes="(min-width: 64rem) 15rem, 40vw"
+								loading="eager"
+							/>
+						</div>
+						<div class="who__plate">
+							<p class="mono lbl lbl--on-dark">
+								<T v={pair('Who', 'من')} />
+							</p>
+							<p class="who__name">
+								<span data-l="en" lang="en">Haitham Assoli</span>
+								<span data-l="ar" lang="ar">هيثم العسولي</span>
+							</p>
+							<T v={profile.title} as="p" class="who__role" />
+						</div>
+					</article>
+
+					<!-- signature: the mirror -->
+					<article class="tile tile--bone w5 h4 mirror" style="--i: 2">
+						<div class="mirror__head">
+							<p class="mono lbl">
+								<T v={pair('Details that matter', 'تفاصيل تصنع الفرق')} />
+							</p>
+						</div>
+
+						<div class="mcard" id="mcard">
+							<div class="mcard__bar">
+								<span class="mcard__back" aria-hidden="true">
+									<svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+										><path
+											d="M15 5 8 12l7 7"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"></path></svg
+									>
+								</span>
+								<span class="mcard__title"
+									><span data-l="en" lang="en">Book a pitch</span><span
+										data-l="ar"
+										lang="ar">احجز ملعبًا</span
+									></span
+								>
+								<span class="mcard__dots" aria-hidden="true"></span>
+							</div>
+
+							<div class="mcard__pitch" aria-hidden="true">
+								<span class="mcard__badge">
+									<span data-l="en" lang="en">5-a-side</span><span
+										data-l="ar"
+										lang="ar">خماسي</span
+									>
+								</span>
+								<span class="mcard__crew">
+									<span class="mcard__face">HA</span>
+									<span class="mcard__face">M</span>
+									<span class="mcard__face">Z</span>
+									<span class="mcard__face"
+										><span data-l="en" lang="en">+3</span><span
+											data-l="ar"
+											lang="ar">٣+</span
+										></span
+									>
+								</span>
+							</div>
+
+							<div class="mcard__body">
+								<p class="mcard__venue">
+									<span data-l="en" lang="en">Al-Hussein Pitch, Amman</span
+									><span data-l="ar" lang="ar">ملعب الحسين، عمّان</span>
+								</p>
+								<p class="mcard__slot mono">
+									<span data-l="en" lang="en">Today 18:00 – 19:00</span><span
+										data-l="ar"
+										lang="ar">اليوم ٦:٠٠ – ٧:٠٠ م</span
+									>
+								</p>
+
+								<div class="mcard__row">
+									<span class="mcard__players">
+										<span data-l="en" lang="en">6 of 10 players in</span><span
+											data-l="ar"
+											lang="ar">٦ من ١٠ لاعبين</span
+										>
+									</span>
+									<span class="mcard__price mono">
+										<span data-l="en" lang="en">12 JOD</span><span
+											data-l="ar"
+											lang="ar">١٢ دينارًا</span
+										>
+									</span>
+								</div>
+
+								<div class="mcard__bar-track" aria-hidden="true">
+									<i></i>
+								</div>
+
+								<span class="mcard__cta">
+									<span data-l="en" lang="en">Book the slot</span><span
+										data-l="ar"
+										lang="ar">احجز الموعد</span
+									>
+									<span class="mcard__arrow" aria-hidden="true">
+										<svg viewBox="0 0 24 24" width="15" height="15" fill="none"
+											><path
+												d="M5 12h13m-5-6 6 6-6 6"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"></path></svg
+										>
+									</span>
+								</span>
+							</div>
+						</div>
+
+						<T
+							v={pair(
+								'The language switch reverses row order, flips the chevron, fills progress from the opposite edge and changes the numeral system. I designed each detail for both languages.',
+								'يعكس مفتاح اللغة ترتيب الصفوف، ويقلب السهم، ويملأ شريط التقدم من الحافة المقابلة، ويغيّر نظام الأرقام. صممت كل تفصيل للغتين.',
+							)}
+							as="p"
+							class="mirror__note"
+						/>
+					</article>
+
+					<!-- the language switch: its own compartment -->
+					<article class="tile tile--ink w3 h4 lang" style="--i: 3">
+						<p class="mono lbl lbl--on-dark">
+							<span dir="ltr">EN</span> / <span lang="ar">ع</span>
+						</p>
+
+						<a
+							href={otherLang(Astro.url.pathname)}
+							class="lidsw"
+							data-lang-link
+						>
+							<span class="lidsw__slot" aria-hidden="true">
+								<span class="lidsw__lid"></span>
+								<span class="lidsw__opt"
+									>EN<small lang="en">English</small></span
+								>
+								<span class="lidsw__opt" lang="ar">ع<small>العربية</small></span
+								>
+							</span>
+							<span class="sr-only" data-l="en" lang="en"
+								>Read this page in Arabic</span
+							>
+							<span class="sr-only" data-l="ar" lang="ar"
+								>اقرأ هذه الصفحة بالإنجليزية</span
+							>
+						</a>
+
+						<T
+							v={pair(
+								'Pull the lid. The whole tray turns over — every tile, every line, the grid itself.',
+								'اسحب الغطاء. تنقلب الصينية كلها — كل بلاطة، وكل سطر، والشبكة نفسها.',
+							)}
+							as="p"
+							class="lang__note"
+						/>
+					</article>
+
+					<!-- ledger -->
+					<article class="tile tile--ink w4 h2 ledger" style="--i: 4">
+						<p class="mono lbl lbl--on-dark">
+							<T v={pair('Ledger', 'السجل')} />
+						</p>
+						<div class="matrix" aria-hidden="true">
+							{
+								squares.map((filled) => (
+									<span class:list={['matrix__cell', filled && 'is-on']} />
+								))
+							}
+						</div>
+						<dl class="ledger__list">
+							<div>
+								<dt>39</dt><T v={pair('shipped', 'صدرت')} as="dd" />
+							</div>
+							<div>
+								<dt>13</dt><T
+									v={pair('on the stores', 'على المتاجر')}
+									as="dd"
+								/>
+							</div>
+							<div>
+								<dt>8</dt><T v={pair('written up', 'مشروحة')} as="dd" />
+							</div>
+							<div>
+								<dt dir="ltr">~4</dt><T v={pair('years', 'سنوات')} as="dd" />
+							</div>
+						</dl>
+					</article>
+
+					<!-- amman -->
+					<article class="tile tile--marigold w4 h2 amman" style="--i: 5">
+						<p class="mono lbl"><T v={pair('Amman', 'عمّان')} /></p>
+						<svg class="amman__map" viewBox="0 0 140 96" aria-hidden="true">
+							<g class="amman__rings">
+								<ellipse cx="44" cy="34" rx="34" ry="22"></ellipse>
+								<ellipse cx="44" cy="34" rx="24" ry="15"></ellipse>
+								<ellipse cx="44" cy="34" rx="14" ry="9"></ellipse>
+								<ellipse cx="98" cy="62" rx="38" ry="24"></ellipse>
+								<ellipse cx="98" cy="62" rx="27" ry="17"></ellipse>
+								<ellipse cx="98" cy="62" rx="16" ry="10"></ellipse>
+								<ellipse cx="18" cy="80" rx="26" ry="15"></ellipse>
+							</g>
+							<path
+								class="amman__road"
+								d="M0 58 C34 44 58 70 88 52 116 36 140 44 140 44"></path>
+							<g class="amman__pin">
+								<circle class="amman__pulse" cx="71" cy="49" r="9"></circle>
+								<circle cx="71" cy="49" r="3.4"></circle>
+							</g>
+						</svg>
+						<T
+							v={pair(
+								'A contour sketch of the hills Amman is built on.',
+								'رسم كنتوري لتلال عمّان التي بُنيت عليها المدينة.',
+							)}
+							as="span"
+							class="sr-only"
+						/>
+						<p class="amman__clock mono">
+							<time id="clock" datetime={nowISO}>{ammanTime}</time>
+							<T
+								v={pair('31.95° N, 35.93° E', '31.95° شمالًا، 35.93° شرقًا')}
+								as="span"
+							/>
+						</p>
+					</article>
+
+					<!-- on-device -->
+					<a
+						class="tile tile--ink w12 h2 device"
+						href={u('/work/naqi')}
+						style="--i: 6; --accent: #C6A02C"
+					>
+						<div class="device__phone" aria-hidden="true">
+							<div class="device__screen">
+								<span class="device__blur"></span>
+								<span class="device__scan"></span>
+								<span class="device__wave">
+									{
+										[9, 17, 28, 14, 22, 33, 19, 11, 25, 15, 30, 12].map((h) => (
+											<i style={`--h:${h}px`} />
+										))
+									}
+								</span>
+							</div>
+						</div>
+						<div class="device__copy">
+							<p class="mono lbl lbl--on-dark">
+								<T v={pair('On-device', 'على الجهاز')} />
+							</p>
+							<h2 class="device__h">
+								<T
+									v={pair(
+										'The model runs on the phone.',
+										'النموذج يعمل على الهاتف نفسه.',
+									)}
+								/>
+							</h2>
+							<T
+								v={pair(
+									'Naqi separates music from video and blurs sensitive content on the device. It needs no upload, account or telemetry, and it leaves the original file unchanged.',
+									'يفصل «نقي» الموسيقى عن الفيديو ويطمس المحتوى الحساس على الجهاز. لا يحتاج إلى رفع أو حساب أو تتبّع، ويترك الملف الأصلي من دون تغيير.',
+								)}
+								as="p"
+								class="device__p"
+							/>
+							<p class="mono device__go">
+								<span data-l="en" lang="en">Read the write-up →</span>
+								<span data-l="ar" lang="ar">اقرأ التفاصيل ←</span>
+							</p>
+						</div>
+					</a>
+				</section>
+
+				<!-- ===================== BOARD TWO: THE WORK ===================== -->
+				<section class="board board--work" aria-labelledby="work-h">
+					<div class="board__head">
+						<h2 class="board__h" id="work-h">
+							<span data-l="en" lang="en">Eight I would show first</span>
+							<span data-l="ar" lang="ar">ثمانية أعرضها أولًا</span>
+						</h2>
+						<T
+							v={pair(
+								'Each one shipped, each one still standing. A full write-up sits behind every tile.',
+								'كلها صدرت، وكلها ما زالت قائمة. خلف كل بلاطة صفحة كاملة.',
+							)}
+							as="p"
+							class="board__lede"
+						/>
+						<a class="mono board__more" href={u('/work')}>
+							<span data-l="en" lang="en">All 39 →</span>
+							<span data-l="ar" lang="ar">كل الـ 39 ←</span>
+						</a>
+					</div>
+
+					{
+						work.map(({ p, w, h, shape, tone }, i) => (
+							<a
+								class:list={[
+									'tile',
+									tone === 'ink' ? 'tile--ink' : 'tile--bone',
+									w,
+									h,
+									'work',
+									`work--${shape}`,
+								]}
+								href={u(`/work/${p.slug}`)}
+								style={`--i:${i}; --accent:${p.accent}`}
+							>
+								<span class="work__shot">
+									{p.image ? (
+										<Image
+											src={p.image}
+											alt=""
+											widths={[320, 640]}
+											sizes="(min-width: 64rem) 22rem, 60vw"
+											loading="lazy"
+										/>
+									) : (
+										<span class="work__noshot mono">{p.title[lang]}</span>
+									)}
+								</span>
+								<span class="work__meta">
+									<span class="mono work__top">
+										<T v={per(p.year)} as="span" class="work__year" />
+										<T v={cat(p.category)} as="span" class="work__cat" />
+									</span>
+									<T v={p.title} as="span" class="work__title" />
+									<T v={p.tagline} as="span" class="work__line" />
+									<span class="mono work__foot">
+										<T v={stat(p.status)} as="span" class="work__status" />
+										<span class="work__stack" lang="en" dir="ltr">
+											{p.stack.slice(0, 3).join(' · ')}
+										</span>
+									</span>
+								</span>
+							</a>
+						))
+					}
+
+					<article class="tile tile--cobalt w4 h3 archive" style="--i: 8">
+						<p class="mono lbl lbl--on-dark">
+							<T v={pair('The rest', 'البقية')} />
+						</p>
+						<T
+							v={pair(
+								`${restCount} more, from municipal apps to a five-platform desktop build.`,
+								`${restCount} مشروعًا آخر، من تطبيقات بلدية إلى برنامج سطح مكتب على خمس منصات.`,
+							)}
+							as="p"
+							class="archive__count"
+						/>
+						<ul class="archive__list mono">
+							{
+								archive.map((a) => (
+									<li>
+										<a href={u(`/work/${a.slug}`)}>
+											<T v={a.title} />
+										</a>
+									</li>
+								))
+							}
+							<li>
+								<a class="archive__all" href={u('/work')}>
+									<span data-l="en" lang="en">See all 39 →</span>
+									<span data-l="ar" lang="ar">شاهد الـ 39 كلها ←</span>
+								</a>
+							</li>
+						</ul>
+					</article>
+				</section>
+
+				<!-- ===================== BOARD THREE: THE PERSON ===================== -->
+				<section class="board board--about" aria-labelledby="about-h">
+					<article class="tile tile--bone w7 h2 about" style="--i: 0">
+						<p class="mono lbl">
+							<T v={pair('Working method', 'طريقة العمل')} />
+						</p>
+						<h2 class="about__h" id="about-h">
+							<span data-l="en" lang="en"
+								>The interesting part is never the framework.</span
+							>
+							<span data-l="ar" lang="ar"
+								>الجزء المثير للاهتمام ليس إطار العمل أبدًا.</span
+							>
+						</h2>
+						<T v={pair(profile.about.en[0], profile.about.ar[0])} as="p" />
+						<T v={pair(profile.about.en[2], profile.about.ar[2])} as="p" />
+					</article>
+
+					<article class="tile tile--bone w5 h2 record" style="--i: 1">
+						<p class="mono lbl"><T v={pair('Record', 'المسار')} /></p>
+						<ol class="record__list">
+							{
+								profile.experience.slice(0, 5).map((job) => (
+									<li>
+										<T
+											v={per(job.period)}
+											as="span"
+											class="mono record__when"
+										/>
+										<span class="record__what">
+											<T v={job.role} as="span" />
+											<span aria-hidden="true">, </span>
+											<T v={job.company} as="b" />
+										</span>
+									</li>
+								))
+							}
+						</ol>
+						<p class="record__edu mono">
+							<T v={profile.education[0].degree} as="span" />
+							<span aria-hidden="true"> — </span>
+							<T v={profile.education[0].school} as="span" />
+						</p>
+					</article>
+
+					<article class="tile tile--ink w12 h1 stack" style="--i: 2">
+						<p class="mono lbl lbl--on-dark stack__lbl">
+							<T v={pair('Toolbox', 'الأدوات')} />
+						</p>
+						<div class="ticker" dir="ltr" aria-hidden="true">
+							<div class="ticker__track">
+								{
+									[0, 1].map(() => (
+										<ul class="ticker__list mono" lang="en" dir="ltr">
+											{toolbox.map((item) => (
+												<li>
+													{item}
+													<span class="ticker__dot">/</span>
+												</li>
+											))}
+										</ul>
+									))
+								}
+							</div>
+						</div>
+						<ul class="sr-only" lang="en">
+							{toolbox.map((item) => <li>{item}</li>)}
+						</ul>
+					</article>
+
+					<article
+						class="tile tile--marigold w8 h2 hire"
+						id="hire"
+						style="--i: 3"
+					>
+						<p class="mono lbl"><T v={s('hire.eyebrow')} /></p>
+						<h2 class="hire__h">
+							<T
+								v={pair('Tell me what you are shipping.', 'حدّثني عمّا تطلقه.')}
+							/>
+						</h2>
+						<T
+							v={pair(
+								'Contract or full time, web or mobile, Arabic or English first. The brief form is the fastest way in; email works too.',
+								'عقد أو دوام كامل، ويب أو جوّال، بالعربية أو بالإنجليزية أولًا. أسرع طريق إليّ نموذج المشروع، والبريد يفي بالغرض أيضًا.',
+							)}
+							as="p"
+							class="hire__p"
+						/>
+						<a class="hire__cta" href={u('/hire')}>
+							<span data-l="en" lang="en">Fill in the brief →</span>
+							<span data-l="ar" lang="ar">املأ نموذج المشروع ←</span>
+						</a>
+						<a
+							class="hire__mail"
+							href={`mailto:${profile.email}`}
+							lang="en"
+							dir="ltr">{profile.email}</a
+						>
+					</article>
+
+					<article class="tile tile--ink w4 h2 links" style="--i: 4">
+						<p class="mono lbl lbl--on-dark"><T v={s('footer.elsewhere')} /></p>
+						<ul class="links__list">
+							<li>
+								<a href={profile.links.github}><span lang="en">GitHub</span></a>
+							</li>
+							<li>
+								<a href={profile.links.linkedin}
+									><span lang="en">LinkedIn</span></a
+								>
+							</li>
+							<li><a href={profile.links.resume}><T v={s('nav.cv')} /></a></li>
+							<li>
+								<a href={profile.links.playStore}><T v={s('project.play')} /></a
+								>
+							</li>
+							<li>
+								<a href={profile.links.website}
+									><span lang="en" dir="ltr">assoli.site</span></a
+								>
+							</li>
+						</ul>
+					</article>
+				</section>
+			</main>
+
+			<footer class="foot">
+				<p class="mono">
+					<span data-l="en" lang="en">Haitham Assoli — Amman, Jordan.</span>
+					<span data-l="ar" lang="ar">هيثم العسولي — عمّان، الأردن.</span>
+				</p>
+				<T v={s('footer.line')} as="p" class="mono" />
+			</footer>
+		</div>
+
+		<script is:inline>
+			/* The tray's wiring, written out the same way here and on /5, so the
+			   router recognises it and runs it once for the whole section rather
+			   than again on every arrival. */
+			(function () {
+				const mark = () => document.documentElement.classList.add('js');
+				mark();
+				/* The router copies <html> off the incoming page, so the class goes
+				   back on before that page paints. */
+				document.addEventListener('astro:after-swap', mark);
+
+				const revealAll = () =>
+					document
+						.querySelectorAll('.board')
+						.forEach((b) => b.classList.add('is-in'));
+				document.addEventListener('visibilitychange', revealAll);
+
+				/* The rest hangs off whichever tray is on screen, so it is wired
+				   again on every arrival; the two listeners above are set once. */
+				function wire() {
+					/* Cursor-tracked highlight: one listener for the whole tray. */
+					const tray = document.querySelector('.tray');
+					if (tray) {
+						tray.addEventListener('pointermove', (e) => {
+							const tile = e.target.closest('.tile');
+							if (!tile) return;
+							const r = tile.getBoundingClientRect();
+							tile.style.setProperty('--mx', `${e.clientX - r.left}px`);
+							tile.style.setProperty('--my', `${e.clientY - r.top}px`);
+						});
+					}
+
+					/* Boards settle in as they arrive. */
+					if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+						revealAll();
+						return;
+					}
+
+					const io = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (!entry.isIntersecting) return;
+								entry.target.classList.add('is-in');
+								io.unobserve(entry.target);
+							});
+						},
+						{ rootMargin: '0px 0px -8% 0px' },
+					);
+					document.querySelectorAll('.board').forEach((b) => io.observe(b));
+					/* Whatever happens, nothing stays hidden. */
+					setTimeout(revealAll, 2000);
+				}
+				wire();
+				document.addEventListener('astro:after-swap', wire);
+			})();
+		</script>
+
+		<script is:inline>
+			/* The two parts only /5 has. Both live in this page's own DOM, so they
+			   are found again on arrival and simply sit idle on the sub-pages. */
+			(function () {
+				let card = null;
+				let clock = null;
+
+				/* The mirror. LangBoot owns the language; the card only reacts to it,
+				   so it flips whichever control was pulled. */
+				new MutationObserver(() => {
+					if (!card) return;
+					card.classList.remove('is-flipping');
+					void card.offsetWidth;
+					card.classList.add('is-flipping');
+				}).observe(document.documentElement, {
+					attributes: true,
+					attributeFilter: ['lang'],
+				});
+
+				/* Amman on the clock, corrected on arrival and kept honest each
+				   minute. */
+				const fmt = new Intl.DateTimeFormat('en-GB', {
+					timeZone: 'Asia/Amman',
+					hour: '2-digit',
+					minute: '2-digit',
+				});
+				const tick = () => {
+					if (!clock) return;
+					const now = new Date();
+					clock.textContent = fmt.format(now);
+					clock.setAttribute('datetime', now.toISOString());
+				};
+				setInterval(tick, 20000);
+
+				function wire() {
+					card = document.getElementById('mcard');
+					clock = document.getElementById('clock');
+					tick();
+				}
+				wire();
+				document.addEventListener('astro:after-swap', wire);
+			})();
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	/* ============================================================
+	   #6 BENTO — a clay tray of compartments, not nine grey cards.
+	   Materials: bone paper, warm ink, ceramic cobalt, marigold.
+	   ============================================================ */
+
+	:root {
+		--tray: #cdb79b;
+		--tray-deep: #b79b7b;
+		--bone: #fbf6ec;
+		--ink: #1e1713;
+		--cobalt: #17457f;
+		--marigold: #e9a426;
+		--pomegranate: #b8402f;
+
+		--rule: rgba(30, 23, 19, 0.14);
+		--row: 7.5rem;
+		--gap: 0.7rem;
+		--pad: clamp(1rem, 2vw, 1.5rem);
+		--radius: 20px;
+
+		--sans:
+			'IBM Plex Sans Arabic', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+		--display: 'Bricolage Grotesque', var(--sans);
+		--mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		background-color: var(--tray);
+		background-image:
+			radial-gradient(
+				120% 80% at 12% 0%,
+				rgba(255, 246, 232, 0.5),
+				rgba(255, 246, 232, 0) 60%
+			),
+			radial-gradient(
+				90% 60% at 95% 100%,
+				rgba(23, 69, 127, 0.16),
+				rgba(23, 69, 127, 0) 55%
+			),
+			repeating-linear-gradient(
+				117deg,
+				rgba(30, 23, 19, 0.035) 0 1px,
+				rgba(30, 23, 19, 0) 1px 4px
+			);
+		color: var(--ink);
+		font-family: var(--sans);
+		font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.02rem);
+		line-height: 1.55;
+		overflow-x: hidden;
+	}
+
+	img,
+	svg {
+		display: block;
+		max-width: 100%;
+	}
+
+	p {
+		margin: 0;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	:focus-visible {
+		outline: 3px solid var(--focus, var(--ink));
+		outline-offset: 3px;
+		border-radius: 6px;
+	}
+
+	.skip {
+		position: absolute;
+		z-index: 20;
+		inset-inline-start: 0.75rem;
+		top: 0.75rem;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bone);
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		text-decoration: none;
+		transform: translateY(-160%);
+		transition: transform 0.18s ease;
+	}
+
+	.skip:focus-visible {
+		transform: none;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.mono {
+		font-family: var(--mono);
+		font-weight: 400;
+	}
+
+	.tray {
+		max-width: 84rem;
+		margin: 0 auto;
+		padding: clamp(0.75rem, 2vw, 1.5rem) clamp(0.6rem, 2vw, 1.5rem) 7.5rem;
+	}
+
+	/* ---------------- top bar ---------------- */
+
+	.topbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1rem;
+		padding: 0.35rem 0.6rem 0.9rem;
+	}
+
+	.topbar__name {
+		display: flex;
+		align-items: center;
+	}
+
+	/* The cover wears the same paint as the lid on the inner pages — ink
+	   letters, a pomegranate rule — only bigger, since a cover can carry it.
+	   Three classes to outweigh the component's own scoped `block-size: auto`. */
+	.topbar .topbar__name .topbar__logo {
+		block-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.35rem);
+		inline-size: auto;
+		color: var(--ink);
+		--logo-rule: var(--pomegranate);
+	}
+
+	/* On the way past, the rule warms to marigold, as it does in the lid. */
+	.topbar__name:hover .topbar__logo {
+		--logo-rule: var(--marigold);
+	}
+
+	.topbar__nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.35rem 1rem;
+		font-size: 0.76rem;
+		letter-spacing: 0.02em;
+	}
+
+	.ilink {
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	.ilink:hover {
+		color: var(--pomegranate);
+	}
+
+	/* ---------------- the grid ---------------- */
+
+	.board {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		grid-auto-rows: minmax(var(--row), auto);
+		gap: var(--gap);
+		margin-bottom: calc(var(--gap) * 3);
+	}
+
+	.board--work {
+		--row: 7rem;
+		/* the heading row is its own height; the tiles start on the next one */
+		grid-template-rows: auto;
+	}
+
+	.board--about {
+		--row: 7.75rem;
+	}
+
+	.board__head {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.3rem 1rem;
+		padding: 0.9rem 0.6rem 0.1rem;
+	}
+
+	.board__h {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem);
+		letter-spacing: -0.035em;
+		line-height: 1;
+	}
+
+	.board__lede {
+		font-size: 0.86rem;
+		color: rgba(30, 23, 19, 0.7);
+		max-width: 34ch;
+	}
+
+	.board__more {
+		margin-inline-start: auto;
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 4px;
+		white-space: nowrap;
+	}
+
+	.board__more:hover {
+		color: var(--pomegranate);
+	}
+
+	.w3 {
+		grid-column: span 3;
+	}
+	.w4 {
+		grid-column: span 4;
+	}
+	.w5 {
+		grid-column: span 5;
+	}
+	.w6 {
+		grid-column: span 6;
+	}
+	.w7 {
+		grid-column: span 7;
+	}
+	.w8 {
+		grid-column: span 8;
+	}
+	.w12 {
+		grid-column: span 12;
+	}
+
+	.h1 {
+		grid-row: span 1;
+	}
+	.h2 {
+		grid-row: span 2;
+	}
+	.h3 {
+		grid-row: span 3;
+	}
+	.h4 {
+		grid-row: span 4;
+	}
+
+	/* ---------------- the tile itself ---------------- */
+
+	.tile {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 0.55rem;
+		min-width: 0;
+		padding: var(--pad);
+		border-radius: var(--radius);
+		background: var(--bone);
+		box-shadow:
+			inset 0 0 0 1px rgba(30, 23, 19, 0.09),
+			0 1px 0 rgba(255, 250, 240, 0.4),
+			0 12px 22px -18px rgba(30, 23, 19, 0.9);
+		isolation: isolate;
+		overflow: hidden;
+	}
+
+	.tile::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.25s ease;
+		background: radial-gradient(
+			14rem 14rem at var(--mx, 50%) var(--my, 50%),
+			color-mix(in srgb, var(--accent, #ffffff) 34%, transparent),
+			transparent 72%
+		);
+		mix-blend-mode: soft-light;
+	}
+
+	.tile:hover::before,
+	.tile:focus-visible::before {
+		opacity: 1;
+	}
+
+	.tile--ink {
+		background: var(--ink);
+		color: var(--bone);
+		--focus: var(--marigold);
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 246, 232, 0.1),
+			0 14px 26px -18px rgba(30, 23, 19, 1);
+	}
+
+	.tile--cobalt {
+		background: var(--cobalt);
+		color: #eef4fb;
+		--focus: var(--marigold);
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+			0 14px 26px -18px rgba(11, 33, 61, 1);
+	}
+
+	.tile--marigold {
+		background: var(--marigold);
+		color: #2a1c06;
+		--focus: var(--ink);
+		box-shadow:
+			inset 0 0 0 1px rgba(42, 28, 6, 0.18),
+			0 14px 26px -18px rgba(120, 82, 12, 0.9);
+	}
+
+	a.tile {
+		text-decoration: none;
+		transition:
+			transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
+			box-shadow 0.22s ease;
+	}
+
+	a.tile:hover {
+		transform: translateY(-3px);
+	}
+
+	a.tile::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		border-radius: inherit;
+		pointer-events: none;
+		box-shadow: inset 0 0 0 2px var(--accent, transparent);
+		opacity: 0;
+		transition: opacity 0.22s ease;
+	}
+
+	a.tile:hover::after,
+	a.tile:focus-visible::after {
+		opacity: 1;
+	}
+
+	.lbl {
+		font-size: 0.63rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(30, 23, 19, 0.5);
+	}
+
+	.lbl--on-dark {
+		color: rgba(251, 246, 236, 0.55);
+	}
+
+	.tile--marigold .lbl {
+		color: rgba(42, 28, 6, 0.6);
+	}
+
+	/* ---------------- thesis ---------------- */
+
+	.thesis {
+		justify-content: space-between;
+		background:
+			radial-gradient(
+				120% 130% at 100% 0%,
+				rgba(233, 164, 38, 0.22),
+				rgba(233, 164, 38, 0) 58%
+			),
+			var(--bone);
+	}
+
+	.thesis__h {
+		margin: 0.2rem 0 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.75rem, 1.05rem + 2.9vw, 3.35rem);
+		line-height: 0.98;
+		letter-spacing: -0.045em;
+		text-wrap: balance;
+	}
+
+	/* Inline, not inline-block: the highlight has to be able to break across
+	   lines at 380px like any other run of text. */
+	.thesis__h em {
+		font-style: normal;
+		padding: 0 0.16em;
+		background: var(--ink);
+		color: var(--bone);
+		box-decoration-break: clone;
+		-webkit-box-decoration-break: clone;
+	}
+
+	.thesis__sub {
+		max-width: 46ch;
+		font-size: clamp(0.9rem, 0.85rem + 0.25vw, 1.02rem);
+		color: rgba(30, 23, 19, 0.78);
+	}
+
+	.thesis__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		font-size: 0.68rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.thesis__tags span {
+		padding: 0.22rem 0.55rem;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+	}
+
+	/* ---------------- who ---------------- */
+
+	.who {
+		padding: 0;
+		justify-content: flex-end;
+	}
+
+	/* No z-index here: a stacking context would trap the blend and the
+	   photo would never take the cobalt underneath it. */
+	.who__photo {
+		position: absolute;
+		inset: 0;
+	}
+
+	.who__photo img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 50% 22%;
+		filter: grayscale(1) contrast(1.15);
+		mix-blend-mode: multiply;
+	}
+
+	.who::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		background: linear-gradient(
+			to top,
+			rgba(9, 27, 51, 0.95) 12%,
+			rgba(9, 27, 51, 0.1) 62%
+		);
+	}
+
+	.who__plate {
+		position: relative;
+		z-index: 2;
+		padding: var(--pad);
+	}
+
+	.who__name {
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.3rem, 1rem + 1vw, 1.75rem);
+		letter-spacing: -0.035em;
+		line-height: 1.05;
+		margin-top: 0.25rem;
+	}
+
+	.who__role {
+		font-size: 0.82rem;
+		color: rgba(238, 244, 251, 0.78);
+	}
+
+	/* ---------------- the mirror (signature) ---------------- */
+
+	.mirror {
+		gap: 0.7rem;
+		background:
+			linear-gradient(90deg, rgba(23, 69, 127, 0.07), rgba(233, 164, 38, 0.1)),
+			var(--bone);
+	}
+
+	.mirror__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.6rem;
+	}
+
+	.mcard {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 0.7rem;
+		padding: 0.85rem;
+		border-radius: 14px;
+		background: #fff;
+		box-shadow:
+			inset 0 0 0 1px rgba(30, 23, 19, 0.1),
+			0 10px 20px -16px rgba(30, 23, 19, 0.8);
+		font-size: 0.86rem;
+	}
+
+	.mcard.is-flipping {
+		animation: mirror-flip 0.42s cubic-bezier(0.3, 0.8, 0.3, 1);
+	}
+
+	@keyframes mirror-flip {
+		0% {
+			transform: perspective(700px) rotateY(0deg);
+		}
+		45% {
+			transform: perspective(700px) rotateY(6deg) scaleX(0.965);
+		}
+		100% {
+			transform: perspective(700px) rotateY(0deg);
+		}
+	}
+
+	.mcard__bar {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		padding-bottom: 0.55rem;
+		border-bottom: 1px solid rgba(30, 23, 19, 0.1);
+	}
+
+	.mcard__back {
+		display: grid;
+		place-items: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 8px;
+		background: rgba(30, 23, 19, 0.07);
+		color: var(--ink);
+	}
+
+	html[dir='rtl'] .mcard__back svg {
+		transform: scaleX(-1);
+	}
+
+	.mcard__title {
+		font-weight: 600;
+	}
+
+	.mcard__dots {
+		margin-inline-start: auto;
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 8px;
+		background:
+			radial-gradient(circle at 50% 30%, var(--ink) 1.6px, transparent 1.7px),
+			radial-gradient(circle at 50% 50%, var(--ink) 1.6px, transparent 1.7px),
+			radial-gradient(circle at 50% 70%, var(--ink) 1.6px, transparent 1.7px);
+		opacity: 0.45;
+	}
+
+	.mcard__pitch {
+		position: relative;
+		flex: 1;
+		min-height: 4.5rem;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		padding: 0.45rem;
+		border-radius: 12px;
+		overflow: hidden;
+		background:
+			linear-gradient(
+				90deg,
+				rgba(255, 255, 255, 0.16) 0 1px,
+				transparent 1px 50%
+			),
+			repeating-linear-gradient(
+				90deg,
+				rgba(255, 255, 255, 0.05) 0 14px,
+				rgba(255, 255, 255, 0) 14px 28px
+			),
+			linear-gradient(165deg, #2f6f4a, #1d4a31);
+	}
+
+	.mcard__pitch::before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 2.6rem;
+		height: 2.6rem;
+		margin: -1.3rem 0 0 -1.3rem;
+		border: 1px solid rgba(255, 255, 255, 0.24);
+		border-radius: 50%;
+	}
+
+	.mcard__badge {
+		position: relative;
+		padding: 0.14rem 0.45rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.9);
+		font-family: var(--mono);
+		font-size: 0.6rem;
+		color: #1d4a31;
+	}
+
+	.mcard__crew {
+		display: flex;
+		align-items: center;
+	}
+
+	.mcard__face {
+		display: grid;
+		place-items: center;
+		width: 1.7rem;
+		height: 1.7rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--cobalt) 14%, #fff);
+		box-shadow: 0 0 0 2px #fff;
+		font-family: var(--mono);
+		font-size: 0.6rem;
+		color: var(--cobalt);
+	}
+
+	.mcard__face + .mcard__face {
+		margin-inline-start: -0.5rem;
+	}
+
+	.mcard__face:last-child {
+		background: var(--marigold);
+		color: #2a1c06;
+	}
+
+	.mcard__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		text-align: start;
+	}
+
+	.mcard__venue {
+		font-weight: 600;
+	}
+
+	.mcard__slot {
+		font-size: 0.76rem;
+		color: rgba(30, 23, 19, 0.62);
+	}
+
+	.mcard__row {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		font-size: 0.78rem;
+	}
+
+	.mcard__price {
+		margin-inline-start: auto;
+		font-weight: 500;
+		color: var(--cobalt);
+	}
+
+	.mcard__bar-track {
+		height: 6px;
+		border-radius: 999px;
+		background: rgba(30, 23, 19, 0.1);
+		overflow: hidden;
+		display: flex;
+	}
+
+	.mcard__bar-track i {
+		display: block;
+		width: 60%;
+		background: var(--marigold);
+		border-radius: 999px;
+	}
+
+	.mcard__cta {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		margin-top: 0.15rem;
+		padding: 0.5rem 0.8rem;
+		border-radius: 10px;
+		background: var(--cobalt);
+		color: #fff;
+		font-weight: 600;
+		font-size: 0.82rem;
+	}
+
+	html[dir='rtl'] .mcard__arrow svg {
+		transform: scaleX(-1);
+	}
+
+	/* The mono face carries no Arabic; in RTL the sans takes those lines. */
+	html[lang='ar'] .mcard__slot,
+	html[lang='ar'] .mcard__price {
+		font-family: var(--sans);
+	}
+
+	.mirror__note {
+		font-size: 0.76rem;
+		line-height: 1.5;
+		color: rgba(30, 23, 19, 0.68);
+	}
+
+	/* ---------------- the language tile ----------------
+	   A two-compartment box with a sliding lid. The lid rests on whichever
+	   language is current; pressing it slides the lid and turns the tray. */
+
+	.lang {
+		justify-content: space-between;
+		background:
+			radial-gradient(
+				120% 90% at 100% 0%,
+				rgba(233, 164, 38, 0.22),
+				rgba(233, 164, 38, 0) 62%
+			),
+			var(--ink);
+	}
+
+	.lidsw {
+		flex: 1;
+		min-height: 9rem;
+		display: block;
+		width: 100%;
+		padding: 4px;
+		border: 0;
+		border-radius: 15px;
+		background: rgba(251, 246, 236, 0.07);
+		box-shadow: inset 0 0 0 1px rgba(251, 246, 236, 0.16);
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.lidsw__slot {
+		position: relative;
+		display: grid;
+		grid-template-rows: 1fr 1fr;
+		height: 100%;
+	}
+
+	.lidsw__lid {
+		position: absolute;
+		z-index: 0;
+		inset-inline: 0;
+		top: 0;
+		height: 50%;
+		border-radius: 11px;
+		background: var(--marigold);
+		box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.8);
+		transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.25, 1);
+	}
+
+	html[lang='ar'] .lidsw__lid {
+		transform: translateY(100%);
+	}
+
+	.lidsw__opt {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		align-content: center;
+		justify-items: center;
+		gap: 0.1rem;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+		line-height: 1;
+		letter-spacing: -0.03em;
+		color: rgba(251, 246, 236, 0.42);
+		transition: color 0.25s ease;
+	}
+
+	.lidsw__opt small {
+		font-family: var(--sans);
+		font-weight: 500;
+		font-size: 0.68rem;
+		letter-spacing: 0;
+	}
+
+	html[lang='en'] .lidsw__opt:nth-child(2),
+	html[lang='ar'] .lidsw__opt:nth-child(3) {
+		color: #2a1c06;
+	}
+
+	.lidsw:hover .lidsw__lid {
+		filter: brightness(1.07);
+	}
+
+	.lang__note {
+		font-size: 0.74rem;
+		line-height: 1.5;
+		color: rgba(251, 246, 236, 0.66);
+	}
+
+	/* ---------------- ledger ---------------- */
+
+	.ledger {
+		justify-content: space-between;
+	}
+
+	.matrix {
+		display: grid;
+		grid-template-columns: repeat(10, 1fr);
+		gap: 4px;
+		max-width: 15rem;
+	}
+
+	.matrix__cell {
+		aspect-ratio: 1;
+		border-radius: 3px;
+		box-shadow: inset 0 0 0 1px rgba(251, 246, 236, 0.28);
+	}
+
+	.matrix__cell.is-on {
+		background: var(--marigold);
+		box-shadow: none;
+	}
+
+	.ledger__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 1.2rem;
+		margin: 0;
+	}
+
+	.ledger__list div {
+		display: flex;
+		align-items: baseline;
+		gap: 0.35rem;
+	}
+
+	.ledger__list dt {
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: 1.35rem;
+		letter-spacing: -0.03em;
+	}
+
+	.ledger__list dd {
+		margin: 0;
+		font-size: 0.72rem;
+		color: rgba(251, 246, 236, 0.62);
+	}
+
+	/* ---------------- amman ---------------- */
+
+	.amman {
+		justify-content: space-between;
+		overflow: hidden;
+	}
+
+	.amman__map {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		width: 100%;
+		height: 100%;
+		opacity: 0.9;
+	}
+
+	.amman__rings ellipse {
+		fill: none;
+		stroke: rgba(42, 28, 6, 0.35);
+		stroke-width: 0.7;
+	}
+
+	.amman__road {
+		fill: none;
+		stroke: rgba(42, 28, 6, 0.55);
+		stroke-width: 1.1;
+		stroke-dasharray: 3 3;
+	}
+
+	.amman__pin circle {
+		fill: var(--pomegranate);
+	}
+
+	.amman__pulse {
+		fill: var(--pomegranate);
+		opacity: 0.25;
+		transform-box: fill-box;
+		transform-origin: center;
+		animation: pulse 3.2s ease-out infinite;
+	}
+
+	@keyframes pulse {
+		0% {
+			transform: scale(0.4);
+			opacity: 0.4;
+		}
+		70% {
+			transform: scale(1.4);
+			opacity: 0;
+		}
+		100% {
+			transform: scale(1.4);
+			opacity: 0;
+		}
+	}
+
+	.amman .lbl,
+	.amman__clock {
+		position: relative;
+		z-index: 1;
+	}
+
+	.amman__clock {
+		display: flex;
+		flex-direction: column;
+		font-size: 0.7rem;
+	}
+
+	.amman__clock time {
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.3rem);
+		letter-spacing: -0.04em;
+		line-height: 1;
+	}
+
+	.amman__clock span {
+		color: rgba(42, 28, 6, 0.66);
+	}
+
+	/* ---------------- on-device ---------------- */
+
+	.device {
+		flex-direction: row;
+		align-items: center;
+		gap: 1.1rem;
+	}
+
+	.device__phone {
+		flex: 0 0 auto;
+		width: 6.2rem;
+		aspect-ratio: 9 / 17;
+		padding: 5px;
+		border-radius: 16px;
+		background: linear-gradient(160deg, #4a423c, #221b17);
+		box-shadow: inset 0 0 0 1px rgba(251, 246, 236, 0.18);
+	}
+
+	.device__screen {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		border-radius: 12px;
+		overflow: hidden;
+		background:
+			linear-gradient(200deg, rgba(23, 69, 127, 0.9), rgba(30, 23, 19, 0.9)),
+			var(--ink);
+	}
+
+	.device__blur {
+		position: absolute;
+		inset: 14% 22% auto;
+		height: 22%;
+		border-radius: 6px;
+		background: repeating-linear-gradient(
+			45deg,
+			rgba(251, 246, 236, 0.5) 0 3px,
+			rgba(251, 246, 236, 0.15) 3px 6px
+		);
+		filter: blur(1.2px);
+	}
+
+	.device__scan {
+		position: absolute;
+		inset-inline: 0;
+		top: 0;
+		height: 28%;
+		background: linear-gradient(
+			to bottom,
+			rgba(233, 164, 38, 0),
+			rgba(233, 164, 38, 0.42)
+		);
+		border-bottom: 1px solid var(--marigold);
+		animation: scan 3.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+	}
+
+	@keyframes scan {
+		0%,
+		100% {
+			transform: translateY(-30%);
+		}
+		50% {
+			transform: translateY(290%);
+		}
+	}
+
+	.device__wave {
+		position: absolute;
+		inset-inline: 8%;
+		bottom: 8%;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		height: 34px;
+	}
+
+	.device__wave i {
+		display: block;
+		width: 3px;
+		height: var(--h);
+		border-radius: 2px;
+		background: rgba(251, 246, 236, 0.5);
+		animation: bob 1.5s ease-in-out infinite alternate;
+	}
+
+	.device__wave i:nth-child(odd) {
+		background: var(--marigold);
+		animation-duration: 1.9s;
+	}
+
+	.device__wave i:nth-child(3n) {
+		animation-delay: 0.25s;
+	}
+
+	.device__wave i:nth-child(3n + 1) {
+		animation-delay: 0.5s;
+	}
+
+	@keyframes bob {
+		to {
+			transform: scaleY(0.35);
+		}
+	}
+
+	.device__copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		min-width: 0;
+	}
+
+	.device__h {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.15rem, 0.9rem + 1vw, 1.65rem);
+		letter-spacing: -0.035em;
+		line-height: 1.02;
+	}
+
+	.device__p {
+		font-size: 0.83rem;
+		color: rgba(251, 246, 236, 0.74);
+		max-width: 52ch;
+	}
+
+	.device__go {
+		margin-top: 0.15rem;
+		font-size: 0.72rem;
+		letter-spacing: 0.06em;
+		color: var(--marigold);
+	}
+
+	/* ---------------- work tiles ---------------- */
+
+	/* Each card takes its temperature from the project's own accent. */
+	.work {
+		gap: 0;
+		padding: 0;
+		background: color-mix(in srgb, var(--accent) 7%, var(--bone));
+	}
+
+	.work.tile--ink {
+		background: color-mix(in srgb, var(--accent) 12%, var(--ink));
+	}
+
+	.work.tile--ink .work__title {
+		color: var(--bone);
+	}
+
+	.work.tile--ink .work__top,
+	.work.tile--ink .work__foot {
+		color: rgba(251, 246, 236, 0.55);
+	}
+
+	.work.tile--ink .work__line {
+		color: rgba(251, 246, 236, 0.75);
+	}
+
+	.work.tile--ink .work__cat,
+	.work.tile--ink .work__status {
+		color: color-mix(in srgb, var(--accent) 60%, #ffffff);
+	}
+
+	.work__shot {
+		display: block;
+		position: relative;
+		overflow: hidden;
+		background: color-mix(in srgb, var(--accent) 16%, #efe6d6);
+	}
+
+	.work__shot img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+	}
+
+	.work:hover .work__shot img {
+		transform: scale(1.045);
+	}
+
+	.work__noshot {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		padding: 0.6rem;
+		font-size: 0.75rem;
+		text-align: center;
+		color: rgba(30, 23, 19, 0.55);
+	}
+
+	.work__meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.22rem;
+		padding: 0.85rem var(--pad) var(--pad);
+		min-width: 0;
+	}
+
+	.work__top {
+		display: flex;
+		gap: 0.5rem;
+		font-size: 0.62rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(30, 23, 19, 0.5);
+	}
+
+	.work__cat {
+		color: color-mix(in srgb, var(--accent) 72%, var(--ink));
+	}
+
+	.work__title {
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.1rem, 0.95rem + 0.6vw, 1.5rem);
+		letter-spacing: -0.035em;
+		line-height: 1.05;
+	}
+
+	.work__line {
+		font-size: 0.82rem;
+		line-height: 1.42;
+		color: rgba(30, 23, 19, 0.72);
+	}
+
+	.work__foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem 0.5rem;
+		margin-top: auto;
+		padding-top: 0.55rem;
+		font-size: 0.63rem;
+		letter-spacing: 0.06em;
+		color: rgba(30, 23, 19, 0.5);
+	}
+
+	.work__status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--accent) 20%, transparent);
+		color: color-mix(in srgb, var(--accent) 70%, var(--ink));
+	}
+
+	.work__stack {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* wide: image beside the words */
+	.work--wide {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.work--wide .work__shot {
+		order: 2;
+		height: 100%;
+		border-radius: 0 var(--radius) var(--radius) 0;
+	}
+
+	.work--wide .work__meta {
+		order: 1;
+		justify-content: flex-start;
+	}
+
+	/* tall: image on top, words beneath */
+	.work--tall .work__shot {
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
+	.work--tall .work__shot img {
+		object-position: 50% 12%;
+	}
+
+	/* ---------------- archive ---------------- */
+
+	.archive__count {
+		font-family: var(--display);
+		font-weight: 600;
+		font-size: 1.02rem;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
+	}
+
+	.archive__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		margin: 0.1rem 0 0;
+		padding: 0;
+		list-style: none;
+		font-size: 0.68rem;
+	}
+
+	.archive__list a {
+		display: inline-block;
+		padding: 0.16rem 0.5rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.12);
+		text-decoration: none;
+		transition: background 0.18s ease;
+	}
+
+	.archive__list a:hover {
+		background: var(--marigold);
+		color: #241905;
+	}
+
+	.archive__all {
+		background: rgba(233, 164, 38, 0.9) !important;
+		color: #241905;
+		font-weight: 500;
+	}
+
+	/* ---------------- about / record ---------------- */
+
+	.about p {
+		font-size: 0.9rem;
+		color: rgba(30, 23, 19, 0.78);
+		max-width: 58ch;
+	}
+
+	.about__h {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.25rem, 1rem + 1.2vw, 1.9rem);
+		letter-spacing: -0.04em;
+		line-height: 1.02;
+	}
+
+	.record__list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.32rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		counter-reset: none;
+	}
+
+	.record__list li {
+		display: grid;
+		grid-template-columns: 8.2rem 1fr;
+		gap: 0.6rem;
+		align-items: baseline;
+		padding-bottom: 0.32rem;
+		border-bottom: 1px solid var(--rule);
+		font-size: 0.82rem;
+	}
+
+	.record__when {
+		font-size: 0.68rem;
+		letter-spacing: 0.04em;
+		color: rgba(30, 23, 19, 0.55);
+	}
+
+	.record__what b {
+		font-weight: 600;
+	}
+
+	.record__edu {
+		margin-top: auto;
+		font-size: 0.7rem;
+		color: rgba(30, 23, 19, 0.6);
+	}
+
+	/* ---------------- toolbox ticker ---------------- */
+
+	.stack {
+		flex-direction: row;
+		align-items: center;
+		gap: 1rem;
+		padding-block: 0;
+	}
+
+	.stack__lbl {
+		flex: 0 0 auto;
+	}
+
+	.ticker {
+		position: relative;
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		mask-image: linear-gradient(
+			90deg,
+			transparent,
+			#000 4rem,
+			#000 calc(100% - 4rem),
+			transparent
+		);
+	}
+
+	.ticker__track {
+		display: flex;
+		width: max-content;
+		animation: ticker 42s linear infinite;
+	}
+
+	.stack:hover .ticker__track {
+		animation-play-state: paused;
+	}
+
+	@keyframes ticker {
+		to {
+			transform: translateX(-50%);
+		}
+	}
+
+	.ticker__list {
+		display: flex;
+		gap: 1rem;
+		margin: 0;
+		padding: 0 0.5rem 0 0;
+		list-style: none;
+		font-size: 0.85rem;
+		letter-spacing: 0.02em;
+		white-space: nowrap;
+	}
+
+	.ticker__list li {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.ticker__dot {
+		color: var(--marigold);
+	}
+
+	/* ---------------- hire / links ---------------- */
+
+	.hire {
+		justify-content: center;
+		gap: 0.4rem;
+		background:
+			radial-gradient(
+				90% 120% at 100% 0%,
+				rgba(255, 240, 200, 0.55),
+				transparent 60%
+			),
+			var(--marigold);
+	}
+
+	.hire__h {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.4rem, 1rem + 1.8vw, 2.3rem);
+		letter-spacing: -0.04em;
+		line-height: 1;
+	}
+
+	.hire__p {
+		font-size: 0.85rem;
+		max-width: 42ch;
+		color: rgba(42, 28, 6, 0.8);
+	}
+
+	.hire__cta {
+		align-self: flex-start;
+		margin-top: 0.4rem;
+		padding: 0.45rem 0.9rem;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bone);
+		text-decoration: none;
+		font-weight: 600;
+		font-size: clamp(0.85rem, 0.78rem + 0.4vw, 1.02rem);
+		transition:
+			transform 0.18s ease,
+			background 0.18s ease;
+	}
+
+	.hire__cta:hover {
+		transform: translateY(-2px);
+		background: var(--pomegranate);
+	}
+
+	.hire__mail {
+		align-self: flex-start;
+		margin-top: 0.1rem;
+		font-size: 0.8rem;
+		color: rgba(42, 28, 6, 0.8);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		padding: 0.45rem 0.9rem;
+		word-break: break-word;
+	}
+
+	.hire__mail:hover {
+		color: var(--pomegranate);
+	}
+
+	.links__list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.links__list a {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.34rem 0;
+		border-bottom: 1px solid rgba(251, 246, 236, 0.14);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: color 0.18s ease;
+	}
+
+	.links__list a::after {
+		content: '↗';
+		font-size: 0.75rem;
+		color: rgba(251, 246, 236, 0.4);
+	}
+
+	.links__list a:hover {
+		color: var(--marigold);
+	}
+
+	/* ---------------- footer ---------------- */
+
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.4rem 1rem;
+		padding: 0.4rem 0.6rem;
+		font-size: 0.72rem;
+		color: rgba(30, 23, 19, 0.62);
+	}
+
+	/* ---------------- arrival ---------------- */
+
+	.js .board .tile {
+		opacity: 0;
+	}
+
+	.js .board.is-in .tile {
+		animation: tile-in 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+		animation-delay: calc(var(--i, 0) * 45ms);
+		opacity: 1;
+	}
+
+	@keyframes tile-in {
+		from {
+			opacity: 0;
+			transform: translateY(14px) scale(0.985);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* ---------------- responsive: six columns ---------------- */
+
+	@media (max-width: 68rem) {
+		:root {
+			--row: 6.75rem;
+		}
+
+		.board {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+			/* Six columns leave odd gaps; let small tiles backfill them. */
+			grid-auto-flow: dense;
+		}
+
+		.w3,
+		.w4 {
+			grid-column: span 3;
+		}
+		.w5,
+		.w6,
+		.w7,
+		.w8,
+		.w12 {
+			grid-column: span 6;
+		}
+
+		.h4 {
+			grid-row: span 3;
+		}
+
+		.device {
+			grid-row: span 2;
+		}
+
+		.hire {
+			grid-column: span 4;
+		}
+
+		.links {
+			grid-column: span 2;
+		}
+
+		.lang {
+			grid-column: span 3;
+			grid-row: span 2;
+		}
+	}
+
+	/* ---------------- responsive: one column ---------------- */
+
+	@media (max-width: 46rem) {
+		:root {
+			--gap: 0.6rem;
+			--radius: 18px;
+		}
+
+		.board,
+		.board--work,
+		.board--about {
+			grid-template-columns: minmax(0, 1fr);
+			grid-auto-rows: auto;
+		}
+
+		.tile {
+			grid-column: 1 / -1 !important;
+			grid-row: auto !important;
+		}
+
+		.thesis {
+			min-height: 20rem;
+		}
+
+		.who {
+			min-height: 17rem;
+		}
+
+		.mirror,
+		.ledger,
+		.archive,
+		.about,
+		.record,
+		.hire,
+		.links {
+			min-height: auto;
+		}
+
+		.amman {
+			min-height: 11rem;
+		}
+
+		.lidsw {
+			min-height: 7.5rem;
+		}
+
+		.work--tall .work__shot,
+		.work--wide .work__shot {
+			height: 11rem;
+			border-radius: 0;
+		}
+
+		.work--wide {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.work--wide .work__shot {
+			order: 0;
+		}
+
+		.work--wide .work__meta {
+			order: 1;
+		}
+
+		.device {
+			flex-direction: row;
+			align-items: flex-start;
+		}
+
+		.device__phone {
+			width: 4.6rem;
+		}
+
+		.stack {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+			padding-block: var(--pad);
+		}
+
+		.ticker {
+			width: 100%;
+			mask-image: linear-gradient(
+				90deg,
+				#000,
+				#000 calc(100% - 2.5rem),
+				transparent
+			);
+		}
+
+		.record__list li {
+			grid-template-columns: 1fr;
+			gap: 0;
+		}
+	}
+
+	@media (max-width: 26rem) {
+		.matrix {
+			grid-template-columns: repeat(10, 1fr);
+		}
+
+		.device {
+			flex-direction: column;
+		}
+
+		.device__phone {
+			width: 5.2rem;
+		}
+
+		.work__foot .work__stack {
+			max-width: 100%;
+		}
+	}
+
+	/* ---------------- Arabic ----------------
+	   Arabic has no capitals and no italics, and letter-spacing breaks the
+	   joins. Everything carrying lang="ar" opts out of all three. */
+
+	[lang='ar'],
+	[lang='ar'] * {
+		font-family: var(--sans);
+		font-style: normal;
+		font-variant: normal;
+		text-transform: none;
+		letter-spacing: normal;
+	}
+
+	[lang='ar'] {
+		line-height: 1.75;
+	}
+
+	[lang='ar'].thesis__h,
+	[lang='ar'] .thesis__h,
+	.thesis__h [lang='ar'],
+	.about__h [lang='ar'],
+	.hire__h [lang='ar'],
+	.device__h [lang='ar'],
+	.board__h [lang='ar'],
+	.who__name [lang='ar'] {
+		line-height: 1.28;
+	}
+
+	/* Bricolage carries no Arabic, so the display weight comes from Plex. */
+	.thesis__h [lang='ar'],
+	.about__h [lang='ar'],
+	.hire__h [lang='ar'],
+	.device__h [lang='ar'],
+	.board__h [lang='ar'],
+	.who__name [lang='ar'],
+	[lang='ar'].archive__count,
+	[lang='ar'].work__title,
+	.lidsw__opt[lang='ar'] {
+		font-weight: 700;
+		letter-spacing: 0;
+	}
+
+	/* The mono face carries no Arabic either. */
+	[lang='ar'].record__when,
+	[lang='ar'].work__status,
+	.mono [lang='ar'],
+	.lbl [lang='ar'] {
+		font-family: var(--sans);
+	}
+
+	/* ---------------- reduced motion ---------------- */
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+		}
+
+		.js .board .tile {
+			opacity: 1;
+		}
+
+		.ticker__track {
+			animation: none;
+			transform: none;
+		}
+
+		a.tile:hover {
+			transform: none;
+		}
+	}
+</style>

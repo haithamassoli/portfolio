@@ -1,0 +1,749 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* /7/work/<slug> — the long read.
+
+   Two thousand words is where a loud page usually gives up and turns into
+   somebody else's blog. The playroom answer is not less colour, it is colour
+   put back in the margins: the field around the page keeps the project's hue,
+   and the words sit on a single white sheet, cut and shadowed like everything
+   else here. Headings are tabbed with a colour block, the meta is a label
+   strip, and each problem is a two-part card — snag on paper, fix on mint.
+   Nothing decorative crosses the measure. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import type {
+	I18n,
+	ProjectCategory,
+	ProjectStatus,
+} from '../../../content/types';
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const { project: p, next } = Astro.props;
+/* The hue rotates through the list, so a project keeps its colour. */
+const i = projects.indexOf(p);
+
+const catLabel: Record<ProjectCategory, I18n> = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+	client: s('cat.client'),
+};
+
+const statusLabel: Record<ProjectStatus, I18n> = {
+	live: s('status.live'),
+	shipped: s('status.shipped'),
+	delisted: s('status.delisted'),
+	wip: s('status.wip'),
+	archived: s('status.archived'),
+};
+
+const linkLabel: Record<string, I18n> = {
+	live: s('project.live'),
+	playGoogle: s('project.play'),
+	appStore: s('project.apple'),
+	vscode: s('project.vscode'),
+	github: s('project.github'),
+};
+
+/* Two parallel arrays of paragraphs, walked as one. */
+const zip = (b: { en: string[]; ar: string[] }): I18n[] =>
+	b.en.map((en, n) => ({ en, ar: b.ar[n] ?? en }));
+
+const overview = zip(p.overview);
+const outcomes = zip(p.outcomes);
+
+/* Several covers are 1080×2340 phone screenshots. A tall shot gets a phone,
+   a wide one gets a window; neither gets cropped into the other's slot. */
+const tall = (im: ImageMetadata) => im.height / im.width > 1.15;
+
+const hues = ['melon', 'sky', 'bubble', 'sun', 'mint'];
+const hue = hues[i % hues.length];
+
+const links = Object.entries(p.links).filter(([, url]) => Boolean(url)) as [
+	string,
+	string,
+][];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={`${p.title[lang]} — ${pair('Haitham Assoli', 'هيثم العسولي')[lang]}`}
+	description={p.summary[lang]}
+	active="work"
+>
+	<article class={`field field--${hue} deck`}>
+		<div class="wrap">
+			<a class="crumb" href={u('/work')}>
+				<span class="crumb__arrow" aria-hidden="true">←</span>
+				<T v={s('project.back')} />
+			</a>
+
+			<p class="deck__pips">
+				<T v={statusLabel[p.status]} as="span" class="sticker" />
+				<T v={catLabel[p.category]} as="span" class="sticker sticker--plain" />
+				<T v={yearPair(p.year)} as="span" class="sticker sticker--mint" />
+			</p>
+
+			<T v={p.title} as="h1" class="deck__title" />
+			<T v={p.tagline} as="p" class="deck__tag" />
+			<T v={p.summary} as="p" class="deck__summary" />
+
+			{
+				p.image && (
+					<div
+						class:list={[
+							'frame',
+							tall(p.image) ? 'frame--tall' : 'frame--wide',
+						]}
+					>
+						<span class="frame__bar" aria-hidden="true" />
+						<Image
+							src={p.image}
+							alt={`${p.title[lang]}: ${p.tagline[lang]}`}
+							widths={[400, 800, 1200]}
+							sizes={
+								tall(p.image) ? '320px' : '(min-width: 1180px) 1100px, 92vw'
+							}
+							loading="eager"
+						/>
+					</div>
+				)
+			}
+
+			<!-- ============================ the sheet ============================ -->
+			<div class="sheet">
+				<dl class="strip">
+					<div class="strip__row">
+						<T v={s('project.role')} as="dt" class="strip__k" />
+						<dd class="strip__v"><T v={p.role} /></dd>
+					</div>
+					<div class="strip__row">
+						<T v={s('project.year')} as="dt" class="strip__k" />
+						<dd class="strip__v"><T v={yearPair(p.year)} /></dd>
+					</div>
+					<div class="strip__row">
+						<T v={s('project.status')} as="dt" class="strip__k" />
+						<dd class="strip__v"><T v={statusLabel[p.status]} /></dd>
+					</div>
+					<div class="strip__row strip__row--wide">
+						<T v={s('project.stack')} as="dt" class="strip__k" />
+						<dd class="strip__v">
+							<ul class="chips">
+								{p.stack.map((tool) => <li class="chip">{tool}</li>)}
+							</ul>
+						</dd>
+					</div>
+					{
+						links.length > 0 && (
+							<div class="strip__row strip__row--wide">
+								<T v={s('project.links')} as="dt" class="strip__k" />
+								<dd class="strip__v">
+									<ul class="chips">
+										{links.map(([k, url]) => (
+											<li>
+												<a class="link-pill" href={url}>
+													<T v={linkLabel[k] ?? pair(k, k)} />
+												</a>
+											</li>
+										))}
+									</ul>
+								</dd>
+							</div>
+						)
+					}
+				</dl>
+
+				<div class="prose">
+					{
+						overview.map((para, n) => (
+							<T v={para} as="p" class={n === 0 ? 'prose__open' : undefined} />
+						))
+					}
+				</div>
+
+				{
+					p.challenges.length > 0 && (
+						<section class="block">
+							<T v={s('project.challenges')} as="h2" class="block__title" />
+							<ul class="snags">
+								{p.challenges.map((c) => (
+									<li class="snag">
+										<T v={c.title} as="h3" class="snag__title" />
+										<div class="snag__half snag__half--problem">
+											<T
+												v={pair('The snag', 'العقبة')}
+												as="p"
+												class="snag__k"
+											/>
+											<T v={c.problem} as="p" class="snag__t" />
+										</div>
+										<div class="snag__half snag__half--solution">
+											<T
+												v={pair('What I did', 'ما الذي فعلته')}
+												as="p"
+												class="snag__k"
+											/>
+											<T v={c.solution} as="p" class="snag__t" />
+										</div>
+									</li>
+								))}
+							</ul>
+						</section>
+					)
+				}
+
+				{
+					outcomes.length > 0 && (
+						<section class="block">
+							<T v={s('project.outcomes')} as="h2" class="block__title" />
+							<ul class="outcomes">
+								{outcomes.map((o) => (
+									<li class="outcome">
+										<span class="outcome__tick" aria-hidden="true">
+											✓
+										</span>
+										<T v={o} as="span" class="outcome__t" />
+									</li>
+								))}
+							</ul>
+						</section>
+					)
+				}
+
+				{
+					p.shots.length > 0 && (
+						<section class="block">
+							<T
+								v={pair('Screens', 'لقطات من الشاشة')}
+								as="h2"
+								class="block__title"
+							/>
+							<ul class="gallery">
+								{p.shots.map((shot, n) => (
+									<li
+										class:list={[
+											'frame',
+											tall(shot) ? 'frame--tall' : 'frame--wide',
+										]}
+									>
+										<span class="frame__bar" aria-hidden="true" />
+										<Image
+											src={shot}
+											alt={`${p.title[lang]} — ${pair('screen', 'لقطة')[lang]} ${n + 1}`}
+											widths={[400, 800]}
+											sizes={
+												tall(shot) ? '280px' : '(min-width: 900px) 46vw, 88vw'
+											}
+											loading="lazy"
+										/>
+									</li>
+								))}
+							</ul>
+						</section>
+					)
+				}
+			</div>
+		</div>
+	</article>
+
+	<section class="field field--ink onward">
+		<div class="wrap onward__grid">
+			<a class="onward__next" href={u(`/work/${next.slug}`)}>
+				<T v={s('project.next')} as="span" class="onward__k" />
+				<T v={next.title} as="span" class="onward__title" />
+				<T v={next.tagline} as="span" class="onward__tag" />
+			</a>
+			<div class="onward__aside">
+				<a class="btn btn--sun" href={u('/work')}>
+					<T v={s('work.all')} />
+				</a>
+				<a class="btn btn--ghost onward__ghost" href={u('/hire')}>
+					<T v={s('hero.cta2')} />
+				</a>
+			</div>
+		</div>
+	</section>
+</Shell>
+
+<style is:global>
+	/* ================================ the deck ================================ */
+
+	.deck {
+		padding-bottom: clamp(3rem, 7vw, 5rem);
+	}
+
+	.crumb {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.3rem 0.85rem;
+		border: 2px solid currentcolor;
+		border-radius: var(--pill);
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+	}
+
+	.crumb [lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 600;
+		font-size: 0.85rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.crumb__arrow {
+		display: inline-block;
+	}
+
+	html[dir='rtl'] .crumb__arrow {
+		transform: scaleX(-1);
+	}
+
+	.deck__pips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 1.6rem;
+	}
+
+	.deck__title {
+		margin-top: 1.4rem;
+		font-size: clamp(2.4rem, 8vw, 5rem);
+		font-variation-settings: 'wdth' 80;
+		letter-spacing: -0.035em;
+	}
+
+	.deck__title[lang='ar'] {
+		font-size: clamp(2.4rem, 8vw, 5rem);
+	}
+
+	.deck__tag {
+		margin-top: 0.9rem;
+		max-width: 30ch;
+		font-family: var(--display);
+		font-weight: 700;
+		font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+		line-height: 1.2;
+	}
+
+	.deck__tag[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		line-height: 1.6;
+	}
+
+	.deck__summary {
+		margin-top: 1.1rem;
+		max-width: 58ch;
+		font-size: 1.05rem;
+	}
+
+	/* ------------------------------- frames ------------------------------- */
+
+	.frame {
+		position: relative;
+		margin-top: clamp(2rem, 5vw, 3rem);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		background: var(--paper);
+		box-shadow: var(--s3);
+		overflow: hidden;
+	}
+
+	.frame img {
+		width: 100%;
+		height: auto;
+	}
+
+	/* A window gets a title bar; a phone gets a speaker slot. */
+	.frame--wide .frame__bar {
+		display: block;
+		height: 1.6rem;
+		border-bottom: var(--b) solid var(--ink);
+		background: var(--sun);
+	}
+
+	.frame--tall {
+		max-width: 19rem;
+		border-radius: var(--r3);
+	}
+
+	.frame--tall .frame__bar {
+		position: absolute;
+		z-index: 1;
+		top: 0.55rem;
+		inset-inline-start: 50%;
+		transform: translateX(-50%);
+		width: 3.2rem;
+		height: 0.4rem;
+		border-radius: var(--pill);
+		background: var(--ink);
+	}
+
+	/* ================================ the sheet ================================ */
+
+	.sheet {
+		margin-top: clamp(2.25rem, 6vw, 3.5rem);
+		padding: clamp(1.25rem, 4vw, 3rem);
+		background: var(--paper);
+		color: var(--ink);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r3);
+		box-shadow: var(--s3);
+		--focus: var(--ink);
+	}
+
+	/* -------------------------------- strip -------------------------------- */
+
+	.strip {
+		display: grid;
+		gap: 0;
+		margin: 0 0 clamp(1.75rem, 4vw, 2.5rem);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		overflow: hidden;
+	}
+
+	@media (min-width: 640px) {
+		.strip {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+		.strip__row--wide {
+			grid-column: 1 / -1;
+		}
+	}
+
+	.strip__row {
+		display: grid;
+		gap: 0.3rem;
+		padding: 0.8rem 1rem;
+		border-bottom: 2px dashed var(--ink);
+	}
+
+	@media (min-width: 640px) {
+		.strip__row:not(.strip__row--wide) + .strip__row:not(.strip__row--wide) {
+			border-inline-start: 2px dashed var(--ink);
+		}
+	}
+
+	.strip__row:last-child {
+		border-bottom: 0;
+	}
+
+	.strip__k {
+		font-family: var(--mono);
+		font-size: 0.64rem;
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+		margin: 0;
+	}
+
+	.strip__k[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.78rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.strip__v {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.4;
+	}
+
+	.strip__v [lang='ar'] {
+		line-height: 1.8;
+	}
+
+	/* -------------------------------- prose -------------------------------- */
+
+	.prose {
+		display: grid;
+		gap: 1.15em;
+		max-width: 68ch;
+		font-size: clamp(1.02rem, 0.35vw + 0.95rem, 1.14rem);
+		line-height: 1.75;
+	}
+
+	.prose [lang='ar'],
+	.prose[lang='ar'] {
+		line-height: 2.05;
+	}
+
+	.prose__open {
+		font-size: 1.12em;
+		line-height: 1.6;
+	}
+
+	/* -------------------------------- blocks -------------------------------- */
+
+	.block {
+		margin-top: clamp(2.5rem, 6vw, 4rem);
+	}
+
+	.block__title {
+		position: relative;
+		font-size: clamp(1.5rem, 3.6vw, 2.2rem);
+		font-variation-settings: 'wdth' 86;
+		padding-inline-start: 1.4rem;
+		margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+	}
+
+	/* A tab of colour on the edge of the sheet: the only ornament in the read. */
+	.block__title::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 0;
+		top: 0.1em;
+		width: 0.7rem;
+		height: 0.85em;
+		border: 2px solid var(--ink);
+		border-radius: 4px;
+		background: var(--melon);
+	}
+
+	.block:nth-of-type(even) .block__title::before {
+		background: var(--sky);
+	}
+
+	/* -------------------------------- snags -------------------------------- */
+
+	.snags {
+		display: grid;
+		gap: clamp(1.1rem, 3vw, 1.75rem);
+	}
+
+	.snag {
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		overflow: hidden;
+		background: var(--paper);
+		box-shadow: var(--s2);
+	}
+
+	.snag__title {
+		padding: 0.75rem 1.1rem;
+		background: var(--sun);
+		border-bottom: var(--b) solid var(--ink);
+		font-size: 1.1rem;
+		font-variation-settings: 'wdth' 90;
+	}
+
+	.snag__half {
+		display: grid;
+		gap: 0.4rem;
+		padding: 1rem 1.1rem;
+	}
+
+	.snag__half--solution {
+		background: var(--mint);
+		border-top: 2px dashed var(--ink);
+	}
+
+	.snag__k {
+		font-family: var(--mono);
+		font-size: 0.64rem;
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+	}
+
+	.snag__k[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.78rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.snag__t {
+		max-width: 66ch;
+		font-size: 0.98rem;
+		line-height: 1.65;
+	}
+
+	.snag__t[lang='ar'] {
+		line-height: 2;
+	}
+
+	@media (min-width: 820px) {
+		.snag {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.snag__title {
+			grid-column: 1 / -1;
+		}
+		.snag__half--solution {
+			border-top: 0;
+			border-inline-start: 2px dashed var(--ink);
+		}
+	}
+
+	/* ------------------------------- outcomes ------------------------------- */
+
+	.outcomes {
+		display: grid;
+		gap: 0.7rem;
+		max-width: 64ch;
+	}
+
+	.outcome {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.7rem;
+	}
+
+	.outcome__tick {
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: 1.6rem;
+		height: 1.6rem;
+		margin-top: 0.1rem;
+		border: 2px solid var(--ink);
+		border-radius: 6px;
+		background: var(--bubble);
+		font-size: 0.9rem;
+		line-height: 1;
+	}
+
+	.outcome__t {
+		font-size: 1rem;
+		line-height: 1.6;
+	}
+
+	/* ------------------------------- gallery ------------------------------- */
+
+	.gallery {
+		display: flex;
+		flex-wrap: wrap;
+		gap: clamp(0.85rem, 2.5vw, 1.4rem);
+		align-items: flex-start;
+	}
+
+	.gallery .frame {
+		margin-top: 0;
+	}
+
+	.gallery .frame--tall {
+		flex: 0 1 15rem;
+	}
+
+	.gallery .frame--wide {
+		flex: 1 1 22rem;
+	}
+
+	/* ================================ onward ================================ */
+
+	.onward__grid {
+		display: grid;
+		gap: clamp(1.5rem, 4vw, 2.5rem);
+		align-items: center;
+	}
+
+	@media (min-width: 820px) {
+		.onward__grid {
+			grid-template-columns: minmax(0, 1fr) auto;
+		}
+	}
+
+	.onward__next {
+		display: grid;
+		gap: 0.35rem;
+		padding: clamp(1.1rem, 3vw, 1.75rem);
+		background: var(--melon);
+		color: var(--ink);
+		border: var(--b) solid var(--ink);
+		border-radius: var(--r2);
+		box-shadow: var(--s3);
+		text-decoration: none;
+		transition:
+			transform 0.28s var(--spring),
+			box-shadow 0.28s var(--spring);
+	}
+
+	.onward__next:hover {
+		transform: translate(calc(var(--dx) * 3px), -3px);
+		box-shadow: var(--s4);
+	}
+
+	.onward__k {
+		font-family: var(--mono);
+		font-size: 0.66rem;
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+	}
+
+	.onward__k[lang='ar'] {
+		font-family: var(--arabicBody);
+		font-weight: 800;
+		font-size: 0.8rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.onward__title {
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+		line-height: 1;
+		font-variation-settings: 'wdth' 84;
+	}
+
+	.onward__title[lang='ar'] {
+		font-family: var(--arabicDisplay);
+		font-weight: 400;
+		line-height: 1.25;
+		font-variation-settings: normal;
+	}
+
+	.onward__tag {
+		font-size: 0.95rem;
+		max-width: 46ch;
+	}
+
+	.onward__aside {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	.playroom .onward__ghost {
+		color: var(--paper);
+		border-color: var(--sun);
+		box-shadow: none;
+	}
+
+	.playroom .onward__ghost:hover {
+		box-shadow: none;
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.playroom .onward__next:hover {
+			transform: none;
+		}
+	}
+</style>

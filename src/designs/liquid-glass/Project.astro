@@ -1,0 +1,626 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* One project, read through the glass. Colour is not decoration on these
+   pages: a project is tinted by its band on /3/projects and carries that same
+   tint here, so you always know which part of the spectrum you are in. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { s, pair, yearPair } from '../../data/variant-ui';
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const { project: p, next } = Astro.props;
+
+const hues: Record<string, string> = {
+	web: '#1FB6C8',
+	mobile: '#4E8AE8',
+	ai: '#6B5BFF',
+	client: '#FF5B8A',
+	desktop: '#FF7360',
+	extension: '#FF8A3D',
+};
+
+const catKey = {
+	web: 'cat.web',
+	mobile: 'cat.mobile',
+	ai: 'cat.ai',
+	client: 'cat.client',
+	desktop: 'cat.desktop',
+	extension: 'cat.extension',
+} as const;
+
+const statusKey = {
+	live: 'status.live',
+	shipped: 'status.shipped',
+	delisted: 'status.delisted',
+	wip: 'status.wip',
+	archived: 'status.archived',
+} as const;
+
+const linkKey = {
+	live: 'project.live',
+	appStore: 'project.apple',
+	playGoogle: 'project.play',
+	github: 'project.github',
+	vscode: 'project.vscode',
+} as const;
+
+const orderedLinks = [
+	'live',
+	'appStore',
+	'playGoogle',
+	'github',
+	'vscode',
+] as const;
+
+const langs = ['en', 'ar'] as const;
+
+const isTall = (img?: ImageMetadata) => !!img && img.height > img.width;
+
+/* Most galleries repeat the cover. Show it once. */
+const gallery = p.shots.filter((sh) => sh.src !== p.image?.src);
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={`${p.title[lang]} — ${p.tagline[lang]}`}
+	description={p.summary[lang].slice(0, 180)}
+	here="projects"
+>
+	<article class="case" style={`--band:${hues[p.category] ?? '#1FB6C8'}`}>
+		<header class="case__head wrap">
+			<p class="eyebrow">
+				<span class="dot"></span>
+				<T v={s(catKey[p.category])} />
+				<span class="eyebrow__sep" aria-hidden="true">/</span>
+				<T v={yearPair(p.year)} />
+				<span class="eyebrow__sep" aria-hidden="true">/</span>
+				<T v={s(statusKey[p.status])} />
+			</p>
+
+			<h1 class="h1"><T v={p.title} /></h1>
+			<T v={p.tagline} as="p" class="case__tag" />
+			<T v={p.summary} as="p" class="lede case__sum" />
+
+			{
+				p.image && (
+					<figure
+						class="vitrine"
+						data-shape={isTall(p.image) ? 'tall' : 'wide'}
+					>
+						<Image
+							src={p.image}
+							alt={`${p.title[lang]} — ${p.tagline[lang]}`}
+							widths={isTall(p.image) ? [380, 620] : [640, 1000, 1400]}
+							sizes={
+								isTall(p.image)
+									? '(max-width: 700px) 62vw, 380px'
+									: '(max-width: 1180px) 92vw, 1100px'
+							}
+							loading="eager"
+							decoding="async"
+						/>
+					</figure>
+				)
+			}
+		</header>
+
+		<section class="wrap plate-wrap" aria-labelledby="plate-h">
+			<h2 class="sr" id="plate-h">
+				<span data-l="en" lang="en">Project details</span>
+				<span data-l="ar" lang="ar">تفاصيل المشروع</span>
+			</h2>
+
+			<dl class="plate pane">
+				<div class="plate__cell">
+					<dt class="mono"><T v={s('project.role')} /></dt>
+					<dd><T v={p.role} /></dd>
+				</div>
+				<div class="plate__cell">
+					<dt class="mono"><T v={s('project.year')} /></dt>
+					<dd><T v={yearPair(p.year)} /></dd>
+				</div>
+				<div class="plate__cell">
+					<dt class="mono"><T v={s('project.status')} /></dt>
+					<dd class="plate__status">
+						<span class="pip"></span><T v={s(statusKey[p.status])} />
+					</dd>
+				</div>
+				<div class="plate__cell plate__cell--wide">
+					<dt class="mono"><T v={s('project.stack')} /></dt>
+					<dd>
+						<ul class="chips">
+							{p.stack.map((t) => <li>{t}</li>)}
+						</ul>
+					</dd>
+				</div>
+				{
+					orderedLinks.some((k) => p.links[k]) && (
+						<div class="plate__cell plate__cell--wide">
+							<dt class="mono">
+								<T v={s('project.links')} />
+							</dt>
+							<dd class="plate__links">
+								{orderedLinks.map((k) =>
+									p.links[k] ? (
+										<a
+											class="btn"
+											href={p.links[k]}
+											rel="noreferrer noopener"
+											target="_blank"
+										>
+											<T v={s(linkKey[k])} />
+										</a>
+									) : null,
+								)}
+							</dd>
+						</div>
+					)
+				}
+			</dl>
+		</section>
+
+		<section class="wrap block" aria-labelledby="overview-h">
+			<h2 class="h2" id="overview-h">
+				<T v={pair('What it is', 'ما هو')} />
+			</h2>
+			{
+				langs.map((l) => (
+					<div class="prose" data-l={l} lang={l}>
+						{p.overview[l].map((para) => (
+							<p>{para}</p>
+						))}
+					</div>
+				))
+			}
+		</section>
+
+		{
+			p.challenges.length > 0 && (
+				<section class="wrap block" aria-labelledby="challenges-h">
+					<h2 class="h2" id="challenges-h">
+						<T v={s('project.challenges')} />
+					</h2>
+					<div class="knots">
+						{p.challenges.map((c) => (
+							<article class="knot pane">
+								<h3 class="h3 knot__title">
+									<T v={c.title} />
+								</h3>
+								<div class="knot__pair">
+									<div class="knot__side knot__side--in">
+										<p class="knot__label mono">
+											<T v={pair('The problem', 'المشكلة')} />
+										</p>
+										<T v={c.problem} as="p" class="knot__text" />
+									</div>
+									<span class="knot__seam" aria-hidden="true" />
+									<div class="knot__side knot__side--out">
+										<p class="knot__label mono">
+											<T v={pair('What I did', 'ما فعلته')} />
+										</p>
+										<T v={c.solution} as="p" class="knot__text" />
+									</div>
+								</div>
+							</article>
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		{
+			(p.outcomes.en.length > 0 || p.outcomes.ar.length > 0) && (
+				<section class="wrap block" aria-labelledby="outcomes-h">
+					<h2 class="h2" id="outcomes-h">
+						<T v={s('project.outcomes')} />
+					</h2>
+					{langs.map((l) => (
+						<ul class="outcomes" data-l={l} lang={l}>
+							{p.outcomes[l].map((o) => (
+								<li>
+									<span class="pip" aria-hidden="true" />
+									<span>{o}</span>
+								</li>
+							))}
+						</ul>
+					))}
+				</section>
+			)
+		}
+
+		{
+			gallery.length > 0 && (
+				<section class="wrap block" aria-labelledby="shots-h">
+					<h2 class="h2" id="shots-h">
+						<T v={pair('Screens', 'لقطات من الشاشة')} />
+					</h2>
+					<ul class="shelf">
+						{gallery.map((sh, i) => (
+							<li
+								class="shot pane"
+								data-shape={sh.height > sh.width ? 'tall' : 'wide'}
+							>
+								<Image
+									src={sh}
+									alt={`${p.title[lang]} — ${pair('screen', 'لقطة')[lang]} ${i + 1}`}
+									widths={
+										sh.height > sh.width
+											? [300, 520].filter((w) => w <= sh.width)
+											: [480, 820].filter((w) => w <= sh.width)
+									}
+									sizes="(max-width: 700px) 88vw, 420px"
+									loading="lazy"
+									decoding="async"
+								/>
+							</li>
+						))}
+					</ul>
+				</section>
+			)
+		}
+
+		<nav class="wrap onward" aria-label="More projects — مشاريع أخرى">
+			<a class="onward__next pane" href={u(`/work/${next.slug}`)}>
+				<span class="mono onward__label"><T v={s('project.next')} /></span>
+				<span class="h2 onward__title"><T v={next.title} /></span>
+				<span class="onward__tag"><T v={next.tagline} /></span>
+			</a>
+			<a class="btn onward__back" href={u('/work')}>
+				<T v={s('project.back')} />
+			</a>
+		</nav>
+	</article>
+</Shell>
+
+<style is:global>
+	.case {
+		display: block;
+	}
+
+	.case__head {
+		padding-block-start: clamp(2.5rem, 8vw, 4.5rem);
+	}
+
+	.eyebrow__sep {
+		color: rgba(234, 242, 255, 0.32);
+	}
+
+	.case__tag {
+		margin: 1rem 0 0;
+		max-width: 38ch;
+		font-family: var(--body);
+		font-style: italic;
+		font-size: clamp(1.2rem, 1rem + 1vw, 1.7rem);
+		line-height: 1.35;
+		color: color-mix(in srgb, var(--band) 32%, #ffffff);
+	}
+
+	/* Arabic never takes the italic, whatever order the sheets land in */
+	.case__tag[lang='ar'] {
+		font-style: normal;
+		font-family: var(--arabic);
+		line-height: 1.5;
+	}
+
+	.case__sum {
+		margin-block-start: 1.4rem;
+	}
+
+	/* ══ the vitrine ═════════════════════════════════════════════════════ */
+	.vitrine {
+		position: relative;
+		margin: clamp(2rem, 5vw, 3.25rem) 0 0;
+		border-radius: var(--radius);
+		overflow: hidden;
+		box-shadow: var(--glass-lift);
+		background:
+			radial-gradient(
+				90% 100% at 50% 0%,
+				color-mix(in srgb, var(--band) 42%, transparent),
+				transparent 70%
+			),
+			#070c17;
+	}
+
+	.vitrine::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		padding: 1px;
+		background: linear-gradient(
+			145deg,
+			rgba(255, 255, 255, 0.7),
+			rgba(255, 255, 255, 0.02) 52%,
+			color-mix(in srgb, var(--band) 60%, transparent)
+		);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+
+	.vitrine[data-shape='wide'] img {
+		width: 100%;
+		height: auto;
+	}
+
+	/* A 1080×2340 phone shot stands in the chamber. It is never cropped. */
+	.vitrine[data-shape='tall'] {
+		display: grid;
+		place-items: end center;
+		min-height: clamp(360px, 56vh, 580px);
+		padding: clamp(1.5rem, 4vw, 2.75rem) 1rem 0;
+	}
+
+	.vitrine[data-shape='tall'] img {
+		width: auto;
+		max-height: clamp(320px, 52vh, 520px);
+		object-fit: contain;
+		border-radius: 14px 14px 0 0;
+		filter: drop-shadow(0 26px 40px rgba(2, 5, 12, 0.85));
+	}
+
+	/* ══ the spec plate ══════════════════════════════════════════════════ */
+	.plate-wrap {
+		padding-block-start: clamp(2rem, 5vw, 3rem);
+	}
+
+	.plate {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+		gap: 0;
+		margin: 0;
+		overflow: hidden;
+	}
+
+	.plate__cell {
+		padding: clamp(1.1rem, 2.6vw, 1.6rem);
+		border-inline-start: 1px solid rgba(200, 230, 255, 0.12);
+		border-block-start: 1px solid rgba(200, 230, 255, 0.12);
+	}
+
+	.plate__cell--wide {
+		grid-column: 1 / -1;
+	}
+
+	.plate dt {
+		margin: 0 0 0.55rem;
+	}
+
+	.plate dd {
+		margin: 0;
+		font-size: 0.98rem;
+		color: var(--frost);
+	}
+
+	.plate__status {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.plate__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+	}
+
+	/* ══ body blocks ═════════════════════════════════════════════════════ */
+	.prose p {
+		margin: 0 0 1.15rem;
+		max-width: 68ch;
+		font-size: clamp(1.02rem, 0.96rem + 0.35vw, 1.16rem);
+		color: #dce8ff;
+	}
+
+	.prose p:last-child {
+		margin-block-end: 0;
+	}
+
+	/* ══ problem → solution ══════════════════════════════════════════════ */
+	.knots {
+		display: grid;
+		gap: clamp(0.8rem, 2vw, 1.2rem);
+	}
+
+	.knot {
+		--radius: 18px;
+		padding: clamp(1.15rem, 3vw, 1.9rem);
+	}
+
+	.knot__title {
+		margin: 0 0 1rem;
+		color: color-mix(in srgb, var(--band) 26%, #ffffff);
+	}
+
+	.knot__pair {
+		display: grid;
+		grid-template-columns: 1fr 1px 1fr;
+		gap: clamp(1rem, 3vw, 2rem);
+		align-items: start;
+	}
+
+	/* light going in is dim; light coming out of the seam is lit */
+	.knot__seam {
+		align-self: stretch;
+		background: linear-gradient(
+			180deg,
+			transparent,
+			color-mix(in srgb, var(--band) 85%, white) 42%,
+			var(--band) 62%,
+			transparent
+		);
+		box-shadow: 0 0 14px 0 color-mix(in srgb, var(--band) 55%, transparent);
+	}
+
+	.knot__label {
+		margin: 0 0 0.5rem;
+		font-size: 0.66rem;
+		letter-spacing: 0.16em;
+	}
+
+	.knot__side--out .knot__label {
+		color: color-mix(in srgb, var(--band) 55%, var(--frost));
+	}
+
+	.knot__text {
+		margin: 0;
+		font-size: 0.99rem;
+		line-height: 1.62;
+		color: var(--haze);
+	}
+
+	.knot__side--out .knot__text {
+		color: #e4eeff;
+	}
+
+	/* ══ outcomes ════════════════════════════════════════════════════════ */
+	.outcomes {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.85rem;
+		max-width: 68ch;
+	}
+
+	.outcomes li {
+		display: flex;
+		gap: 0.75rem;
+		align-items: baseline;
+		font-size: 1.02rem;
+		color: #dce8ff;
+	}
+
+	/* ══ the shelf ═══════════════════════════════════════════════════════ */
+	.shelf {
+		display: flex;
+		flex-wrap: wrap;
+		gap: clamp(0.8rem, 2vw, 1.2rem);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.shot {
+		--radius: 16px;
+		overflow: hidden;
+		flex: 1 1 min(100%, 300px);
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		background:
+			radial-gradient(
+				80% 90% at 50% 4%,
+				color-mix(in srgb, var(--band) 34%, transparent),
+				transparent 72%
+			),
+			#070c17;
+	}
+
+	/* The chamber is a fixed box so the row does not reflow when a lazy
+	   screenshot arrives; the phone shot stands inside it, never cropped. */
+	.shot[data-shape='tall'] {
+		max-width: 340px;
+		height: clamp(300px, 40vw, 420px);
+		padding: 1.1rem 1.1rem 0;
+	}
+
+	.shot[data-shape='tall'] img {
+		width: auto;
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		border-radius: 10px 10px 0 0;
+		filter: drop-shadow(0 18px 26px rgba(2, 5, 12, 0.8));
+	}
+
+	.shot[data-shape='wide'] img {
+		width: 100%;
+		height: auto;
+	}
+
+	/* ══ onward ══════════════════════════════════════════════════════════ */
+	.onward {
+		padding-block-start: clamp(3rem, 8vw, 5rem);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.onward__next {
+		flex: 1 1 min(100%, 22rem);
+		display: grid;
+		gap: 0.35rem;
+		padding: clamp(1.25rem, 3vw, 2rem);
+		text-decoration: none;
+		transition:
+			transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+			box-shadow 0.3s ease;
+	}
+
+	.onward__next:hover {
+		transform: translateY(-3px);
+		box-shadow:
+			var(--glass-lift),
+			0 0 40px -16px color-mix(in srgb, var(--band) 80%, transparent);
+	}
+
+	.onward__label {
+		color: rgba(160, 232, 242, 0.9);
+	}
+
+	.onward__title {
+		display: block;
+	}
+
+	.onward__tag {
+		color: var(--haze);
+		font-size: 0.98rem;
+	}
+
+	@media (max-width: 700px) {
+		.knot__pair {
+			grid-template-columns: 1fr;
+			gap: 1.1rem;
+		}
+		.knot__seam {
+			height: 1px;
+			width: 100%;
+			background: linear-gradient(
+				90deg,
+				transparent,
+				color-mix(in srgb, var(--band) 85%, white) 42%,
+				var(--band) 62%,
+				transparent
+			);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.onward__next {
+			transition: none !important;
+		}
+	}
+</style>

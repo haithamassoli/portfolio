@@ -1,56 +1,18 @@
 ---
-/* The one language switch, shared by every design variant.
+/* The designs write some bilingual copy inline as a `data-l="en"` / `data-l="ar"`
+   pair rather than through <T>, usually where the two languages need different
+   markup around them. Both are in the DOM; this hides the one that is not the
+   page's language.
 
-   Both languages are in the DOM; CSS hides the one that is not current, so
-   switching is instant and needs no second route and no reload. Any element
-   marked `data-l="en"` or `data-l="ar"` participates. Anything with
-   `data-lang-toggle` flips the page.
-
-   ponytail: no routing, no reload, no i18n runtime. Add real /ar routes only
-   if these prototypes ever need to be indexed in Arabic. */
+   ponytail: <T> renders one language now, and <html lang> is set by the route,
+   so this rule is all that is left — no script, no localStorage, no flash.
+   Converting the remaining ~200 inline pairs to <T> would delete this file and
+   halve those blocks; worth doing when one of them next needs editing. */
 ---
 
-<script is:inline>
-	/* Before first paint: no flash of the wrong language. */
-	(function () {
-		function apply() {
-			const el = document.documentElement;
-			let l = 'en';
-			try {
-				l = localStorage.getItem('vx-lang') === 'ar' ? 'ar' : 'en';
-			} catch {
-				/* private mode: English it is */
-			}
-			el.lang = l;
-			el.dir = l === 'ar' ? 'rtl' : 'ltr';
-		}
-		apply();
-		/* The router copies <html> attributes off the incoming page, so the
-		   language is put back before that page paints. */
-		document.addEventListener('astro:after-swap', apply);
-	})();
-
-	document.addEventListener('click', function (ev) {
-		const t = ev.target;
-		if (!t || !t.closest) return;
-		const btn = t.closest('[data-lang-toggle]');
-		if (!btn) return;
-		ev.preventDefault();
-		const el = document.documentElement;
-		const next = el.lang === 'ar' ? 'en' : 'ar';
-		el.lang = next;
-		el.dir = next === 'ar' ? 'rtl' : 'ltr';
-		try {
-			localStorage.setItem('vx-lang', next);
-		} catch {
-			/* nothing to do */
-		}
-	});
-</script>
-
 <style is:global>
-	/* Specificity (0,2,1): beats a two-class rule, so a variant's own
-	   `display` never resurrects the hidden language. */
+	/* Specificity (0,2,1): beats a two-class rule, so a design's own `display`
+	   never resurrects the hidden language. */
 	html[lang='ar'] [data-l='en'],
 	html[lang='en'] [data-l='ar'] {
 		display: none;

@@ -1,0 +1,656 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+/* The brief, laid out as a tray: one compartment per question, sized by how
+   much you have to put in it. Nothing is sent from this page — pressing the
+   button writes the email and hands it to your own mail app. */
+import { profile } from '../../../content/profile';
+import { deals, locations, techStack } from '../../i18n';
+import type { Key } from '../../i18n';
+import { pair, s } from '../../data/variant-ui';
+import HireCompose from '../../components/HireCompose.astro';
+import T from '../../components/T.astro';
+import Shell from './Shell.astro';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+
+const dealLabel = (d: string) => s(`deal.${d}` as Key);
+const locLabel = (l: string) => s(`loc.${l}` as Key);
+const techLabel = (t: string) => s(`tech.${t}` as Key);
+
+/* What he takes on, straight out of the site's own dictionary. */
+const skills = [
+	{ w: 'w4', title: s('skill.web'), desc: s('skill.webDesc'), tone: 'bone' },
+	{
+		w: 'w4',
+		title: s('skill.mobile'),
+		desc: s('skill.mobileDesc'),
+		tone: 'ink',
+	},
+	{
+		w: 'w4',
+		title: s('skill.backend'),
+		desc: s('skill.backendDesc'),
+		tone: 'bone',
+	},
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	page="hire"
+	title={pair(
+		'Start a project — Haitham Assoli',
+		'ابدأ مشروعًا — هيثم العسولي',
+	)[lang]}
+	description={pair(
+		'Tell Haitham Assoli what you are building. The form writes a pre-filled email and hands it to your own mail app; nothing is sent until you press send.',
+		'أخبر هيثم العسولي بما تبنيه. يكتب النموذج رسالة جاهزة ويسلّمها إلى تطبيق بريدك، ولا يُرسل شيء حتى تضغط إرسال.',
+	)[lang]}
+>
+	<HireCompose />
+
+	<section class="board" aria-labelledby="hire-h">
+		<article class="tile tile--bone w7 h2 pitch" style="--i: 0">
+			<p class="mono lbl"><T v={s('hire.eyebrow')} /></p>
+			<h1 class="tile__h tile__h--big" id="hire-h">
+				<T v={s('hire.title')} as="span" />
+			</h1>
+			<T v={s('hire.lede')} as="p" class="pitch__lede" />
+		</article>
+
+		<article class="tile tile--ink w5 h2 avail" style="--i: 1">
+			<p class="mono lbl lbl--on-dark">
+				<T v={pair('Availability', 'الجاهزية')} />
+			</p>
+			<dl class="avail__list">
+				<div>
+					<T v={pair('Reply', 'الرد')} as="dt" class="mono" />
+					<T v={s('hire.note')} as="dd" />
+				</div>
+				<div>
+					<T v={pair('Base', 'المقر')} as="dt" class="mono" />
+					<T
+						v={pair(
+							'Amman, UTC+3. Remote by default.',
+							'عمّان، UTC+3. عن بُعد افتراضًا.',
+						)}
+						as="dd"
+					/>
+				</div>
+				<div>
+					<T v={pair('Languages', 'اللغات')} as="dt" class="mono" />
+					<T
+						v={pair(
+							'Arabic and English, both shipped.',
+							'العربية والإنجليزية، وكلتاهما تصدر.',
+						)}
+						as="dd"
+					/>
+				</div>
+				<div>
+					<T v={pair('Rates', 'الأسعار')} as="dt" class="mono" />
+					<T
+						v={pair(
+							'Fixed price when the scope is fixed, hourly when it is not. Tell me the budget and I will tell you what fits inside it.',
+							'سعر مقطوع حين يكون النطاق محددًا، وبالساعة حين لا يكون. أخبرني بالميزانية وأخبرك بما يتّسع لها.',
+						)}
+						as="dd"
+					/>
+				</div>
+			</dl>
+		</article>
+	</section>
+
+	<section class="board" aria-labelledby="skills-h">
+		<div class="board__head">
+			<h2 class="board__h" id="skills-h">
+				<T v={s('skills.title')} as="span" />
+			</h2>
+			<T
+				v={pair(
+					'Pick one or several. The form asks the same question further down.',
+					'اختر واحدًا أو أكثر. والنموذج يسأل السؤال نفسه في الأسفل.',
+				)}
+				as="p"
+				class="board__lede"
+			/>
+		</div>
+
+		{
+			skills.map((sk, i) => (
+				<article
+					class:list={['tile', `tile--${sk.tone}`, sk.w, 'h1', 'skill']}
+					style={`--i:${i}`}
+				>
+					<T v={sk.title} as="h3" class="tile__h" />
+					<div class="prose">
+						<T v={sk.desc} as="p" />
+					</div>
+				</article>
+			))
+		}
+
+		<article
+			class="tile tile--marigold w12 h1 skill skill--wide"
+			style="--i: 3"
+		>
+			<T v={s('skill.other')} as="h3" class="tile__h" />
+			<div class="prose">
+				<T v={s('skill.otherDesc')} as="p" />
+			</div>
+		</article>
+	</section>
+
+	<form data-hire>
+		<section class="board" aria-labelledby="brief-h">
+			<div class="board__head">
+				<h2 class="board__h" id="brief-h">
+					<span data-l="en" lang="en">The brief</span>
+					<span data-l="ar" lang="ar">النموذج</span>
+				</h2>
+				<T
+					v={pair(
+						'Everything marked with a dot is needed. Nothing leaves this page.',
+						'كل حقل عليه نقطة مطلوب. ولا يغادر شيء هذه الصفحة.',
+					)}
+					as="p"
+					class="board__lede"
+				/>
+			</div>
+
+			<div class="tile tile--bone w6 h1 field" style="--i: 0">
+				<label class="field__lbl mono" for="f-name">
+					<T v={s('hire.fullName')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</label>
+				<input
+					class="field__in"
+					id="f-name"
+					name="fullName"
+					type="text"
+					autocomplete="name"
+					required
+				/>
+			</div>
+
+			<div class="tile tile--bone w6 h1 field" style="--i: 1">
+				<label class="field__lbl mono" for="f-email">
+					<T v={s('hire.email')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</label>
+				<input
+					class="field__in mono"
+					id="f-email"
+					name="email"
+					type="email"
+					dir="ltr"
+					autocomplete="email"
+					required
+				/>
+			</div>
+
+			<div class="tile tile--bone w4 h1 field" style="--i: 2">
+				<label class="field__lbl mono" for="f-phone">
+					<T v={s('hire.phone')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</label>
+				<input
+					class="field__in mono"
+					id="f-phone"
+					name="phone"
+					type="tel"
+					dir="ltr"
+					autocomplete="tel"
+					required
+				/>
+			</div>
+
+			<div class="tile tile--bone w4 h1 field" style="--i: 3">
+				<label class="field__lbl mono" for="f-budget">
+					<T v={s('hire.budget')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</label>
+				<input
+					class="field__in"
+					id="f-budget"
+					name="budget"
+					type="text"
+					aria-describedby="f-budget-en f-budget-ar"
+					required
+				/>
+				<span class="field__help" id="f-budget-en" data-l="en" lang="en"
+					>{s('hire.budgetPlaceholder').en}</span
+				>
+				<span class="field__help" id="f-budget-ar" data-l="ar" lang="ar"
+					>{s('hire.budgetPlaceholder').ar}</span
+				>
+			</div>
+
+			<fieldset class="tile tile--ink w4 h1 field field--pick" style="--i: 4">
+				<legend class="field__lbl mono">
+					<T v={s('hire.location')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</legend>
+				<div class="picks">
+					{
+						locations.map((l, i) => (
+							<label class="pick">
+								<input
+									type="radio"
+									name="location"
+									value={l}
+									required={i === 0}
+								/>
+								<T v={locLabel(l)} as="span" class="pick__face" />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset
+				class="tile tile--cobalt w7 h1 field field--pick"
+				style="--i: 5"
+			>
+				<legend class="field__lbl mono">
+					<T v={s('hire.deal')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</legend>
+				<div class="picks">
+					{
+						deals.map((d, i) => (
+							<label class="pick">
+								<input type="radio" name="deal" value={d} required={i === 0} />
+								<T v={dealLabel(d)} as="span" class="pick__face" />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="tile tile--bone w5 h1 field field--pick" style="--i: 6">
+				<legend class="field__lbl mono">
+					<T v={s('hire.techStack')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</legend>
+				<div class="picks">
+					{
+						techStack.map((t) => (
+							<label class="pick">
+								<input type="checkbox" name="techStack" value={t} />
+								<T v={techLabel(t)} as="span" class="pick__face" />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<div class="tile tile--bone w8 h3 field field--long" style="--i: 7">
+				<label class="field__lbl mono" for="f-summary">
+					<T v={s('hire.summary')} as="span" />
+					<span class="field__req" aria-hidden="true"></span>
+				</label>
+				<span class="field__help" id="f-summary-en" data-l="en" lang="en"
+					>{s('hire.summaryPlaceholder').en}</span
+				>
+				<span class="field__help" id="f-summary-ar" data-l="ar" lang="ar"
+					>{s('hire.summaryPlaceholder').ar}</span
+				>
+				<textarea
+					class="field__in field__area"
+					id="f-summary"
+					name="summary"
+					aria-describedby="f-summary-en f-summary-ar"
+					required></textarea>
+			</div>
+
+			<div class="tile tile--ink w4 h3 send" style="--i: 8">
+				<p class="mono lbl lbl--on-dark">
+					<T v={pair('Last compartment', 'الخانة الأخيرة')} />
+				</p>
+				<T
+					v={pair(
+						'Pressing this writes the email and opens it in your own mail app. Nothing is sent until you press send there.',
+						'الضغط هنا يكتب الرسالة ويفتحها في تطبيق بريدك. ولا يُرسل شيء حتى تضغط إرسال هناك.',
+					)}
+					as="p"
+					class="send__note"
+				/>
+				<button class="send__btn" type="submit">
+					<T v={s('hire.submit')} as="span" />
+				</button>
+				<p class="mono send__alt">
+					<T v={pair('or write directly', 'أو راسلني مباشرة')} as="span" />
+					<a href={`mailto:${profile.email}`} lang="en" dir="ltr">
+						{profile.email}
+					</a>
+				</p>
+
+				<p class="send__done" role="status">
+					<T v={s('hire.sent')} as="span" />
+				</p>
+			</div>
+		</section>
+	</form>
+</Shell>
+
+<style is:global>
+	/* ---------------- the pitch pair ---------------- */
+
+	.pitch {
+		justify-content: center;
+	}
+
+	.pitch__lede {
+		max-width: 54ch;
+		font-size: 0.9rem;
+		color: rgba(30, 23, 19, 0.78);
+	}
+
+	.avail__list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		margin: 0;
+	}
+
+	.avail__list div {
+		display: grid;
+		grid-template-columns: 5.5rem minmax(0, 1fr);
+		gap: 0.7rem;
+		align-items: baseline;
+		padding-bottom: 0.3rem;
+		border-bottom: 1px solid rgba(251, 246, 236, 0.12);
+	}
+
+	.avail__list dt {
+		font-size: 0.64rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: rgba(251, 246, 236, 0.5);
+	}
+
+	.avail__list dd {
+		margin: 0;
+		font-size: 0.82rem;
+		line-height: 1.45;
+	}
+
+	/* ---------------- what he takes on ---------------- */
+
+	.skill {
+		justify-content: flex-start;
+		gap: 0.4rem;
+	}
+
+	.skill--wide {
+		flex-direction: row;
+		align-items: baseline;
+		gap: 1.2rem;
+	}
+
+	.skill--wide .tile__h {
+		flex: 0 0 auto;
+	}
+
+	.skill--wide .prose p {
+		color: rgba(42, 28, 6, 0.85);
+	}
+
+	/* ---------------- the form ---------------- */
+
+	form[data-hire] {
+		display: block;
+	}
+
+	.field {
+		gap: 0.4rem;
+		justify-content: center;
+		border: 0;
+		margin: 0;
+	}
+
+	.field__lbl {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0;
+		font-size: 0.66rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(30, 23, 19, 0.55);
+	}
+
+	.tile--ink .field__lbl,
+	.tile--cobalt .field__lbl {
+		color: rgba(251, 246, 236, 0.6);
+	}
+
+	.field__req {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: var(--pomegranate);
+	}
+
+	.tile--ink .field__req,
+	.tile--cobalt .field__req {
+		background: var(--marigold);
+	}
+
+	.field__in {
+		width: 100%;
+		padding: 0.55rem 0.7rem;
+		border: 0;
+		border-radius: 10px;
+		background: #fff;
+		box-shadow: inset 0 0 0 1px rgba(30, 23, 19, 0.16);
+		color: var(--ink);
+		font-family: inherit;
+		font-size: 0.92rem;
+		line-height: 1.4;
+		transition: box-shadow 0.18s ease;
+	}
+
+	.field__in::placeholder {
+		color: rgba(30, 23, 19, 0.4);
+	}
+
+	.field__in:hover {
+		box-shadow: inset 0 0 0 1px rgba(30, 23, 19, 0.3);
+	}
+
+	.field__in:focus-visible {
+		outline: none;
+		box-shadow: inset 0 0 0 2px var(--cobalt);
+	}
+
+	.field__in:user-invalid {
+		box-shadow: inset 0 0 0 2px var(--pomegranate);
+	}
+
+	.field--long {
+		justify-content: flex-start;
+	}
+
+	.field__help {
+		font-size: 0.72rem;
+		line-height: 1.45;
+		color: rgba(30, 23, 19, 0.55);
+	}
+
+	.tile--ink .field__help,
+	.tile--cobalt .field__help {
+		color: rgba(251, 246, 236, 0.6);
+	}
+
+	/* A rendered legend sits on the fieldset's border edge and ignores the
+	   tile's padding. Floating it turns it back into an ordinary child. */
+	.field--pick {
+		display: block;
+	}
+
+	.field--pick > legend {
+		float: left;
+		float: inline-start;
+		width: 100%;
+		padding: 0;
+		margin-bottom: 0.5rem;
+	}
+
+	.field--pick > .picks {
+		clear: both;
+	}
+
+	.field__area {
+		flex: 1;
+		min-height: 8rem;
+		resize: vertical;
+	}
+
+	/* Options are compartments too: a lid drops on the one you pick. */
+	.picks {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.pick {
+		position: relative;
+		display: inline-flex;
+		cursor: pointer;
+	}
+
+	.pick input {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		cursor: pointer;
+		margin: 0;
+	}
+
+	.pick__face {
+		padding: 0.32rem 0.75rem;
+		border-radius: 999px;
+		box-shadow: inset 0 0 0 1px rgba(30, 23, 19, 0.2);
+		font-size: 0.8rem;
+		transition:
+			background 0.18s ease,
+			color 0.18s ease,
+			box-shadow 0.18s ease;
+	}
+
+	.tile--ink .pick__face,
+	.tile--cobalt .pick__face {
+		box-shadow: inset 0 0 0 1px rgba(251, 246, 236, 0.3);
+	}
+
+	.pick:hover .pick__face {
+		background: rgba(30, 23, 19, 0.08);
+	}
+
+	.tile--ink .pick:hover .pick__face,
+	.tile--cobalt .pick:hover .pick__face {
+		background: rgba(251, 246, 236, 0.12);
+	}
+
+	.pick:has(input:checked) .pick__face {
+		background: var(--marigold);
+		color: #2a1c06;
+		box-shadow: inset 0 0 0 1px rgba(42, 28, 6, 0.3);
+	}
+
+	.pick:has(input:focus-visible) .pick__face {
+		outline: 3px solid var(--focus, var(--ink));
+		outline-offset: 3px;
+	}
+
+	/* ---------------- send ---------------- */
+
+	.send {
+		justify-content: flex-start;
+		gap: 0.7rem;
+	}
+
+	.send__btn {
+		margin-block-start: 0.2rem;
+	}
+
+	.send__alt {
+		margin-block-start: auto;
+	}
+
+	.send__note {
+		font-size: 0.82rem;
+		line-height: 1.55;
+		color: rgba(251, 246, 236, 0.72);
+	}
+
+	.send__btn {
+		align-self: flex-start;
+		padding: 0.6rem 1.1rem;
+		border: 0;
+		border-radius: 999px;
+		background: var(--marigold);
+		color: #2a1c06;
+		font-family: inherit;
+		font-weight: 600;
+		font-size: 0.95rem;
+		cursor: pointer;
+		transition:
+			transform 0.18s ease,
+			background 0.18s ease;
+	}
+
+	.send__btn:hover {
+		transform: translateY(-2px);
+		background: #f5b63f;
+	}
+
+	.send__alt {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		font-size: 0.72rem;
+		color: rgba(251, 246, 236, 0.55);
+	}
+
+	.send__alt a {
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	/* The confirmation only exists once the draft has been handed over. */
+	.send__done {
+		display: none;
+		padding: 0.6rem 0.75rem;
+		border-radius: 12px;
+		background: rgba(233, 164, 38, 0.16);
+		box-shadow: inset 0 0 0 1px rgba(233, 164, 38, 0.5);
+		font-size: 0.8rem;
+		line-height: 1.5;
+		color: var(--marigold);
+	}
+
+	form[data-hire][data-sent] .send__done {
+		display: block;
+	}
+
+	@media (max-width: 46rem) {
+		.skill--wide {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.4rem;
+		}
+
+		.field {
+			min-height: auto;
+		}
+	}
+</style>

@@ -1,0 +1,34 @@
+---
+/* /1 … /7 were the prototype addresses and are in a few people's history, so
+   they still land somewhere. A static build has no redirects, so this is the
+   meta-refresh version: instant, and `canonical` tells a crawler the rest.
+   ponytail: delete once nobody links to a number any more. */
+import { designs } from '../designs/registry';
+import { url } from '../designs/routes';
+
+export function getStaticPaths() {
+	return designs
+		.filter((d) => d.n > 0)
+		.map((d) => ({
+			params: { n: String(d.n) },
+			props: { to: url(d, 'en', '') },
+		}));
+}
+
+const { to } = Astro.props;
+const here = new URL(to, Astro.site ?? Astro.url.origin).href;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="refresh" content={`0; url=${to}`} />
+		<meta name="robots" content="noindex, follow" />
+		<link rel="canonical" href={here} />
+		<title>Moved</title>
+	</head>
+	<body>
+		<p>This design now lives at <a href={to}>{to}</a>.</p>
+	</body>
+</html>

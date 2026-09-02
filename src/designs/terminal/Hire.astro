@@ -1,0 +1,698 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+/* /4/hire — the brief form, set as a man page and a prompt. The form posts
+   nowhere: HireCompose turns it into a mail draft in the reader's language. */
+import Shell from './Shell.astro';
+import HireCompose from '../../components/HireCompose.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+import { deals, locations, techStack } from '../../i18n';
+import { profile } from '../../../content/profile';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+
+const takes = [
+	{ k: 'frontend', t: s('skill.web'), d: s('skill.webDesc') },
+	{ k: 'mobile', t: s('skill.mobile'), d: s('skill.mobileDesc') },
+	{ k: 'backend', t: s('skill.backend'), d: s('skill.backendDesc') },
+	{ k: 'other', t: s('skill.other'), d: s('skill.otherDesc') },
+];
+
+const method = [
+	pair(
+		'A short call or a long email first. I would rather argue about the scope than about the invoice.',
+		'مكالمة قصيرة أو رسالة طويلة في البداية. أفضّل أن يكون الخلاف على النطاق لا على الفاتورة.',
+	),
+	pair(
+		'A build you can open on your own phone, early and then every week.',
+		'نسخة تفتحها على هاتفك، مبكرًا ثم كل أسبوع.',
+	),
+	pair(
+		'Arabic and English from the first screen, not a localisation pass bolted on at the end.',
+		'العربية والإنجليزية من الشاشة الأولى، لا مرحلة تعريب تُلصق في النهاية.',
+	),
+	pair(
+		'Rates follow the shape of the work, not a table. Fixed price when the scope is clear, hourly when it is not, and I say which I think it is before you commit to anything.',
+		'الأسعار تتبع شكل العمل لا جدولًا جاهزًا. سعر ثابت حين يكون النطاق واضحًا، وبالساعة حين لا يكون، وأقول لك أيّهما أراه قبل أن تلتزم بشيء.',
+	),
+];
+
+const exits = [
+	{
+		c: '0',
+		v: pair(
+			'a reply from Amman within two business days',
+			'ردّ من عمّان خلال يومَي عمل',
+		),
+	},
+	{
+		c: '1',
+		v: pair(
+			'not work I should take — I say so, and point you at someone who should',
+			'عمل ليس لي — أقول ذلك، وأدلّك على من هو أنسب له',
+		),
+	},
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair('man hire — haitham@amman', 'man hire — haitham@amman')[lang]}
+	description={pair(
+		'Send Haitham Assoli a project brief. The form writes the email for you; nothing is sent until you press send in your own mail app.',
+		'أرسل إلى هيثم العسولي وصف مشروعك. يكتب النموذج الرسالة نيابة عنك، ولا يُرسل شيء حتى تضغط إرسال من تطبيق بريدك.',
+	)[lang]}
+	path="~/portfolio/hire"
+	tab="hire"
+>
+	<section class="block--man block" aria-labelledby="hire-h">
+		<p class="cmdline"><span class="cmdline__q">man</span> hire</p>
+
+		<h1 class="case__title" id="hire-h"><T v={s('hire.title')} /></h1>
+		<T v={s('hire.lede')} as="p" class="case__sum" />
+
+		<div class="man">
+			<section class="man__sec" aria-labelledby="syn-h">
+				<h2 class="man__h" id="syn-h">
+					<span data-l="en">Synopsis</span>
+					<span data-l="ar" lang="ar">الاستعمال</span>
+				</h2>
+				<p class="man__syn tty">
+					hire haitham [--part-time | --full-time | --contract | --freelance |
+					--hourly] [--remote | --onsite] &lt;brief&gt;
+				</p>
+			</section>
+
+			<section class="man__sec" aria-labelledby="desc-h">
+				<h2 class="man__h" id="desc-h"><T v={s('skills.title')} /></h2>
+				<dl class="takes">
+					{
+						takes.map((t) => (
+							<div class="takes__row">
+								<T v={t.t} as="dt" class="takes__t" />
+								<T v={t.d} as="dd" class="takes__d" />
+							</div>
+						))
+					}
+				</dl>
+			</section>
+
+			<section class="man__sec" aria-labelledby="how-h">
+				<h2 class="man__h" id="how-h">
+					<span data-l="en">How the work goes</span>
+					<span data-l="ar" lang="ar">كيف يجري العمل</span>
+				</h2>
+				<ul class="notes">
+					{
+						method.map((m) => (
+							<li class="notes__i">
+								<span class="notes__b tty" aria-hidden="true">
+									·
+								</span>
+								<T v={m} />
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="man__sec" aria-labelledby="exit-h">
+				<h2 class="man__h" id="exit-h">
+					<span data-l="en">Exit status</span>
+					<span data-l="ar" lang="ar">رمز الخروج</span>
+				</h2>
+				<dl class="exits">
+					{
+						exits.map((e) => (
+							<div class="exits__row">
+								<dt class="exits__c tty">{e.c}</dt>
+								<T v={e.v} as="dd" class="exits__v" />
+							</div>
+						))
+					}
+				</dl>
+			</section>
+		</div>
+	</section>
+
+	<section class="block--form block" aria-labelledby="form-h">
+		<p class="cmdline">
+			<span class="cmdline__q">./brief.sh</span> --interactive
+		</p>
+		<h2 class="h2" id="form-h">
+			<T v={pair('Answer eight prompts', 'أجب عن ثمانية أسئلة')} />
+		</h2>
+		<T
+			v={pair(
+				'Everything below goes into one email addressed to me. Nothing leaves this page until you press send in your own mail app.',
+				'كل ما تكتبه هنا يذهب إلى رسالة واحدة موجّهة إليّ. ولا يغادر شيء هذه الصفحة حتى تضغط إرسال في تطبيق بريدك.',
+			)}
+			as="p"
+			class="lede"
+		/>
+
+		<form class="tty-form" data-hire>
+			<div class="fld">
+				<label class="fld__lbl" for="fullName">
+					<span class="fld__q tty" aria-hidden="true">?</span>
+					<T v={s('hire.fullName')} />
+				</label>
+				<div class="fld__in">
+					<span class="fld__caret tty" aria-hidden="true">❯</span>
+					<input
+						id="fullName"
+						name="fullName"
+						type="text"
+						dir="auto"
+						autocomplete="name"
+						required
+						data-ph-en="Your name"
+						data-ph-ar="اسمك"
+					/>
+				</div>
+			</div>
+
+			<div class="fld fld--pair">
+				<div class="fld">
+					<label class="fld__lbl" for="email">
+						<span class="fld__q tty" aria-hidden="true">?</span>
+						<T v={s('hire.email')} />
+					</label>
+					<div class="fld__in">
+						<span class="fld__caret tty" aria-hidden="true">❯</span>
+						<input
+							class="tty"
+							id="email"
+							name="email"
+							type="email"
+							autocomplete="email"
+							required
+							data-ph-en="you@example.com"
+							data-ph-ar="you@example.com"
+						/>
+					</div>
+				</div>
+
+				<div class="fld">
+					<label class="fld__lbl" for="phone">
+						<span class="fld__q tty" aria-hidden="true">?</span>
+						<T v={s('hire.phone')} />
+					</label>
+					<div class="fld__in">
+						<span class="fld__caret tty" aria-hidden="true">❯</span>
+						<input
+							class="tty"
+							id="phone"
+							name="phone"
+							type="tel"
+							autocomplete="tel"
+							required
+							data-ph-en="+962 …"
+							data-ph-ar="+962 …"
+						/>
+					</div>
+				</div>
+			</div>
+
+			<fieldset class="grp">
+				<legend class="fld__lbl">
+					<span class="fld__q tty" aria-hidden="true">?</span>
+					<T v={s('hire.deal')} />
+				</legend>
+				<div class="opts">
+					{
+						deals.map((d, i) => (
+							<label class="opt">
+								<input
+									class="sr-only"
+									type="radio"
+									name="deal"
+									value={d}
+									required={i === 0}
+								/>
+								<span class="opt__box opt__box--radio tty" aria-hidden="true" />
+								<T v={s(`deal.${d}` as 'deal.part')} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="grp">
+				<legend class="fld__lbl">
+					<span class="fld__q tty" aria-hidden="true">?</span>
+					<T v={s('hire.location')} />
+				</legend>
+				<div class="opts">
+					{
+						locations.map((l, i) => (
+							<label class="opt">
+								<input
+									class="sr-only"
+									type="radio"
+									name="location"
+									value={l}
+									required={i === 0}
+								/>
+								<span class="opt__box opt__box--radio tty" aria-hidden="true" />
+								<T v={s(`loc.${l}` as 'loc.remote')} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="grp">
+				<legend class="fld__lbl">
+					<span class="fld__q tty" aria-hidden="true">?</span>
+					<T v={s('hire.techStack')} />
+				</legend>
+				<T
+					v={pair('Tick as many as apply.', 'اختر ما ينطبق، ولو أكثر من واحد.')}
+					as="p"
+					class="fld__hint"
+				/>
+				<div class="opts">
+					{
+						techStack.map((t) => (
+							<label class="opt">
+								<input
+									class="sr-only"
+									type="checkbox"
+									name="techStack"
+									value={t}
+								/>
+								<span class="opt__box tty" aria-hidden="true" />
+								<T v={s(`tech.${t}` as 'tech.frontend')} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<div class="fld">
+				<label class="fld__lbl" for="budget">
+					<span class="fld__q tty" aria-hidden="true">?</span>
+					<T v={s('hire.budget')} />
+				</label>
+				<div class="fld__in">
+					<span class="fld__caret tty" aria-hidden="true">❯</span>
+					<input
+						id="budget"
+						name="budget"
+						type="text"
+						dir="auto"
+						required
+						data-ph-en={s('hire.budgetPlaceholder').en}
+						data-ph-ar={s('hire.budgetPlaceholder').ar}
+					/>
+				</div>
+			</div>
+
+			<div class="fld">
+				<label class="fld__lbl" for="summary">
+					<span class="fld__q tty" aria-hidden="true">?</span>
+					<T v={s('hire.summary')} />
+				</label>
+				<div class="here">
+					<p class="here__mark tty" aria-hidden="true">
+						cat &gt; brief.txt &lt;&lt;'EOF'
+					</p>
+					<textarea
+						id="summary"
+						name="summary"
+						dir="auto"
+						rows="6"
+						required
+						data-ph-en={s('hire.summaryPlaceholder').en}
+						data-ph-ar={s('hire.summaryPlaceholder').ar}></textarea>
+					<p class="here__mark tty" aria-hidden="true">EOF</p>
+				</div>
+			</div>
+
+			<div class="send">
+				<button class="send__btn" type="submit">
+					<T v={s('hire.submit')} />
+					<span class="tty" aria-hidden="true">⏎</span>
+				</button>
+				<T v={s('hire.note')} class="send__note" />
+			</div>
+
+			<p class="sent" role="status">
+				<span class="sent__code tty" aria-hidden="true">[0]</span>{' '}<T
+					v={s('hire.sent')}
+				/>{' '}
+				<a class="go tty" href={`mailto:${profile.email}`}>{profile.email}</a>
+			</p>
+		</form>
+	</section>
+
+	<HireCompose />
+</Shell>
+
+<style is:global>
+	.block--man {
+		padding-block-start: clamp(1.75rem, 4vw, 3rem);
+	}
+
+	/* Two columns that flow rather than a grid that leaves holes: the four
+	   man sections are wildly different heights. */
+	.man {
+		max-width: 66rem;
+	}
+
+	@media (min-width: 56rem) {
+		.man {
+			column-count: 2;
+			column-gap: 3rem;
+		}
+	}
+
+	.man__sec {
+		break-inside: avoid;
+		border-block-start: 1px solid var(--rule);
+		padding-block-start: 0.85rem;
+		margin-block-end: 1.75rem;
+	}
+
+	.man__h {
+		margin: 0 0 0.6rem;
+		font-size: 0.74rem;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		color: var(--amber);
+	}
+
+	.man__h [data-l='en'] {
+		text-transform: uppercase;
+	}
+
+	.man__syn {
+		margin: 0;
+		color: var(--ash);
+		font-size: 0.78rem;
+		word-break: break-word;
+	}
+
+	html[dir='rtl'] :is(.man__syn, .here__mark) {
+		text-align: right;
+	}
+
+	.takes,
+	.exits {
+		margin: 0;
+	}
+
+	.takes__row {
+		padding-block: 0.4rem;
+	}
+
+	.takes__row + .takes__row {
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.takes__t {
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.takes__d {
+		margin: 0;
+		color: var(--ash);
+		font-size: 0.8rem;
+		max-width: 58ch;
+	}
+
+	.notes {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.notes__i {
+		display: grid;
+		grid-template-columns: 2ch minmax(0, 1fr);
+		gap: 0 0.5ch;
+		color: var(--ash);
+		max-width: 60ch;
+	}
+
+	.notes__b {
+		color: var(--rule);
+	}
+
+	.exits__row {
+		display: grid;
+		grid-template-columns: 3ch minmax(0, 1fr);
+		gap: 0 1ch;
+		padding-block: 0.3rem;
+	}
+
+	.exits__c {
+		color: var(--jade);
+		font-weight: 600;
+	}
+
+	.exits__v {
+		margin: 0;
+		color: var(--ash);
+	}
+
+	/* ── the prompt form ────────────────────────────────────────────── */
+	.tty-form {
+		display: grid;
+		gap: 1.5rem;
+		max-width: 46rem;
+	}
+
+	.fld--pair {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 40rem) {
+		.fld--pair {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.fld__lbl {
+		display: block;
+		margin-block-end: 0.35rem;
+		color: var(--bone);
+		font-size: 0.82rem;
+	}
+
+	.fld__q {
+		color: var(--jade);
+		font-weight: 600;
+		margin-inline-end: 0.5ch;
+	}
+
+	html[dir='rtl'] .fld__q {
+		margin-inline-end: 0;
+		margin-inline-start: 0.5ch;
+	}
+
+	.fld__hint {
+		margin: 0 0 0.5rem;
+		color: var(--ash);
+		font-size: 0.74rem;
+	}
+
+	.fld__in {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		border: 1px solid var(--rule);
+		background: var(--panel);
+		padding: 0.4rem 0.7rem;
+	}
+
+	.fld__in:focus-within {
+		border-color: var(--amber);
+	}
+
+	.fld__caret {
+		color: var(--amber);
+		flex: none;
+	}
+
+	.fld__in input {
+		flex: 1 1 auto;
+		min-width: 0;
+		border: 0;
+		background: transparent;
+		color: var(--bone);
+		font: inherit;
+		padding: 0;
+	}
+
+	.fld__in input:focus {
+		outline: none;
+	}
+
+	.fld__in input::placeholder,
+	.here textarea::placeholder {
+		color: var(--rule);
+	}
+
+	.fld__in input:user-invalid {
+		color: var(--rose);
+	}
+
+	.fld__in:has(input:user-invalid) {
+		border-color: var(--rose);
+	}
+
+	.grp {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+
+	.grp legend {
+		padding: 0;
+	}
+
+	.opts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem 1.25rem;
+	}
+
+	.opt {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.6ch;
+		cursor: pointer;
+		color: var(--ash);
+		padding-block: 0.15rem;
+	}
+
+	.opt:hover {
+		color: var(--bone);
+	}
+
+	.opt__box::before {
+		content: '[ ]';
+		color: var(--rule);
+	}
+
+	.opt__box--radio::before {
+		content: '( )';
+	}
+
+	.opt input:checked ~ .opt__box::before {
+		content: '[x]';
+		color: var(--amber);
+	}
+
+	.opt input:checked ~ .opt__box--radio::before {
+		content: '(•)';
+	}
+
+	.opt:has(input:checked) {
+		color: var(--bone);
+	}
+
+	.opt input:focus-visible ~ .opt__box {
+		outline: 2px solid var(--amber);
+		outline-offset: 2px;
+	}
+
+	.here {
+		border: 1px solid var(--rule);
+		background: var(--panel);
+		padding: 0.4rem 0.7rem;
+	}
+
+	.here:focus-within {
+		border-color: var(--amber);
+	}
+
+	.here__mark {
+		margin: 0;
+		color: var(--rule);
+		font-size: 0.72rem;
+	}
+
+	.here textarea {
+		display: block;
+		width: 100%;
+		border: 0;
+		background: transparent;
+		color: var(--bone);
+		font: inherit;
+		line-height: 1.7;
+		resize: vertical;
+		padding: 0.25rem 0;
+	}
+
+	.here textarea:focus {
+		outline: none;
+	}
+
+	.send {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1.25rem;
+	}
+
+	.send__btn {
+		appearance: none;
+		border: 0;
+		background: var(--amber);
+		color: var(--void);
+		font: inherit;
+		font-weight: 600;
+		padding: 0.5rem 1.1rem;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.75ch;
+	}
+
+	.send__btn:hover {
+		background: var(--bone);
+	}
+
+	.send__note {
+		color: var(--ash);
+		font-size: 0.78rem;
+	}
+
+	.sent {
+		display: none;
+		margin: 0;
+		border: 1px solid var(--jade);
+		background: color-mix(in srgb, var(--jade) 8%, transparent);
+		padding: 0.7rem 0.9rem;
+		color: var(--bone);
+	}
+
+	.sent__code {
+		color: var(--jade);
+		font-weight: 600;
+		margin-inline-end: 0.75ch;
+	}
+
+	html[dir='rtl'] .sent__code {
+		margin-inline-end: 0;
+		margin-inline-start: 0.75ch;
+	}
+
+	.tty-form[data-sent] .sent {
+		display: block;
+	}
+</style>

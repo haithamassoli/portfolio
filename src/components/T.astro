@@ -1,7 +1,12 @@
 ---
-/* One bilingual string, written twice. LangBoot's CSS shows the current one.
-   Do not pass `id`: the element is rendered twice. */
+/* One bilingual string, in the language of the page it is on.
+
+   The page's language comes from its URL — every design has real /ar routes —
+   so nothing has to be threaded through the tree. `lang` stays on the element
+   because several hundred CSS rules across the designs select on it to swap
+   the Arabic face, its size and its tracking. */
 import type { I18n } from '../../content/types';
+import { langOf } from '../designs/routes';
 
 interface Props {
 	v: I18n;
@@ -13,7 +18,7 @@ interface Props {
 
 const { v, as = 'span', ...rest } = Astro.props;
 const Tag = as;
+const lang = langOf(Astro.url.pathname);
 ---
 
-<Tag {...rest} data-l="en" lang="en">{v.en}</Tag>
-<Tag {...rest} data-l="ar" lang="ar">{v.ar}</Tag>
+<Tag {...rest} lang={lang}>{v[lang]}</Tag>

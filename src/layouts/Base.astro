@@ -5,6 +5,10 @@ import { canonical as canonicalUrl, dirOf, useT, type Lang } from '../i18n';
 import { profile } from '../../content/profile';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Reveal from '../designs/_shared/Reveal.astro';
+import DesignSwitch from '../designs/_shared/DesignSwitch.astro';
+import { byId } from '../designs/registry';
+import { gateSource } from '../designs/boot';
 import '../styles/global.css';
 
 interface Props {
@@ -45,6 +49,11 @@ const card =
 	}));
 const ogImage = new URL(card?.src ?? '/og.png', site).href;
 
+/* The gate only stands on the two home pages: anywhere else it would re-run on
+   every navigation inside a design. */
+const isHome =
+	Astro.url.pathname.replace(/\/$/, '') === (lang === 'ar' ? '/ar' : '');
+
 /* One Person record, on the home page only, because repeating it on eighty pages
    tells Google nothing it did not already know. */
 const person = {
@@ -63,9 +72,20 @@ const person = {
 ---
 
 <!doctype html>
-<html lang={lang} dir={dir} style={accent ? `--accent:${accent}` : undefined}>
+<html
+	lang={lang}
+	dir={dir}
+	data-design="main"
+	style={accent ? `--accent:${accent}` : undefined}
+>
 	<head>
 		<meta charset="utf-8" />
+		{
+			/* Blocking, before first paint, so a returning visitor never sees the
+			   main design flash past on the way to theirs. Crawlers do not run it,
+			   which is why `/` stays the canonical page. */
+			isHome && <script is:inline set:html={gateSource()} />
+		}
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
@@ -117,11 +137,25 @@ const person = {
 		/>
 		<Font cssVariable="--font-mono" preload={[{ weight: 400 }]} />
 		<ClientRouter />
+		<Reveal />
 	</head>
 	<body>
 		<a class="skip mono" href="#main">{t('nav.skip')}</a>
 		<Nav lang={lang} />
-		<main id="main" tabindex="-1"><slot /></main>
+		<main id="main" tabindex="-1">
+			<slot />
+			{
+				/* Sub-pages get the same switch, kept at the foot of the content:
+				   the hero already carries it on the home page. */
+				!isHome && (
+					<DesignSwitch
+						design={byId('main')}
+						lang={lang}
+						class="dsw-row--tail"
+					/>
+				)
+			}
+		</main>
 		<Footer lang={lang} />
 	</body>
 </html>

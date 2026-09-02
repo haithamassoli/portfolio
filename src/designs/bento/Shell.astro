@@ -1,0 +1,894 @@
+---
+import type { Design } from '../registry';
+import { parse, otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+/* The tray, without anything in it. Every /5 sub-page is a set of tiles
+   dropped into this. The lid at the top carries the name, the routes and the
+   language switch; the compartments below are each page's own composition. */
+import LangBoot from '../../components/LangBoot.astro';
+import Logo from '../../components/Logo.astro';
+import Seam from '../../components/Seam.astro';
+import Reveal from '../_shared/Reveal.astro';
+import Meta from '../_shared/Meta.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+interface Props {
+	design: Design;
+	lang: Lang;
+	title: string;
+	description: string;
+	/** Which route to mark as current in the lid. */
+	page?: 'projects' | 'work' | 'hire';
+}
+
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+const { design, lang } = Astro.props;
+const route = parse(Astro.url.pathname).page;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const { title, description, page } = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="color-scheme" content="light" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+		/>
+		<LangBoot />
+		<Seam />
+		<Reveal />
+		<Meta design={design} lang={lang} />
+	</head>
+
+	<body>
+		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
+
+		<div class="tray">
+			<header class="lid">
+				<a class="lid__name" href={u()}>
+					<Logo class="lid__logo" labelled={false} />
+					<T class="sr-only" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+				</a>
+
+				<nav class="lid__nav mono">
+					<a href={u()}><T v={s('nav.home')} /></a>
+					<a
+						href={u('/work')}
+						aria-current={page === 'projects' ? 'page' : undefined}
+					>
+						<T v={s('nav.work')} />
+					</a>
+					<a
+						href={u('/hire')}
+						aria-current={page === 'hire' ? 'page' : undefined}
+					>
+						<T v={s('nav.hire')} />
+					</a>
+				</nav>
+
+				<a
+					href={otherLang(Astro.url.pathname)}
+					class="langsw"
+					data-lang-link
+					dir="ltr"
+					lang="en"
+				>
+					<span class="langsw__slot" aria-hidden="true">
+						<span class="langsw__lid"></span>
+						<span class="langsw__opt">EN</span>
+						<span class="langsw__opt" lang="ar">ع</span>
+					</span>
+					<span class="sr-only" data-l="en" lang="en"
+						>Read this page in Arabic</span
+					>
+					<span class="sr-only" data-l="ar" lang="ar"
+						>اقرأ هذه الصفحة بالإنجليزية</span
+					>
+				</a>
+			</header>
+
+			<main id="main">
+				<slot />
+				{
+					/* Sub-pages get the same switch, kept out of the way at the foot
+				   of the content instead of at the top: the hero already carries
+				   it on the home page, and one design gets one switch. */
+					route !== '' && (
+						<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+					)
+				}
+			</main>
+
+			<footer class="foot">
+				<p class="mono">
+					<span data-l="en" lang="en">Haitham Assoli — Amman, Jordan.</span>
+					<span data-l="ar" lang="ar">هيثم العسولي — عمّان، الأردن.</span>
+				</p>
+				<p class="mono foot__links">
+					<a href={u()}><T v={pair('The tray', 'الصينية')} /></a>
+					<a href={u('/work')}><T v={s('work.all')} /></a>
+					<a href={u('/hire')}><T v={s('nav.hire')} /></a>
+				</p>
+			</footer>
+		</div>
+
+		<script is:inline>
+			/* The tray's wiring, written out the same way here and on /5, so the
+			   router recognises it and runs it once for the whole section rather
+			   than again on every arrival. */
+			(function () {
+				const mark = () => document.documentElement.classList.add('js');
+				mark();
+				/* The router copies <html> off the incoming page, so the class goes
+				   back on before that page paints. */
+				document.addEventListener('astro:after-swap', mark);
+
+				const revealAll = () =>
+					document
+						.querySelectorAll('.board')
+						.forEach((b) => b.classList.add('is-in'));
+				document.addEventListener('visibilitychange', revealAll);
+
+				/* The rest hangs off whichever tray is on screen, so it is wired
+				   again on every arrival; the two listeners above are set once. */
+				function wire() {
+					/* Cursor-tracked highlight: one listener for the whole tray. */
+					const tray = document.querySelector('.tray');
+					if (tray) {
+						tray.addEventListener('pointermove', (e) => {
+							const tile = e.target.closest('.tile');
+							if (!tile) return;
+							const r = tile.getBoundingClientRect();
+							tile.style.setProperty('--mx', `${e.clientX - r.left}px`);
+							tile.style.setProperty('--my', `${e.clientY - r.top}px`);
+						});
+					}
+
+					/* Boards settle in as they arrive. */
+					if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+						revealAll();
+						return;
+					}
+
+					const io = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (!entry.isIntersecting) return;
+								entry.target.classList.add('is-in');
+								io.unobserve(entry.target);
+							});
+						},
+						{ rootMargin: '0px 0px -8% 0px' },
+					);
+					document.querySelectorAll('.board').forEach((b) => io.observe(b));
+					/* Whatever happens, nothing stays hidden. */
+					setTimeout(revealAll, 2000);
+				}
+				wire();
+				document.addEventListener('astro:after-swap', wire);
+			})();
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	/* ============================================================
+	   #5 BENTO — the shared tray for /5/projects, /5/work/… and /5/hire.
+	   Same clay, same compartments, same materials as the home page.
+	   ============================================================ */
+
+	:root {
+		--tray: #cdb79b;
+		--tray-deep: #b79b7b;
+		--bone: #fbf6ec;
+		--ink: #1e1713;
+		--cobalt: #17457f;
+		--marigold: #e9a426;
+		--pomegranate: #b8402f;
+
+		--rule: rgba(30, 23, 19, 0.14);
+		--row: 7.5rem;
+		--gap: 0.7rem;
+		--pad: clamp(1rem, 2vw, 1.5rem);
+		--radius: 20px;
+
+		--sans:
+			'IBM Plex Sans Arabic', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+		--display: 'Bricolage Grotesque', var(--sans);
+		--mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		background-color: var(--tray);
+		background-image:
+			radial-gradient(
+				120% 80% at 12% 0%,
+				rgba(255, 246, 232, 0.5),
+				rgba(255, 246, 232, 0) 60%
+			),
+			radial-gradient(
+				90% 60% at 95% 100%,
+				rgba(23, 69, 127, 0.16),
+				rgba(23, 69, 127, 0) 55%
+			),
+			repeating-linear-gradient(
+				117deg,
+				rgba(30, 23, 19, 0.035) 0 1px,
+				rgba(30, 23, 19, 0) 1px 4px
+			);
+		color: var(--ink);
+		font-family: var(--sans);
+		font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.02rem);
+		line-height: 1.55;
+		overflow-x: hidden;
+	}
+
+	img,
+	svg {
+		display: block;
+		max-width: 100%;
+	}
+
+	p {
+		margin: 0;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	:focus-visible {
+		outline: 3px solid var(--focus, var(--ink));
+		outline-offset: 3px;
+		border-radius: 6px;
+	}
+
+	.skip {
+		position: absolute;
+		z-index: 20;
+		inset-inline-start: 0.75rem;
+		top: 0.75rem;
+		padding: 0.5rem 0.9rem;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bone);
+		font-family: var(--mono);
+		font-size: 0.78rem;
+		text-decoration: none;
+		transform: translateY(-160%);
+		transition: transform 0.18s ease;
+	}
+
+	.skip:focus-visible {
+		transform: none;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.mono {
+		font-family: var(--mono);
+		font-weight: 400;
+	}
+
+	.tray {
+		max-width: 84rem;
+		margin: 0 auto;
+		padding: clamp(0.75rem, 2vw, 1.5rem) clamp(0.6rem, 2vw, 1.5rem) 7.5rem;
+	}
+
+	/* ---------------- the lid ---------------- */
+
+	.lid {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1.1rem;
+		margin-bottom: calc(var(--gap) * 2);
+		padding: 0.55rem 0.9rem;
+		border-radius: 999px;
+		background: var(--bone);
+		box-shadow:
+			inset 0 0 0 1px rgba(30, 23, 19, 0.09),
+			0 12px 22px -18px rgba(30, 23, 19, 0.9);
+	}
+
+	.lid__name {
+		display: flex;
+		align-items: center;
+	}
+
+	/* The wordmark wears the tray's own paint: ink letters on bone, ruled in
+	   pomegranate like every other accent on a light tile. Three classes to
+	   outweigh the component's own scoped `block-size: auto`. */
+	.lid .lid__name .lid__logo {
+		block-size: 1.25rem;
+		inline-size: auto;
+		color: var(--ink);
+		--logo-rule: var(--pomegranate);
+	}
+
+	/* On the way in, the rule warms to the lid's own marigold. */
+	.lid__name:hover .lid__logo {
+		--logo-rule: var(--marigold);
+	}
+
+	.lid__nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.2rem 0.35rem;
+		margin-inline-start: auto;
+		font-size: 0.76rem;
+	}
+
+	.lid__nav a {
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+		text-decoration: none;
+		color: rgba(30, 23, 19, 0.7);
+		transition:
+			background 0.18s ease,
+			color 0.18s ease;
+	}
+
+	.lid__nav a:hover {
+		background: rgba(30, 23, 19, 0.08);
+		color: var(--ink);
+	}
+
+	.lid__nav a[aria-current='page'] {
+		background: var(--ink);
+		color: var(--bone);
+	}
+
+	/* ---------------- the language switch ----------------
+	   The same sliding lid as the home page, pressed into a pill. It stays
+	   dir="ltr" so the lid always travels towards the language it selects. */
+
+	.langsw {
+		flex: 0 0 auto;
+		padding: 3px;
+		border: 0;
+		border-radius: 999px;
+		background: rgba(30, 23, 19, 0.1);
+		box-shadow: inset 0 0 0 1px rgba(30, 23, 19, 0.08);
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.langsw__slot {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.langsw__lid {
+		position: absolute;
+		z-index: 0;
+		inset-block: 0;
+		left: 0;
+		width: 50%;
+		border-radius: 999px;
+		background: var(--marigold);
+		box-shadow: 0 4px 10px -6px rgba(30, 23, 19, 0.9);
+		transition: transform 0.36s cubic-bezier(0.2, 0.8, 0.25, 1);
+	}
+
+	html[lang='ar'] .langsw__lid {
+		transform: translateX(100%);
+	}
+
+	.langsw__opt {
+		position: relative;
+		z-index: 1;
+		min-width: 2.4rem;
+		padding: 0.26rem 0.6rem;
+		font-family: var(--mono);
+		font-size: 0.76rem;
+		line-height: 1.3;
+		text-align: center;
+		color: rgba(30, 23, 19, 0.5);
+		transition: color 0.25s ease;
+	}
+
+	html[lang='en'] .langsw__opt:nth-child(2),
+	html[lang='ar'] .langsw__opt:nth-child(3) {
+		color: #2a1c06;
+	}
+
+	.langsw:hover .langsw__lid {
+		filter: brightness(1.06);
+	}
+
+	/* ---------------- the grid ---------------- */
+
+	.board {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		grid-auto-rows: minmax(var(--row), auto);
+		gap: var(--gap);
+		margin-bottom: calc(var(--gap) * 3);
+	}
+
+	/* Prose tiles size to their words instead of to the row rhythm. */
+	.board--flow {
+		grid-auto-rows: auto;
+	}
+
+	.board__head {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.3rem 1rem;
+		padding: 0.9rem 0.6rem 0.1rem;
+	}
+
+	.board__h {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem);
+		letter-spacing: -0.035em;
+		line-height: 1;
+	}
+
+	.board__lede {
+		font-size: 0.86rem;
+		color: rgba(30, 23, 19, 0.7);
+		max-width: 40ch;
+	}
+
+	.board__count {
+		margin-inline-start: auto;
+		padding: 0.14rem 0.6rem;
+		border-radius: 999px;
+		background: rgba(30, 23, 19, 0.12);
+		font-family: var(--mono);
+		font-size: 0.72rem;
+		white-space: nowrap;
+	}
+
+	.w1 {
+		grid-column: span 1;
+	}
+	.w2 {
+		grid-column: span 2;
+	}
+	.w3 {
+		grid-column: span 3;
+	}
+	.w4 {
+		grid-column: span 4;
+	}
+	.w5 {
+		grid-column: span 5;
+	}
+	.w6 {
+		grid-column: span 6;
+	}
+	.w7 {
+		grid-column: span 7;
+	}
+	.w8 {
+		grid-column: span 8;
+	}
+	.w9 {
+		grid-column: span 9;
+	}
+	.w12 {
+		grid-column: span 12;
+	}
+
+	.h1 {
+		grid-row: span 1;
+	}
+	.h2 {
+		grid-row: span 2;
+	}
+	.h3 {
+		grid-row: span 3;
+	}
+	.h4 {
+		grid-row: span 4;
+	}
+
+	/* ---------------- the tile itself ---------------- */
+
+	.tile {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 0.55rem;
+		min-width: 0;
+		padding: var(--pad);
+		border-radius: var(--radius);
+		background: var(--bone);
+		box-shadow:
+			inset 0 0 0 1px rgba(30, 23, 19, 0.09),
+			0 1px 0 rgba(255, 250, 240, 0.4),
+			0 12px 22px -18px rgba(30, 23, 19, 0.9);
+		isolation: isolate;
+		overflow: hidden;
+	}
+
+	.tile::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.25s ease;
+		background: radial-gradient(
+			14rem 14rem at var(--mx, 50%) var(--my, 50%),
+			color-mix(in srgb, var(--accent, #ffffff) 34%, transparent),
+			transparent 72%
+		);
+		mix-blend-mode: soft-light;
+	}
+
+	.tile:hover::before,
+	.tile:focus-visible::before {
+		opacity: 1;
+	}
+
+	.tile--ink {
+		background: var(--ink);
+		color: var(--bone);
+		--focus: var(--marigold);
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 246, 232, 0.1),
+			0 14px 26px -18px rgba(30, 23, 19, 1);
+	}
+
+	.tile--cobalt {
+		background: var(--cobalt);
+		color: #eef4fb;
+		--focus: var(--marigold);
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+			0 14px 26px -18px rgba(11, 33, 61, 1);
+	}
+
+	.tile--marigold {
+		background: var(--marigold);
+		color: #2a1c06;
+		--focus: var(--ink);
+		box-shadow:
+			inset 0 0 0 1px rgba(42, 28, 6, 0.18),
+			0 14px 26px -18px rgba(120, 82, 12, 0.9);
+	}
+
+	a.tile {
+		text-decoration: none;
+		transition:
+			transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
+			box-shadow 0.22s ease;
+	}
+
+	a.tile:hover {
+		transform: translateY(-3px);
+	}
+
+	a.tile::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		border-radius: inherit;
+		pointer-events: none;
+		box-shadow: inset 0 0 0 2px var(--accent, transparent);
+		opacity: 0;
+		transition: opacity 0.22s ease;
+	}
+
+	a.tile:hover::after,
+	a.tile:focus-visible::after {
+		opacity: 1;
+	}
+
+	.lbl {
+		font-size: 0.63rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: rgba(30, 23, 19, 0.5);
+	}
+
+	.lbl--on-dark {
+		color: rgba(251, 246, 236, 0.55);
+	}
+
+	.tile--marigold .lbl {
+		color: rgba(42, 28, 6, 0.6);
+	}
+
+	/* ---------------- small shared parts ---------------- */
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.chip {
+		padding: 0.16rem 0.55rem;
+		border-radius: 999px;
+		border: 1px solid var(--rule);
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.02em;
+	}
+
+	.tile--ink .chip,
+	.tile--cobalt .chip {
+		border-color: rgba(251, 246, 236, 0.22);
+	}
+
+	.chip--status {
+		border-color: transparent;
+		background: color-mix(
+			in srgb,
+			var(--accent, var(--marigold)) 22%,
+			transparent
+		);
+		color: color-mix(in srgb, var(--accent, var(--ink)) 68%, var(--ink));
+	}
+
+	.tile--ink .chip--status,
+	.tile--cobalt .chip--status {
+		color: color-mix(in srgb, var(--accent, #ffffff) 55%, #ffffff);
+	}
+
+	.prose p {
+		font-size: 0.9rem;
+		line-height: 1.62;
+		color: rgba(30, 23, 19, 0.8);
+		max-width: 62ch;
+	}
+
+	.prose p + p {
+		margin-top: 0.7rem;
+	}
+
+	.tile--ink .prose p,
+	.tile--cobalt .prose p {
+		color: rgba(251, 246, 236, 0.78);
+	}
+
+	.tile--marigold .prose p {
+		color: rgba(42, 28, 6, 0.82);
+	}
+
+	.tile__h {
+		margin: 0;
+		font-family: var(--display);
+		font-weight: 800;
+		font-size: clamp(1.1rem, 0.95rem + 0.6vw, 1.5rem);
+		letter-spacing: -0.035em;
+		line-height: 1.06;
+	}
+
+	.tile__h--big {
+		font-size: clamp(1.6rem, 1.1rem + 2.2vw, 3rem);
+		letter-spacing: -0.045em;
+		line-height: 1;
+		text-wrap: balance;
+	}
+
+	.arrow {
+		font-family: var(--mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.05em;
+		color: var(--marigold);
+	}
+
+	.tile--bone .arrow,
+	.tile--marigold .arrow {
+		color: var(--pomegranate);
+	}
+
+	/* ---------------- footer ---------------- */
+
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.4rem 1rem;
+		padding: 0.4rem 0.6rem;
+		font-size: 0.72rem;
+		color: rgba(30, 23, 19, 0.62);
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.2rem 1rem;
+	}
+
+	.foot__links a {
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	.foot__links a:hover {
+		color: var(--pomegranate);
+	}
+
+	/* ---------------- arrival ---------------- */
+
+	.js .board .tile {
+		opacity: 0;
+	}
+
+	.js .board.is-in .tile {
+		animation: tile-in 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+		animation-delay: calc(var(--i, 0) * 40ms);
+		opacity: 1;
+	}
+
+	@keyframes tile-in {
+		from {
+			opacity: 0;
+			transform: translateY(14px) scale(0.985);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* ---------------- responsive: six columns ---------------- */
+
+	@media (max-width: 68rem) {
+		:root {
+			--row: 6.75rem;
+		}
+
+		.board {
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+			/* Six columns leave odd gaps; let small tiles backfill them. */
+			grid-auto-flow: dense;
+		}
+
+		.w1,
+		.w2,
+		.w3,
+		.w4 {
+			grid-column: span 3;
+		}
+
+		.w5,
+		.w6,
+		.w7,
+		.w8,
+		.w9,
+		.w12 {
+			grid-column: span 6;
+		}
+
+		.h4 {
+			grid-row: span 3;
+		}
+	}
+
+	/* ---------------- responsive: one column ---------------- */
+
+	@media (max-width: 46rem) {
+		:root {
+			--gap: 0.6rem;
+			--radius: 18px;
+		}
+
+		.board {
+			grid-template-columns: minmax(0, 1fr);
+			grid-auto-rows: auto;
+		}
+
+		.tile {
+			grid-column: 1 / -1 !important;
+			grid-row: auto !important;
+		}
+
+		.lid {
+			border-radius: var(--radius);
+			padding: 0.7rem 0.9rem;
+		}
+
+		.lid__nav {
+			margin-inline-start: 0;
+			width: 100%;
+			order: 3;
+		}
+	}
+
+	/* ---------------- Arabic ----------------
+	   Arabic has no capitals and no italics, and letter-spacing breaks the
+	   joins. Everything carrying lang="ar" opts out of all three. */
+
+	[lang='ar'],
+	[lang='ar'] * {
+		font-family: var(--sans);
+		font-style: normal;
+		font-variant: normal;
+		text-transform: none;
+		letter-spacing: normal;
+	}
+
+	[lang='ar'] {
+		line-height: 1.75;
+	}
+
+	.board__h [lang='ar'],
+	.tile__h [lang='ar'],
+	[lang='ar'].board__h,
+	[lang='ar'].tile__h {
+		font-weight: 700;
+		letter-spacing: 0;
+		line-height: 1.3;
+	}
+
+	.mono [lang='ar'],
+	.lbl [lang='ar'],
+	[lang='ar'].mono,
+	[lang='ar'].lbl,
+	[lang='ar'].chip {
+		font-family: var(--sans);
+	}
+
+	/* ---------------- reduced motion ---------------- */
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+		}
+
+		.js .board .tile {
+			opacity: 1;
+		}
+
+		a.tile:hover {
+			transform: none;
+		}
+	}
+</style>
