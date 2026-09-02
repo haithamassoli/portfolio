@@ -7,7 +7,7 @@
    language on the main design — the one spelling worth ranking. */
 import { designs, type Design } from '../registry';
 import { parse, url } from '../routes';
-import type { Lang } from '../../i18n';
+import { canonical, type Lang } from '../../i18n';
 
 interface Props {
 	design: Design;
@@ -17,8 +17,7 @@ interface Props {
 const { design, lang } = Astro.props;
 const { page } = parse(Astro.url.pathname);
 const site = Astro.site ?? Astro.url.origin;
-const abs = (path: string) =>
-	new URL(path, site).href.replace(/(?<=[^/])\/$/, '');
+const abs = (path: string) => canonical(path, site);
 ---
 
 <meta name="robots" content="noindex, follow" />

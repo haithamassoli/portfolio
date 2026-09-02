@@ -5,6 +5,7 @@
    ponytail: delete once nobody links to a number any more. */
 import { designs } from '../designs/registry';
 import { url } from '../designs/routes';
+import { canonical } from '../i18n';
 
 export function getStaticPaths() {
 	return designs
@@ -16,7 +17,7 @@ export function getStaticPaths() {
 }
 
 const { to } = Astro.props;
-const here = new URL(to, Astro.site ?? Astro.url.origin).href;
+const here = canonical(to, Astro.site ?? Astro.url.origin);
 ---
 
 <!doctype html>

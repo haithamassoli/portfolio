@@ -15,12 +15,11 @@ const THEME = {
 	background: '#1d2050',
 } as const;
 
-/* An empty day, then four steps of the site's orange climbing out of the
-   panel. Stepped against the #1d2050 surface: monotone in lightness, every
-   gap over 0.06, and the dimmest step still clears 2:1 so one quiet day does
-   not read as blank. */
-/* An empty day sits below the panel rather than above it. A light tint reads
-   as a filled tile of another colour; the page ink reads as absence. */
+/* An empty day sits below the #1d2050 panel rather than above it: a light
+   tint reads as a filled tile of another colour, the page ink reads as
+   absence. Then four steps of the site's orange climbing out of the panel,
+   monotone in lightness with every gap over 0.06, the dimmest still clearing
+   2:1 so one quiet day does not read as blank either. */
 const EMPTY = '#191c46';
 const RAMP = ['#874131', '#bf4f36', '#f26546', '#ff8563'] as const;
 
@@ -211,10 +210,8 @@ export function cumulativeContributions(
 				id: 'cumulative',
 				x: 'index',
 				y: 'total',
-				// The brighter step as a wash: the mid one turns muddy against
-				// indigo at any opacity that still reads as a fill.
-				// The dimmest step, near-opaque: a bright wash over indigo goes
-				// mauve at every alpha that still reads as a fill.
+				// The dimmest step as the wash, the brightest as the line: a bright
+				// fill over indigo goes mauve at every alpha that still reads as one.
 				fill: RAMP[0],
 				fillOpacity: 0.45,
 				stroke: RAMP[3],

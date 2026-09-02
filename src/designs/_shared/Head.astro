@@ -1,0 +1,45 @@
+---
+/* One <head> for all seven design variants. They differ in exactly three
+   things — the title, the description, and which webfonts they load — and
+   every one of them wants the same LangBoot, Seam, Reveal and Meta in the
+   same order. This was eleven hand-kept copies of that list.
+
+   The slot sits where a design's own before-first-paint script goes: after
+   the fonts, before the transition machinery. Quiet Room reads its theme
+   there; Playroom sets its `js` marker. */
+import type { Design } from '../registry';
+import { fonts } from '../fonts';
+import type { Lang } from '../../i18n';
+import LangBoot from '../../components/LangBoot.astro';
+import Seam from '../../components/Seam.astro';
+import Reveal from './Reveal.astro';
+import Meta from './Meta.astro';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	title: string;
+	description: string;
+	/** Set by a design that paints one theme whatever the OS prefers. */
+	colorScheme?: 'light' | 'dark';
+}
+
+const { design, lang, title, description, colorScheme } = Astro.props;
+const href = fonts[design.id as Exclude<Design['id'], 'main'>];
+---
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>{title}</title>
+	<meta name="description" content={description} />
+	{colorScheme && <meta name="color-scheme" content={colorScheme} />}
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="stylesheet" href={href} />
+	<LangBoot />
+	<slot />
+	<Seam />
+	<Reveal />
+	<Meta design={design} lang={lang} />
+</head>

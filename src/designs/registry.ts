@@ -123,9 +123,6 @@ export const heavy = designs
 export const byId = (id: string): Design =>
 	designs.find((d) => d.id === id) ?? designs[0];
 
-export const byN = (n: number): Design | undefined =>
-	designs.find((d) => d.n === n && d.n !== 0);
-
 /** Position in the set, printed on the switch as `03 / 08`. */
 export const pad = (n: number) => String(n).padStart(2, '0');
 export const indexOf = (id: DesignId) => designs.findIndex((d) => d.id === id);

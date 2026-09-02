@@ -32,13 +32,13 @@ language switch never falls back.
 
 Each project carries enough for a full page:
 
-| field                                                 | what it is                                            |
-| ----------------------------------------------------- | ----------------------------------------------------- |
-| `summary`                                             | 2–4 sentences under the title                         |
+| field                                                 | what it is                                           |
+| ----------------------------------------------------- | ---------------------------------------------------- |
+| `summary`                                             | 2–4 sentences under the title                        |
 | `overview`                                            | long-form paragraphs, the story                      |
 | `challenges`                                          | `{ title, problem, solution }[]`, the problems faced |
-| `outcomes`                                            | result bullets                                        |
-| `stack`, `links`, `gallery`, `year`, `role`, `status` | metadata                                              |
+| `outcomes`                                            | result bullets                                       |
+| `stack`, `links`, `gallery`, `year`, `role`, `status` | metadata                                             |
 
 74 challenge entries across 39 projects.
 

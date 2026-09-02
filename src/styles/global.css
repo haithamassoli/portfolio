@@ -188,12 +188,6 @@ select {
 	position: relative;
 }
 
-.rule {
-	border: 0;
-	border-top: 1px solid var(--rule);
-	margin: 0;
-}
-
 .tag {
 	font-family: var(--font-mono);
 	font-size: 0.68rem;

@@ -1,5 +1,6 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { parse, otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 /* Variant 4 — "Terminal". The session chrome every /4 route sits inside:
@@ -10,11 +11,7 @@ import { dirOf, type Lang } from '../../i18n';
    the same page in the other language, drawn as the environment variable a
    session would actually carry, with the `dir=` readout beside it reporting
    what the language chose. */
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
 import { dateSpan } from './_dates';
@@ -72,22 +69,7 @@ const year = new Date().getFullYear();
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@1,400&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} />
 
 	<body>
 		<T v={s('nav.skip')} as="a" class="skip" href="#main" />

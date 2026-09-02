@@ -19,8 +19,8 @@ const year = new Date().getFullYear();
 			<span class="foot__name" lang="ar" dir="rtl">{t('name.arabic')}</span>
 		</div>
 
-		<a class="foot__mail" href={`mailto:${t('footer.contact')}`} dir="ltr">
-			{t('footer.contact')}<span class="arrow">→</span>
+		<a class="foot__mail" href={`mailto:${profile.email}`} dir="ltr">
+			{profile.email}<span class="arrow">→</span>
 		</a>
 
 		<nav class="foot__links mono" aria-label={t('nav.home')}>
@@ -33,8 +33,7 @@ const year = new Date().getFullYear();
 		</nav>
 
 		<nav class="foot__links mono" aria-label={t('footer.elsewhere')}>
-			<a href={profile.links.github} target="_blank" rel="noopener me"
-				>GitHub</a
+			<a href={profile.links.github} target="_blank" rel="noopener me">GitHub</a
 			>
 			<a href={profile.links.linkedin} target="_blank" rel="noopener me"
 				>LinkedIn</a

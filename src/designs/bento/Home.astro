@@ -1,5 +1,6 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 import { Image } from 'astro:assets';
@@ -8,11 +9,7 @@ import { featured, projects } from '../../data/projects';
 import { toolbox } from '../../i18n';
 import type { Key } from '../../i18n';
 import { pair, s } from '../../data/variant-ui';
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import profilePhoto from '../../assets/images/profile.png';
 interface Props {
@@ -76,40 +73,21 @@ const ammanTime = new Intl.DateTimeFormat('en-GB', {
 	minute: '2-digit',
 }).format(new Date());
 const nowISO = new Date().toISOString();
+
+/* The cover page writes its own, rather than the shell's generic pair. */
+const title = pair(
+	'Haitham Assoli — full-stack product engineer',
+	'هيثم العسولي — مهندس منتجات برمجية متكامل',
+)[lang];
+const description = pair(
+	'Haitham Assoli builds and ships web, iOS, and Android products from Amman, from architecture and backend systems to interfaces and app-store releases.',
+	'يبني هيثم العسولي منتجات الويب وiOS وأندرويد ويطلقها من عمّان، من المعمارية وأنظمة الخادم إلى الواجهات وإصدارات المتاجر.',
+)[lang];
 ---
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>
-			{
-				pair(
-					'Haitham Assoli — full-stack product engineer',
-					'هيثم العسولي — مهندس منتجات برمجية متكامل',
-				)[lang]
-			}
-		</title>
-		<meta
-			name="description"
-			content={pair(
-				'Haitham Assoli builds and ships web, iOS, and Android products from Amman, from architecture and backend systems to interfaces and app-store releases.',
-				'يبني هيثم العسولي منتجات الويب وiOS وأندرويد ويطلقها من عمّان، من المعمارية وأنظمة الخادم إلى الواجهات وإصدارات المتاجر.',
-			)[lang]}
-		/>
-		<meta name="color-scheme" content="light" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} colorScheme="light" />
 
 	<body>
 		<a class="skip" href="#main">

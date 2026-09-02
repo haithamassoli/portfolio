@@ -1,15 +1,12 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { parse, otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 /* The tray, without anything in it. Every /5 sub-page is a set of tiles
    dropped into this. The lid at the top carries the name, the routes and the
    language switch; the compartments below are each page's own composition. */
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import { pair, s } from '../../data/variant-ui';
 interface Props {
@@ -32,23 +29,7 @@ const { title, description, page } = Astro.props;
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<meta name="color-scheme" content="light" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} colorScheme="light" />
 
 	<body>
 		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>

@@ -32,3 +32,45 @@ test('a failed fetch falls back to the frozen numbers', async () => {
 
 	vi.unstubAllGlobals();
 });
+
+/**
+ * The one piece of this module that reads someone else's markup. It is
+ * exported so it can be checked without a network, and the fixture below is
+ * the shape GitHub actually serves: cells one weekday per row, so out of date
+ * order, with the exact counts in separate <tool-tip> elements keyed by id.
+ */
+const cell = (id: string, date: string, level: number) =>
+	`<td class="ContributionCalendar-day" id="${id}" data-date="${date}" data-level="${level}"></td>`;
+
+const FIXTURE = [
+	cell('contribution-day-component-0-0', '2025-01-05', 0),
+	cell('contribution-day-component-0-1', '2025-01-12', 4),
+	cell('contribution-day-component-1-0', '2025-01-06', 2),
+	// No tool-tip: GitHub omits one for a day with nothing on it.
+	cell('contribution-day-component-1-1', '2025-01-13', 0),
+	'<tool-tip for="contribution-day-component-0-1" class="sr-only">1,204 contributions on January 12th.</tool-tip>',
+	'<tool-tip for="contribution-day-component-1-0">2 contributions on January 6th.</tool-tip>',
+	'<tool-tip for="contribution-day-component-0-0">No contributions on January 5th.</tool-tip>',
+].join('');
+
+test('the contribution calendar is parsed into dated, counted days', async () => {
+	const { parseContributions } = await import('./dev-stats');
+	const days = parseContributions(FIXTURE);
+
+	// Sorted, whatever order the rows arrived in.
+	expect(days.map((d) => d.date)).toEqual([
+		'2025-01-05',
+		'2025-01-06',
+		'2025-01-12',
+		'2025-01-13',
+	]);
+	// Thousands separators survive; "No contributions" is zero, not NaN.
+	expect(days.map((d) => d.count)).toEqual([0, 2, 1204, 0]);
+	expect(days.map((d) => d.level)).toEqual([0, 2, 4, 0]);
+});
+
+test('markup that no longer has day cells throws rather than rendering blank', async () => {
+	const { parseContributions } = await import('./dev-stats');
+	// The day GitHub renames the class, the frozen year should win.
+	expect(() => parseContributions('<td class="Renamed-day"></td>')).toThrow();
+});

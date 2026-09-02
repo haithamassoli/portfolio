@@ -1,16 +1,13 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 import { Image } from 'astro:assets';
 import { profile } from '../../../content/profile';
 import { featured, projects } from '../../data/projects';
 import { toolbox } from '../../i18n';
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import { s, pair, yearPair } from '../../data/variant-ui';
 import profilePhoto from '../../assets/images/profile.png';
@@ -110,39 +107,21 @@ const widthsFor = (img: ImageMetadata) =>
 	(img.height > img.width ? [320, 560, 780] : [440, 760, 1120]).filter(
 		(w) => w <= img.width,
 	);
+
+/* The cover page writes its own, rather than the shell's generic pair. */
+const title = pair(
+	'Haitham Assoli — web & mobile engineer',
+	'هيثم العسولي — مهندس تطبيقات جوال وويب',
+)[lang];
+const description = pair(
+	'Haitham Assoli builds and ships full-stack web, iOS, and Android products from Amman. 39 shipped, 13 on app stores, with recent work in private on-device AI.',
+	'يبني هيثم العسولي منتجات متكاملة للويب وiOS وأندرويد ويطلقها من عمّان. أطلق 39 مشروعًا، منها 13 على المتاجر، مع أعمال حديثة في الذكاء الاصطناعي الخاص على الجهاز.',
+)[lang];
 ---
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>
-			{
-				pair(
-					'Haitham Assoli — web & mobile engineer',
-					'هيثم العسولي — مهندس تطبيقات جوال وويب',
-				)[lang]
-			}
-		</title>
-		<meta
-			name="description"
-			content={pair(
-				'Haitham Assoli builds and ships full-stack web, iOS, and Android products from Amman. 39 shipped, 13 on app stores, with recent work in private on-device AI.',
-				'يبني هيثم العسولي منتجات متكاملة للويب وiOS وأندرويد ويطلقها من عمّان. أطلق 39 مشروعًا، منها 13 على المتاجر، مع أعمال حديثة في الذكاء الاصطناعي الخاص على الجهاز.',
-			)[lang]}
-		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} />
 	<body>
 		<!-- The refraction filter. One turbulence field, displaced gently, used
 		     by the hero lens and by the language switch: it is expensive and it

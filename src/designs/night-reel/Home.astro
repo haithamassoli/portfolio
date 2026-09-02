@@ -1,16 +1,13 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 import { Image } from 'astro:assets';
 import { profile } from '../../../content/profile';
 import { featured, projects } from '../../data/projects';
 import { toolbox } from '../../i18n';
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import { s, pair, yearPair } from '../../data/variant-ui';
 import profilePhoto from '../../assets/images/profile.png';
@@ -100,34 +97,20 @@ const booking: [I18n, string, string][] = [
 	[s('nav.cv'), 'cv.assoli.site', profile.links.resume],
 	[s('project.play'), 'Developer page', profile.links.playStore],
 ];
+
+/* The cover page writes its own, rather than the shell's generic pair. */
+const title = pair('Haitham Assoli — Night Reel', 'هيثم العسولي — بكرة الليل')[
+	lang
+];
+const description = pair(
+	'Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products, including thirteen on the app stores.',
+	'هيثم العسولي، مهندس ويب وجوال متكامل في عمّان. تسعة وثلاثون منتجًا صدر، منها ثلاثة عشر على متاجر التطبيقات.',
+)[lang];
 ---
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>
-			{pair('Haitham Assoli — Night Reel', 'هيثم العسولي — بكرة الليل')[lang]}
-		</title>
-		<meta
-			name="description"
-			content={pair(
-				'Haitham Assoli, web and mobile full-stack engineer in Amman. Thirty-nine shipped products, including thirteen on the app stores.',
-				'هيثم العسولي، مهندس ويب وجوال متكامل في عمّان. تسعة وثلاثون منتجًا صدر، منها ثلاثة عشر على متاجر التطبيقات.',
-			)[lang]}
-		/>
-		<LangBoot />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Barlow+Condensed:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Cairo:wght@500..900&family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap"
-			rel="stylesheet"
-		/>
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} />
 
 	<body>
 		<script is:inline>

@@ -161,7 +161,6 @@ export const ui = {
 		'project.next': 'Next project',
 		'project.back': 'All projects',
 		'footer.line': 'Selected product engineering work from Amman, Jordan.',
-		'footer.contact': 'haitham.b.assoli@gmail.com',
 		'footer.rights': 'All rights reserved',
 		'footer.elsewhere': 'Elsewhere',
 		'404.title': 'Nothing at this address',
@@ -320,7 +319,6 @@ export const ui = {
 		'project.next': 'المشروع التالي',
 		'project.back': 'كل المشاريع',
 		'footer.line': 'أعمال مختارة في هندسة المنتجات من عمّان، الأردن.',
-		'footer.contact': 'haitham.b.assoli@gmail.com',
 		'footer.rights': 'جميع الحقوق محفوظة',
 		'footer.elsewhere': 'مواقع أخرى',
 		'404.title': 'لا شيء على هذا العنوان',
@@ -372,9 +370,3 @@ export const toolbox = [
 	'Skia',
 	'Figma',
 ];
-
-/** Same page, other language. `/work/aoun` <-> `/ar/work/aoun`. */
-export const swapLangHref = (pathname: string, lang: Lang) => {
-	const path = pathname.replace(/^\/ar(?=\/|$)/, '').replace(/^\//, '');
-	return lang === 'ar' ? href('en', path) : href('ar', path);
-};

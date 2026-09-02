@@ -1,5 +1,6 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { parse, otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 /* PLAYROOM — the shell every page of variant 7 is built on.
@@ -12,12 +13,8 @@ import { dirOf, type Lang } from '../../i18n';
    All shared CSS lives here so the four pages stay thin. Every reset is
    wrapped in `:where()` — a bare `p { margin: 0 }` outranks a class rule and
    quietly eats section spacing. */
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
 import T from '../../components/T.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import { profile } from '../../../content/profile';
 import { s, pair } from '../../data/variant-ui';
 interface Props {
@@ -54,22 +51,11 @@ const footLinks = [
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Cairo:wght@400;600;800&family=Lalezar&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@700&display=swap"
-			rel="stylesheet"
-		/>
-		<LangBoot />
+	<Head {design} {lang} {title} {description}>
 		<script is:inline>
 			/* The router copies <html> attributes off the incoming page, so the
-			   marker goes back on before that page paints — otherwise the lever
-			   disappears on the second navigation. */
+		   marker goes back on before that page paints — otherwise the lever
+		   disappears on the second navigation. */
 			(function () {
 				function apply() {
 					document.documentElement.classList.add('js');
@@ -78,10 +64,7 @@ const footLinks = [
 				document.addEventListener('astro:after-swap', apply);
 			})();
 		</script>
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	</Head>
 
 	<body class="playroom">
 		<a class="skip" href="#main">

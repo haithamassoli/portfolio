@@ -1,5 +1,6 @@
 ---
-import { href, swapLangHref, useT, type Lang } from '../i18n';
+import { href, useT, type Lang } from '../i18n';
+import { otherLang } from '../designs/routes';
 import Logo from './Logo.astro';
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useT(lang);
-const other = swapLangHref(Astro.url.pathname, lang);
+const other = otherLang(Astro.url.pathname);
 
 const links = [
 	{ label: t('nav.work'), to: href(lang, 'work') },

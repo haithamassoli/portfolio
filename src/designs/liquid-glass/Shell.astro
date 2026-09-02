@@ -1,5 +1,6 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { parse, otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 /* The frame every /3 sub-page sits in: head, fonts, the field behind the
@@ -10,11 +11,7 @@ import { dirOf, type Lang } from '../../i18n';
    and the puck inside the language switch. Everything else is `.pane`, which
    is the same rim and the same tint painted flat. Over a blurred field you
    cannot tell, and the compositor can. */
-import LangBoot from '../../components/LangBoot.astro';
 import Logo from '../../components/Logo.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import { s, pair } from '../../data/variant-ui';
 import { profile } from '../../../content/profile';
@@ -44,22 +41,7 @@ const nav = [
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=Azeret+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} />
 	<body>
 		<!-- One turbulence field, displaced. The language switch drinks from it. -->
 		<svg

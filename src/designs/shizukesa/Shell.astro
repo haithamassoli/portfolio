@@ -1,5 +1,6 @@
 ---
 import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
 import { parse, otherLang, url as designUrl } from '../routes';
 import { dirOf, type Lang } from '../../i18n';
 /* 静けさ — the shell every /2 sub-page is set in.
@@ -7,10 +8,6 @@ import { dirOf, type Lang } from '../../i18n';
    the footer with the seal. The pages themselves stay thin. */
 import { profile } from '../../../content/profile';
 import { pair, s } from '../../data/variant-ui';
-import LangBoot from '../../components/LangBoot.astro';
-import Seam from '../../components/Seam.astro';
-import Reveal from '../_shared/Reveal.astro';
-import Meta from '../_shared/Meta.astro';
 import T from '../../components/T.astro';
 import Logo from '../../components/Logo.astro';
 interface Props {
@@ -40,22 +37,7 @@ const nav = [
 
 <!doctype html>
 <html lang={lang} dir={dirOf(lang)} data-design={design.id}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Shippori+Mincho:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
-		/>
-		<LangBoot />
-		<Seam />
-		<Reveal />
-		<Meta design={design} lang={lang} />
-	</head>
+	<Head {design} {lang} {title} {description} />
 
 	<body>
 		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>

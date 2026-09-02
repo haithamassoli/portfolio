@@ -1,15 +1,16 @@
 import { expect, test } from 'vitest';
 import { hireSchema } from './components/HireForm';
 import { projects } from './data/projects';
-import { href, swapLangHref, ui } from './i18n';
+import { href, ui } from './i18n';
+import { otherLang } from './designs/routes';
 
 test('language switch lands on the same page in the other language', () => {
-	expect(swapLangHref('/', 'en')).toBe('/ar/');
-	expect(swapLangHref('/ar/', 'ar')).toBe('/');
-	expect(swapLangHref('/work/aoun', 'en')).toBe('/ar/work/aoun');
-	expect(swapLangHref('/ar/work/aoun', 'ar')).toBe('/work/aoun');
+	expect(otherLang('/')).toBe('/ar');
+	expect(otherLang('/ar')).toBe('/');
+	expect(otherLang('/work/aoun')).toBe('/ar/work/aoun');
+	expect(otherLang('/ar/work/aoun')).toBe('/work/aoun');
 	// a slug that merely starts with "ar" must not be mistaken for the prefix
-	expect(swapLangHref('/work/archive', 'en')).toBe('/ar/work/archive');
+	expect(otherLang('/work/archive')).toBe('/ar/work/archive');
 	expect(href('en', 'hire')).toBe('/hire');
 	expect(href('ar', 'hire')).toBe('/ar/hire');
 });

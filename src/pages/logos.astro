@@ -80,7 +80,6 @@ const marks = [
 	},
 ];
 
-
 /* Second pass: the surname. A, the double S, and the arch — plus four
    wordmarks, type-set here and outlined once one is picked. */
 const assoli = [
@@ -269,7 +268,6 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 			}
 		</ul>
 
-
 		<header class="head head--two">
 			<p class="kicker">Second sheet</p>
 			<h1>Eight for the surname</h1>
@@ -320,7 +318,7 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 			</p>
 		</header>
 
-		<ul class="grid grid--wide">
+		<ul class="grid--wide grid">
 			{
 				words.map((m, i) => (
 					<li class="card">
@@ -349,19 +347,18 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 			}
 		</ul>
 
-
 		<header class="head head--two">
 			<p class="kicker">Arabic</p>
 			<h1>Eight in Thmanyah Sans</h1>
 			<p class="sub">
 				The name as it is actually written, set in the face the site already
-				loads &mdash; so any of these is shippable today without a new file.
-				The kashida in 27 is a real tatweel, not a drawn line, which means it
+				loads &mdash; so any of these is shippable today without a new file. The
+				kashida in 27 is a real tatweel, not a drawn line, which means it
 				stretches or shortens to fit whatever box you put it in.
 			</p>
 		</header>
 
-		<ul class="grid grid--wide">
+		<ul class="grid--wide grid">
 			{
 				arabic.map((m, i) => (
 					<li class="card">
@@ -410,7 +407,10 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 				padding: clamp(2rem, 6vw, 5rem);
 				background: var(--ink);
 				color: var(--bone);
-				font: 16px/1.5 ui-sans-serif, system-ui, sans-serif;
+				font:
+					16px/1.5 ui-sans-serif,
+					system-ui,
+					sans-serif;
 			}
 			.head {
 				max-width: 60ch;
@@ -418,7 +418,9 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 			}
 			.kicker {
 				margin: 0 0 0.75rem;
-				font: 0.75rem/1 ui-monospace, monospace;
+				font:
+					0.75rem/1 ui-monospace,
+					monospace;
 				letter-spacing: 0.18em;
 				text-transform: uppercase;
 				color: var(--sig);
@@ -463,8 +465,7 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 				justify-content: space-between;
 				gap: 1rem;
 				padding: 0.75rem 1rem;
-				border-top: 1px solid
-					color-mix(in oklab, var(--bone) 12%, transparent);
+				border-top: 1px solid color-mix(in oklab, var(--bone) 12%, transparent);
 			}
 			.chip {
 				display: grid;
@@ -494,11 +495,12 @@ const wrap = (m: (typeof marks)[number], cls: string) =>
 				display: flex;
 				gap: 0.75rem;
 				padding: 1rem;
-				border-top: 1px solid
-					color-mix(in oklab, var(--bone) 12%, transparent);
+				border-top: 1px solid color-mix(in oklab, var(--bone) 12%, transparent);
 			}
 			.num {
-				font: 0.75rem/1.4 ui-monospace, monospace;
+				font:
+					0.75rem/1.4 ui-monospace,
+					monospace;
 				color: var(--sig);
 			}
 			.name {
