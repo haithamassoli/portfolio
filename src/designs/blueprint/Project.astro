@@ -1,0 +1,343 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* One sheet per project: title block, the drawing, the details, results. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import {
+	catWord,
+	linkWord,
+	pair,
+	s,
+	statusWord,
+	yearPair,
+} from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang, project: p, next } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const no = 101 + projects.findIndex((q) => q.slug === p.slug);
+const sheet = `A-${no}`;
+const tall = (img: ImageMetadata) => img.height / img.width > 1.1;
+const overview = p.overview.en.map((en, i) => pair(en, p.overview.ar[i]));
+const outcomes = p.outcomes.en.map((en, i) => pair(en, p.outcomes.ar[i]));
+const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={`${p.title[lang]} — ${pair('Haitham Assoli', 'هيثم العسولي')[lang]}`}
+	description={p.tagline[lang]}
+	sheet={sheet}
+>
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<a class="back" href={u('/work')}>← <T v={s('project.back')} /></a>
+			<span class="dim" lang="en"> · SHEET {sheet}</span>
+		</p>
+		<T as="h1" class="h1--sm case__h1" v={p.title} />
+		<T as="p" class="lede case__tag" v={p.tagline} />
+
+		<div class="tb-wrap case__tb">
+			<table class="tb">
+				<caption class="vh"
+					><T v={pair('Title block', 'خانة العنوان')} /></caption
+				>
+				<tbody>
+					<tr>
+						<th><T v={s('project.role')} /></th>
+						<td><T v={p.role} /></td>
+						<th><T v={s('project.year')} /></th>
+						<td><T v={yearPair(p.year)} /></td>
+					</tr>
+					<tr>
+						<th><T v={s('project.status')} /></th>
+						<td><T v={statusWord[p.status]} /></td>
+						<th><T v={pair('Room', 'الغرفة')} /></th>
+						<td><T v={catWord[p.category]} /></td>
+					</tr>
+					<tr>
+						<th><T v={s('project.stack')} /></th>
+						<td colspan="3" lang="en" dir="ltr">{p.stack.join(' · ')}</td>
+					</tr>
+					{
+						Object.values(p.links).some(Boolean) && (
+							<tr>
+								<th>
+									<T v={s('project.links')} />
+								</th>
+								<td colspan="3" class="case__links">
+									{Object.entries(p.links).map(([key, url]) =>
+										url ? (
+											<a class="mark" href={url} rel="noreferrer">
+												<T v={linkWord[key]} />
+											</a>
+										) : null,
+									)}
+								</td>
+							</tr>
+						)
+					}
+				</tbody>
+			</table>
+		</div>
+
+		{
+			p.image && (
+				<figure class={`cover${tall(p.image) ? ' cover--tall' : ''}`}>
+					<Image
+						src={p.image}
+						alt={p.title[lang]}
+						widths={tall(p.image) ? [280, 560] : [480, 720, 1080]}
+						sizes={
+							tall(p.image)
+								? '17rem'
+								: '(min-width: 900px) 44rem, calc(100vw - 4rem)'
+						}
+						loading="eager"
+						decoding="async"
+					/>
+					<figcaption class="lbl lbl--sm mark">
+						<span lang="en">ELEVATION · {sheet} · SCALE 1 : 1</span>
+					</figcaption>
+				</figure>
+			)
+		}
+	</section>
+
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<span lang="en">1</span> · <T v={pair('General notes', 'ملاحظات عامة')} />
+		</p>
+		<T
+			as="h2"
+			v={pair('What it is, and why it exists.', 'ما هو، ولماذا وُجد.')}
+		/>
+		<T as="p" class="lede" v={p.summary} />
+		{overview.map((block) => <T as="p" v={block} />)}
+	</section>
+
+	{
+		p.challenges.length > 0 && (
+			<section class="sec">
+				<p class="lbl eyebrow">
+					<span lang="en">2</span>
+					{' · '}
+					<T v={s('project.challenges')} />
+				</p>
+				<div class="details">
+					{p.challenges.map((c, i) => (
+						<article class="det panel">
+							<p class="lbl lbl--sm mark det__no">
+								<span lang="en">DETAIL {i + 1}</span>
+							</p>
+							<T as="h3" v={c.title} />
+							<p class="lbl lbl--sm dim det__lbl">
+								<T v={pair('The problem', 'المشكلة')} />
+							</p>
+							<T as="p" class="dim" v={c.problem} />
+							<p class="lbl lbl--sm dim det__lbl">
+								<T v={pair('As built', 'كما نُفّذ')} />
+							</p>
+							<T as="p" v={c.solution} />
+						</article>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<span lang="en">3</span> · <T v={s('project.outcomes')} />
+		</p>
+		<ol class="outs">
+			{
+				outcomes.map((block, i) => (
+					<li>
+						<span class="lbl mark" lang="en">
+							3.{i + 1}
+						</span>
+						<T as="span" v={block} />
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
+	{
+		gallery.length > 0 && (
+			<section class="sec">
+				<p class="lbl eyebrow">
+					<span lang="en">4</span>
+					{' · '}
+					<T v={pair('Elevations', 'الواجهات')} />
+				</p>
+				<div class="shots">
+					{gallery.map((shot, i) => (
+						<figure class={`shot${tall(shot) ? ' shot--tall' : ''}`}>
+							<Image
+								src={shot}
+								alt={`${p.title[lang]} — ${i + 1}`}
+								widths={tall(shot) ? [280, 560] : [480, 720, 1080]}
+								sizes={
+									tall(shot)
+										? '14rem'
+										: '(min-width: 900px) 44rem, calc(100vw - 4rem)'
+								}
+								loading="lazy"
+								decoding="async"
+							/>
+							<figcaption class="lbl lbl--sm dim">
+								<span lang="en">ELEVATION {i + 1}</span>
+							</figcaption>
+						</figure>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<section class="sec">
+		<p class="lbl eyebrow"><T v={pair('Next sheet', 'الورقة التالية')} /></p>
+		<h2 class="nexth">
+			<a href={u(`/work/${next.slug}`)}><T as="i" v={next.title} /> →</a>
+		</h2>
+		<T as="p" class="dim" v={next.tagline} />
+	</section>
+</Shell>
+
+<style is:global>
+	.back {
+		text-decoration: none;
+	}
+
+	.back:hover {
+		color: var(--pale);
+	}
+
+	.case__h1 {
+		font-style: italic;
+	}
+
+	.case__tag {
+		margin-block: 1.4rem 0;
+		color: var(--dim);
+	}
+
+	.case__tb {
+		margin-block-start: 2.25rem;
+		max-width: 52rem;
+	}
+
+	.case__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem 1.25rem;
+	}
+
+	.cover,
+	.shot {
+		margin: 2.5rem 0 0;
+		max-width: 44rem;
+	}
+
+	.cover--tall,
+	.shot--tall {
+		max-width: 17rem;
+	}
+
+	.cover img,
+	.shot img {
+		width: 100%;
+		border: 1px solid var(--line);
+		outline: 1px solid var(--line);
+		outline-offset: 5px;
+	}
+
+	.cover figcaption,
+	.shot figcaption {
+		margin-block-start: 0.9rem;
+	}
+
+	.details {
+		display: grid;
+		gap: 1.5rem;
+		max-width: 52rem;
+	}
+
+	@media (min-width: 900px) {
+		.details {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.det__no {
+		margin-block-end: 0.5rem;
+	}
+
+	.det h3 {
+		margin-block-end: 1rem;
+		font-style: italic;
+	}
+
+	.det__lbl {
+		margin: 0 0 0.25rem;
+	}
+
+	.det p:last-child {
+		margin: 0;
+	}
+
+	.outs {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		max-width: 40rem;
+		display: grid;
+		gap: 0.9rem;
+	}
+
+	.outs li {
+		display: grid;
+		grid-template-columns: 3rem minmax(0, 1fr);
+		gap: 1rem;
+		align-items: baseline;
+	}
+
+	.shots {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2rem;
+		max-width: 44rem;
+	}
+
+	.shot {
+		margin: 0;
+		flex: 1 1 100%;
+	}
+
+	.shot--tall {
+		flex: 0 1 14rem;
+	}
+
+	.nexth a {
+		text-decoration: none;
+	}
+
+	.nexth a:hover {
+		color: var(--mark);
+	}
+</style>

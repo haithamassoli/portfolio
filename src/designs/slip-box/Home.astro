@@ -1,0 +1,616 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* Slip-box home. The hero is five index cards on the board, tied with red
+   thread; under it the method (three cards), the card the box pulled for
+   you, the six drawers, the ledger and the last card. */
+import { profile } from '../../../content/profile';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { featured, projects } from '../../data/projects';
+import { catWord, pair, s, statusWord, yearPair } from '../../data/variant-ui';
+import { toolbox } from '../../i18n';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+/* Luhmann numbering: a branch is a letter, a branch of a branch a digit. */
+const zid = [
+	'21/3d',
+	'21/3d1',
+	'4/2',
+	'9/8a',
+	'21/3d1a',
+	'4/2b',
+	'9/8',
+	'12/1',
+];
+
+/* Where each of the five hero cards sits, and how it leans. */
+const spots = [
+	{ x: 1, y: 6, w: 47, r: -3 },
+	{ x: 50, y: 0, w: 49, r: 2.2 },
+	{ x: 25, y: 33, w: 47, r: -1 },
+	{ x: 0, y: 62, w: 47, r: 1.6 },
+	{ x: 51, y: 57, w: 48, r: -2.4 },
+];
+
+const method = profile.about.en.map((en, i) => ({
+	id: ['1', '1a', '1a1'][i],
+	title: [
+		pair('One product, end to end', 'منتج واحد، من أوله إلى آخره'),
+		pair('Constraints shape the build', 'القيود تشكّل البناء'),
+		pair('What the recent cards say', 'ما تقوله البطاقات الأخيرة'),
+	][i],
+	body: pair(en, profile.about.ar[i]),
+}));
+
+const pulled = featured[0];
+
+const drawers = (
+	['web', 'mobile', 'ai', 'client', 'desktop', 'extension'] as const
+).map((cat, n) => ({
+	cat,
+	n: n + 1,
+	items: projects.filter((p) => p.category === cat),
+}));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Haitham Assoli — web and mobile engineer, Amman',
+		'هيثم العسولي — مهندس ويب وجوال، عمّان',
+	)[lang]}
+	description={pair(
+		'Haitham Assoli builds web and mobile products from Amman. Forty shipped, thirteen on the app stores, every one filed on its own card.',
+		'يبني هيثم العسولي منتجات ويب وجوال من عمّان. أربعون مشروعًا صدر، ثلاثة عشر منها على متاجر التطبيقات، ولكل واحد بطاقته.',
+	)[lang]}
+>
+	<section class="hero wrap" slot="board">
+		<div class="hero__copy">
+			<p class="k hero__eyebrow">
+				<T v={pair('A slip-box, on a screen', 'صندوق بطاقات، على شاشة')} />
+			</p>
+			<T
+				as="h1"
+				v={pair(
+					'Forty projects. One card each.',
+					'أربعون مشروعًا. بطاقة لكلٍّ منها.',
+				)}
+			/>
+			<T
+				as="p"
+				class="lede hero__lede"
+				v={pair(
+					'I build web and mobile products from Amman the way Luhmann kept notes: one idea per card, every card filed behind the one that made it. Pull a card and the box hands you the ones it links to.',
+					'أبني منتجات ويب وجوال من عمّان بالطريقة التي كان لومان يدوّن بها: فكرة واحدة في كل بطاقة، وكل بطاقة مصنّفة خلف التي أنتجتها. اسحب بطاقة يناولك الصندوق ما يرتبط بها.',
+				)}
+			/>
+			<p class="hero__do">
+				<a class="btn" href={u('/work')}
+					><T v={pair('Open the box', 'افتح الصندوق')} /></a
+				>
+				<a class="txt" href={u('/hire')}
+					><T v={pair(`${s('hero.cta2').en} →`, `${s('hero.cta2').ar} ←`)} /></a
+				>
+			</p>
+			<p class="k-lc hero__note soft">
+				<T
+					v={pair(
+						'13 on the app stores · 8 written up in full · both languages, every screen.',
+						'13 على متاجر التطبيقات · 8 مشروحة بالكامل · لغتان في كل شاشة.',
+					)}
+				/>
+			</p>
+			<DesignSwitch design={design} lang={lang} />
+		</div>
+
+		<div
+			class="stack"
+			aria-label={pair('Five project cards', 'خمس بطاقات مشاريع')[lang]}
+		>
+			<svg
+				class="thread"
+				viewBox="0 0 100 100"
+				preserveAspectRatio="none"
+				aria-hidden="true"
+			>
+				<polyline points="26,22 50,48 74,76"></polyline>
+				<polyline points="73,16 50,48 23,80"></polyline>
+				{
+					[
+						[26, 22],
+						[73, 16],
+						[50, 48],
+						[23, 80],
+						[74, 76],
+					].map(([x, y]) => <circle cx={x} cy={y} r="1.1" />)
+				}
+			</svg>
+			{
+				featured.slice(0, 5).map((p, i) => (
+					<a
+						class="card stack__card"
+						href={u(`/work/${p.slug}`)}
+						style={`--x:${spots[i].x}%;--y:${spots[i].y}%;--w:${spots[i].w}%;--r:${spots[i].r}deg`}
+					>
+						<p class="card__head">
+							<span class="card__id" lang="en">
+								{zid[i]}
+							</span>
+							<T as="span" class="card__title" v={p.title} />
+						</p>
+						<T as="p" class="card__body" v={p.tagline} />
+					</a>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="sec" id="method">
+		<T
+			as="h2"
+			v={pair(
+				'Three cards explain the whole method.',
+				'ثلاث بطاقات تشرح الطريقة كلها.',
+			)}
+		/>
+		<T
+			as="p"
+			class="soft"
+			v={pair(
+				'The numbers are the filing system. 1a is a branch of 1, not a folder, and it says exactly where each idea sits in the conversation.',
+				'الأرقام هي نظام التصنيف. 1أ فرعٌ من 1 وليست مجلدًا، وتقول بالضبط أين تقع كل فكرة في الحوار.',
+			)}
+		/>
+		<div class="method">
+			{
+				method.map((m) => (
+					<article class="card card--wide">
+						<p class="card__head">
+							<span class="card__id" lang="en">
+								{m.id}
+							</span>
+							<T as="span" class="card__title" v={m.title} />
+						</p>
+						<T as="p" class="card__body card__body--serif" v={m.body} />
+					</article>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="sec">
+		<blockquote class="quote">
+			<T as="p" v={profile.tagline} />
+			<footer class="k soft">
+				<T v={pair('Haitham Assoli, Amman', 'هيثم العسولي، عمّان')} />
+			</footer>
+		</blockquote>
+
+		<p class="k eyebrow pulled__lead">
+			<T
+				v={pair(
+					'You were looking for someone who ships to the stores. The box pulled this:',
+					'كنت تبحث عمّن يُصدر إلى المتاجر. سحب الصندوق هذه:',
+				)}
+			/>
+		</p>
+		<a class="card pulled" href={u(`/work/${pulled.slug}`)}>
+			<span class="stamp k" aria-hidden="true">
+				<T v={pair(`Pulled · ${pulled.year}`, `مسحوبة · ${pulled.year}`)} />
+			</span>
+			<p class="card__head">
+				<span class="card__id" lang="en">{zid[0]}</span>
+				<T as="span" class="card__title" v={pulled.title} />
+			</p>
+			<T as="p" class="card__body" v={pulled.summary} />
+			<p class="card__foot">
+				<T v={statusWord[pulled.status]} />
+				<T v={catWord[pulled.category]} />
+				<span lang="en">{pulled.stack.slice(0, 4).join(' · ')}</span>
+			</p>
+		</a>
+		<T
+			as="p"
+			class="soft pulled__after"
+			v={pair(
+				'Thirty-nine more are filed behind it. Every card links to the one that made it, so a booking app leads to the payment card, and that to the one about not double-selling a slot.',
+				'خلفها تسعٌ وثلاثون بطاقة أخرى. كل بطاقة تربط بالتي أنتجتها، فتطبيق الحجز يقود إلى بطاقة الدفع، وتلك إلى بطاقة منع بيع الموعد مرتين.',
+			)}
+		/>
+	</section>
+
+	<section class="sec" id="drawers">
+		<T
+			as="h2"
+			v={pair('Forty cards, six drawers.', 'أربعون بطاقة، ستة أدراج.')}
+		/>
+		<div class="drawers">
+			{
+				drawers.map((d) => (
+					<div class="folder">
+						<p class="folder__tab">
+							<T v={catWord[d.cat]} />
+							<span class="soft" lang="en">
+								· {d.items.length}
+							</span>
+						</p>
+						<ul class="drawer__list">
+							{d.items.slice(0, 4).map((p, i) => (
+								<li>
+									<a href={u(`/work/${p.slug}`)}>
+										<span class="card__id" lang="en">
+											{d.n}/{i + 1}
+										</span>
+										<T v={p.title} />
+									</a>
+								</li>
+							))}
+						</ul>
+						<p class="drawer__more k-lc">
+							<a href={u(`/work#cat-${d.cat}`)}>
+								<T
+									v={pair(
+										d.items.length > 4
+											? `and ${d.items.length - 4} more →`
+											: 'open the drawer →',
+										d.items.length > 4
+											? `و${d.items.length - 4} غيرها ←`
+											: 'افتح الدرج ←',
+									)}
+								/>
+							</a>
+						</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="sec">
+		<T
+			as="h2"
+			v={pair('Where the cards were written.', 'أين كُتبت البطاقات.')}
+		/>
+		<ol class="ledger">
+			{
+				profile.experience.map((job) => (
+					<li class="ledger__row">
+						<T as="span" class="k-lc ledger__when" v={yearPair(job.period)} />
+						<span class="ledger__co">
+							<T v={job.company} />
+						</span>
+						<T as="span" class="soft ledger__role" v={job.role} />
+					</li>
+				))
+			}
+		</ol>
+		<p class="k eyebrow ledger__sub"><T v={pair('Study', 'الدراسة')} /></p>
+		<ol class="ledger">
+			{
+				profile.education.map((ed) => (
+					<li class="ledger__row">
+						<T as="span" class="k-lc ledger__when" v={yearPair(ed.period)} />
+						<span class="ledger__co">
+							<T v={ed.school} />
+						</span>
+						<T as="span" class="soft ledger__role" v={ed.degree} />
+					</li>
+				))
+			}
+		</ol>
+		<p class="k eyebrow ledger__sub"><T v={s('about.stackTitle')} /></p>
+		<p class="k-lc tools" lang="en" dir="ltr">{toolbox.join(' · ')}</p>
+	</section>
+
+	<section class="sec last">
+		<T
+			as="h2"
+			v={pair(
+				'The next card is yours to write.',
+				'البطاقة التالية لك أن تكتبها.',
+			)}
+		/>
+		<T
+			as="p"
+			class="soft"
+			v={pair(
+				'Contract or full time, Amman or remote. Tell me what you are building and when it has to be live.',
+				'بعقد أو بدوام كامل، من عمّان أو عن بُعد. أخبرني بما تبنيه ومتى يجب أن يكون جاهزًا.',
+			)}
+		/>
+		<p class="hero__do">
+			<a class="btn btn--ink" href={u('/hire')}><T v={s('nav.hire')} /></a>
+			<a class="txt" href={`mailto:${profile.email}`} lang="en" dir="ltr"
+				>{profile.email}</a
+			>
+		</p>
+	</section>
+</Shell>
+
+<style is:global>
+	.hero {
+		display: grid;
+		gap: 3rem;
+		padding-block-start: clamp(2rem, 5vw, 4.5rem);
+		align-items: center;
+	}
+
+	.hero__lede {
+		margin-block: 1.9rem 1.9rem;
+		color: var(--on-board-soft);
+		max-width: 34rem;
+	}
+
+	.hero__do {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 2rem;
+		margin: 0 0 1.1rem;
+		max-width: none;
+	}
+
+	.hero__note {
+		margin: 0;
+	}
+
+	.board .hero__note {
+		color: var(--on-board-soft);
+	}
+
+	.board .txt:hover {
+		color: var(--on-board);
+	}
+
+	/* ── The stack ──────────────────────────────────────────────────────── */
+	.stack {
+		position: relative;
+		display: grid;
+		gap: 1rem;
+	}
+
+	.stack__card {
+		transform: rotate(var(--r));
+		transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+	}
+
+	.stack__card:hover {
+		transform: rotate(0deg) translateY(-3px);
+		z-index: 2;
+	}
+
+	.thread {
+		display: none;
+	}
+
+	@media (min-width: 900px) {
+		.hero {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+			gap: clamp(2rem, 5vw, 5rem);
+		}
+
+		.stack {
+			display: block;
+			aspect-ratio: 1 / 0.92;
+		}
+
+		.stack__card {
+			position: absolute;
+			inset-inline-start: var(--x);
+			inset-block-start: var(--y);
+			width: var(--w);
+		}
+
+		.thread {
+			display: block;
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 3;
+			pointer-events: none;
+			overflow: visible;
+		}
+
+		.thread polyline {
+			fill: none;
+			stroke: var(--thread);
+			stroke-width: 1.5;
+			vector-effect: non-scaling-stroke;
+			opacity: 0.9;
+		}
+
+		.thread circle {
+			fill: var(--thread);
+			stroke: rgba(0, 0, 0, 0.25);
+			stroke-width: 0.3;
+		}
+	}
+
+	/* ── Method ─────────────────────────────────────────────────────────── */
+	.method {
+		display: grid;
+		gap: 1.25rem;
+		margin-block-start: 2.25rem;
+		max-width: 44rem;
+	}
+
+	.card--wide {
+		padding: 1.1rem 1.4rem 1.3rem;
+	}
+
+	.card__body--serif {
+		font-family: var(--serif);
+		font-size: 1rem;
+	}
+
+	.card__body--serif[lang='ar'] {
+		font-family: var(--serif-ar);
+	}
+
+	/* ── Quote and the pulled card ──────────────────────────────────────── */
+	.quote {
+		margin: 0 0 var(--band);
+		max-width: 40rem;
+	}
+
+	.quote p {
+		margin: 0 0 0.9rem;
+		font-style: italic;
+		font-size: clamp(1.3rem, 1.1rem + 1vw, 1.8rem);
+		line-height: 1.4;
+		color: var(--soft);
+		max-width: none;
+	}
+
+	.quote footer {
+		margin: 0;
+	}
+
+	.pulled__lead {
+		max-width: 40rem;
+	}
+
+	.pulled {
+		max-width: 40rem;
+		transform: rotate(-0.6deg);
+	}
+
+	.stamp {
+		position: absolute;
+		inset-block-start: -0.9rem;
+		inset-inline-end: 1rem;
+		padding: 0.3rem 0.7rem;
+		border: 2px solid var(--thread);
+		border-radius: 2px;
+		background: var(--card);
+		color: var(--thread);
+		font-weight: 700;
+		transform: rotate(3deg);
+	}
+
+	.pulled__after {
+		margin-block-start: 2rem;
+	}
+
+	/* ── Drawers ────────────────────────────────────────────────────────── */
+	.drawers {
+		display: grid;
+		gap: 1.75rem 1.5rem;
+		margin-block-start: 1.5rem;
+	}
+
+	@media (min-width: 720px) {
+		.drawers {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 1080px) {
+		.drawers {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	.drawer__list {
+		margin: 0.4rem 0 0.8rem;
+		padding: 0;
+		list-style: none;
+		font-family: var(--mono);
+		font-size: 0.92rem;
+	}
+
+	.drawer__list li {
+		padding-block: 0.4rem;
+		border-block-end: 1px solid var(--ruling);
+	}
+
+	.drawer__list a {
+		display: flex;
+		gap: 0.7rem;
+		align-items: baseline;
+		text-decoration: none;
+	}
+
+	.drawer__list a:hover {
+		color: var(--thread);
+	}
+
+	.drawer__more {
+		margin: 0;
+		font-size: 0.85rem;
+	}
+
+	.drawer__more a {
+		text-decoration: none;
+		color: var(--soft);
+	}
+
+	.drawer__more a:hover {
+		color: var(--thread);
+	}
+
+	/* ── Ledger ─────────────────────────────────────────────────────────── */
+	.ledger {
+		margin: 1.5rem 0 0;
+		padding: 0;
+		list-style: none;
+		max-width: 44rem;
+	}
+
+	.ledger__row {
+		display: grid;
+		grid-template-columns: 8.5rem minmax(0, 1fr);
+		gap: 0.1rem 1.25rem;
+		padding-block: 0.75rem;
+		border-block-end: 1px dotted rgba(31, 27, 23, 0.3);
+	}
+
+	.ledger__when {
+		white-space: nowrap;
+		color: var(--thread);
+	}
+
+	.ledger__co {
+		font-weight: 500;
+	}
+
+	.ledger__role {
+		grid-column: 2;
+	}
+
+	@media (max-width: 520px) {
+		.ledger__row {
+			grid-template-columns: 1fr;
+		}
+
+		.ledger__role {
+			grid-column: 1;
+		}
+	}
+
+	.ledger__sub {
+		margin-block: 2.5rem 0.5rem;
+	}
+
+	.tools {
+		max-width: 44rem;
+		color: var(--soft);
+		line-height: 1.9;
+	}
+
+	.last h2 {
+		max-width: 30ch;
+	}
+</style>

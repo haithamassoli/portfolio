@@ -1,0 +1,158 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* Every card in the box, drawer by drawer. */
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { catWord, pair, s, statusWord, yearPair } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const yearOf = (y: string) =>
+	Math.max(...(y.match(/\d{4}/g) ?? ['0']).map(Number));
+
+const drawers = (
+	['web', 'mobile', 'ai', 'client', 'desktop', 'extension'] as const
+).map((cat, n) => ({
+	cat,
+	n: n + 1,
+	items: projects
+		.filter((p) => p.category === cat)
+		.sort(
+			(a, b) =>
+				Number(b.featured) - Number(a.featured) ||
+				yearOf(b.year) - yearOf(a.year),
+		),
+}));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair('All projects — Haitham Assoli', 'كل المشاريع — هيثم العسولي')[
+		lang
+	]}
+	description={s('work.allLede')[lang]}
+>
+	<section class="wrap band" slot="board">
+		<p class="k hero__eyebrow">
+			<T v={pair('The whole box', 'الصندوق كله')} />
+		</p>
+		<T as="h1" v={s('work.all')} />
+		<T as="p" class="lede band__lede" v={s('work.allLede')} />
+		<nav class="tabs" aria-label={pair('Drawers', 'الأدراج')[lang]}>
+			{
+				drawers.map((d) => (
+					<a class="tab k" href={`#cat-${d.cat}`}>
+						<span lang="en">{d.n}</span>
+						<T v={catWord[d.cat]} />
+						<span class="soft" lang="en">
+							{d.items.length}
+						</span>
+					</a>
+				))
+			}
+		</nav>
+	</section>
+
+	{
+		drawers.map((d) => (
+			<section class="sec drawer" id={`cat-${d.cat}`}>
+				<p class="k eyebrow">
+					<span lang="en">{d.n}</span>
+					{' · '}
+					<T v={catWord[d.cat]} />
+				</p>
+				<div class="cards">
+					{d.items.map((p, i) => (
+						<a class="card" href={u(`/work/${p.slug}`)}>
+							<p class="card__head">
+								<span class="card__id" lang="en">
+									{d.n}/{i + 1}
+									{p.featured ? 'a' : ''}
+								</span>
+								<T as="span" class="card__title" v={p.title} />
+							</p>
+							<T as="p" class="card__body" v={p.tagline} />
+							<p class="card__foot">
+								<T v={yearPair(p.year)} />
+								<T v={statusWord[p.status]} />
+								{p.featured && <T v={pair('written up', 'مشروح')} />}
+							</p>
+						</a>
+					))}
+				</div>
+			</section>
+		))
+	}
+</Shell>
+
+<style is:global>
+	.tabs {
+		margin-block-start: 2rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.tab {
+		display: inline-flex;
+		gap: 0.6rem;
+		padding: 0.55rem 0.9rem;
+		background: var(--card);
+		color: var(--ink);
+		border-radius: 3px 3px 0 0;
+		text-decoration: none;
+	}
+
+	.tab:hover {
+		background: var(--card-2);
+	}
+
+	.tab > span:first-child {
+		color: var(--thread);
+		font-weight: 700;
+	}
+
+	.drawer .eyebrow {
+		color: var(--soft);
+	}
+
+	.cards {
+		display: grid;
+		gap: 1.25rem;
+	}
+
+	@media (min-width: 640px) {
+		.cards {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 1080px) {
+		.cards {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+	}
+
+	/* A hint of the pile: every other card leans a hair. */
+	.cards .card:nth-child(3n + 2) {
+		transform: rotate(0.5deg);
+	}
+
+	.cards .card:nth-child(3n) {
+		transform: rotate(-0.5deg);
+	}
+
+	.cards .card:hover {
+		transform: none;
+	}
+</style>

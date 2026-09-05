@@ -1,0 +1,323 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+/* The job ticket. Fields on the ruled paper; the printer composes the mail. */
+import { profile } from '../../../content/profile';
+import HireCompose from '../../components/HireCompose.astro';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const deals = ['part', 'full', 'contract', 'freelance', 'hourly'] as const;
+const places = ['remote', 'onsite'] as const;
+const stacks = ['frontend', 'backend', 'mobile', 'other'] as const;
+const takes = [
+	{ title: s('skill.web'), body: s('skill.webDesc') },
+	{ title: s('skill.mobile'), body: s('skill.mobileDesc') },
+	{ title: s('skill.backend'), body: s('skill.backendDesc') },
+	{ title: s('skill.other'), body: s('skill.otherDesc') },
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Start a project — Haitham Assoli',
+		'ابدأ مشروعًا — هيثم العسولي',
+	)[lang]}
+	description={s('hire.lede')[lang]}
+	job="JOB TICKET"
+>
+	<HireCompose />
+
+	<section class="sec">
+		<p class="k"><T v={s('hire.eyebrow')} /></p>
+		<T as="h1" class="h1--sm" v={s('hire.title')} />
+		<T as="p" class="lede hire__lede" v={s('hire.lede')} />
+		<p class="k"><T v={s('hire.note')} /></p>
+	</section>
+
+	<div class="fold">FOLD</div>
+	<p class="sheet-head">
+		<span lang="en">ASSOLI</span>
+		<T v={s('skills.title')} />
+		<span lang="en">SHEET 01 / 02</span>
+	</p>
+	<section class="sec sec--tight">
+		<ul class="rows">
+			{
+				takes.map((t) => (
+					<li class="row">
+						<T as="p" class="row__k" v={t.title} />
+						<T as="p" v={t.body} />
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<div class="fold">FOLD</div>
+	<p class="sheet-head">
+		<span lang="en">ASSOLI</span>
+		<T v={pair('The brief', 'الطلب')} />
+		<span lang="en">SHEET 02 / 02</span>
+	</p>
+	<section class="sec sec--tight">
+		<form class="form" data-hire>
+			<div class="f">
+				<label class="k" for="fullName"><T v={s('hire.fullName')} /></label>
+				<input
+					class="f__i"
+					id="fullName"
+					name="fullName"
+					type="text"
+					autocomplete="name"
+					required
+				/>
+			</div>
+			<div class="f">
+				<label class="k" for="email"><T v={s('hire.email')} /></label>
+				<input
+					class="f__i"
+					id="email"
+					name="email"
+					type="email"
+					autocomplete="email"
+					dir="ltr"
+					required
+				/>
+			</div>
+			<div class="f">
+				<label class="k" for="phone"><T v={s('hire.phone')} /></label>
+				<input
+					class="f__i"
+					id="phone"
+					name="phone"
+					type="tel"
+					autocomplete="tel"
+					dir="ltr"
+					required
+				/>
+			</div>
+
+			<fieldset class="f">
+				<legend class="k"><T v={s('hire.deal')} /></legend>
+				<div class="opts">
+					{
+						deals.map((d, i) => (
+							<label class="opt">
+								<input type="radio" name="deal" value={d} required={i === 0} />
+								<span class="opt__box" aria-hidden="true" />
+								<T v={s(`deal.${d}`)} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="f">
+				<legend class="k"><T v={s('hire.location')} /></legend>
+				<div class="opts">
+					{
+						places.map((l, i) => (
+							<label class="opt">
+								<input
+									type="radio"
+									name="location"
+									value={l}
+									required={i === 0}
+								/>
+								<span class="opt__box" aria-hidden="true" />
+								<T v={s(`loc.${l}`)} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="f">
+				<legend class="k"><T v={s('hire.techStack')} /></legend>
+				<div class="opts">
+					{
+						stacks.map((t) => (
+							<label class="opt">
+								<input type="checkbox" name="techStack" value={t} />
+								<span class="opt__box" aria-hidden="true" />
+								<T v={s(`tech.${t}`)} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<div class="f">
+				<label class="k" for="budget"><T v={s('hire.budget')} /></label>
+				<input
+					class="f__i"
+					id="budget"
+					name="budget"
+					type="text"
+					placeholder={s('hire.budgetPlaceholder')[lang]}
+					required
+				/>
+			</div>
+			<div class="f">
+				<label class="k" for="summary"><T v={s('hire.summary')} /></label>
+				<textarea
+					class="f__i f__t"
+					id="summary"
+					name="summary"
+					rows="5"
+					placeholder={s('hire.summaryPlaceholder')[lang]}
+					required></textarea>
+			</div>
+
+			<div class="form__end">
+				<button class="bk" type="submit"><T v={s('hire.submit')} /></button>
+				<T as="p" class="m form__note" v={s('hire.sent')} />
+			</div>
+		</form>
+
+		<p class="m dim form__alt">
+			<T v={pair('Or write directly:', 'أو راسلني مباشرة:')} />
+			<a href={`mailto:${profile.email}`} lang="en" dir="ltr">{profile.email}</a
+			>
+		</p>
+	</section>
+</Shell>
+
+<style is:global>
+	.hire__lede {
+		margin-block: var(--line);
+	}
+
+	.form {
+		display: grid;
+		gap: var(--line);
+		max-width: 38rem;
+	}
+
+	.f {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+
+	.f .k {
+		display: block;
+		padding: 0;
+		margin-block-end: 0.3rem;
+	}
+
+	.f__i {
+		display: block;
+		width: 100%;
+		padding: 0.35rem 0 0.4rem;
+		border: 0;
+		border-block-end: 1px solid var(--ink);
+		border-radius: 0;
+		background: transparent;
+		color: var(--ink);
+		font-family: var(--mono);
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+
+	html[lang='ar'] .f__i {
+		font-family: var(--ar);
+	}
+
+	.f__i::placeholder {
+		color: var(--faint);
+	}
+
+	.f__i:focus {
+		outline: none;
+		border-block-end: 2px solid var(--red);
+		padding-block-end: calc(0.4rem - 1px);
+	}
+
+	.f__t {
+		resize: vertical;
+		min-height: 6rem;
+	}
+
+	.opts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.4rem;
+		font-family: var(--mono);
+		font-size: 0.95rem;
+	}
+
+	.opt {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+	}
+
+	/* A checkbox drawn the way the printer would: [ ] and [x]. */
+	.opt input {
+		position: absolute;
+		opacity: 0;
+		width: 1px;
+		height: 1px;
+	}
+
+	.opt__box::before {
+		content: '[ ]';
+		font-family: var(--mono);
+		letter-spacing: -0.05em;
+		color: var(--dim);
+	}
+
+	.opt input:checked + .opt__box::before {
+		content: '[x]';
+		color: var(--red);
+		font-weight: 700;
+	}
+
+	.opt input:focus-visible + .opt__box {
+		outline: 2px solid var(--red);
+		outline-offset: 2px;
+	}
+
+	.form__end {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 1.5rem;
+	}
+
+	.form__note {
+		display: none;
+		margin: 0;
+		color: var(--red);
+		font-size: 0.9rem;
+	}
+
+	.form[data-sent] .form__note {
+		display: block;
+	}
+
+	.form__alt {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-start: calc(var(--line) * 1.5);
+		font-size: 0.9rem;
+	}
+
+	.form__alt a:hover {
+		color: var(--red);
+	}
+</style>

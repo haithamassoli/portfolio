@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/* The eight non-main designs, by the id that is now in their URL. */
+/* The eleven non-main designs, by the id that is now in their URL. */
 const designs = [
 	'quiet-room',
 	'shizukesa',
@@ -10,6 +10,9 @@ const designs = [
 	'night-reel',
 	'playroom',
 	'signal',
+	'slip-box',
+	'spooler',
+	'blueprint',
 ] as const;
 
 const KEY = 'vx-design';
@@ -65,7 +68,7 @@ for (const id of ['main', ...designs]) {
 			const sw = page.locator('a.dsw');
 			await expect(sw).toHaveCount(1);
 			await expect(sw).toBeVisible();
-			await expect(sw).toContainText(/\d\d \/ 09/);
+			await expect(sw).toContainText(/\d\d \/ 12/);
 
 			/* Prominence, in the terms the designs can actually be held to: a
 			   full-size target inside the opening section, next to that design's

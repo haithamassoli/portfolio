@@ -1,0 +1,608 @@
+---
+/* SPOOLER — the portfolio as a print job on green-bar continuous-form paper.
+   Tractor holes down both edges, alternating green bars, one monospace face
+   for structure and a plain sans for reading. Red is reserved for the one
+   line the printer wants you to notice.
+   ponytail: the paper is two gradients and two pseudo-elements. */
+import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { parse, otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import { pair, s } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	title: string;
+	description: string;
+	/** Printed top right of the first sheet. */
+	job?: string;
+}
+
+const { design, lang, title, description, job = 'JOB 0001' } = Astro.props;
+const { page } = parse(Astro.url.pathname);
+const u = (p = '') => designUrl(design, lang, p);
+const other = otherLang(Astro.url.pathname);
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<Head {design} {lang} {title} {description} colorScheme="light" />
+	<body>
+		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
+
+		<div class="sheet">
+			<header class="head">
+				<p class="strip">
+					<span
+						><T
+							v={pair(
+								'Haitham Assoli · print spooler',
+								'هيثم العسولي · طابعة السطور',
+							)}
+						/></span
+					>
+					<span lang="en">{job}</span>
+				</p>
+				<p class="mast">
+					<a class="mast__name" href={u()}
+						>ASSOLI<T class="vh" v={pair(' — home', ' — الرئيسية')} /></a
+					>
+					<span class="mast__nav">
+						<a
+							href={u('/work')}
+							aria-current={page === '/work' ? 'page' : undefined}
+							>[ <T v={s('nav.work')} /> ]</a
+						>
+						<a href={other} data-lang-link lang={lang === 'ar' ? 'en' : 'ar'}
+							>[ {lang === 'ar' ? 'EN' : 'عربي'} ]</a
+						>
+						<a
+							href={u('/hire')}
+							aria-current={page === '/hire' ? 'page' : undefined}
+							>[ <T v={s('nav.hire')} /> ]</a
+						>
+					</span>
+				</p>
+			</header>
+
+			<main id="main">
+				<slot />
+				{
+					page !== '' && (
+						<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+					)
+				}
+			</main>
+
+			<footer class="foot">
+				<p><span lang="en">ASSOLI · {year}</span></p>
+				<p class="foot__links">
+					<a href={u('/work')}><T v={s('nav.work')} /></a>
+					<a href={u('/hire')}><T v={s('nav.hire')} /></a>
+					<a href={profile.links.github} rel="noreferrer">GitHub</a>
+					<a href={profile.links.resume} rel="noreferrer"
+						><T v={s('nav.cv')} /></a
+					>
+				</p>
+			</footer>
+		</div>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--desk: #c9c7be;
+		--paper: #fbfbf7;
+		--bar: #e3ebe0;
+		--edge: #f3f3ee;
+		--hole: #c4c2b8;
+		--ink: #17201a;
+		--dim: #5f6b62;
+		--faint: #b9bcb2;
+		--red: #c8322b;
+
+		--mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+		--sans: 'IBM Plex Sans', system-ui, sans-serif;
+		--ar: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+
+		/* One bar is two lines of the base type. Everything snaps to it. */
+		--line: 1.6rem;
+		--edge-w: clamp(2rem, 5vw, 3.4rem);
+		color-scheme: light;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		background: var(--desk);
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		padding: clamp(0.5rem, 2vw, 1.5rem) 0;
+		background: var(--desk);
+		color: var(--ink);
+		font-family: var(--sans);
+		font-size: 1.0625rem;
+		line-height: var(--line);
+		-webkit-font-smoothing: antialiased;
+		overflow-x: hidden;
+	}
+
+	::selection {
+		background: var(--ink);
+		color: var(--paper);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--red);
+		outline-offset: 2px;
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	p {
+		margin: 0 0 var(--line);
+		max-width: 38rem;
+	}
+
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.skip {
+		position: absolute;
+		inset-block-start: 0.5rem;
+		inset-inline-start: 0.5rem;
+		z-index: 5;
+		padding: 0.5rem 0.85rem;
+		background: var(--ink);
+		color: var(--paper);
+		font-family: var(--mono);
+		transform: translateY(-200%);
+	}
+
+	.skip:focus {
+		transform: none;
+	}
+
+	/* ── The paper ─────────────────────────────────────────────────────── */
+	.sheet {
+		position: relative;
+		width: min(100%, 70rem);
+		margin-inline: auto;
+		padding-inline: calc(var(--edge-w) + clamp(1rem, 3vw, 2.5rem));
+		background: repeating-linear-gradient(
+			to bottom,
+			var(--paper) 0 calc(var(--line) * 2),
+			var(--bar) calc(var(--line) * 2) calc(var(--line) * 4)
+		);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+	}
+
+	.sheet::before,
+	.sheet::after {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		width: var(--edge-w);
+		background: radial-gradient(
+				circle at 50% 50%,
+				var(--hole) 0 0.34rem,
+				transparent 0.4rem
+			)
+			0 0 / 100% calc(var(--line) * 2) repeat-y;
+		border-inline: 1px dashed var(--faint);
+		pointer-events: none;
+	}
+
+	.sheet::before {
+		inset-inline-start: 0;
+		border-inline-start: 0;
+	}
+
+	.sheet::after {
+		inset-inline-end: 0;
+		border-inline-end: 0;
+	}
+
+	/* ── Type roles ─────────────────────────────────────────────────────── */
+	.m {
+		font-family: var(--mono);
+	}
+
+	.k {
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--mono);
+		font-weight: 700;
+		margin: 0;
+	}
+
+	h1 {
+		font-size: clamp(2.2rem, 5.6vw, 4.6rem);
+		line-height: 1.05;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem);
+		line-height: 1.2;
+		margin-block-end: var(--line);
+		max-width: 28ch;
+	}
+
+	h3 {
+		font-size: 1.05rem;
+		line-height: var(--line);
+	}
+
+	.lede {
+		font-size: clamp(1.15rem, 1rem + 0.6vw, 1.4rem);
+		line-height: 1.5;
+	}
+
+	.dim {
+		color: var(--dim);
+	}
+
+	.red {
+		color: var(--red);
+	}
+
+	/* ── Arabic ──────────────────────────────────────────────────────────── */
+	[lang='ar']:where(:not(:root)) {
+		font-family: var(--ar);
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	h1[lang='ar'] {
+		line-height: 1.25;
+		font-size: clamp(2rem, 5vw, 4rem);
+	}
+
+	html[dir='rtl'] [lang='en'] {
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
+
+	/* ── Head and foot ──────────────────────────────────────────────────── */
+	.strip {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		margin: 0;
+		max-width: none;
+		padding-block: 0.4rem;
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--dim);
+		border-block-end: 1px dashed var(--faint);
+	}
+
+	.mast {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+		margin: 0;
+		max-width: none;
+		padding-block: var(--line) 0;
+		font-family: var(--mono);
+	}
+
+	.mast__name {
+		font-size: 1.6rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-decoration: none;
+	}
+
+	.mast__nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1.25rem;
+		font-size: 0.9rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.mast__nav a {
+		text-decoration: none;
+		color: var(--dim);
+	}
+
+	.mast__nav a:hover,
+	.mast__nav a[aria-current='page'] {
+		color: var(--ink);
+	}
+
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+		padding-block: var(--line);
+		border-block-start: 1px dashed var(--faint);
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+
+	.foot p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1.25rem;
+	}
+
+	.foot a {
+		text-decoration: none;
+	}
+
+	.foot a:hover {
+		color: var(--ink);
+	}
+
+	/* ── Bracketed buttons ─────────────────────────────────────────────── */
+	.bk {
+		display: inline-block;
+		padding: 0.85rem 1.4rem;
+		border: 2px solid var(--ink);
+		background: var(--ink);
+		color: var(--paper);
+		font-family: var(--mono);
+		font-size: 0.9rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		text-decoration: none;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			background-color 0.15s,
+			color 0.15s;
+	}
+
+	.bk::before {
+		content: '[ ';
+	}
+
+	.bk::after {
+		content: ' ]';
+	}
+
+	.bk:hover {
+		background: var(--red);
+		border-color: var(--red);
+	}
+
+	.bk--out {
+		background: transparent;
+		color: var(--ink);
+	}
+
+	.bk--out:hover {
+		background: var(--ink);
+		border-color: var(--ink);
+		color: var(--paper);
+	}
+
+	/* ── Fold and sheet header ──────────────────────────────────────────── */
+	.fold {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-block: calc(var(--line) * 2);
+		color: var(--faint);
+		font-family: var(--mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.2em;
+	}
+
+	.fold::before {
+		content: '';
+		flex: 1;
+		border-block-start: 1px dashed var(--faint);
+	}
+
+	.sheet-head {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.25rem 2rem;
+		margin: 0 0 var(--line);
+		max-width: none;
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+
+	/* ── Report rows ───────────────────────────────────────────────────── */
+	.rows {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		max-width: 44rem;
+	}
+
+	.row {
+		padding-block: calc(var(--line) * 0.5) calc(var(--line) * 0.75);
+		border-block-end: 1px solid var(--ink);
+	}
+
+	.row p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.row__k {
+		font-family: var(--mono);
+		font-weight: 700;
+	}
+
+	.row__m {
+		font-family: var(--mono);
+		font-size: 0.9rem;
+		color: var(--dim);
+	}
+
+	.row--red,
+	.row--red .row__m {
+		color: var(--red);
+	}
+
+	/* ── The directory listing ──────────────────────────────────────────── */
+	.ls__cmd {
+		font-size: 1.1rem;
+		font-weight: 500;
+		margin-block-end: calc(var(--line) * 0.5);
+	}
+
+	.ls {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-family: var(--mono);
+		font-size: 0.95rem;
+		max-width: 50rem;
+	}
+
+	.ls__row {
+		display: grid;
+		grid-template-columns: auto auto minmax(0, 1fr) auto;
+		column-gap: 1.5rem;
+		align-items: baseline;
+		padding-block: 0.3rem;
+	}
+
+	.ls__perm,
+	.ls__size {
+		color: var(--dim);
+		white-space: nowrap;
+	}
+
+	.ls__name {
+		font-weight: 700;
+		text-decoration: none;
+		overflow-wrap: anywhere;
+	}
+
+	.ls__name:hover {
+		color: var(--red);
+		text-decoration: underline;
+	}
+
+	.ls__tag {
+		grid-column: 3;
+		font-family: var(--sans);
+		font-size: 0.9rem;
+		color: var(--dim);
+	}
+
+	.ls__st {
+		grid-column: 4;
+		grid-row: 1;
+		font-size: 0.75rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--dim);
+	}
+
+	@media (max-width: 600px) {
+		.ls__row {
+			grid-template-columns: auto minmax(0, 1fr) auto;
+		}
+
+		.ls__perm {
+			display: none;
+		}
+
+		.ls__tag {
+			grid-column: 2;
+		}
+
+		.ls__st {
+			grid-column: 3;
+		}
+	}
+
+	.sec--tight {
+		padding-block-start: 0;
+	}
+
+	.h1--sm {
+		font-size: clamp(1.8rem, 1.3rem + 2.4vw, 3.2rem);
+		text-transform: none;
+		max-width: 22ch;
+		margin-block-start: 0.5rem;
+	}
+
+	/* ── Sections ──────────────────────────────────────────────────────── */
+	.sec {
+		padding-block: calc(var(--line) * 2);
+	}
+
+	.dsw-row--tail {
+		font-family: var(--mono);
+	}
+
+	html[lang='ar'] .dsw-row {
+		font-family: var(--ar);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+		}
+	}
+</style>

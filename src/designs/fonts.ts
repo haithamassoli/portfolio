@@ -29,4 +29,13 @@ export const fonts: Record<Exclude<DesignId, 'main' | 'signal'>, string> = {
 	playroom: family(
 		'family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Cairo:wght@400;600;800&family=Lalezar&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@700',
 	),
+	'slip-box': family(
+		'family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Kufi+Arabic:wght@400;700',
+	),
+	spooler: family(
+		'family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;700',
+	),
+	blueprint: family(
+		'family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Barlow:wght@400;500&family=Barlow+Semi+Condensed:wght@500;600&family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500&family=Cairo:wght@500;700',
+	),
 };

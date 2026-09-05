@@ -1,0 +1,190 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* Sheet A-201: the room schedule. Every project, one row, room by room. */
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { catWord, pair, s, statusWord, yearPair } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const yearOf = (y: string) =>
+	Math.max(...(y.match(/\d{4}/g) ?? ['0']).map(Number));
+const rooms = (
+	['web', 'mobile', 'ai', 'client', 'desktop', 'extension'] as const
+).map((cat, i) => ({
+	cat,
+	no: 101 + i,
+	items: projects
+		.filter((p) => p.category === cat)
+		.sort(
+			(a, b) =>
+				Number(b.featured) - Number(a.featured) ||
+				yearOf(b.year) - yearOf(a.year),
+		),
+}));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair('All projects — Haitham Assoli', 'كل المشاريع — هيثم العسولي')[
+		lang
+	]}
+	description={s('work.allLede')[lang]}
+	sheet="A-201"
+>
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<span lang="en">SHEET A-201</span> · <T
+				v={pair('Room schedule', 'جدول الغرف')}
+			/>
+		</p>
+		<T as="h1" v={s('work.all')} />
+		<T as="p" class="lede idx__lede" v={s('work.allLede')} />
+		<nav class="idx lbl" aria-label={pair('Rooms', 'الغرف')[lang]}>
+			{
+				rooms.map((r) => (
+					<a href={`#cat-${r.cat}`}>
+						<span class="mark" lang="en">
+							{r.no}
+						</span>
+						<T v={catWord[r.cat]} />
+					</a>
+				))
+			}
+		</nav>
+	</section>
+
+	{
+		rooms.map((r) => (
+			<section class="sec sched" id={`cat-${r.cat}`}>
+				<p class="lbl eyebrow">
+					<span lang="en">{r.no}</span>
+					{' · '}
+					<T v={catWord[r.cat]} />
+					<span class="dim" lang="en">
+						{' '}
+						· {r.items.length}
+					</span>
+				</p>
+				<div class="tb-wrap">
+					<table class="tb sched__tb">
+						<thead>
+							<tr>
+								<th scope="col">
+									<T v={pair('No.', 'رقم')} />
+								</th>
+								<th scope="col">
+									<T v={pair('Room', 'الغرفة')} />
+								</th>
+								<th scope="col">
+									<T v={pair('Year', 'السنة')} />
+								</th>
+								<th scope="col">
+									<T v={pair('Status', 'الحالة')} />
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{r.items.map((p, i) => (
+								<tr>
+									<td class="mark" lang="en">
+										{r.no}.{String(i + 1).padStart(2, '0')}
+									</td>
+									<td>
+										<a class="serif" href={u(`/work/${p.slug}`)}>
+											<T v={p.title} />
+										</a>
+										<T as="span" class="sched__tag dim" v={p.tagline} />
+									</td>
+									<td>
+										<T v={yearPair(p.year)} />
+									</td>
+									<td>
+										<T v={statusWord[p.status]} />
+										{p.featured && (
+											<span class="mark">
+												{' '}
+												<T v={pair('· detailed', '· مفصّل')} />
+											</span>
+										)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</section>
+		))
+	}
+</Shell>
+
+<style is:global>
+	.idx__lede {
+		margin-block: 1.5rem 2rem;
+	}
+
+	.idx {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.75rem;
+		color: var(--dim);
+	}
+
+	.idx a {
+		display: inline-flex;
+		gap: 0.5rem;
+		text-decoration: none;
+	}
+
+	.idx a:hover {
+		color: var(--pale);
+	}
+
+	.sched .eyebrow {
+		color: var(--pale);
+	}
+
+	.sched .eyebrow span:first-child {
+		color: var(--mark);
+	}
+
+	.sched__tb {
+		max-width: 60rem;
+	}
+
+	.sched__tb th {
+		width: auto;
+	}
+
+	.sched__tb td:first-child,
+	.sched__tb td:nth-child(3),
+	.sched__tb td:nth-child(4) {
+		white-space: nowrap;
+		width: 1%;
+	}
+
+	.sched__tag {
+		display: block;
+		font-family: var(--sans);
+		font-size: 0.9rem;
+		font-weight: 400;
+		letter-spacing: 0;
+		text-transform: none;
+		margin-block-start: 0.15rem;
+		max-width: 34rem;
+	}
+
+	.sched__tag[lang='ar'] {
+		font-family: var(--sans-ar);
+	}
+</style>

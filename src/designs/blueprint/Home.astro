@@ -1,0 +1,723 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* Blueprint home: the ground floor. Six rooms, one for each kind of project,
+   drawn to scale over the work; then the sheet's title block, the walk
+   through the featured eight, one detail, and the revisions. */
+import { profile } from '../../../content/profile';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { featured, projects } from '../../data/projects';
+import { catWord, pair, yearPair } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const count = (cat: string) =>
+	projects.filter((p) => p.category === cat).length;
+const stores = projects.filter(
+	(p) => p.links.appStore || p.links.playGoogle,
+).length;
+
+/* The plan. Units are drawing units; the viewBox scales them. */
+const rooms = [
+	{ cat: 'web', no: 101, x: 0, y: 0, w: 220, h: 150 },
+	{ cat: 'mobile', no: 102, x: 220, y: 0, w: 330, h: 150 },
+	{ cat: 'ai', no: 103, x: 550, y: 0, w: 210, h: 220 },
+	{ cat: 'client', no: 104, x: 0, y: 220, w: 310, h: 280 },
+	{ cat: 'desktop', no: 105, x: 310, y: 220, w: 240, h: 280 },
+	{ cat: 'extension', no: 106, x: 550, y: 220, w: 210, h: 280, hatch: true },
+] as const;
+
+/* A door: the gap in the wall, the leaf, and the swing. `h` for a door in a
+   horizontal wall swinging down, `v` for one in a vertical wall swinging right. */
+const doors = [
+	{ x: 20, y: 0, d: 'h' },
+	{ x: 70, y: 150, d: 'h' },
+	{ x: 300, y: 150, d: 'h' },
+	{ x: 550, y: 165, d: 'v' },
+	{ x: 120, y: 220, d: 'h' },
+	{ x: 400, y: 220, d: 'h' },
+	{ x: 550, y: 330, d: 'v' },
+] as const;
+
+const door = ({ x, y, d }: (typeof doors)[number]) =>
+	d === 'h'
+		? {
+				gap: `M${x} ${y}h40`,
+				leaf: `M${x} ${y}v40`,
+				arc: `M${x} ${y + 40}A40 40 0 0 1 ${x + 40} ${y}`,
+			}
+		: {
+				gap: `M${x} ${y}v40`,
+				leaf: `M${x} ${y}h40`,
+				arc: `M${x + 40} ${y}A40 40 0 0 1 ${x} ${y + 40}`,
+			};
+
+const walk = featured.map((p, i) => ({ ...p, no: 101 + i }));
+const about = profile.about.en.map((en, i) => pair(en, profile.about.ar[i]));
+const revs = profile.experience.map((job, i) => ({
+	...job,
+	rev: String.fromCharCode(65 + i),
+}));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Haitham Assoli — web and mobile engineer, Amman',
+		'هيثم العسولي — مهندس ويب وجوال، عمّان',
+	)[lang]}
+	description={pair(
+		'Haitham Assoli builds web and mobile products from Amman, Jordan. Forty shipped, thirteen on the app stores, drawn here as one floor plan.',
+		'يبني هيثم العسولي منتجات ويب وجوال من عمّان. أربعون مشروعًا صدر، ثلاثة عشر منها على متاجر التطبيقات، مرسومة هنا كمخطّط أرضي واحد.',
+	)[lang]}
+>
+	<section class="plan">
+		<svg
+			class="plan__svg"
+			viewBox="-10 -52 830 572"
+			role="img"
+			aria-label={pair(
+				'Floor plan: six rooms, one for each kind of project, joined by a corridor',
+				'مخطّط أرضي: ست غرف، واحدة لكل نوع من المشاريع، يصل بينها رواق',
+			)[lang]}
+		>
+			<defs>
+				<pattern
+					id="hatch"
+					width="8"
+					height="8"
+					patternUnits="userSpaceOnUse"
+					patternTransform="rotate(45)"
+				>
+					<line x1="0" y1="0" x2="0" y2="8" class="hatch"></line>
+				</pattern>
+			</defs>
+
+			<!-- dimensions, in the marker pencil -->
+			<g class="dim-line">
+				<path d="M0 -28H760M0 -34v12M760 -34v12"></path>
+				<text x="380" y="-34" text-anchor="middle" lang="en"
+					>{projects.length} PROJECTS</text
+				>
+				<path d="M792 0V500M786 0h12M786 500h12"></path>
+				<text
+					x="800"
+					y="250"
+					text-anchor="middle"
+					transform="rotate(90 800 250)"
+					lang="en">{stores} ON THE STORES</text
+				>
+			</g>
+
+			<!-- rooms -->
+			{
+				rooms.map((r) => (
+					<a
+						class="rm"
+						href={u(`/work#cat-${r.cat}`)}
+						aria-label={`${catWord[r.cat][lang]} · ${count(r.cat)}`}
+					>
+						<rect
+							class="rm__fill"
+							x={r.x}
+							y={r.y}
+							width={r.w}
+							height={r.h}
+							fill={'hatch' in r ? 'url(#hatch)' : 'transparent'}
+						/>
+						<rect class="wall" x={r.x} y={r.y} width={r.w} height={r.h} />
+						<text
+							class="rm__name"
+							x={r.x + r.w / 2}
+							y={r.y + r.h / 2 - 2}
+							text-anchor="middle"
+							lang={lang}
+						>
+							{catWord[r.cat][lang]}
+						</text>
+						<text
+							class="rm__no"
+							x={r.x + r.w / 2}
+							y={r.y + r.h / 2 + 14}
+							text-anchor="middle"
+							lang="en"
+						>
+							{r.no} · {count(r.cat)}{' '}
+							{count(r.cat) === 1 ? 'PROJECT' : 'PROJECTS'}
+						</text>
+					</a>
+				))
+			}
+
+			<!-- corridor -->
+			<rect class="wall" x="0" y="150" width="550" height="70"></rect>
+			<text class="rm__no" x="275" y="176" text-anchor="middle" lang="en"
+				>CORRIDOR · ONE CODEBASE, EVERY PLATFORM</text
+			>
+			<path class="dim-line" d="M30 197H520M30 197l8 -4v8zM520 197l-8 -4v8z"
+			></path>
+
+			<!-- furniture -->
+			<g class="furn">
+				<rect x="24" y="96" width="60" height="26"></rect>
+				<g>
+					{
+						[...Array(10)].map((_, i) => (
+							<rect x={236 + i * 30} y="12" width="22" height="12" />
+						))
+					}
+				</g>
+				<rect x="590" y="34" width="26" height="26"></rect>
+				<rect x="690" y="34" width="26" height="26"></rect>
+				<rect x="590" y="160" width="26" height="26"></rect>
+				<rect x="690" y="160" width="26" height="26"></rect>
+				<rect x="40" y="290" width="130" height="56"></rect>
+				<circle cx="110" cy="390" r="14"></circle>
+				{
+					[0, 1, 2, 3, 4].map((i) => (
+						<rect x={330 + i * 42} y="250" width="30" height="30" />
+					))
+				}
+				{
+					[0, 1, 2].map((i) => (
+						<rect x={330 + i * 42} y="294" width="30" height="30" />
+					))
+				}
+				<circle cx="655" cy="340" r="40"></circle>
+				<circle cx="655" cy="340" r="14"></circle>
+				<rect x="620" y="440" width="70" height="14"></rect>
+			</g>
+
+			<!-- doors -->
+			{
+				doors.map((d) => {
+					const p = door(d);
+					return (
+						<g class="door">
+							<path class="door__gap" d={p.gap} />
+							<path class="door__leaf" d={p.leaf} />
+							<path class="door__arc" d={p.arc} />
+						</g>
+					);
+				})
+			}
+		</svg>
+
+		<aside class="panel plan__cap">
+			<p class="lbl mark plan__lbl">
+				<T v={pair('Ground floor', 'الطابق الأرضي')} />
+			</p>
+			<T
+				as="h3"
+				class="serif"
+				v={pair('Six rooms, one corridor.', 'ست غرف، ورواق واحد.')}
+			/>
+			<T
+				as="p"
+				v={pair(
+					'Each room holds one kind of project; the corridor is the shared TypeScript that runs through all of them. Open a room to see what is in it.',
+					'كل غرفة تحوي نوعًا واحدًا من المشاريع؛ والرواق هو TypeScript المشتركة التي تمرّ بها جميعًا. افتح غرفة لترى ما فيها.',
+				)}
+			/>
+		</aside>
+	</section>
+
+	<section class="sec hero">
+		<p class="lbl eyebrow">
+			<span lang="en">SHEET A-101</span> · <T
+				v={pair('Ground floor', 'الطابق الأرضي')}
+			/>
+		</p>
+		<h1>
+			<T as="span" v={pair('Software drawn', 'برمجيات مرسومة')} />
+			{' '}<T as="i" v={pair('to scale.', 'على مقاسها.')} />
+		</h1>
+		<T
+			as="p"
+			class="lede hero__lede"
+			v={pair(
+				'An architect does not hand a client a pile of features; they hand over a plan. I build web and mobile products from Amman the same way: the data model is the foundation, the interface is the elevation, and release day is when someone moves in.',
+				'لا يسلّم المعماري عميله كومة من الميزات؛ بل يسلّمه مخطّطًا. أبني منتجات الويب والجوال من عمّان على النحو نفسه: نموذج البيانات هو الأساس، والواجهة هي الواجهة المعمارية، ويوم الإطلاق هو يوم يسكن فيه أحد.',
+			)}
+		/>
+		<p class="hero__do">
+			<a class="btn" href={u('/hire')}
+				><T v={pair('Start a project', 'ابدأ مشروعًا')} /></a
+			>
+			<a class="txt" href="#walk"
+				><T v={pair('Tour the rooms ↓', 'تجوّل في الغرف ↓')} /></a
+			>
+		</p>
+		<DesignSwitch design={design} lang={lang} />
+
+		<div class="tb-wrap hero__tb">
+			<table class="tb">
+				<caption class="vh"
+					><T v={pair('Drawing title block', 'خانة عنوان الرسم')} /></caption
+				>
+				<tbody>
+					<tr>
+						<th><T v={pair('Project', 'المشروع')} /></th>
+						<td
+							><T
+								v={pair(
+									'Web & mobile, end to end',
+									'ويب وجوال، من أوله إلى آخره',
+								)}
+							/></td
+						>
+						<th><T v={pair('Sheet', 'الورقة')} /></th>
+						<td lang="en">A-101</td>
+					</tr>
+					<tr>
+						<th><T v={pair('Client', 'العميل')} /></th>
+						<td><T v={pair('You', 'أنت')} /></td>
+						<th><T v={pair('Scale', 'المقياس')} /></th>
+						<td lang="en">1 : 1</td>
+					</tr>
+					<tr>
+						<th><T v={pair('Drawn by', 'رسمه')} /></th>
+						<td
+							><T
+								v={pair('Haitham Assoli, Amman', 'هيثم العسولي، عمّان')}
+							/></td
+						>
+						<th><T v={pair('Rev', 'المراجعة')} /></th>
+						<td class="mark" lang="en">∞</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="sec" id="walk">
+		<p class="lbl eyebrow"><T v={pair('The walk', 'الجولة')} /></p>
+		<T
+			as="h2"
+			v={pair(
+				'Eight rooms, in the order you’d walk them.',
+				'ثماني غرف، بالترتيب الذي تمشيها به.',
+			)}
+		/>
+		<T
+			as="p"
+			class="dim"
+			v={pair(
+				'A route is easier to remember than a list, so the featured work is numbered the way you would move through the building: in the front door, past what is live, to the desk.',
+				'المسار أسهل حفظًا من القائمة، لذا رُقّمت الأعمال المختارة كما تمشي في المبنى: من الباب الأمامي، مرورًا بما يعمل الآن، إلى المكتب.',
+			)}
+		/>
+		<ol class="walk">
+			{
+				walk.map((p) => (
+					<li class="room">
+						<span class="room__no lbl mark" lang="en">
+							{p.no}
+						</span>
+						<div class="room__body">
+							<h3 class="room__name">
+								<a href={u(`/work/${p.slug}`)}>
+									<T v={p.title} />
+								</a>
+							</h3>
+							<p class="lbl lbl--sm dim room__lbl">
+								<T v={catWord[p.category]} />
+								<span aria-hidden="true"> · </span>
+								<T v={yearPair(p.year)} />
+							</p>
+							<T as="p" class="room__tag" v={p.tagline} />
+						</div>
+					</li>
+				))
+			}
+		</ol>
+		<p class="walk__all">
+			<a class="txt" href={u('/work')}
+				><T
+					v={pair(
+						`All ${projects.length} rooms →`,
+						`كل الغرف الـ${projects.length} ←`,
+					)}
+				/></a
+			>
+		</p>
+	</section>
+
+	<section class="sec detail">
+		<figure class="detail__fig">
+			<svg viewBox="0 0 300 300" aria-hidden="true">
+				<g class="wall-thin">
+					<path d="M20 150H110M190 150H280"></path>
+					<path d="M110 150V60" class="door__leaf"></path>
+					<path d="M110 60A90 90 0 0 1 200 150" class="door__arc"></path>
+					<path d="M190 150V240" class="door__leaf"></path>
+					<path d="M190 240A90 90 0 0 1 100 150" class="door__arc"></path>
+				</g>
+				<g class="dim-line">
+					<path d="M150 20V280M146 24l4 -8 4 8M146 276l4 8 4 -8"></path>
+				</g>
+			</svg>
+			<figcaption class="lbl lbl--sm dim">
+				<span lang="en">DETAIL 1 · DOOR, TYPICAL · SCALE 1 : 5</span>
+			</figcaption>
+		</figure>
+		<div class="detail__text">
+			<p class="lbl eyebrow"><T v={pair('Detail 1', 'تفصيل 1')} /></p>
+			<T
+				as="h2"
+				v={pair('Every door swings both ways.', 'كل باب يُفتح في الاتجاهين.')}
+			/>
+			{about.map((block) => <T as="p" v={block} />)}
+		</div>
+	</section>
+
+	<section class="sec">
+		<p class="lbl eyebrow"><T v={pair('Revisions', 'المراجعات')} /></p>
+		<T as="h2" v={pair('Marked up in red pencil.', 'مُعلَّم بالقلم الأحمر.')} />
+		<div class="tb-wrap">
+			<table class="tb revs">
+				<thead>
+					<tr>
+						<th scope="col"><T v={pair('Rev', 'المراجعة')} /></th>
+						<th scope="col"><T v={pair('Date', 'التاريخ')} /></th>
+						<th scope="col"><T v={pair('Description', 'الوصف')} /></th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						revs.map((r) => (
+							<tr>
+								<td class="mark" lang="en">
+									{r.rev}
+								</td>
+								<td>
+									<T v={yearPair(r.period)} />
+								</td>
+								<td>
+									<span class="serif">
+										<T v={r.company} />
+									</span>
+									<span class="revs__role dim">
+										<T v={r.role} />
+									</span>
+								</td>
+							</tr>
+						))
+					}
+					{
+						profile.education.map((ed) => (
+							<tr>
+								<td class="mark" lang="en">
+									—
+								</td>
+								<td>
+									<T v={yearPair(ed.period)} />
+								</td>
+								<td>
+									<span class="serif">
+										<T v={ed.school} />
+									</span>
+									<span class="revs__role dim">
+										<T v={ed.degree} />
+									</span>
+								</td>
+							</tr>
+						))
+					}
+					<tr>
+						<td class="mark" lang="en">∞</td>
+						<td>—</td>
+						<td>
+							<a class="serif" href={u('/hire')}
+								><T v={pair('Yours to commission.', 'التالية بطلبك.')} /></a
+							>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="sec last">
+		<T
+			as="h2"
+			v={pair('The plans are drawn. Move in.', 'المخطّطات مرسومة. اسكن.')}
+		/>
+		<p class="hero__do">
+			<a class="btn" href={u('/hire')}
+				><T v={pair('Start a project', 'ابدأ مشروعًا')} /></a
+			>
+			<a class="txt" href={`mailto:${profile.email}`} lang="en" dir="ltr"
+				>{profile.email}</a
+			>
+		</p>
+	</section>
+</Shell>
+
+<style is:global>
+	/* ── The plan ───────────────────────────────────────────────────────── */
+	.plan {
+		display: grid;
+		gap: 2rem;
+		padding-block: clamp(2rem, 5vw, 4rem) 0;
+		align-items: end;
+	}
+
+	@media (min-width: 960px) {
+		.plan {
+			grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+			gap: 3rem;
+		}
+	}
+
+	.plan__svg {
+		width: 100%;
+		height: auto;
+		overflow: visible;
+		font-family: var(--cond);
+	}
+
+	.wall {
+		fill: none;
+		stroke: var(--line);
+		stroke-width: 2.5;
+	}
+
+	.wall-thin path {
+		fill: none;
+		stroke: var(--line);
+		stroke-width: 2;
+	}
+
+	.hatch {
+		stroke: var(--line-soft);
+		stroke-width: 1;
+	}
+
+	.furn rect,
+	.furn circle {
+		fill: none;
+		stroke: var(--line);
+		stroke-width: 1;
+		opacity: 0.8;
+	}
+
+	.rm {
+		cursor: pointer;
+	}
+
+	.rm__fill {
+		transition: fill 0.2s;
+	}
+
+	.rm:hover .rm__fill,
+	.rm:focus-visible .rm__fill {
+		fill: rgba(238, 243, 250, 0.08);
+	}
+
+	.rm__name {
+		fill: var(--pale);
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 2.2px;
+		text-transform: uppercase;
+	}
+
+	.rm__name[lang='ar'] {
+		font-family: var(--cond-ar);
+		font-size: 14px;
+		letter-spacing: 0;
+	}
+
+	.rm:hover .rm__name {
+		fill: var(--mark);
+	}
+
+	.rm__no {
+		fill: var(--dim);
+		font-size: 7.5px;
+		letter-spacing: 1.4px;
+	}
+
+	.door__gap {
+		stroke: var(--navy);
+		stroke-width: 4;
+	}
+
+	.door__leaf {
+		stroke: var(--line);
+		stroke-width: 1.5;
+	}
+
+	.door__arc {
+		fill: none;
+		stroke: var(--line);
+		stroke-width: 0.8;
+		stroke-dasharray: 3 3;
+	}
+
+	.dim-line path {
+		fill: var(--mark);
+		stroke: var(--mark);
+		stroke-width: 1;
+	}
+
+	.dim-line text {
+		fill: var(--mark);
+		font-size: 8px;
+		font-weight: 600;
+		letter-spacing: 1.6px;
+	}
+
+	.plan__lbl {
+		margin-block-end: 0.5rem;
+	}
+
+	.plan__cap h3 {
+		font-style: italic;
+		font-size: 1.9rem;
+		margin-block-end: 0.6rem;
+	}
+
+	.plan__cap p:last-child {
+		margin: 0;
+		color: var(--dim);
+	}
+
+	/* ── Hero ───────────────────────────────────────────────────────────── */
+	.hero__lede {
+		margin-block: 1.75rem;
+		max-width: 40rem;
+	}
+
+	.hero__do {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 2rem;
+		margin: 0 0 1.25rem;
+		max-width: none;
+	}
+
+	.hero__tb {
+		margin-block-start: 2.5rem;
+		max-width: 44rem;
+	}
+
+	/* ── The walk ───────────────────────────────────────────────────────── */
+	.walk {
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+	}
+
+	.room {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1fr);
+		gap: 0.25rem 1.5rem;
+		padding-block: 1.6rem;
+		border-block-start: 1px solid var(--line-soft);
+	}
+
+	.room__no {
+		font-size: 0.95rem;
+		padding-block-start: 0.5rem;
+	}
+
+	.room__name {
+		font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+		font-style: italic;
+		margin-block-end: 0.35rem;
+	}
+
+	.room__name a {
+		text-decoration: none;
+	}
+
+	.room__name a:hover {
+		color: var(--mark);
+	}
+
+	.room__lbl {
+		margin: 0 0 0.6rem;
+	}
+
+	.room__tag {
+		margin: 0;
+		max-width: 36rem;
+	}
+
+	.walk__all {
+		margin-block-start: 2rem;
+	}
+
+	/* ── Detail ─────────────────────────────────────────────────────────── */
+	.detail {
+		display: grid;
+		gap: 2rem;
+		align-items: center;
+	}
+
+	@media (min-width: 900px) {
+		.detail {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+			gap: 4rem;
+		}
+	}
+
+	.detail__fig {
+		margin: 0;
+		max-width: 24rem;
+	}
+
+	.detail__fig svg {
+		width: 100%;
+		height: auto;
+	}
+
+	.detail__fig figcaption {
+		margin-block-start: 0.5rem;
+	}
+
+	/* ── Revisions ──────────────────────────────────────────────────────── */
+	.revs {
+		margin-block-start: 1.5rem;
+		max-width: 52rem;
+	}
+
+	.revs th {
+		width: auto;
+	}
+
+	.revs td:first-child {
+		font-size: 1.1rem;
+		font-weight: 600;
+		width: 1%;
+	}
+
+	.revs td:nth-child(2) {
+		white-space: nowrap;
+		width: 1%;
+	}
+
+	.revs__role {
+		display: block;
+		margin-block-start: 0.1rem;
+	}
+
+	.last h2 {
+		font-style: italic;
+		font-size: clamp(2rem, 1.5rem + 2.4vw, 3.4rem);
+	}
+</style>

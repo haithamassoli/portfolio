@@ -1,0 +1,365 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* Spooler home: three sheets. The job header and a directory listing of the
+   work, a report of what gets done, and a changelog that ends the job. */
+import { profile } from '../../../content/profile';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { featured, projects } from '../../data/projects';
+import { pair, s, yearPair } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const stores = projects.filter(
+	(p) => p.links.appStore || p.links.playGoogle,
+).length;
+
+const report = [
+	{
+		title: s('skill.web'),
+		m: 'Next.js · Astro · React · Tailwind',
+		line: s('skill.webDesc'),
+	},
+	{
+		title: s('skill.mobile'),
+		m: 'React Native · Expo · Reanimated · Skia',
+		line: s('skill.mobileDesc'),
+	},
+	{
+		title: s('skill.backend'),
+		m: 'NestJS · Convex · Supabase · PostgreSQL',
+		line: s('skill.backendDesc'),
+	},
+	{
+		title: s('skill.other'),
+		m: 'CI/CD · store review · handover',
+		line: s('skill.otherDesc'),
+	},
+];
+
+const about = profile.about.en.map((en, i) => pair(en, profile.about.ar[i]));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Haitham Assoli — web and mobile engineer, Amman',
+		'هيثم العسولي — مهندس ويب وجوال، عمّان',
+	)[lang]}
+	description={pair(
+		'Haitham Assoli builds web and mobile products from Amman, Jordan. Forty shipped, thirteen on the app stores, printed here as one job.',
+		'يبني هيثم العسولي منتجات ويب وجوال من عمّان. أربعون مشروعًا صدر، ثلاثة عشر منها على متاجر التطبيقات، مطبوعة هنا كمهمّة واحدة.',
+	)[lang]}
+>
+	<section class="sec hero">
+		<T as="h1" v={pair('Web. Mobile. Shipped.', 'ويب. جوال. صدر.')} />
+		<span class="cursor" aria-hidden="true"></span>
+		<T as="p" class="lede hero__lede" v={s('hero.lede')} />
+		<p class="hero__do">
+			<a class="bk" href={u('/work')}
+				><T v={pair('See the work', 'شاهد الأعمال')} /></a
+			>
+			<a class="bk bk--out" href={u('/hire')}><T v={s('nav.hire')} /></a>
+		</p>
+		<p class="k hero__note">
+			<T
+				v={pair(
+					`Amman · ${projects.length} projects · ${stores} on the stores · both languages`,
+					`عمّان · ${projects.length} مشروعًا · ${stores} على المتاجر · لغتان`,
+				)}
+			/>
+		</p>
+		<DesignSwitch design={design} lang={lang} />
+	</section>
+
+	<section class="sec">
+		<p class="m ls__cmd" lang="en" dir="ltr">
+			<span class="dim">$</span> ls -la ~/work | head
+		</p>
+		<ol class="ls" lang="en" dir="ltr" aria-label="Featured projects">
+			{
+				featured.map((p) => (
+					<li class="ls__row">
+						<span class="ls__perm">-rw-r--r--</span>
+						<span class="ls__size">
+							{p.year.replace(/\D/g, '').slice(0, 4)}
+						</span>
+						<a class="ls__name" href={u(`/work/${p.slug}`)}>
+							{p.slug}.md
+						</a>
+						<T as="span" class="ls__tag" v={p.tagline} />
+					</li>
+				))
+			}
+		</ol>
+		<p class="m dim ls__sum" lang="en" dir="ltr">
+			{projects.length} files · {stores} on the stores · every one of them written
+			up
+		</p>
+		<T as="p" class="ls__after" v={about[0]} />
+	</section>
+
+	<div class="fold">FOLD</div>
+	<p class="sheet-head">
+		<span lang="en">ASSOLI</span>
+		<T v={pair('Report: what gets done', 'تقرير: ما يُنجز')} />
+		<span lang="en">SHEET 02 / 03</span>
+	</p>
+
+	<section class="sec sec--tight">
+		<ul class="rows">
+			{
+				report.map((r) => (
+					<li class="row">
+						<T as="p" class="row__k" v={r.title} />
+						<p class="row__m" lang="en" dir="ltr">
+							{r.m}
+						</p>
+						<T as="p" v={r.line} />
+					</li>
+				))
+			}
+			<li class="row row--red">
+				<T
+					as="p"
+					class="row__k"
+					v={pair('Handoffs', 'التسليمات بين المختصين')}
+				/>
+				<T as="p" class="row__m" v={pair('None', 'لا شيء')} />
+				<T
+					as="p"
+					v={pair(
+						'There is nothing to hand off. One engineer, data model to store review.',
+						'لا شيء يُسلَّم. مهندس واحد، من نموذج البيانات حتى مراجعة المتجر.',
+					)}
+				/>
+			</li>
+		</ul>
+
+		<T
+			as="h2"
+			class="red shout"
+			v={pair(
+				'No handoffs. Nothing lost between specialists.',
+				'لا تسليمات. لا شيء يضيع بين المختصين.',
+			)}
+		/>
+		<T as="p" v={about[1]} />
+		<T as="p" v={about[2]} />
+	</section>
+
+	<div class="fold">FOLD</div>
+	<p class="sheet-head">
+		<span lang="en">ASSOLI</span>
+		<T v={pair('Changelog · end of job', 'سجل التغييرات · نهاية المهمّة')} />
+		<span lang="en">SHEET 03 / 03</span>
+	</p>
+
+	<section class="sec sec--tight">
+		<p class="m k log__title">
+			<T v={pair('Changelog (excerpt)', 'سجل التغييرات (مقتطف)')} />
+		</p>
+		<ol class="log">
+			{
+				profile.experience.map((job) => (
+					<li class="log__row">
+						<T as="span" class="m log__when" v={yearPair(job.period)} />
+						<span class="log__what">
+							<b>
+								<T v={job.company} />
+							</b>
+							<span class="dim">
+								{' — '}
+								<T v={job.role} />
+							</span>
+							<T
+								as="span"
+								class="log__hl"
+								v={pair(job.highlights.en[0], job.highlights.ar[0])}
+							/>
+						</span>
+					</li>
+				))
+			}
+			{
+				profile.education.map((ed) => (
+					<li class="log__row">
+						<T as="span" class="m log__when" v={yearPair(ed.period)} />
+						<span class="log__what">
+							<b>
+								<T v={ed.school} />
+							</b>
+							<span class="dim">
+								{' — '}
+								<T v={ed.degree} />
+							</span>
+						</span>
+					</li>
+				))
+			}
+		</ol>
+
+		<p class="m dim eoj" lang="en" dir="ltr">
+			*** END OF JOB · {projects.length} PROJECTS · 0 ERRORS · 0 WARNINGS ***
+		</p>
+
+		<T
+			as="h2"
+			class="cta"
+			v={pair('Start a job. Send the brief.', 'ابدأ مهمّة. أرسل الطلب.')}
+		/>
+		<p class="hero__do">
+			<a class="bk" href={u('/hire')}><T v={s('nav.hire')} /></a>
+			<a class="m mail" href={`mailto:${profile.email}`} lang="en" dir="ltr"
+				>{profile.email}</a
+			>
+		</p>
+	</section>
+</Shell>
+
+<style is:global>
+	.hero {
+		padding-block-start: calc(var(--line) * 3);
+	}
+
+	.hero h1 {
+		display: inline;
+	}
+
+	/* The block cursor the printer left after the last character. */
+	.cursor {
+		display: inline-block;
+		width: 0.55em;
+		height: 0.9em;
+		margin-inline-start: 0.15em;
+		vertical-align: -0.1em;
+		background: var(--dim);
+		font-size: clamp(2.2rem, 5.6vw, 4.6rem);
+		animation: blink 1.1s steps(1) infinite;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	.hero__lede {
+		margin-block: calc(var(--line) * 1.5) var(--line);
+	}
+
+	.hero__do {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.8rem 1rem;
+		max-width: none;
+	}
+
+	.hero__note {
+		margin: 0;
+		max-width: 30rem;
+		line-height: 1.6;
+	}
+
+	.hero .dsw-row {
+		font-family: var(--mono);
+	}
+
+	html[lang='ar'] .hero .dsw-row {
+		font-family: var(--ar);
+	}
+
+	.ls__sum {
+		margin-block: var(--line);
+		font-size: 0.85rem;
+		border-block-start: 1px dashed var(--faint);
+		padding-block-start: 0.5rem;
+	}
+
+	.ls__after {
+		margin-block-start: var(--line);
+	}
+
+	.shout {
+		margin-block: calc(var(--line) * 2) var(--line);
+		max-width: 22ch;
+		text-transform: uppercase;
+	}
+
+	.shout[lang='ar'] {
+		text-transform: none;
+	}
+
+	/* ── Changelog ──────────────────────────────────────────────────────── */
+	.log__title {
+		font-weight: 700;
+		color: var(--ink);
+		margin-block-end: calc(var(--line) * 0.5);
+	}
+
+	.log {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		max-width: 44rem;
+	}
+
+	.log__row {
+		display: grid;
+		grid-template-columns: 8rem minmax(0, 1fr);
+		gap: 0.25rem 1.5rem;
+		padding-block: calc(var(--line) * 0.5);
+	}
+
+	.log__when {
+		font-size: 0.9rem;
+		white-space: nowrap;
+	}
+
+	.log__what {
+		display: block;
+	}
+
+	.log__hl {
+		display: block;
+		font-size: 0.95rem;
+	}
+
+	@media (max-width: 560px) {
+		.log__row {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.eoj {
+		margin-block: calc(var(--line) * 2);
+		font-size: 0.8rem;
+		letter-spacing: 0.12em;
+		text-align: center;
+		max-width: none;
+	}
+
+	.cta {
+		max-width: 20ch;
+		font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.6rem);
+	}
+
+	.mail {
+		font-size: 0.95rem;
+	}
+
+	.mail:hover {
+		color: var(--red);
+	}
+</style>

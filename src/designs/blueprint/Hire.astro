@@ -1,0 +1,349 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+/* Sheet A-301: the specification. What gets delivered, then the brief. */
+import { profile } from '../../../content/profile';
+import HireCompose from '../../components/HireCompose.astro';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { pair, s } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+const deals = ['part', 'full', 'contract', 'freelance', 'hourly'] as const;
+const places = ['remote', 'onsite'] as const;
+const stacks = ['frontend', 'backend', 'mobile', 'other'] as const;
+const takes = [
+	{ no: '1.1', title: s('skill.web'), body: s('skill.webDesc') },
+	{ no: '1.2', title: s('skill.mobile'), body: s('skill.mobileDesc') },
+	{ no: '1.3', title: s('skill.backend'), body: s('skill.backendDesc') },
+	{ no: '1.4', title: s('skill.other'), body: s('skill.otherDesc') },
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={pair(
+		'Start a project — Haitham Assoli',
+		'ابدأ مشروعًا — هيثم العسولي',
+	)[lang]}
+	description={s('hire.lede')[lang]}
+	sheet="A-301"
+>
+	<HireCompose />
+
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<span lang="en">SHEET A-301</span> · <T
+				v={pair('Specification', 'المواصفات')}
+			/>
+		</p>
+		<T as="h1" class="h1--sm" v={s('hire.title')} />
+		<T as="p" class="lede hire__lede" v={s('hire.lede')} />
+		<p class="lbl lbl--sm dim"><T v={s('hire.note')} /></p>
+	</section>
+
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<span lang="en">1</span> · <T v={s('skills.title')} />
+		</p>
+		<div class="spec">
+			{
+				takes.map((t) => (
+					<div class="spec__item">
+						<span class="lbl mark" lang="en">
+							{t.no}
+						</span>
+						<div>
+							<T as="h3" v={t.title} />
+							<T as="p" class="dim" v={t.body} />
+						</div>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="sec">
+		<p class="lbl eyebrow">
+			<span lang="en">2</span> · <T v={pair('The brief', 'الطلب')} />
+		</p>
+		<T
+			as="h2"
+			v={pair(
+				'Eight lines, and I can answer properly.',
+				'ثماني خانات، وأستطيع الردّ ردًّا مفيدًا.',
+			)}
+		/>
+		<form class="form panel" data-hire>
+			<div class="f">
+				<label class="lbl lbl--sm dim" for="fullName"
+					><T v={s('hire.fullName')} /></label
+				>
+				<input
+					class="f__i"
+					id="fullName"
+					name="fullName"
+					type="text"
+					autocomplete="name"
+					required
+				/>
+			</div>
+			<div class="f">
+				<label class="lbl lbl--sm dim" for="email"
+					><T v={s('hire.email')} /></label
+				>
+				<input
+					class="f__i"
+					id="email"
+					name="email"
+					type="email"
+					autocomplete="email"
+					dir="ltr"
+					required
+				/>
+			</div>
+			<div class="f">
+				<label class="lbl lbl--sm dim" for="phone"
+					><T v={s('hire.phone')} /></label
+				>
+				<input
+					class="f__i"
+					id="phone"
+					name="phone"
+					type="tel"
+					autocomplete="tel"
+					dir="ltr"
+					required
+				/>
+			</div>
+
+			<fieldset class="f">
+				<legend class="lbl lbl--sm dim"><T v={s('hire.deal')} /></legend>
+				<div class="opts">
+					{
+						deals.map((d, i) => (
+							<label class="opt">
+								<input type="radio" name="deal" value={d} required={i === 0} />
+								<T v={s(`deal.${d}`)} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="f">
+				<legend class="lbl lbl--sm dim"><T v={s('hire.location')} /></legend>
+				<div class="opts">
+					{
+						places.map((l, i) => (
+							<label class="opt">
+								<input
+									type="radio"
+									name="location"
+									value={l}
+									required={i === 0}
+								/>
+								<T v={s(`loc.${l}`)} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<fieldset class="f">
+				<legend class="lbl lbl--sm dim"><T v={s('hire.techStack')} /></legend>
+				<div class="opts">
+					{
+						stacks.map((t) => (
+							<label class="opt">
+								<input type="checkbox" name="techStack" value={t} />
+								<T v={s(`tech.${t}`)} />
+							</label>
+						))
+					}
+				</div>
+			</fieldset>
+
+			<div class="f">
+				<label class="lbl lbl--sm dim" for="budget"
+					><T v={s('hire.budget')} /></label
+				>
+				<input
+					class="f__i"
+					id="budget"
+					name="budget"
+					type="text"
+					placeholder={s('hire.budgetPlaceholder')[lang]}
+					required
+				/>
+			</div>
+			<div class="f f--wide">
+				<label class="lbl lbl--sm dim" for="summary"
+					><T v={s('hire.summary')} /></label
+				>
+				<textarea
+					class="f__i f__t"
+					id="summary"
+					name="summary"
+					rows="5"
+					placeholder={s('hire.summaryPlaceholder')[lang]}
+					required></textarea>
+			</div>
+
+			<div class="form__end f--wide">
+				<button class="btn" type="submit"><T v={s('hire.submit')} /></button>
+				<T as="p" class="form__note mark" v={s('hire.sent')} />
+			</div>
+		</form>
+
+		<p class="form__alt dim">
+			<T v={pair('Or write directly:', 'أو راسلني مباشرة:')} />
+			<a href={`mailto:${profile.email}`} lang="en" dir="ltr">{profile.email}</a
+			>
+		</p>
+	</section>
+</Shell>
+
+<style is:global>
+	.hire__lede {
+		margin-block: 1.5rem 1rem;
+	}
+
+	.spec {
+		display: grid;
+		gap: 1.75rem;
+		max-width: 44rem;
+	}
+
+	.spec__item {
+		display: grid;
+		grid-template-columns: 3.5rem minmax(0, 1fr);
+		gap: 1rem;
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid var(--line-soft);
+	}
+
+	.spec__item h3 {
+		margin-block-end: 0.4rem;
+	}
+
+	.spec__item p {
+		margin: 0;
+	}
+
+	.form {
+		display: grid;
+		gap: 1.5rem 2rem;
+		max-width: 46rem;
+		margin-block-start: 1.75rem;
+	}
+
+	@media (min-width: 720px) {
+		.form {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.f--wide {
+			grid-column: 1 / -1;
+		}
+	}
+
+	.f {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+
+	.f label,
+	.f legend {
+		display: block;
+		padding: 0;
+		margin-block-end: 0.4rem;
+	}
+
+	.f__i {
+		display: block;
+		width: 100%;
+		padding: 0.45rem 0 0.5rem;
+		border: 0;
+		border-block-end: 1px solid var(--line);
+		border-radius: 0;
+		background: transparent;
+		color: var(--pale);
+		font-family: var(--sans);
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+
+	html[lang='ar'] .f__i {
+		font-family: var(--sans-ar);
+	}
+
+	.f__i::placeholder {
+		color: rgba(143, 167, 204, 0.6);
+	}
+
+	.f__i:focus {
+		outline: none;
+		border-block-end: 2px solid var(--mark);
+		padding-block-end: calc(0.5rem - 1px);
+	}
+
+	.f__t {
+		resize: vertical;
+		min-height: 6rem;
+	}
+
+	.opts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.4rem;
+	}
+
+	.opt {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		cursor: pointer;
+	}
+
+	.opt input {
+		accent-color: var(--mark);
+		margin: 0;
+		transform: translateY(0.1rem);
+	}
+
+	.form__end {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem 1.5rem;
+	}
+
+	.form__note {
+		display: none;
+		margin: 0;
+	}
+
+	.form[data-sent] .form__note {
+		display: block;
+	}
+
+	.form__alt {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-start: 2rem;
+	}
+
+	.form__alt a:hover {
+		color: var(--mark);
+	}
+</style>

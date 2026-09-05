@@ -1,0 +1,24 @@
+---
+/* slip-box, in English. Thin on purpose: the only reason this file exists is to
+   keep slip-box's stylesheet off the other designs' pages. */
+import Home from '../../designs/slip-box/Home.astro';
+import Work from '../../designs/slip-box/Work.astro';
+import Hire from '../../designs/slip-box/Hire.astro';
+import Project from '../../designs/slip-box/Project.astro';
+import { designPaths, resolve, type RouteProps } from '../../designs/paths';
+
+export const getStaticPaths = () => designPaths('slip-box', 'en');
+
+const props = Astro.props as RouteProps;
+const { design, project, next } = resolve(props);
+const lang = props.lang;
+---
+
+{props.kind === 'home' && <Home design={design} lang={lang} />}
+{props.kind === 'work' && <Work design={design} lang={lang} />}
+{props.kind === 'hire' && <Hire design={design} lang={lang} />}
+{
+	props.kind === 'project' && project && next && (
+		<Project design={design} lang={lang} project={project} next={next} />
+	)
+}

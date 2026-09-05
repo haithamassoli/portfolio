@@ -1,0 +1,298 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* `cat` one Markdown file: front matter, then the write-up. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import {
+	catWord,
+	linkWord,
+	pair,
+	s,
+	statusWord,
+	yearPair,
+} from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang, project: p, next } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const tall = (img: ImageMetadata) => img.height / img.width > 1.1;
+const overview = p.overview.en.map((en, i) => pair(en, p.overview.ar[i]));
+const outcomes = p.outcomes.en.map((en, i) => pair(en, p.outcomes.ar[i]));
+const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={`${p.title[lang]} — ${pair('Haitham Assoli', 'هيثم العسولي')[lang]}`}
+	description={p.tagline[lang]}
+	job={`FILE ${p.slug.toUpperCase()}`}
+>
+	<section class="sec">
+		<p class="m cmd" lang="en" dir="ltr">
+			<a class="dim" href={u('/work')}>$ cd ~/work</a> && cat {p.slug}.md
+		</p>
+
+		<pre
+			class="fm"
+			dir="ltr"><span class="dim">---</span>
+<span class="fm__k">title:</span> <T v={p.title} />
+<span class="fm__k">role:</span> <T v={p.role} />
+<span class="fm__k">year:</span> <T v={yearPair(p.year)} />
+<span class="fm__k">status:</span> <T v={statusWord[p.status]} />
+<span class="fm__k">category:</span> <T v={catWord[p.category]} />
+<span class="fm__k">stack:</span> <span lang="en" dir="ltr">[{p.stack.join(', ')}]</span>{Object.entries(p.links).filter(([, url]) => url).map(([key, url]) => (<><br /><span class="fm__k">{key}:</span> <a href={url} rel="noreferrer"><T v={linkWord[key]} /></a></>))}
+<span class="dim">---</span></pre>
+
+		<T as="h1" class="h1--sm" v={p.title} />
+		<T as="p" class="lede case__tag" v={p.tagline} />
+		<T as="p" v={p.summary} />
+
+		{
+			p.image && (
+				<figure class={`cover${tall(p.image) ? ' cover--tall' : ''}`}>
+					<Image
+						src={p.image}
+						alt={p.title[lang]}
+						widths={tall(p.image) ? [280, 560] : [480, 720, 1080]}
+						sizes={
+							tall(p.image)
+								? '17rem'
+								: '(min-width: 900px) 40rem, calc(100vw - 6rem)'
+						}
+						loading="eager"
+						decoding="async"
+					/>
+					<figcaption class="k">
+						<span lang="en">{p.cover.split('/').pop()}</span>
+					</figcaption>
+				</figure>
+			)
+		}
+	</section>
+
+	<section class="sec sec--tight">
+		<h2 class="md">
+			<span class="dim">##</span>
+			<T v={pair('Overview', 'نظرة عامة')} />
+		</h2>
+		{overview.map((block) => <T as="p" v={block} />)}
+	</section>
+
+	{
+		p.challenges.length > 0 && (
+			<section class="sec sec--tight">
+				<h2 class="md">
+					<span class="dim">##</span> <T v={s('project.challenges')} />
+				</h2>
+				{p.challenges.map((c) => (
+					<div class="chal">
+						<h3 class="md">
+							<span class="dim">###</span> <T v={c.title} />
+						</h3>
+						<blockquote class="q">
+							<T as="p" v={c.problem} />
+						</blockquote>
+						<T as="p" v={c.solution} />
+					</div>
+				))}
+			</section>
+		)
+	}
+
+	<section class="sec sec--tight">
+		<h2 class="md">
+			<span class="dim">##</span>
+			<T v={s('project.outcomes')} />
+		</h2>
+		<ul class="outs">
+			{outcomes.map((block) => <T as="li" v={block} />)}
+		</ul>
+	</section>
+
+	{
+		gallery.length > 0 && (
+			<section class="sec sec--tight">
+				<h2 class="md">
+					<span class="dim">##</span> <T v={pair('Screens', 'لقطات')} />
+				</h2>
+				<div class="shots">
+					{gallery.map((shot, i) => (
+						<figure class={`shot${tall(shot) ? ' shot--tall' : ''}`}>
+							<Image
+								src={shot}
+								alt={`${p.title[lang]} — ${i + 1}`}
+								widths={tall(shot) ? [280, 560] : [480, 720, 1080]}
+								sizes={
+									tall(shot)
+										? '14rem'
+										: '(min-width: 900px) 40rem, calc(100vw - 6rem)'
+								}
+								loading="lazy"
+								decoding="async"
+							/>
+						</figure>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<div class="fold">FOLD</div>
+	<section class="sec sec--tight">
+		<p class="m cmd" lang="en" dir="ltr"><span class="dim">$</span> next</p>
+		<p class="nextp">
+			<a class="m" href={u(`/work/${next.slug}`)}><b><T v={next.title} /></b></a
+			>
+			<T as="span" class="dim" v={next.tagline} />
+		</p>
+	</section>
+</Shell>
+
+<style is:global>
+	.cmd {
+		font-size: 1.05rem;
+		font-weight: 500;
+		margin-block-end: calc(var(--line) * 0.5);
+	}
+
+	.cmd a {
+		text-decoration: none;
+	}
+
+	.cmd a:hover {
+		color: var(--red);
+	}
+
+	.fm {
+		margin: 0 0 var(--line);
+		padding: 0.5rem 0;
+		font-family: var(--mono);
+		font-size: 0.9rem;
+		line-height: 1.6;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+		border-block: 1px dashed var(--faint);
+		max-width: 44rem;
+	}
+
+	.fm__k {
+		color: var(--red);
+	}
+
+	.fm a:hover {
+		color: var(--red);
+	}
+
+	.case__tag {
+		margin-block: var(--line) calc(var(--line) * 0.5);
+		color: var(--dim);
+	}
+
+	.cover,
+	.shot {
+		margin: var(--line) 0 0;
+		max-width: 40rem;
+	}
+
+	.cover--tall,
+	.shot--tall {
+		max-width: 17rem;
+	}
+
+	.cover img,
+	.shot img {
+		width: 100%;
+		border: 1px solid var(--ink);
+		filter: grayscale(0.15) contrast(1.02);
+	}
+
+	.cover figcaption {
+		margin-block-start: 0.4rem;
+	}
+
+	.md {
+		margin-block: 0 var(--line);
+		font-size: 1.25rem;
+	}
+
+	h3.md {
+		font-size: 1.05rem;
+		margin-block: var(--line) calc(var(--line) * 0.5);
+	}
+
+	.q {
+		margin: 0 0 calc(var(--line) * 0.5);
+		padding-inline-start: 1rem;
+		border-inline-start: 3px solid var(--faint);
+		color: var(--dim);
+	}
+
+	.q p {
+		margin: 0;
+	}
+
+	.outs {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		max-width: 38rem;
+	}
+
+	.outs li {
+		position: relative;
+		padding-inline-start: 1.4rem;
+		margin-block-end: calc(var(--line) * 0.5);
+	}
+
+	.outs li::before {
+		content: '-';
+		position: absolute;
+		inset-inline-start: 0;
+		font-family: var(--mono);
+		font-weight: 700;
+		color: var(--red);
+	}
+
+	.shots {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25rem;
+		max-width: 40rem;
+	}
+
+	.shot {
+		margin: 0;
+		flex: 1 1 100%;
+	}
+
+	.shot--tall {
+		flex: 0 1 14rem;
+	}
+
+	.nextp {
+		display: grid;
+		gap: 0.2rem;
+		max-width: 38rem;
+	}
+
+	.nextp a {
+		text-decoration: none;
+		font-size: 1.15rem;
+	}
+
+	.nextp a:hover {
+		color: var(--red);
+	}
+</style>

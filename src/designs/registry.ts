@@ -15,7 +15,10 @@ export type DesignId =
 	| 'bento'
 	| 'night-reel'
 	| 'playroom'
-	| 'signal';
+	| 'signal'
+	| 'slip-box'
+	| 'spooler'
+	| 'blueprint';
 
 export interface Design {
 	id: DesignId;
@@ -125,6 +128,39 @@ export const designs: Design[] = [
 			ar: 'حبر وعظم، خطّان متلاصقان على درزة واحدة',
 		},
 		accent: '#ff5a1f',
+		weight: 'light',
+	},
+	{
+		id: 'slip-box',
+		n: 9,
+		name: { en: 'Slip-box', ar: 'صندوق البطاقات' },
+		note: {
+			en: 'Index cards on a green board, threaded in red',
+			ar: 'بطاقات فهرسة على لوح أخضر، يربطها خيط أحمر',
+		},
+		accent: '#c1362b',
+		weight: 'light',
+	},
+	{
+		id: 'spooler',
+		n: 10,
+		name: { en: 'Spooler', ar: 'الطابعة' },
+		note: {
+			en: 'Green-bar paper, tractor holes, a dot-matrix report',
+			ar: 'ورق مخطّط أخضر، ثقوب الجرّ، تقرير طابعة نقطية',
+		},
+		accent: '#6b8f72',
+		weight: 'light',
+	},
+	{
+		id: 'blueprint',
+		n: 11,
+		name: { en: 'Blueprint', ar: 'المخطَّط' },
+		note: {
+			en: 'Navy drawing sheet, a floor plan of the work',
+			ar: 'ورقة رسم كحلية، مخطّط أرضي للأعمال',
+		},
+		accent: '#ff6b52',
 		weight: 'light',
 	},
 ];

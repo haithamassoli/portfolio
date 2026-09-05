@@ -1,0 +1,523 @@
+---
+/* BLUEPRINT — the portfolio as an architect's drawing set. Navy sheet, pale
+   ink lines, a double border round the page, condensed capitals for the
+   labels and a serif for the words a person reads. Orange-red is the marker
+   pencil: dimensions, revisions, the thing to look at.
+   ponytail: the frame is one fixed element; the grid is one gradient. */
+import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { parse, otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+import Logo from '../../components/Logo.astro';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import { pair, s } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	title: string;
+	description: string;
+	/** Printed in the footer: the sheet this page is. */
+	sheet?: string;
+}
+
+const { design, lang, title, description, sheet = 'A-101' } = Astro.props;
+const { page } = parse(Astro.url.pathname);
+const u = (p = '') => designUrl(design, lang, p);
+const other = otherLang(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<Head {design} {lang} {title} {description} colorScheme="dark" />
+	<body>
+		<a class="skip lbl" href="#main"><T v={s('nav.skip')} /></a>
+		<div class="frame" aria-hidden="true"></div>
+
+		<div class="wrap">
+			<header class="top">
+				<a class="top__name" href={u()}>
+					<Logo labelled={false} />
+					<span class="top__word" aria-hidden="true">Assoli</span>
+					<T class="vh" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+				</a>
+				<nav class="top__nav lbl" aria-label={pair('Pages', 'الصفحات')[lang]}>
+					<a
+						href={u('/work')}
+						aria-current={page === '/work' ? 'page' : undefined}
+						><T v={s('nav.work')} /></a
+					>
+					<a href={other} data-lang-link lang={lang === 'ar' ? 'en' : 'ar'}
+						>{lang === 'ar' ? 'English' : 'عربي'}</a
+					>
+					<a class="btn btn--line" href={u('/hire')}><T v={s('nav.hire')} /></a>
+				</nav>
+			</header>
+
+			<main id="main">
+				<slot />
+				{
+					page !== '' && (
+						<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+					)
+				}
+			</main>
+
+			<footer class="foot lbl">
+				<p><span lang="en">ASSOLI · SHEET {sheet} · REV ∞</span></p>
+				<p class="foot__links">
+					<a href={profile.links.github} rel="noreferrer">GitHub</a>
+					<a href={profile.links.linkedin} rel="noreferrer">LinkedIn</a>
+					<a href={profile.links.resume} rel="noreferrer"
+						><T v={s('nav.cv')} /></a
+					>
+					<span lang="en">© {new Date().getFullYear()}</span>
+				</p>
+			</footer>
+		</div>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--navy: #10295a;
+		--navy-deep: #0b1f47;
+		--line: #c9d6ea;
+		--line-soft: rgba(201, 214, 234, 0.35);
+		--pale: #eef3fa;
+		--dim: #8fa7cc;
+		--mark: #ff6b52;
+		--panel: rgba(0, 0, 0, 0.14);
+
+		--serif: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+		--sans: 'Barlow', system-ui, sans-serif;
+		--cond: 'Barlow Semi Condensed', 'Barlow', system-ui, sans-serif;
+		--serif-ar: 'Amiri', 'Noto Naskh Arabic', serif;
+		--sans-ar: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+		--cond-ar: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+
+		--s-hero: clamp(2.6rem, 6.2vw, 5.2rem);
+		--s-h2: clamp(1.7rem, 1.3rem + 1.6vw, 2.6rem);
+		--band: clamp(3.5rem, 8vw, 6.5rem);
+		color-scheme: dark;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		background: var(--navy);
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		background:
+			linear-gradient(var(--line-soft) 1px, transparent 1px) 0 0 / 100% 2.5rem,
+			linear-gradient(90deg, var(--line-soft) 1px, transparent 1px) 0 0 / 2.5rem
+				100%,
+			radial-gradient(
+				120% 80% at 50% 0%,
+				#163672,
+				var(--navy) 60%,
+				var(--navy-deep)
+			);
+		background-blend-mode: soft-light, soft-light, normal;
+		color: var(--pale);
+		font-family: var(--sans);
+		font-size: 1.0625rem;
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+		overflow-x: hidden;
+	}
+
+	::selection {
+		background: var(--mark);
+		color: var(--navy);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--mark);
+		outline-offset: 3px;
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	p {
+		margin: 0 0 1rem;
+		max-width: 38rem;
+	}
+
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.skip {
+		position: absolute;
+		inset-block-start: 0.5rem;
+		inset-inline-start: 0.5rem;
+		z-index: 5;
+		padding: 0.5rem 0.85rem;
+		background: var(--pale);
+		color: var(--navy);
+		transform: translateY(-200%);
+	}
+
+	.skip:focus {
+		transform: none;
+	}
+
+	/* The double border every drawing sheet carries. */
+	.frame {
+		position: fixed;
+		inset: 0.6rem;
+		border: 1px solid var(--line);
+		outline: 1px solid var(--line);
+		outline-offset: 5px;
+		pointer-events: none;
+		z-index: 4;
+	}
+
+	@media (max-width: 640px) {
+		.frame {
+			inset: 0.35rem;
+			outline-offset: 3px;
+		}
+	}
+
+	.wrap {
+		width: min(100% - 2 * clamp(1.6rem, 6vw, 5rem), 74rem);
+		margin-inline: auto;
+	}
+
+	/* ── Type roles ─────────────────────────────────────────────────────── */
+	.lbl {
+		font-family: var(--cond);
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+	}
+
+	.lbl--sm {
+		font-size: 0.68rem;
+		letter-spacing: 0.16em;
+	}
+
+	.mark {
+		color: var(--mark);
+	}
+
+	.dim {
+		color: var(--dim);
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--serif);
+		font-weight: 400;
+		line-height: 1.05;
+		letter-spacing: -0.01em;
+		margin: 0;
+		text-wrap: balance;
+	}
+
+	h1 {
+		font-size: var(--s-hero);
+	}
+
+	h2 {
+		font-size: var(--s-h2);
+		line-height: 1.12;
+		margin-block-end: 1rem;
+		max-width: 26ch;
+	}
+
+	h3 {
+		font-size: 1.5rem;
+		line-height: 1.2;
+	}
+
+	h1 i,
+	h2 i,
+	h3 i {
+		font-style: italic;
+		font-weight: 300;
+	}
+
+	.h1--sm {
+		font-size: clamp(2rem, 1.4rem + 2.6vw, 3.6rem);
+		max-width: 22ch;
+	}
+
+	.lede {
+		font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
+		line-height: 1.55;
+	}
+
+	/* ── Arabic ──────────────────────────────────────────────────────────── */
+	[lang='ar']:where(:not(:root)) {
+		font-family: var(--sans-ar);
+		letter-spacing: 0;
+		text-transform: none;
+		line-height: 1.85;
+	}
+
+	h1[lang='ar'],
+	h2[lang='ar'],
+	h3[lang='ar'],
+	.serif[lang='ar'] {
+		font-family: var(--serif-ar);
+		line-height: 1.35;
+	}
+
+	.lbl[lang='ar'],
+	.lbl [lang='ar'],
+	.tb [lang='ar'],
+	.btn [lang='ar'] {
+		font-family: var(--cond-ar);
+		font-weight: 700;
+		letter-spacing: 0;
+		line-height: 1.4;
+	}
+
+	html[dir='rtl'] [lang='en'] {
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
+
+	/* ── Header, footer ─────────────────────────────────────────────────── */
+	.top {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.9rem 1.5rem;
+		padding-block: 1.8rem 1.4rem;
+		border-block-end: 1px solid var(--line);
+	}
+
+	.top__name {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+		text-decoration: none;
+		--logo-rule: var(--mark);
+	}
+
+	.top .top__name .logo {
+		block-size: 1.6rem;
+	}
+
+	.top__word {
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 1.7rem;
+		line-height: 1;
+	}
+
+	.top__nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1.75rem;
+		color: var(--dim);
+	}
+
+	.top__nav a {
+		text-decoration: none;
+	}
+
+	.top__nav a:hover,
+	.top__nav a[aria-current='page'] {
+		color: var(--pale);
+	}
+
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.6rem 1.5rem;
+		padding-block: 1.4rem 3.5rem;
+		border-block-start: 1px solid var(--line);
+		color: var(--dim);
+	}
+
+	.foot p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.25rem;
+	}
+
+	.foot a {
+		text-decoration: none;
+	}
+
+	.foot a:hover {
+		color: var(--pale);
+	}
+
+	/* ── Buttons ────────────────────────────────────────────────────────── */
+	.btn {
+		display: inline-block;
+		padding: 0.95rem 1.5rem;
+		border: 1px solid var(--pale);
+		background: var(--pale);
+		color: var(--navy);
+		font-family: var(--cond);
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		text-decoration: none;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			background-color 0.2s,
+			color 0.2s,
+			border-color 0.2s;
+	}
+
+	.btn:hover {
+		background: var(--mark);
+		border-color: var(--mark);
+		color: var(--navy);
+	}
+
+	.btn--line {
+		padding: 0.7rem 1.1rem;
+		background: transparent;
+		color: var(--pale);
+		border-color: var(--line);
+	}
+
+	.btn--line:hover {
+		background: rgba(238, 243, 250, 0.08);
+		border-color: var(--pale);
+		color: var(--pale);
+	}
+
+	.txt {
+		font-family: var(--cond);
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		text-decoration: none;
+		border-block-end: 1px solid var(--line-soft);
+		padding-block-end: 0.2rem;
+	}
+
+	.txt:hover {
+		color: var(--mark);
+		border-color: var(--mark);
+	}
+
+	/* ── Panel and title block ──────────────────────────────────────────── */
+	.panel {
+		padding: 1.4rem 1.6rem 1.5rem;
+		border: 1px solid var(--line);
+		background: var(--panel);
+	}
+
+	.tb {
+		width: 100%;
+		border-collapse: collapse;
+		border: 1px solid var(--line);
+		font-family: var(--cond);
+		font-size: 0.8rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.tb th,
+	.tb td {
+		padding: 0.6rem 0.9rem;
+		border: 1px solid var(--line);
+		text-align: start;
+		vertical-align: top;
+	}
+
+	.tb th {
+		font-weight: 600;
+		color: var(--dim);
+		white-space: nowrap;
+		width: 1%;
+	}
+
+	.tb td {
+		font-weight: 500;
+	}
+
+	.tb .serif {
+		font-family: var(--serif);
+		font-size: 1.1rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.tb a {
+		text-decoration: none;
+	}
+
+	.tb a:hover {
+		color: var(--mark);
+	}
+
+	.tb-wrap {
+		overflow-x: auto;
+	}
+
+	/* ── Sections ──────────────────────────────────────────────────────── */
+	.sec {
+		padding-block: var(--band);
+		border-block-start: 1px solid var(--line-soft);
+	}
+
+	.sec:first-child {
+		border: 0;
+	}
+
+	.eyebrow {
+		margin: 0 0 1.2rem;
+		color: var(--mark);
+	}
+
+	.dsw-row {
+		font-family: var(--sans);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			transition-duration: 0.001ms !important;
+		}
+	}
+</style>

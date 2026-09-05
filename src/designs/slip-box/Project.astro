@@ -1,0 +1,372 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* One card, pulled from the box, and the cards filed behind it. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import {
+	catWord,
+	linkWord,
+	pair,
+	s,
+	statusWord,
+	yearPair,
+} from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang, project: p, next } = Astro.props;
+const u = (page = '') => designUrl(design, lang, page);
+
+const tall = (img: ImageMetadata) => img.height / img.width > 1.1;
+const overview = p.overview.en.map((en, i) => pair(en, p.overview.ar[i]));
+const outcomes = p.outcomes.en.map((en, i) => pair(en, p.outcomes.ar[i]));
+const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
+const facts = [
+	[s('project.role'), p.role],
+	[s('project.year'), yearPair(p.year)],
+	[s('project.status'), statusWord[p.status]],
+	[pair('Category', 'التصنيف'), catWord[p.category]],
+];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={`${p.title[lang]} — ${pair('Haitham Assoli', 'هيثم العسولي')[lang]}`}
+	description={p.tagline[lang]}
+>
+	<section class="wrap band" slot="board">
+		<p class="k hero__eyebrow">
+			<a class="back" href={u('/work')}>← <T v={s('project.back')} /></a>
+		</p>
+		<T as="h1" v={p.title} />
+		<T as="p" class="lede band__lede" v={p.tagline} />
+	</section>
+
+	<section class="sec case__top">
+		<div class="facts card">
+			<p class="card__head">
+				<span class="card__id" lang="en">0</span>
+				<T as="span" class="card__title" v={pair('The facts', 'الحقائق')} />
+			</p>
+			<dl class="facts__list">
+				{
+					facts.map(([k, v]) => (
+						<div class="facts__row">
+							<T as="dt" class="k" v={k} />
+							<T as="dd" v={v} />
+						</div>
+					))
+				}
+				<div class="facts__row">
+					<dt class="k"><T v={s('project.stack')} /></dt>
+					<dd lang="en" dir="ltr">{p.stack.join(' · ')}</dd>
+				</div>
+				{
+					Object.values(p.links).some(Boolean) && (
+						<div class="facts__row">
+							<dt class="k">
+								<T v={s('project.links')} />
+							</dt>
+							<dd class="facts__links">
+								{Object.entries(p.links).map(([key, url]) =>
+									url ? (
+										<a href={url} rel="noreferrer">
+											<T v={linkWord[key]} />
+										</a>
+									) : null,
+								)}
+							</dd>
+						</div>
+					)
+				}
+			</dl>
+		</div>
+		{
+			p.image && (
+				<figure class={`cover${tall(p.image) ? ' cover--tall' : ''}`}>
+					<Image
+						src={p.image}
+						alt={p.title[lang]}
+						widths={tall(p.image) ? [280, 560] : [480, 720, 1080]}
+						sizes={
+							tall(p.image)
+								? '17rem'
+								: '(min-width: 900px) 34rem, calc(100vw - 3rem)'
+						}
+						loading="eager"
+						decoding="async"
+					/>
+				</figure>
+			)
+		}
+	</section>
+
+	<section class="sec">
+		<p class="k eyebrow">
+			<span lang="en">1</span> · <T v={pair('Overview', 'نظرة عامة')} />
+		</p>
+		<T
+			as="h2"
+			v={pair('What it is, and why it exists.', 'ما هو، ولماذا وُجد.')}
+		/>
+		<T as="p" class="lede" v={p.summary} />
+		{overview.map((block) => <T as="p" v={block} />)}
+	</section>
+
+	{
+		p.challenges.length > 0 && (
+			<section class="sec">
+				<p class="k eyebrow">
+					<span lang="en">1a</span>
+					{' · '}
+					<T v={s('project.challenges')} />
+				</p>
+				<T
+					as="h2"
+					v={pair(
+						'Each problem got a card. Each fix got filed behind it.',
+						'كل مشكلة أخذت بطاقة، وكل حلّ صُنّف خلفها.',
+					)}
+				/>
+				<div class="chals">
+					{p.challenges.map((c, i) => (
+						<div class="chal">
+							<article class="card">
+								<p class="card__head">
+									<span class="card__id" lang="en">
+										1a{i + 1}
+									</span>
+									<T as="span" class="card__title" v={c.title} />
+								</p>
+								<T as="p" class="card__body" v={c.problem} />
+							</article>
+							<article class="card chal__fix">
+								<p class="card__head">
+									<span class="card__id" lang="en">
+										1a{i + 1}a
+									</span>
+									<T
+										as="span"
+										class="card__title"
+										v={pair('What I did', 'ما فعلته')}
+									/>
+								</p>
+								<T as="p" class="card__body" v={c.solution} />
+							</article>
+						</div>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<section class="sec">
+		<p class="k eyebrow">
+			<span lang="en">2</span> · <T v={s('project.outcomes')} />
+		</p>
+		<ul class="outs">
+			{outcomes.map((block) => <T as="li" v={block} />)}
+		</ul>
+	</section>
+
+	{
+		gallery.length > 0 && (
+			<section class="sec">
+				<p class="k eyebrow">
+					<span lang="en">3</span>
+					{' · '}
+					<T v={pair('Screens', 'لقطات')} />
+				</p>
+				<div class="shots">
+					{gallery.map((shot, i) => (
+						<figure class={`shot${tall(shot) ? ' shot--tall' : ''}`}>
+							<Image
+								src={shot}
+								alt={`${p.title[lang]} — ${i + 1}`}
+								widths={tall(shot) ? [280, 560] : [480, 720, 1080]}
+								sizes={
+									tall(shot)
+										? '14rem'
+										: '(min-width: 900px) 34rem, calc(100vw - 3rem)'
+								}
+								loading="lazy"
+								decoding="async"
+							/>
+						</figure>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<section class="sec">
+		<p class="k eyebrow"><T v={s('project.next')} /></p>
+		<a class="card nextc" href={u(`/work/${next.slug}`)}>
+			<p class="card__head">
+				<span class="card__id" lang="en">→</span>
+				<T as="span" class="card__title" v={next.title} />
+			</p>
+			<T as="p" class="card__body" v={next.tagline} />
+		</a>
+	</section>
+</Shell>
+
+<style is:global>
+	.back {
+		text-decoration: none;
+		color: var(--on-board-soft);
+	}
+
+	.back:hover {
+		color: var(--on-board);
+	}
+
+	.case__top {
+		display: grid;
+		gap: 2rem;
+		align-items: start;
+	}
+
+	@media (min-width: 900px) {
+		.case__top {
+			grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+		}
+	}
+
+	.facts__list {
+		margin: 0;
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.facts__row dt {
+		color: var(--soft);
+		margin-block-end: 0.1rem;
+	}
+
+	.facts__row dd {
+		margin: 0;
+		font-size: 0.95rem;
+	}
+
+	.facts__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem 1rem;
+	}
+
+	.facts__links a:hover {
+		color: var(--thread);
+	}
+
+	.cover {
+		margin: 0;
+		padding: 0.6rem;
+		background: var(--card);
+		border-radius: 3px;
+		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+		transform: rotate(0.6deg);
+	}
+
+	.cover--tall {
+		max-width: 18rem;
+	}
+
+	.cover img,
+	.shot img {
+		width: 100%;
+		border-radius: 2px;
+	}
+
+	.chals {
+		display: grid;
+		gap: 2.5rem;
+		margin-block-start: 1.75rem;
+		max-width: 52rem;
+	}
+
+	.chal {
+		display: grid;
+		gap: 1rem;
+		position: relative;
+	}
+
+	@media (min-width: 720px) {
+		.chal {
+			grid-template-columns: 1fr 1fr;
+			gap: 2.5rem;
+		}
+
+		/* The thread from the problem to what was done about it. */
+		.chal::before {
+			content: '';
+			position: absolute;
+			inset-block-start: 1.6rem;
+			inset-inline: 45% 45%;
+			border-block-start: 1.5px solid var(--thread);
+		}
+
+		.chal__fix {
+			transform: translateY(1.2rem) rotate(0.6deg);
+		}
+	}
+
+	.outs {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		max-width: 40rem;
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.outs li {
+		padding-inline-start: 1.4rem;
+		position: relative;
+	}
+
+	.outs li::before {
+		content: '';
+		position: absolute;
+		inset-inline-start: 0;
+		inset-block-start: 0.65em;
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--thread);
+	}
+
+	.shots {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+		max-width: 40rem;
+	}
+
+	.shot {
+		margin: 0;
+		flex: 1 1 100%;
+		padding: 0.6rem;
+		background: var(--card);
+		border-radius: 3px;
+		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.shot--tall {
+		flex: 0 1 14rem;
+	}
+
+	.nextc {
+		max-width: 32rem;
+	}
+</style>

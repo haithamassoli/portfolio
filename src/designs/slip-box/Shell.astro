@@ -1,0 +1,578 @@
+---
+/* SLIP-BOX — a Zettelkasten on a screen. A dark green board carries the
+   header and whatever a page puts in its `board` slot (the hero, or a title
+   band); everything under it sits on cream card stock. One accent, the red
+   thread that ties card to card.
+   ponytail: tokens, the card and the folder live here; pages only lay out. */
+import type { Design } from '../registry';
+import Head from '../_shared/Head.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { parse, otherLang, url as designUrl } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+import Logo from '../../components/Logo.astro';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import { pair, s } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	title: string;
+	description: string;
+}
+
+const { design, lang, title, description } = Astro.props;
+const { page } = parse(Astro.url.pathname);
+const u = (p = '') => designUrl(design, lang, p);
+const other = otherLang(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<Head {design} {lang} {title} {description} colorScheme="light" />
+	<body>
+		<a class="skip k" href="#main"><T v={s('nav.skip')} /></a>
+
+		<div class="board">
+			<header class="top wrap">
+				<a class="top__name" href={u()}>
+					<Logo labelled={false} />
+					<span class="top__word k" aria-hidden="true">Assoli</span>
+					<T class="vh" v={pair('Haitham Assoli', 'هيثم العسولي')} />
+				</a>
+				<nav class="top__nav k" aria-label={pair('Pages', 'الصفحات')[lang]}>
+					<a
+						href={u('/work')}
+						aria-current={page === '/work' ? 'page' : undefined}
+						><T v={s('nav.work')} /></a
+					>
+					<a href={u('#method')}><T v={pair('Method', 'الطريقة')} /></a>
+					<a href={other} data-lang-link lang={lang === 'ar' ? 'en' : 'ar'}
+						>{lang === 'ar' ? 'English' : 'عربي'}</a
+					>
+					<a class="btn btn--ghost" href={u('/hire')}><T v={s('nav.hire')} /></a
+					>
+				</nav>
+			</header>
+			<slot name="board" />
+		</div>
+
+		<main id="main" class="wrap">
+			<slot />
+			{
+				page !== '' && (
+					<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+				)
+			}
+		</main>
+
+		<footer class="foot wrap k">
+			<p>
+				<T
+					v={pair(
+						'Haitham Assoli · Amman, Jordan',
+						'هيثم العسولي · عمّان، الأردن',
+					)}
+				/>
+				<span aria-hidden="true"> · </span>© {new Date().getFullYear()}
+			</p>
+			<p class="foot__links">
+				<a href={profile.links.github} rel="noreferrer">GitHub</a>
+				<a href={profile.links.linkedin} rel="noreferrer">LinkedIn</a>
+				<a href={profile.links.resume} rel="noreferrer"><T v={s('nav.cv')} /></a
+				>
+				<a href={other} data-lang-link>{lang === 'ar' ? 'English' : 'عربي'}</a>
+			</p>
+		</footer>
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--board: #1e3a2d;
+		--board-deep: #15291f;
+		--on-board: #f3ebd3;
+		--on-board-soft: rgba(243, 235, 211, 0.72);
+		--cream: #f6f0dd;
+		--card: #f3ebd3;
+		--card-2: #eee4c6;
+		--ruling: #b9c8d8;
+		--ink: #1f1b17;
+		--soft: #6e655a;
+		--thread: #c1362b;
+
+		--mono: 'Courier Prime', 'Courier New', Courier, monospace;
+		--serif: 'Literata', 'Iowan Old Style', Georgia, serif;
+		--serif-ar: 'Amiri', 'Noto Naskh Arabic', serif;
+		--mono-ar: 'Noto Kufi Arabic', 'Courier Prime', monospace;
+
+		--s-hero: clamp(2.4rem, 5.2vw, 4.4rem);
+		--s-h2: clamp(1.45rem, 1.1rem + 1.4vw, 2.1rem);
+		--s-body: 1.0625rem;
+		--s-meta: 0.78rem;
+		--band: clamp(3.5rem, 8vw, 6.5rem);
+		color-scheme: light;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		background: var(--cream);
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		background: var(--cream);
+		color: var(--ink);
+		font-family: var(--serif);
+		font-size: var(--s-body);
+		line-height: 1.65;
+		-webkit-font-smoothing: antialiased;
+		overflow-x: hidden;
+	}
+
+	::selection {
+		background: var(--thread);
+		color: var(--card);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--thread);
+		outline-offset: 3px;
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	p {
+		margin: 0 0 1rem;
+		max-width: 38rem;
+	}
+
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.skip {
+		position: absolute;
+		inset-block-start: 0.5rem;
+		inset-inline-start: 0.5rem;
+		z-index: 5;
+		padding: 0.5rem 0.85rem;
+		background: var(--card);
+		color: var(--ink);
+		transform: translateY(-200%);
+	}
+
+	.skip:focus {
+		transform: none;
+	}
+
+	.wrap {
+		width: min(100% - 2 * clamp(1.15rem, 5vw, 4rem), 76rem);
+		margin-inline: auto;
+	}
+
+	/* ── Type roles ─────────────────────────────────────────────────────── */
+	.k {
+		font-family: var(--mono);
+		font-size: var(--s-meta);
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.k-lc {
+		font-family: var(--mono);
+		font-size: 0.92rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--mono);
+		font-weight: 700;
+		line-height: 1.05;
+		margin: 0;
+	}
+
+	h1 {
+		font-size: var(--s-hero);
+		letter-spacing: -0.01em;
+		text-wrap: balance;
+	}
+
+	h2 {
+		font-size: var(--s-h2);
+		line-height: 1.15;
+		margin-block-end: 1rem;
+		max-width: 26ch;
+		text-wrap: balance;
+	}
+
+	h3 {
+		font-size: 1.05rem;
+	}
+
+	.lede {
+		font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+		line-height: 1.55;
+	}
+
+	.soft {
+		color: var(--soft);
+	}
+
+	/* ── Arabic ──────────────────────────────────────────────────────────── */
+	[lang='ar']:where(:not(:root)) {
+		font-family: var(--serif-ar);
+		font-size: 1.15em;
+		letter-spacing: 0;
+		line-height: 1.9;
+	}
+
+	.k[lang='ar'],
+	.k [lang='ar'],
+	h1[lang='ar'],
+	h2[lang='ar'],
+	h3[lang='ar'],
+	.card [lang='ar'],
+	.btn [lang='ar'],
+	.folder__tab[lang='ar'] {
+		font-family: var(--mono-ar);
+		font-size: 1em;
+		text-transform: none;
+		letter-spacing: 0;
+	}
+
+	h1[lang='ar'] {
+		line-height: 1.3;
+		font-size: calc(var(--s-hero) * 0.9);
+	}
+
+	h2[lang='ar'] {
+		line-height: 1.45;
+	}
+
+	html[dir='rtl'] [lang='en'] {
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
+
+	/* ── The board ──────────────────────────────────────────────────────── */
+	.board {
+		background:
+			radial-gradient(
+				120% 90% at 20% 0%,
+				rgba(255, 255, 255, 0.05),
+				transparent 60%
+			),
+			linear-gradient(180deg, var(--board), var(--board-deep));
+		color: var(--on-board);
+		padding-block-end: clamp(3rem, 6vw, 5rem);
+	}
+
+	.top {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.9rem 1.5rem;
+		padding-block: 1.6rem;
+	}
+
+	.top__name {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		color: var(--on-board);
+		text-decoration: none;
+		--logo-rule: var(--thread);
+	}
+
+	.top .top__name .logo {
+		block-size: 1.6rem;
+	}
+
+	.top__word {
+		font-size: 1.15rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+	}
+
+	.top__nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 1.75rem;
+		color: var(--on-board-soft);
+	}
+
+	.top__nav a {
+		text-decoration: none;
+	}
+
+	.top__nav a:hover,
+	.top__nav a[aria-current='page'] {
+		color: var(--on-board);
+	}
+
+	/* ── Buttons ────────────────────────────────────────────────────────── */
+	.btn {
+		display: inline-block;
+		padding: 0.95rem 1.6rem;
+		border: 1px solid var(--card);
+		border-radius: 2px;
+		background: var(--card);
+		color: var(--ink);
+		font-family: var(--mono);
+		font-size: var(--s-meta);
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		text-decoration: none;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			background-color 0.2s,
+			color 0.2s;
+	}
+
+	.btn:hover {
+		background: var(--card-2);
+	}
+
+	.btn--ghost {
+		padding: 0.7rem 1.1rem;
+		background: transparent;
+		border-color: rgba(243, 235, 211, 0.45);
+		color: var(--on-board);
+	}
+
+	.btn--ghost:hover {
+		background: rgba(243, 235, 211, 0.1);
+		color: var(--on-board);
+	}
+
+	.btn--ink {
+		background: var(--ink);
+		border-color: var(--ink);
+		color: var(--card);
+	}
+
+	.btn--ink:hover {
+		background: var(--thread);
+		border-color: var(--thread);
+	}
+
+	.txt {
+		font-family: var(--mono);
+		font-size: 0.95rem;
+		text-decoration: underline;
+		text-underline-offset: 0.3em;
+		text-decoration-thickness: 1px;
+	}
+
+	.txt:hover {
+		color: var(--thread);
+	}
+
+	/* ── The index card ─────────────────────────────────────────────────── */
+	.card {
+		position: relative;
+		display: block;
+		padding: 0.95rem 1.15rem 1.15rem;
+		background: var(--card);
+		color: var(--ink);
+		border-radius: 3px;
+		box-shadow:
+			0 1px 0 rgba(0, 0, 0, 0.1),
+			0 14px 28px -18px rgba(0, 0, 0, 0.55);
+		font-family: var(--mono);
+		text-decoration: none;
+	}
+
+	.card__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.2rem 0.7rem;
+		margin: 0 0 0.6rem;
+		padding-block-end: 0.4rem;
+		border-block-end: 2px solid var(--thread);
+		max-width: none;
+	}
+
+	.card__id {
+		color: var(--thread);
+		font-size: 0.82rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.card__title {
+		font-family: var(--mono);
+		font-size: 1rem;
+		font-weight: 700;
+	}
+
+	.card__body {
+		margin: 0;
+		max-width: none;
+		font-size: 0.9rem;
+		line-height: 1.75;
+		/* Ruled stock: one faint blue line per line of type. */
+		background: repeating-linear-gradient(
+			to bottom,
+			transparent 0 calc(1.75em - 1px),
+			var(--ruling) calc(1.75em - 1px) 1.75em
+		);
+	}
+
+	.card__body[lang='ar'] {
+		line-height: 1.95;
+		background: repeating-linear-gradient(
+			to bottom,
+			transparent 0 calc(1.95em - 1px),
+			var(--ruling) calc(1.95em - 1px) 1.95em
+		);
+	}
+
+	.card__foot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem 1rem;
+		margin: 0.7rem 0 0;
+		max-width: none;
+		color: var(--soft);
+		font-size: 0.78rem;
+	}
+
+	a.card:hover {
+		box-shadow:
+			0 1px 0 rgba(0, 0, 0, 0.1),
+			0 18px 34px -18px rgba(0, 0, 0, 0.6);
+	}
+
+	/* ── The folder: a card with a tab ──────────────────────────────────── */
+	.folder {
+		position: relative;
+		margin-block-start: 1.6rem;
+		padding: 1.1rem 1.25rem 1.25rem;
+		background: var(--card);
+		border-radius: 0 3px 3px 3px;
+		box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+	}
+
+	.folder__tab {
+		position: absolute;
+		inset-block-start: -1.5rem;
+		inset-inline-start: 0;
+		padding: 0.35rem 0.9rem;
+		background: var(--card);
+		border-radius: 3px 3px 0 0;
+		font-family: var(--mono);
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		white-space: nowrap;
+	}
+
+	/* ── The thread: a red rule that ties a section to the next ─────────── */
+	.sec {
+		padding-block: var(--band);
+		border-block-start: 1px solid rgba(31, 27, 23, 0.14);
+	}
+
+	.sec:first-child {
+		border: 0;
+	}
+
+	.eyebrow {
+		margin: 0 0 1rem;
+		color: var(--thread);
+	}
+
+	/* ── The title band a sub-page puts on the board ─────────────────────── */
+	.band {
+		padding-block-start: clamp(1.5rem, 4vw, 3rem);
+	}
+
+	.band h1 {
+		font-size: clamp(2rem, 1.4rem + 2.6vw, 3.6rem);
+		max-width: 24ch;
+	}
+
+	.band__lede {
+		margin-block: 1.6rem 0;
+		color: var(--on-board-soft);
+	}
+
+	.hero__eyebrow {
+		margin-block-end: 1.5rem;
+		color: var(--on-board-soft);
+	}
+
+	/* ── Footer ─────────────────────────────────────────────────────────── */
+	.foot {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.75rem 1.5rem;
+		padding-block: 1.5rem 4rem;
+		border-block-start: 1px solid rgba(31, 27, 23, 0.14);
+		color: var(--soft);
+	}
+
+	.foot p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.25rem;
+	}
+
+	.foot a {
+		text-decoration: none;
+	}
+
+	.foot a:hover {
+		color: var(--thread);
+	}
+
+	/* The switch takes the board's colours when it stands in the hero. */
+	.board .dsw-row {
+		color: var(--on-board);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.001ms !important;
+			transition-duration: 0.001ms !important;
+		}
+	}
+</style>
