@@ -1,7 +1,7 @@
 ---
-import { dirOf, href, ui, useT, type Lang } from '../i18n';
-import { byId } from '../designs/registry';
-import DesignSwitch from '../designs/_shared/DesignSwitch.astro';
+import { dirOf, href, ui, useT, type Lang } from '../../i18n';
+import { byId } from '../registry';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
 
 interface Props {
 	lang: Lang;
@@ -42,7 +42,7 @@ const mirrorRole = ui[other]['hero.role'];
 				<a class="btn btn--ghost" href={href(lang, 'hire')}>{t('hero.cta2')}</a>
 			</div>
 
-			<DesignSwitch design={byId('main')} lang={lang} class="enter" />
+			<DesignSwitch design={byId('signal')} lang={lang} class="enter" />
 		</div>
 
 		<div class="hero__seam" aria-hidden="true">

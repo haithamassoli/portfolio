@@ -1,0 +1,80 @@
+---
+/* A whip stitch between two sections: a hairline seam, and one thread that
+   sews itself over and under it as the seam scrolls into view.
+
+   The sewing is a scroll-driven animation — `animation-timeline: view()` —
+   so it is one CSS rule, runs on the compositor, and needs no observer. A
+   browser without it gets the finished stitch. In Arabic the needle starts
+   from the right, because that is where the eye starts. */
+interface Props {
+	class?: string;
+}
+
+const { class: cls } = Astro.props;
+
+const W = 1200;
+const H = 28;
+const STEP = 22;
+let d = `M0 ${H / 2}`;
+for (let x = 0; x < W; x += STEP) {
+	const up = (x / STEP) % 2 === 0;
+	d += ` L${x + STEP / 2} ${up ? 4 : H - 4} L${x + STEP} ${H / 2}`;
+}
+---
+
+<svg
+	class:list={['stitch', cls]}
+	viewBox={`0 0 ${W} ${H}`}
+	preserveAspectRatio="none"
+	aria-hidden="true"
+>
+	<line class="stitch__seam" x1="0" y1={H / 2} x2={W} y2={H / 2}></line>
+	<path class="stitch__thread" d={d} pathLength="1"></path>
+</svg>
+
+<style is:global>
+	.stitch {
+		display: block;
+		width: 100%;
+		height: 28px;
+		overflow: visible;
+	}
+
+	[dir='rtl'] .stitch {
+		scale: -1 1;
+	}
+
+	.stitch__seam {
+		stroke: var(--rule-2);
+		stroke-width: 1;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.stitch__thread {
+		fill: none;
+		stroke: var(--thread);
+		stroke-width: 2;
+		stroke-linejoin: round;
+		stroke-linecap: round;
+		vector-effect: non-scaling-stroke;
+		stroke-dasharray: 1;
+		stroke-dashoffset: 0;
+	}
+
+	@supports (animation-timeline: view()) {
+		@media (prefers-reduced-motion: no-preference) {
+			.stitch__thread {
+				stroke-dashoffset: 1;
+				animation: sew linear both;
+				animation-timeline: view();
+				animation-range: cover 0% cover 55%;
+			}
+		}
+	}
+
+	@keyframes sew {
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+</style>

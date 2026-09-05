@@ -1,0 +1,847 @@
+---
+/* LOOM — the shell of the main design, the one at `/`.
+
+   Linen, ink, and one indigo thread. The argument of the page is that a
+   product is woven, not assembled: warp and weft, over and under, until the
+   pattern holds. The hero says it in WebGL (the name is woven into a field
+   of threads), the dividers say it in SVG (a running stitch that sews itself
+   as you scroll), and the hire form says it with a Jacquard card — the first
+   program anyone ever wrote for a machine.
+
+   This shell owns what only the main design carries: the indexable <head>
+   (canonical, hreflang, Open Graph, the Person record) and the gate on `/`
+   that hands a returning visitor their design. Everything else — the switch,
+   the reveal, the seam — is the shared machinery every design uses. */
+import { Font, getImage } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import { canonical as canonicalUrl, dirOf, useT, type Lang } from '../../i18n';
+import { profile } from '../../../content/profile';
+import Logo from '../../components/Logo.astro';
+import LangBoot from '../../components/LangBoot.astro';
+import T from '../../components/T.astro';
+import Reveal from '../_shared/Reveal.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import type { Design } from '../registry';
+import { otherLang, parse, url as designUrl } from '../routes';
+import { gateSource } from '../boot';
+import { pair, s } from '../../data/variant-ui';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	title?: string;
+	description?: string;
+	/** Overrides the default share card. Project pages pass their cover. */
+	image?: ImageMetadata;
+	/** Error pages set this so they never turn up in a search result. */
+	noindex?: boolean;
+	/** Which nav link reads as the current page. */
+	active?: 'home' | 'work' | 'hire';
+}
+
+const { design, lang, title, description, image, noindex, active } =
+	Astro.props;
+const t = useT(lang);
+const dir = dirOf(lang);
+const siteName = lang === 'ar' ? t('name.arabic') : t('name.latin');
+const pageTitle = title ? `${title} · ${siteName}` : t('meta.title');
+const desc = description ?? t('meta.desc');
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+/* Crawlers and chat apps only accept absolute URLs, so everything below is
+   resolved against `site`. Trailing slashes are dropped so a page has one
+   canonical spelling. */
+const site = Astro.site ?? Astro.url.origin;
+const abs = (path: string) => canonicalUrl(path, site);
+const bare = Astro.url.pathname.replace(/^\/ar(?=\/|$)/, '') || '/';
+const canonical = abs(Astro.url.pathname);
+const card =
+	image &&
+	(await getImage({
+		src: image,
+		width: 1200,
+		height: 630,
+		fit: 'cover',
+		format: 'jpeg',
+	}));
+const ogImage = new URL(card?.src ?? '/og.png', site).href;
+
+/* The gate only stands on the two home pages: anywhere else it would re-run on
+   every navigation inside the design. */
+const { page } = parse(Astro.url.pathname);
+const isHome = page === '';
+
+const person = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: profile.name[lang],
+	alternateName: profile.name[lang === 'ar' ? 'en' : 'ar'],
+	jobTitle: profile.title[lang],
+	url: abs('/'),
+	image: ogImage,
+	email: `mailto:${profile.email}`,
+	address: { '@type': 'PostalAddress', addressLocality: profile.location.en },
+	sameAs: Object.values(profile.links),
+	knowsLanguage: ['ar', 'en'],
+};
+
+const nav = [
+	{ key: 'work', href: u('/work'), label: s('nav.work') },
+	{ key: 'about', href: u('#about'), label: s('nav.about') },
+	{ key: 'hire', href: u('/hire'), label: s('nav.hire') },
+] as const;
+---
+
+<!doctype html>
+<html lang={lang} dir={dir} data-design={design.id}>
+	<head>
+		<meta charset="utf-8" />
+		{
+			/* Blocking, before first paint, so a returning visitor never sees the
+			   main design flash past on the way to theirs. Crawlers do not run it,
+			   which is why `/` stays the canonical page. */
+			isHome && <script is:inline set:html={gateSource()} />
+		}
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle}</title>
+		<meta name="description" content={desc} />
+		<meta name="theme-color" content="#f3efe6" />
+		<link rel="canonical" href={canonical} />
+		{noindex && <meta name="robots" content="noindex, follow" />}
+
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={desc} />
+		<meta property="og:type" content={title ? 'article' : 'website'} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:locale" content={lang === 'ar' ? 'ar_JO' : 'en_US'} />
+		<meta
+			property="og:locale:alternate"
+			content={lang === 'ar' ? 'en_US' : 'ar_JO'}
+		/>
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={title ?? siteName} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={pageTitle} />
+		<meta name="twitter:description" content={desc} />
+		<meta name="twitter:image" content={ogImage} />
+
+		<link rel="alternate" hreflang="en" href={abs(bare)} />
+		<link
+			rel="alternate"
+			hreflang="ar"
+			href={abs(`/ar${bare === '/' ? '' : bare}`)}
+		/>
+		<link rel="alternate" hreflang="x-default" href={abs(bare)} />
+		{
+			bare === '/' && (
+				<script
+					type="application/ld+json"
+					set:html={JSON.stringify(person)}
+					is:inline
+				/>
+			)
+		}
+		<Font
+			cssVariable="--font-thmanyah"
+			preload={[{ weight: 400 }, { weight: 900 }]}
+		/>
+		<Font cssVariable="--font-mono" preload={[{ weight: 400 }]} />
+		<LangBoot />
+		<ClientRouter />
+		<Reveal />
+	</head>
+
+	<body class="loom">
+		<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
+
+		<header class="bar">
+			<div class="wrap bar__in">
+				<a class="bar__mark" href={u()} aria-label={siteName}>
+					<Logo labelled={false} />
+				</a>
+				<nav class="bar__nav" aria-label={pair('Site', 'الموقع')[lang]}>
+					{
+						nav.map((n) => (
+							<a
+								href={n.href}
+								aria-current={n.key === active ? 'page' : undefined}
+							>
+								<T v={n.label} />
+							</a>
+						))
+					}
+					<a href={profile.links.resume} target="_blank" rel="noopener">
+						<T v={s('nav.cv')} />
+					</a>
+				</nav>
+				<a
+					class="bar__lang"
+					href={otherLang(Astro.url.pathname)}
+					hreflang={lang === 'ar' ? 'en' : 'ar'}
+					lang={lang === 'ar' ? 'en' : 'ar'}
+					data-lang-link
+				>
+					<span class="bar__lang-short">{t('nav.langShort')}</span>
+					<span class="bar__lang-long">{t('nav.lang')}</span>
+				</a>
+			</div>
+		</header>
+
+		<main id="main" tabindex="-1">
+			<slot />
+			{
+				/* Sub-pages get the same switch, kept at the foot of the content:
+				   the hero already carries it on the home page. */
+				!isHome && (
+					<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+				)
+			}
+		</main>
+
+		<footer class="foot">
+			<div class="wrap foot__in">
+				<p class="foot__names">
+					<span dir="ltr">{profile.name.en}</span>
+					<span class="foot__knot" aria-hidden="true"></span>
+					<span lang="ar" dir="rtl">{profile.name.ar}</span>
+				</p>
+				<a class="foot__mail" href={`mailto:${profile.email}`} dir="ltr"
+					>{profile.email}</a
+				>
+				<nav class="foot__links" aria-label={s('nav.home')[lang]}>
+					<a href={u()}><T v={s('nav.home')} /></a>
+					<a href={u('/work')}><T v={s('work.all')} /></a>
+					<a href={u('/hire')}><T v={s('nav.hire')} /></a>
+					<a href={profile.links.resume} target="_blank" rel="noopener"
+						><T v={s('nav.cv')} /></a
+					>
+				</nav>
+				<nav class="foot__links" aria-label={s('footer.elsewhere')[lang]}>
+					<a href={profile.links.github} rel="noopener me" target="_blank"
+						>GitHub</a
+					>
+					<a href={profile.links.linkedin} rel="noopener me" target="_blank"
+						>LinkedIn</a
+					>
+					<a href={profile.links.playStore} rel="noopener me" target="_blank"
+						>Play Store</a
+					>
+				</nav>
+				<p class="foot__note">
+					<T v={s('footer.line')} />
+					<span dir="ltr"> · © {new Date().getFullYear()} · </span>
+					<T v={s('footer.rights')} />
+				</p>
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style is:global>
+	/* ======================================================================
+	   TOKENS — linen, ink, one thread
+	   ====================================================================== */
+
+	.loom {
+		--linen: #f3efe6;
+		--linen-2: #e8e2d5;
+		--linen-3: #dcd4c3;
+		--ink: #16171d;
+		--ink-2: #4b4c57;
+		--ink-3: #8a8b96;
+		--thread: #1d35d1;
+		--thread-2: #6f7ff0;
+		--thread-soft: color-mix(in oklab, var(--thread) 12%, var(--linen));
+		--rule: color-mix(in oklab, var(--ink) 14%, transparent);
+		--rule-2: color-mix(in oklab, var(--ink) 28%, transparent);
+
+		--sans:
+			var(--font-thmanyah, 'Thmanyah Sans'), ui-sans-serif, system-ui,
+			sans-serif;
+		--mono:
+			var(--font-mono, 'Martian Mono'), ui-monospace, SFMono-Regular, Menlo,
+			monospace;
+
+		--gutter: clamp(1.25rem, 5vw, 5rem);
+		--measure: 60ch;
+
+		--t-1: clamp(0.72rem, 0.7rem + 0.12vw, 0.78rem);
+		--t0: clamp(0.98rem, 0.94rem + 0.2vw, 1.08rem);
+		--t1: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem);
+		--t2: clamp(1.5rem, 1.25rem + 1.2vw, 2.15rem);
+		--t3: clamp(2rem, 1.5rem + 2.4vw, 3.4rem);
+		--t4: clamp(2.6rem, 1.6rem + 5vw, 5.6rem);
+		--t5: clamp(3.4rem, 1rem + 11vw, 10.5rem);
+
+		--ease: cubic-bezier(0.2, 0.9, 0.25, 1);
+		--slow: cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	html:has(.loom) {
+		color-scheme: light;
+		background: #f3efe6;
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: none;
+		text-size-adjust: none;
+		accent-color: #1d35d1;
+	}
+
+	.loom *,
+	.loom *::before,
+	.loom *::after {
+		box-sizing: border-box;
+	}
+
+	.loom {
+		margin: 0;
+		background: var(--linen);
+		color: var(--ink);
+		font-family: var(--sans);
+		font-size: var(--t0);
+		font-weight: 400;
+		line-height: 1.62;
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+		overflow-x: clip;
+	}
+
+	.loom :where(h1, h2, h3, h4) {
+		margin: 0;
+		font-weight: 900;
+		line-height: 1.02;
+		letter-spacing: -0.03em;
+		text-wrap: balance;
+	}
+
+	.loom :where(p, ul, ol, dl, figure) {
+		margin: 0;
+	}
+
+	.loom :where(ul, ol) {
+		padding: 0;
+		list-style: none;
+	}
+
+	.loom :where(img, svg, canvas) {
+		display: block;
+		max-width: 100%;
+	}
+
+	.loom :where(img) {
+		height: auto;
+	}
+
+	.loom :where(a) {
+		color: inherit;
+		text-decoration-color: var(--rule-2);
+		text-underline-offset: 0.18em;
+	}
+
+	.loom :where(a:hover) {
+		text-decoration-color: var(--thread);
+	}
+
+	.loom :where(button, input, select, textarea) {
+		font: inherit;
+		color: inherit;
+	}
+
+	.loom :where([id]) {
+		scroll-margin-top: 5rem;
+	}
+
+	.loom
+		:is(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+		outline: 2px solid var(--thread);
+		outline-offset: 3px;
+		border-radius: 2px;
+	}
+
+	/* Arabic: no tracking, taller lines. The face is the same in both scripts,
+	   so only the metrics change. */
+	.loom :lang(ar) {
+		letter-spacing: 0;
+		line-height: 1.85;
+	}
+
+	.loom :is(h1, h2, h3, h4):lang(ar),
+	.loom :is(h1, h2, h3, h4) :lang(ar) {
+		line-height: 1.25;
+		letter-spacing: 0;
+	}
+
+	.loom :where(code, kbd, .ltr) {
+		direction: ltr;
+		unicode-bidi: isolate;
+	}
+
+	/* ======================================================================
+	   FURNITURE
+	   ====================================================================== */
+
+	.vh {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.skip {
+		position: absolute;
+		inset-inline-start: -9999px;
+		top: 0.6rem;
+		z-index: 90;
+		padding: 0.6rem 1rem;
+		background: var(--ink);
+		color: var(--linen);
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		text-decoration: none;
+	}
+
+	.skip:focus-visible {
+		inset-inline-start: 0.75rem;
+	}
+
+	.wrap {
+		width: min(76rem, 100% - 2 * var(--gutter));
+		margin-inline: auto;
+	}
+
+	.section {
+		padding-block: clamp(3.5rem, 8vw, 7rem);
+	}
+
+	.eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		margin-block-end: 1.1rem;
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+
+	.eyebrow:lang(ar) {
+		font-family: var(--sans);
+		font-weight: 500;
+		font-size: 0.9rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	/* A short indigo thread, tied off before every label. */
+	.eyebrow::before {
+		content: '';
+		flex: none;
+		width: 1.6rem;
+		height: 2px;
+		background: var(--thread);
+	}
+
+	.title {
+		font-size: var(--t3);
+		max-width: 22ch;
+	}
+
+	.lede {
+		font-size: var(--t1);
+		font-weight: 300;
+		line-height: 1.5;
+		max-width: var(--measure);
+		color: var(--ink-2);
+	}
+
+	.lede:lang(ar) {
+		font-weight: 400;
+		line-height: 1.8;
+	}
+
+	.mono {
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		letter-spacing: 0.04em;
+	}
+
+	.mono:lang(ar),
+	.mono :lang(ar) {
+		font-family: var(--sans);
+		font-size: 0.88rem;
+		letter-spacing: 0;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		min-height: 3rem;
+		padding: 0.75rem 1.35rem;
+		border: 1px solid var(--ink);
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--linen);
+		font-weight: 500;
+		text-decoration: none;
+		transition:
+			background-color 0.25s var(--ease),
+			color 0.25s var(--ease),
+			border-color 0.25s var(--ease),
+			transform 0.25s var(--ease);
+	}
+
+	.btn:hover {
+		background: var(--thread);
+		border-color: var(--thread);
+		color: #fff;
+		transform: translateY(-1px);
+	}
+
+	.btn--ghost {
+		background: transparent;
+		color: var(--ink);
+	}
+
+	.btn--ghost:hover {
+		background: var(--thread-soft);
+		color: var(--thread);
+	}
+
+	.btn .arrow {
+		transition: translate 0.25s var(--ease);
+	}
+
+	.btn:hover .arrow {
+		translate: 0.2rem 0;
+	}
+
+	[dir='rtl'] .btn .arrow {
+		scale: -1 1;
+	}
+
+	[dir='rtl'] .btn:hover .arrow {
+		translate: -0.2rem 0;
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+
+	.chip {
+		padding: 0.22rem 0.6rem;
+		border: 1px solid var(--rule-2);
+		border-radius: 999px;
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.02em;
+		direction: ltr;
+		unicode-bidi: isolate;
+		white-space: nowrap;
+	}
+
+	/* Something that rises into place as it scrolls into view. Scroll-driven,
+	   so it is one CSS rule and no observer; browsers without it just show. */
+	.rise {
+		opacity: 1;
+	}
+
+	@supports (animation-timeline: view()) {
+		@media (prefers-reduced-motion: no-preference) {
+			.rise {
+				animation: rise linear both;
+				animation-timeline: view();
+				animation-range: entry 0% entry 55%;
+			}
+		}
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(1.5rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* ======================================================================
+	   THE BAR
+	   ====================================================================== */
+
+	.bar {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: color-mix(in oklab, var(--linen) 82%, transparent);
+		backdrop-filter: blur(12px) saturate(1.2);
+		border-block-end: 1px solid var(--rule);
+	}
+
+	.bar__in {
+		display: flex;
+		align-items: center;
+		gap: clamp(0.75rem, 3vw, 2.5rem);
+		padding-block: 0.7rem;
+	}
+
+	.bar__mark {
+		display: block;
+		flex: none;
+		color: var(--ink);
+		--logo-rule: var(--thread);
+		transition: color 0.3s;
+	}
+
+	.bar__mark .logo {
+		block-size: 1.5rem;
+		inline-size: auto;
+	}
+
+	.bar__mark:hover {
+		color: var(--thread);
+	}
+
+	.bar__nav {
+		display: flex;
+		gap: clamp(0.8rem, 2.5vw, 1.8rem);
+		margin-inline-end: auto;
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.bar__nav :lang(ar) {
+		font-family: var(--sans);
+		font-size: 0.9rem;
+		font-weight: 500;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.bar__nav a {
+		position: relative;
+		padding-block: 0.35rem;
+		color: var(--ink-2);
+		text-decoration: none;
+		transition: color 0.25s;
+	}
+
+	.bar__nav a::after {
+		content: '';
+		position: absolute;
+		inset-inline: 0;
+		bottom: 0;
+		height: 2px;
+		background: var(--thread);
+		scale: 0 1;
+		transform-origin: var(--origin, left);
+		transition: scale 0.3s var(--ease);
+	}
+
+	[dir='rtl'] .bar__nav a::after {
+		--origin: right;
+	}
+
+	.bar__nav a:hover,
+	.bar__nav a[aria-current='page'] {
+		color: var(--ink);
+	}
+
+	.bar__nav a:hover::after,
+	.bar__nav a[aria-current='page']::after {
+		scale: 1 1;
+	}
+
+	.bar__lang {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6ch;
+		flex: none;
+		padding: 0.4rem 0.85rem;
+		border: 1px solid var(--rule-2);
+		border-radius: 999px;
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		text-decoration: none;
+		transition:
+			background-color 0.25s,
+			border-color 0.25s,
+			color 0.25s;
+	}
+
+	.bar__lang:lang(ar) {
+		font-family: var(--sans);
+		font-size: 0.9rem;
+	}
+
+	.bar__lang:hover {
+		background: var(--ink);
+		border-color: var(--ink);
+		color: var(--linen);
+	}
+
+	.bar__lang-short {
+		font-weight: 600;
+	}
+
+	.bar__lang-long {
+		display: none;
+	}
+
+	@media (min-width: 46rem) {
+		.bar__lang-long {
+			display: inline;
+		}
+		.bar__lang-short {
+			opacity: 0.55;
+		}
+	}
+
+	@media (max-width: 34rem) {
+		.bar__nav a:nth-child(2) {
+			display: none;
+		}
+	}
+
+	/* ======================================================================
+	   THE FOOT
+	   ====================================================================== */
+
+	.foot {
+		border-block-start: 1px solid var(--rule);
+		background: var(--linen-2);
+		padding-block: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.foot__in {
+		display: grid;
+		gap: 1.4rem;
+	}
+
+	.foot__names {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.9rem;
+		font-size: var(--t2);
+		font-weight: 900;
+		letter-spacing: -0.03em;
+	}
+
+	.foot__names :lang(ar) {
+		letter-spacing: 0;
+		line-height: 1.3;
+	}
+
+	/* A knot: the two names are tied with the thread. */
+	.foot__knot {
+		width: 0.7rem;
+		height: 0.7rem;
+		border: 2px solid var(--thread);
+		border-radius: 999px;
+	}
+
+	.foot__mail {
+		justify-self: start;
+		font-size: var(--t1);
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule-2);
+		padding-block-end: 0.1em;
+		transition:
+			color 0.25s,
+			border-color 0.25s;
+	}
+
+	.foot__mail:hover {
+		color: var(--thread);
+		border-color: var(--thread);
+	}
+
+	.foot__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.4rem;
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.foot__links :lang(ar) {
+		font-family: var(--sans);
+		font-size: 0.9rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.foot__links a {
+		color: var(--ink-2);
+		text-decoration: none;
+	}
+
+	.foot__links a:hover {
+		color: var(--thread);
+	}
+
+	.foot__note {
+		font-family: var(--mono);
+		font-size: 0.68rem;
+		color: var(--ink-3);
+	}
+
+	.foot__note :lang(ar) {
+		font-family: var(--sans);
+		font-size: 0.82rem;
+	}
+
+	/* ======================================================================
+	   THE SWITCH, in this room's hand
+	   ====================================================================== */
+
+	.loom .dsw {
+		border-radius: 999px;
+		border-color: var(--rule-2);
+		background: var(--linen);
+	}
+
+	.loom .dsw:hover {
+		border-color: var(--ink);
+	}
+
+	.loom .dsw-row {
+		border-block-start-color: var(--rule);
+	}
+
+	/* ======================================================================
+	   MOTION
+	   ====================================================================== */
+
+	@media (prefers-reduced-motion: reduce) {
+		.loom *,
+		.loom *::before,
+		.loom *::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
+</style>

@@ -1,0 +1,366 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* The index: all forty, on six shelves. Each entry carries a swatch — a
+   thumbnail of weave in the project's own accent — and the shelf label stays
+   in the margin while its shelf scrolls past. */
+import Shell from './Shell.astro';
+import Stitch from './Stitch.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import type { I18n, ProjectCategory } from '../../../content/types';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const order: ProjectCategory[] = [
+	'web',
+	'mobile',
+	'ai',
+	'client',
+	'desktop',
+	'extension',
+];
+
+const catWord: Record<ProjectCategory, I18n> = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	client: s('cat.client'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+};
+
+const statusWord: Record<string, I18n> = {
+	live: s('status.live'),
+	shipped: s('status.shipped'),
+	delisted: s('status.delisted'),
+	wip: s('status.wip'),
+	archived: s('status.archived'),
+};
+
+const linkWord: Record<string, I18n> = {
+	live: s('project.live'),
+	github: s('project.github'),
+	appStore: s('project.apple'),
+	playGoogle: s('project.play'),
+	vscode: s('project.vscode'),
+};
+
+/** "Since 2022", "2023 to 2026" — sort on the latest year in the string. */
+const yearOf = (year: string) =>
+	Math.max(...(year.match(/\d{4}/g) ?? ['0']).map(Number));
+
+const shelves = order
+	.map((cat) => ({
+		cat,
+		items: projects
+			.filter((p) => p.category === cat)
+			.sort(
+				(a, b) =>
+					Number(b.featured) - Number(a.featured) ||
+					yearOf(b.year) - yearOf(a.year) ||
+					a.title.en.localeCompare(b.title.en),
+			),
+	}))
+	.filter((shelf) => shelf.items.length);
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={s('work.all')[lang]}
+	description={s('work.allLede')[lang]}
+	active="work"
+>
+	<section class="section idx-head">
+		<div class="wrap">
+			<T v={pair('The index', 'الفهرس')} as="p" class="eyebrow" />
+			<T v={s('work.all')} as="h1" class="title idx-head__title" />
+			<T v={s('work.allLede')} as="p" class="lede idx-head__lede" />
+			<nav class="idx" aria-label={pair('Categories', 'التصنيفات')[lang]}>
+				{
+					shelves.map((shelf) => (
+						<a class="idx__a" href={`#cat-${shelf.cat}`}>
+							<T v={catWord[shelf.cat]} />
+							<span class="idx__n mono" dir="ltr">
+								{shelf.items.length}
+							</span>
+						</a>
+					))
+				}
+			</nav>
+		</div>
+	</section>
+
+	<Stitch />
+
+	{
+		shelves.map((shelf) => (
+			<section class="shelf" id={`cat-${shelf.cat}`}>
+				<div class="wrap shelf__grid">
+					<h2 class="shelf__label">
+						<T v={catWord[shelf.cat]} />
+						<span class="shelf__count mono" dir="ltr">
+							{shelf.items.length}
+						</span>
+					</h2>
+					<ol class="entries">
+						{shelf.items.map((p, i) => (
+							<li class="entry rise" style={`--accent:${p.accent}`}>
+								<svg
+									class="swatch"
+									viewBox="0 0 32 32"
+									aria-hidden="true"
+									focusable="false"
+								>
+									<defs>
+										<pattern
+											id={`w-${p.slug}`}
+											width="8"
+											height="8"
+											patternUnits="userSpaceOnUse"
+										>
+											<rect width="8" height="8" fill="var(--linen-2)" />
+											<rect width="4" height="4" fill="var(--accent)" />
+											<rect
+												x="4"
+												y="4"
+												width="4"
+												height="4"
+												fill="var(--accent)"
+											/>
+										</pattern>
+									</defs>
+									<rect
+										class="swatch__cloth"
+										width="32"
+										height="32"
+										fill={`url(#w-${p.slug})`}
+									/>
+								</svg>
+								<div class="entry__main">
+									<p class="entry__head">
+										<a class="entry__title" href={u(`/work/${p.slug}`)}>
+											<T v={p.title} />
+										</a>
+										<span class="entry__lead" aria-hidden="true" />
+										<T
+											v={yearPair(p.year)}
+											as="span"
+											class="mono entry__year"
+										/>
+									</p>
+									<T v={p.tagline} as="p" class="entry__tag" />
+									<p class="entry__meta mono">
+										<span>
+											<T v={statusWord[p.status]} />
+										</span>
+										{p.featured && (
+											<span class="entry__full">
+												<T v={pair('written up in full', 'مشروح بالكامل')} />
+											</span>
+										)}
+										{Object.entries(p.links).map(([key, href]) =>
+											href ? (
+												<a
+													class="entry__ext"
+													href={href}
+													rel="noopener noreferrer"
+												>
+													<T v={linkWord[key] ?? pair(key, key)} />
+												</a>
+											) : null,
+										)}
+									</p>
+								</div>
+								<span class="entry__i mono" aria-hidden="true">
+									{String(i + 1).padStart(2, '0')}
+								</span>
+							</li>
+						))}
+					</ol>
+				</div>
+			</section>
+		))
+	}
+</Shell>
+
+<style is:global>
+	.idx-head {
+		padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2rem, 4vw, 3rem);
+	}
+
+	.idx-head__lede {
+		margin-block-start: 1.4rem;
+	}
+
+	.idx {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-start: 2rem;
+	}
+
+	.idx__a {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.55rem;
+		padding: 0.45rem 0.85rem;
+		border: 1px solid var(--rule-2);
+		border-radius: 999px;
+		text-decoration: none;
+		font-size: 0.92rem;
+		font-weight: 500;
+		transition:
+			border-color 0.2s,
+			color 0.2s;
+	}
+
+	.idx__a:hover {
+		border-color: var(--thread);
+		color: var(--thread);
+	}
+
+	.idx__n {
+		color: var(--ink-3);
+	}
+
+	.shelf {
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.shelf__grid {
+		display: grid;
+		gap: 1rem 3rem;
+		padding-block: clamp(2rem, 5vw, 3.5rem);
+	}
+
+	@media (min-width: 60rem) {
+		.shelf__grid {
+			grid-template-columns: 12rem minmax(0, 1fr);
+			align-items: start;
+		}
+
+		.shelf__label {
+			position: sticky;
+			inset-block-start: 5rem;
+		}
+	}
+
+	.shelf__label {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		font-size: var(--t2);
+	}
+
+	.shelf__count {
+		color: var(--ink-3);
+		font-weight: 400;
+	}
+
+	.entries {
+		display: grid;
+		gap: 0;
+		max-width: 52rem;
+	}
+
+	.entry {
+		position: relative;
+		display: grid;
+		grid-template-columns: 2rem minmax(0, 1fr) auto;
+		gap: 1rem;
+		padding-block: 1.25rem;
+		border-block-end: 1px solid var(--rule);
+	}
+
+	.entry:first-child {
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.swatch {
+		width: 2rem;
+		height: 2rem;
+		border: 1px solid var(--rule-2);
+		border-radius: 2px;
+		overflow: hidden;
+		transition: transform 0.4s var(--ease);
+	}
+
+	.entry:hover .swatch {
+		transform: rotate(-6deg) scale(1.08);
+	}
+
+	.entry__head {
+		display: flex;
+		align-items: baseline;
+		gap: 0.7rem;
+	}
+
+	.entry__title {
+		font-size: var(--t1);
+		font-weight: 700;
+		text-decoration: none;
+		letter-spacing: -0.01em;
+		transition: color 0.2s;
+	}
+
+	.entry__title:hover {
+		color: var(--thread);
+	}
+
+	.entry__lead {
+		flex: 1 1 1.5rem;
+		min-width: 1rem;
+		border-block-end: 1px dotted var(--rule-2);
+		transform: translateY(-0.3em);
+	}
+
+	.entry__year {
+		flex: none;
+		color: var(--ink-3);
+		white-space: nowrap;
+	}
+
+	.entry__tag {
+		margin-block: 0.3rem 0.5rem;
+		color: var(--ink-2);
+		max-width: 60ch;
+	}
+
+	.entry__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.9rem;
+		color: var(--ink-3);
+	}
+
+	.entry__full {
+		color: var(--thread);
+	}
+
+	.entry__ext {
+		color: var(--ink-2);
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule-2);
+	}
+
+	.entry__ext:hover {
+		color: var(--thread);
+		border-color: var(--thread);
+	}
+
+	.entry__i {
+		color: var(--ink-3);
+		padding-block-start: 0.3rem;
+	}
+</style>

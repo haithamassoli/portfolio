@@ -8,9 +8,14 @@ export const dirOf = (lang: Lang) => (lang === 'ar' ? 'rtl' : 'ltr');
 export const canonical = (path: string, site: URL | string) =>
 	new URL(path, site).href.replace(/(?<=[^/])\/$/, '');
 
-/** `/about` in English, `/ar/about` in Arabic. Pass '' for the home page. */
+/** A link inside the Signal design: `/signal/hire`, `/ar/signal/hire`,
+ * `/signal#work`. Pass '' for its home page. Signal was the main design, so
+ * its pages link through this rather than through routes.url(). */
 export const href = (lang: Lang, path = '') =>
-	lang === defaultLang ? `/${path}` : `/ar/${path}`;
+	(lang === defaultLang ? '' : '/ar') +
+	'/signal' +
+	(path && !path.startsWith('#') ? '/' : '') +
+	path;
 
 export const ui = {
 	en: {

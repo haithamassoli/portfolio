@@ -1,4 +1,4 @@
-/* The eight designs, and everything that has to agree about them: routing, the
+/* The designs, and everything that has to agree about them: routing, the
    hero switch, the picker, the gallery, the sitemap. One list, no second copy.
 
    `weight: 'heavy'` means the design leads with blur, grain or motion. The
@@ -14,7 +14,8 @@ export type DesignId =
 	| 'terminal'
 	| 'bento'
 	| 'night-reel'
-	| 'playroom';
+	| 'playroom'
+	| 'signal';
 
 export interface Design {
 	id: DesignId;
@@ -31,12 +32,14 @@ export const designs: Design[] = [
 	{
 		id: 'main',
 		n: 0,
-		name: { en: 'Signal', ar: 'الإشارة' },
+		name: { en: 'Loom', ar: 'النَّوْل' },
 		note: {
-			en: 'The primary portfolio: work, process, results',
-			ar: 'ملف الأعمال الأساسي: المشاريع والمنهج والنتائج',
+			en: 'The primary portfolio: the name woven in WebGL, linen and ink',
+			ar: 'ملف الأعمال الأساسي: الاسم منسوج بـ WebGL، كتّان وحبر',
 		},
-		accent: '#6c5ce7',
+		accent: '#1d35d1',
+		/* Light on purpose: the loom is an enhancement. Reduced motion, a slow
+		   connection or no WebGL get the same page with a CSS weave instead. */
 		weight: 'light',
 	},
 	{
@@ -112,6 +115,17 @@ export const designs: Design[] = [
 		},
 		accent: '#ff6fb5',
 		weight: 'heavy',
+	},
+	{
+		id: 'signal',
+		n: 8,
+		name: { en: 'Signal', ar: 'الإشارة' },
+		note: {
+			en: 'Ink and bone, two scripts pressed along one seam',
+			ar: 'حبر وعظم، خطّان متلاصقان على درزة واحدة',
+		},
+		accent: '#ff5a1f',
+		weight: 'light',
 	},
 ];
 

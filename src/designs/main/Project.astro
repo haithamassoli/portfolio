@@ -1,0 +1,554 @@
+---
+import type { Design } from '../registry';
+import type { Project as ProjectData } from '../../data/projects';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+/* One project, read as a swatch book: the cover, woven in band by band; the
+   facts down the margin; then what it is, what went wrong, and what came of
+   it. */
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import Stitch from './Stitch.astro';
+import T from '../../components/T.astro';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import type { I18n } from '../../../content/types';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: ProjectData;
+	next: ProjectData;
+}
+
+const { design, lang, project: p, next } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const statusWord: Record<string, I18n> = {
+	live: s('status.live'),
+	shipped: s('status.shipped'),
+	delisted: s('status.delisted'),
+	wip: s('status.wip'),
+	archived: s('status.archived'),
+};
+
+const catWord: Record<string, I18n> = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	client: s('cat.client'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+};
+
+const linkWord: Record<string, I18n> = {
+	live: s('project.live'),
+	github: s('project.github'),
+	appStore: s('project.apple'),
+	playGoogle: s('project.play'),
+	vscode: s('project.vscode'),
+};
+
+/* Several covers are 1080×2340 phone screenshots. They get a narrow column
+   instead of being cropped into a landscape slot. */
+const tall = (img: ImageMetadata) => img.height / img.width > 1.1;
+
+const overview = p.overview.en.map((en, i) => pair(en, p.overview.ar[i]));
+const outcomes = p.outcomes.en.map((en, i) => pair(en, p.outcomes.ar[i]));
+const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
+const links = Object.entries(p.links).filter(([, href]) => href) as [
+	string,
+	string,
+][];
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	title={p.title[lang]}
+	description={p.summary[lang]}
+	image={p.image}
+	active="work"
+>
+	<article class="case" style={`--accent:${p.accent}`}>
+		<header class="section case__head">
+			<div class="wrap">
+				<p class="mono case__back">
+					<a href={u('/work')}>
+						<span class="arrow" aria-hidden="true">←</span>
+						<T v={s('project.back')} />
+					</a>
+				</p>
+				<p class="eyebrow">
+					<T v={catWord[p.category]} />
+					<span aria-hidden="true">·</span>
+					<T v={yearPair(p.year)} />
+					<span aria-hidden="true">·</span>
+					<T v={statusWord[p.status]} />
+				</p>
+				<T v={p.title} as="h1" class="title case__title" />
+				<T v={p.tagline} as="p" class="lede case__tag" />
+			</div>
+		</header>
+
+		{
+			p.image && (
+				<div class="wrap">
+					<figure
+						class:list={['cover', tall(p.image) && 'cover--tall']}
+						aria-hidden="false"
+					>
+						<Image
+							src={p.image}
+							alt={p.title[lang]}
+							widths={tall(p.image) ? [320, 640] : [720, 1200, 1800]}
+							sizes={
+								tall(p.image)
+									? '(min-width: 640px) 20rem, 70vw'
+									: '(min-width: 80rem) 76rem, 100vw'
+							}
+							loading="eager"
+							decoding="async"
+						/>
+						{/* the weft: eight bands that pull back, one after another */}
+						<span class="cover__bands" aria-hidden="true">
+							{Array.from({ length: 8 }, (_, i) => (
+								<i style={`--i:${i}`} />
+							))}
+						</span>
+					</figure>
+				</div>
+			)
+		}
+
+		<section class="section case__body">
+			<div class="wrap case__grid">
+				<aside class="facts">
+					<dl class="facts__list">
+						<div>
+							<dt class="mono"><T v={s('project.role')} /></dt>
+							<dd><T v={p.role} /></dd>
+						</div>
+						<div>
+							<dt class="mono"><T v={s('project.year')} /></dt>
+							<dd><T v={yearPair(p.year)} /></dd>
+						</div>
+						<div>
+							<dt class="mono"><T v={s('project.status')} /></dt>
+							<dd><T v={statusWord[p.status]} /></dd>
+						</div>
+						<div>
+							<dt class="mono"><T v={s('project.stack')} /></dt>
+							<dd>
+								<ul class="chips">
+									{p.stack.map((tool) => <li class="chip">{tool}</li>)}
+								</ul>
+							</dd>
+						</div>
+						{
+							links.length > 0 && (
+								<div>
+									<dt class="mono">
+										<T v={s('project.links')} />
+									</dt>
+									<dd class="facts__links">
+										{links.map(([key, href]) => (
+											<a
+												class="btn btn--ghost btn--sm"
+												href={href}
+												rel="noopener noreferrer"
+											>
+												<T v={linkWord[key] ?? pair(key, key)} />
+												<span class="arrow" aria-hidden="true">
+													→
+												</span>
+											</a>
+										))}
+									</dd>
+								</div>
+							)
+						}
+					</dl>
+				</aside>
+
+				<div class="prose">
+					<T v={p.summary} as="p" class="prose__sum" />
+
+					<T
+						v={pair('What it is, and why it exists', 'ما هو، ولماذا وُجد')}
+						as="h2"
+						class="prose__h2"
+					/>
+					{overview.map((block) => <T v={block} as="p" />)}
+
+					{
+						p.challenges.length > 0 && (
+							<>
+								<T v={s('project.challenges')} as="h2" class="prose__h2" />
+								<div class="knots">
+									{p.challenges.map((c, i) => (
+										<article class="knot rise">
+											<span class="knot__n mono" aria-hidden="true">
+												{String(i + 1).padStart(2, '0')}
+											</span>
+											<T v={c.title} as="h3" class="knot__t" />
+											<p class="knot__lbl mono">
+												<T v={pair('the problem', 'المشكلة')} />
+											</p>
+											<T v={c.problem} as="p" class="knot__p" />
+											<p class="knot__lbl mono">
+												<T v={pair('what I did', 'ما فعلته')} />
+											</p>
+											<T v={c.solution} as="p" class="knot__p knot__p--fix" />
+										</article>
+									))}
+								</div>
+							</>
+						)
+					}
+
+					<T v={s('project.outcomes')} as="h2" class="prose__h2" />
+					<ul class="outs">
+						{outcomes.map((block) => <T v={block} as="li" />)}
+					</ul>
+
+					{
+						gallery.length > 0 && (
+							<>
+								<T
+									v={pair('A few screens', 'بعض الشاشات')}
+									as="h2"
+									class="prose__h2"
+								/>
+								<div class="shots">
+									{gallery.map((shot, i) => (
+										<figure
+											class:list={['shot rise', tall(shot) && 'shot--tall']}
+										>
+											<Image
+												src={shot}
+												alt={`${p.title[lang]} — ${i + 1}`}
+												widths={tall(shot) ? [280, 560] : [480, 720, 1080]}
+												sizes={
+													tall(shot)
+														? '(min-width: 640px) 14rem, 44vw'
+														: '(min-width: 1040px) 36rem, calc(100vw - 4rem)'
+												}
+												loading="lazy"
+												decoding="async"
+											/>
+										</figure>
+									))}
+								</div>
+							</>
+						)
+					}
+				</div>
+			</div>
+		</section>
+
+		<Stitch />
+
+		<section class="section next">
+			<div class="wrap">
+				<T v={s('project.next')} as="p" class="eyebrow" />
+				<a class="next__a" href={u(`/work/${next.slug}`)}>
+					<T v={next.title} as="span" class="next__title" />
+					<span class="arrow next__arrow" aria-hidden="true">→</span>
+				</a>
+				<T v={next.tagline} as="p" class="lede next__tag" />
+			</div>
+		</section>
+	</article>
+</Shell>
+
+<style is:global>
+	.case__head {
+		padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 3vw, 2.5rem);
+	}
+
+	.case__back {
+		margin-block-end: 1.8rem;
+	}
+
+	.case__back a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+		color: var(--ink-2);
+	}
+
+	.case__back a:hover {
+		color: var(--thread);
+	}
+
+	[dir='rtl'] .case__back .arrow {
+		scale: -1 1;
+	}
+
+	.case__title {
+		font-size: var(--t4);
+		max-width: 16ch;
+	}
+
+	.case__tag {
+		margin-block-start: 1.2rem;
+	}
+
+	/* ------------------------------ the cover ------------------------------ */
+
+	.cover {
+		position: relative;
+		overflow: hidden;
+		border: 1px solid var(--rule);
+		border-radius: 4px;
+		background: var(--linen-2);
+	}
+
+	.cover--tall {
+		max-width: 20rem;
+	}
+
+	.cover img {
+		width: 100%;
+		height: auto;
+	}
+
+	.cover__bands {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		grid-template-rows: repeat(8, 1fr);
+		pointer-events: none;
+	}
+
+	.cover__bands i {
+		display: block;
+		background: var(--linen);
+		transform-origin: var(--from, right);
+		scale: 0 1;
+	}
+
+	[dir='rtl'] .cover__bands i {
+		--from: left;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.cover__bands i {
+			scale: 1 1;
+			animation: unweave 0.9s var(--slow) both;
+			animation-delay: calc(var(--i) * 70ms + 120ms);
+		}
+	}
+
+	@keyframes unweave {
+		to {
+			scale: 0 1;
+		}
+	}
+
+	/* ------------------------------- the body ------------------------------- */
+
+	.case__grid {
+		display: grid;
+		gap: clamp(2rem, 5vw, 4rem);
+	}
+
+	@media (min-width: 60rem) {
+		.case__grid {
+			grid-template-columns: 17rem minmax(0, 1fr);
+			align-items: start;
+		}
+
+		.facts {
+			position: sticky;
+			inset-block-start: 5rem;
+		}
+	}
+
+	.facts__list {
+		display: grid;
+		gap: 1.1rem;
+	}
+
+	.facts__list > div {
+		display: grid;
+		gap: 0.35rem;
+		padding-block-start: 0.8rem;
+		border-block-start: 1px solid var(--rule-2);
+	}
+
+	.facts__list dt {
+		color: var(--ink-3);
+		text-transform: uppercase;
+	}
+
+	.facts__list dt :lang(ar) {
+		text-transform: none;
+	}
+
+	.facts__list dd {
+		margin: 0;
+	}
+
+	.facts__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.btn--sm {
+		min-height: 2.4rem;
+		padding: 0.4rem 0.95rem;
+		font-size: 0.88rem;
+	}
+
+	.prose {
+		max-width: 62ch;
+	}
+
+	.prose > p {
+		margin-block-start: 1rem;
+	}
+
+	.prose__sum {
+		font-size: var(--t1);
+		font-weight: 300;
+		line-height: 1.5;
+	}
+
+	.prose__sum:lang(ar) {
+		font-weight: 400;
+		line-height: 1.8;
+	}
+
+	.prose__h2 {
+		margin-block: 2.8rem 0.8rem;
+		font-size: var(--t2);
+	}
+
+	.knots {
+		display: grid;
+		gap: 1.6rem;
+		margin-block-start: 1.2rem;
+	}
+
+	.knot {
+		position: relative;
+		padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+		border: 1px solid var(--rule-2);
+		border-inline-start: 3px solid var(--accent);
+		border-radius: 4px;
+		background: var(--linen-2);
+	}
+
+	.knot__n {
+		position: absolute;
+		inset-block-start: 1.1rem;
+		inset-inline-end: 1.1rem;
+		color: var(--ink-3);
+	}
+
+	.knot__t {
+		font-size: var(--t1);
+		margin-block-end: 0.9rem;
+		padding-inline-end: 2.5rem;
+	}
+
+	.knot__lbl {
+		margin-block: 0.8rem 0.25rem;
+		color: var(--ink-3);
+	}
+
+	.knot__p {
+		color: var(--ink-2);
+	}
+
+	.knot__p--fix {
+		color: var(--ink);
+	}
+
+	.outs {
+		display: grid;
+		gap: 0.7rem;
+		margin-block-start: 1rem;
+	}
+
+	.outs li {
+		position: relative;
+		padding-inline-start: 1.5rem;
+	}
+
+	.outs li::before {
+		content: '';
+		position: absolute;
+		inset-block-start: 0.7em;
+		inset-inline-start: 0;
+		width: 0.85rem;
+		height: 2px;
+		background: var(--thread);
+	}
+
+	.shots {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25rem;
+		margin-block-start: 1.2rem;
+	}
+
+	.shot {
+		flex: 1 1 100%;
+		border: 1px solid var(--rule);
+		border-radius: 4px;
+		overflow: hidden;
+		background: var(--linen-2);
+	}
+
+	.shot--tall {
+		flex: 0 1 14rem;
+	}
+
+	/* ------------------------------- the next ------------------------------- */
+
+	.next {
+		padding-block: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.next__a {
+		display: inline-flex;
+		align-items: center;
+		gap: 1rem;
+		text-decoration: none;
+		font-size: var(--t3);
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		line-height: 1;
+		transition: color 0.25s;
+	}
+
+	.next__a:hover {
+		color: var(--thread);
+	}
+
+	.next__arrow {
+		font-weight: 300;
+		transition: translate 0.3s var(--ease);
+	}
+
+	.next__a:hover .next__arrow {
+		translate: 0.4rem 0;
+	}
+
+	[dir='rtl'] .next__arrow {
+		scale: -1 1;
+	}
+
+	[dir='rtl'] .next__a:hover .next__arrow {
+		translate: -0.4rem 0;
+	}
+
+	.next__tag {
+		margin-block-start: 0.9rem;
+	}
+</style>

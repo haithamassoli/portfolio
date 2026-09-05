@@ -1,0 +1,1193 @@
+---
+import type { Design } from '../registry';
+import { url as designUrl } from '../routes';
+import type { Lang } from '../../i18n';
+import { Image } from 'astro:assets';
+import Shell from './Shell.astro';
+import Stitch from './Stitch.astro';
+import T from '../../components/T.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { profile } from '../../../content/profile';
+import { featured, projects, rest } from '../../data/projects';
+import { toolbox } from '../../i18n';
+import { s, pair, yearPair } from '../../data/variant-ui';
+import profilePhoto from '../../assets/images/profile.png';
+import type { I18n, ProjectCategory } from '../../../content/types';
+
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+
+const { design, lang } = Astro.props;
+/** A link inside this design, in this language: u('/work/aoun'). */
+const u = (page = '') => designUrl(design, lang, page);
+
+const name = profile.name[lang];
+
+/* Four true numbers, counted from the content rather than typed. */
+const stores = projects.filter(
+	(p) => p.links.appStore || p.links.playGoogle,
+).length;
+const counts = [
+	{ n: projects.length, label: s('stat.shipped') },
+	{ n: stores, label: s('stat.stores') },
+	{ n: new Date().getFullYear() - 2022, label: s('stat.years') },
+	{ n: 2, label: pair('scripts, both first-class', 'لغتان، كلتاهما أصلية') },
+];
+
+const catLabel: Record<ProjectCategory, I18n> = {
+	web: s('cat.web'),
+	mobile: s('cat.mobile'),
+	ai: s('cat.ai'),
+	desktop: s('cat.desktop'),
+	extension: s('cat.extension'),
+	client: s('cat.client'),
+};
+
+/* The shuttle's five stations: how a brief becomes a release. */
+const stations = [
+	{
+		title: pair('Brief', 'المتطلبات'),
+		body: pair(
+			'What must ship, for whom, and by when.',
+			'ما الذي يجب إطلاقه، ولمن، ومتى.',
+		),
+	},
+	{
+		title: pair('Model', 'النموذج'),
+		body: pair(
+			'The data model and the API before any screen.',
+			'نموذج البيانات وواجهة API قبل أي شاشة.',
+		),
+	},
+	{
+		title: pair('Build', 'البناء'),
+		body: pair(
+			'Web, iOS and Android, from one codebase where that pays.',
+			'الويب وiOS وأندرويد، من قاعدة شيفرة واحدة حيث يستحق ذلك.',
+		),
+	},
+	{
+		title: pair('Release', 'الإطلاق'),
+		body: pair(
+			'Store review, CI, and a build you can open on your own phone.',
+			'مراجعة المتاجر، وCI، ونسخة تفتحها على هاتفك.',
+		),
+	},
+	{
+		title: pair('Support', 'الدعم'),
+		body: pair(
+			'A short weekly note, and the fixes after launch.',
+			'رسالة أسبوعية قصيرة، والإصلاحات بعد الإطلاق.',
+		),
+	},
+];
+
+const about = profile.about.en.map((en, i) => pair(en, profile.about.ar[i]));
+---
+
+<Shell
+	design={design}
+	lang={lang}
+	description={pair(
+		'Haitham Assoli builds full-stack web and mobile products in Amman: React Native and Expo on both stores, Next.js and Astro on the web, and private on-device AI.',
+		'يبني هيثم العسولي منتجات متكاملة للويب والجوال من عمّان: React Native وExpo على المتجرين، وNext.js وAstro على الويب، وذكاء اصطناعي خاص يعمل على الجهاز.',
+	)[lang]}
+	active="home"
+>
+	<!-- ============================== HERO ============================== -->
+	<section class="hero">
+		<div class="hero__stage" data-loom={name}>
+			<h1 class="hero__name">{name}</h1>
+		</div>
+
+		<div class="wrap hero__copy">
+			<div class="hero__lead">
+				<T v={s('hero.role')} as="p" class="eyebrow" />
+				<T v={s('hero.lede')} as="p" class="lede hero__lede" />
+				<div class="hero__ctas">
+					<a class="btn" href="#work">
+						<T v={s('hero.cta')} />
+						<span class="arrow" aria-hidden="true">→</span>
+					</a>
+					<a class="btn btn--ghost" href={u('/hire')}>
+						<T v={s('hero.cta2')} />
+					</a>
+				</div>
+				<DesignSwitch design={design} lang={lang} />
+			</div>
+
+			<dl class="hero__spec mono">
+				<div>
+					<dt><T v={pair('Based', 'المقر')} /></dt>
+					<dd><T v={profile.location} /></dd>
+				</div>
+				<div>
+					<dt><T v={pair('Mobile', 'الجوال')} /></dt>
+					<dd dir="ltr">React Native · Expo · Swift</dd>
+				</div>
+				<div>
+					<dt><T v={pair('Web', 'الويب')} /></dt>
+					<dd dir="ltr">Next.js · Astro · NestJS</dd>
+				</div>
+				<div>
+					<dt><T v={pair('Now', 'الآن')} /></dt>
+					<dd><T v={profile.experience[0].company} /></dd>
+				</div>
+			</dl>
+		</div>
+	</section>
+
+	<Stitch />
+
+	<!-- ============================ THE COUNT ============================ -->
+	<section class="section count" aria-labelledby="count-h">
+		<div class="wrap">
+			<h2 id="count-h" class="vh"><T v={s('stats.eyebrow')} /></h2>
+			<ul class="count__row">
+				{
+					counts.map((c) => (
+						<li class="count__item rise">
+							<b class="count__n" data-count={c.n}>
+								{c.n}
+							</b>
+							<T v={c.label} as="span" class="count__label" />
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<Stitch />
+
+	<!-- ============================== WORK ============================== -->
+	<section class="section work" id="work">
+		<div class="wrap">
+			<header class="work__head">
+				<div>
+					<T v={s('work.eyebrow')} as="p" class="eyebrow" />
+					<T v={s('work.title')} as="h2" class="title" />
+				</div>
+				<T v={s('work.lede')} as="p" class="lede work__lede" />
+			</header>
+
+			<ul class="cards">
+				{
+					featured.map((p, i) => (
+						<li class="card rise" style={`--accent:${p.accent}`}>
+							<a class="card__link" href={u(`/work/${p.slug}`)}>
+								<span class="vh">
+									<T v={p.title} />
+								</span>
+							</a>
+							<div class="card__shot">
+								{p.image && (
+									<Image
+										src={p.image}
+										alt={`${p.title[lang]}: ${p.tagline[lang]}`}
+										widths={[480, 800, 1200]}
+										sizes="(min-width: 60rem) 44vw, 92vw"
+										loading={i < 2 ? 'eager' : 'lazy'}
+									/>
+								)}
+							</div>
+							<div class="card__body">
+								<p class="card__meta mono">
+									<T v={catLabel[p.category]} />
+									<span aria-hidden="true">·</span>
+									<T v={yearPair(p.year)} />
+								</p>
+								<h3 class="card__title">
+									<T v={p.title} />
+								</h3>
+								<T v={p.tagline} as="p" class="card__tag" />
+								<ul class="chips">
+									{p.stack.slice(0, 4).map((tool) => (
+										<li class="chip">{tool}</li>
+									))}
+								</ul>
+							</div>
+						</li>
+					))
+				}
+			</ul>
+
+			<div class="rest rise">
+				<T
+					v={pair(
+						`And ${rest.length} more, in the index`,
+						`و${rest.length} مشروعًا آخر في الفهرس`,
+					)}
+					as="h3"
+					class="rest__title"
+				/>
+				<p class="rest__list">
+					{
+						rest.map((p) => (
+							<a class="rest__a" href={u(`/work/${p.slug}`)}>
+								<T v={p.title} />
+							</a>
+						))
+					}
+				</p>
+				<a class="btn btn--ghost" href={u('/work')}>
+					<T v={s('work.all')} />
+					<span class="arrow" aria-hidden="true">→</span>
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<Stitch />
+
+	<!-- ============================= PROCESS ============================= -->
+	<section class="section process" aria-labelledby="process-h">
+		<div class="wrap">
+			<header class="process__head">
+				<T v={s('hero.seam')} as="p" class="eyebrow" />
+				<T
+					v={pair('One shuttle, five passes.', 'مكّوك واحد، خمس مرّات.')}
+					as="h2"
+					class="title"
+					id="process-h"
+				/>
+			</header>
+
+			<svg
+				class="shuttle"
+				viewBox="0 0 1000 200"
+				role="img"
+				aria-label={pair(
+					'A shuttle carrying a thread through five stations: brief, model, build, release, support.',
+					'مكّوك يحمل خيطًا عبر خمس محطات: المتطلبات، النموذج، البناء، الإطلاق، الدعم.',
+				)[lang]}
+			>
+				<defs>
+					<path
+						id="loom-path"
+						d="M40 130 C 155 130, 155 70, 270 70 S 385 130, 500 130 S 615 70, 730 70 S 845 130, 960 130"
+					></path>
+				</defs>
+				<use class="shuttle__guide" href="#loom-path"></use>
+				<use class="shuttle__laid" href="#loom-path" pathLength="1">
+					<animate
+						attributeName="stroke-dashoffset"
+						dur="14s"
+						repeatCount="indefinite"
+						calcMode="linear"
+						values="1;1;0.75;0.75;0.5;0.5;0.25;0.25;0;0"
+						keyTimes="0;0.08;0.2;0.28;0.4;0.48;0.6;0.68;0.8;1"></animate>
+				</use>
+				{
+					stations.map((_, i) => {
+						const x = 40 + i * 230;
+						const y = i % 2 ? 70 : 130;
+						return (
+							<g class="station" transform={`translate(${x} ${y})`}>
+								<circle class="station__ring" r="11" />
+								<circle class="station__dot" r="4">
+									<animate
+										attributeName="r"
+										dur="14s"
+										repeatCount="indefinite"
+										calcMode="spline"
+										values={[0, 1, 2, 3, 4]
+											.map((k) => (k === i ? '7' : '4'))
+											.join(';')}
+										keyTimes="0;0.25;0.5;0.75;1"
+										keySplines="0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1"
+									/>
+								</circle>
+								<text
+									class="station__n"
+									y={i % 2 ? -26 : 34}
+									text-anchor="middle"
+								>
+									0{i + 1}
+								</text>
+							</g>
+						);
+					})
+				}
+				<g class="shuttle__body">
+					<path d="M-28 0 Q0 -10 28 0 Q0 10 -28 0 Z"></path>
+					<circle r="3" fill="var(--linen)"></circle>
+					<animateMotion
+						dur="14s"
+						repeatCount="indefinite"
+						rotate="auto"
+						calcMode="linear"
+						keyPoints="0;0;0.25;0.25;0.5;0.5;0.75;0.75;1;1"
+						keyTimes="0;0.08;0.2;0.28;0.4;0.48;0.6;0.68;0.8;1"
+					>
+						<mpath href="#loom-path"></mpath>
+					</animateMotion>
+				</g>
+			</svg>
+
+			<ol class="stations">
+				{
+					stations.map((st, i) => (
+						<li class="stations__item rise">
+							<span class="stations__n mono">0{i + 1}</span>
+							<T v={st.title} as="h3" class="stations__t" />
+							<T v={st.body} as="p" class="stations__p" />
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<Stitch />
+
+	<!-- ============================== ABOUT ============================== -->
+	<section class="section about" id="about">
+		<div class="wrap about__grid">
+			<div class="about__text">
+				<T v={s('about.eyebrow')} as="p" class="eyebrow" />
+				<T v={s('about.title')} as="h2" class="title" />
+				{about.map((para) => <T v={para} as="p" class="about__p" />)}
+
+				<T v={s('about.stackTitle')} as="h3" class="about__h3" />
+				<ul class="tools">
+					{
+						toolbox.map((tool) => (
+							<li class="tool" dir="ltr">
+								{tool}
+							</li>
+						))
+					}
+				</ul>
+				<T
+					v={pair('And, on the device itself', 'وعلى الجهاز نفسه')}
+					as="h3"
+					class="about__h3"
+				/>
+				<ul class="tools tools--ai">
+					{
+						profile.skills.ai.map((tool) => (
+							<li class="tool" dir="ltr">
+								{tool}
+							</li>
+						))
+					}
+				</ul>
+			</div>
+
+			<aside class="about__side">
+				<figure class="portrait rise">
+					<Image
+						src={profilePhoto}
+						alt={profile.name.en}
+						widths={[320, 640]}
+						sizes="(min-width: 60rem) 20rem, 60vw"
+						loading="lazy"
+					/>
+					<figcaption class="mono">
+						<T v={profile.name} />
+						<span aria-hidden="true"> · </span>
+						<T v={profile.location} />
+					</figcaption>
+				</figure>
+
+				<T
+					v={pair('Where the hours went', 'أين ذهبت الساعات')}
+					as="h3"
+					class="about__h3"
+				/>
+				<ol class="jobs">
+					{
+						profile.experience.map((job) => (
+							<li class="job">
+								<T v={job.company} as="span" class="job__co" />
+								<T v={job.role} as="span" class="job__role" />
+								<T v={yearPair(job.period)} as="span" class="job__when mono" />
+							</li>
+						))
+					}
+				</ol>
+
+				<T v={pair('School', 'الدراسة')} as="h3" class="about__h3" />
+				<ol class="jobs">
+					{
+						profile.education.map((ed) => (
+							<li class="job">
+								<T v={ed.school} as="span" class="job__co" />
+								<T v={ed.degree} as="span" class="job__role" />
+								<T v={yearPair(ed.period)} as="span" class="job__when mono" />
+							</li>
+						))
+					}
+				</ol>
+			</aside>
+		</div>
+	</section>
+
+	<!-- ============================== HIRE ============================== -->
+	<section class="section hire-band">
+		<div class="wrap hire-band__in">
+			<div>
+				<T v={s('hire.eyebrow')} as="p" class="eyebrow eyebrow--light" />
+				<T v={s('hire.title')} as="h2" class="title hire-band__title" />
+				<T v={s('hire.lede')} as="p" class="lede hire-band__lede" />
+			</div>
+			<div class="hire-band__ctas">
+				<a class="btn btn--linen" href={u('/hire')}>
+					<T v={pair('Fill in the brief', 'املأ الطلب')} />
+					<span class="arrow" aria-hidden="true">→</span>
+				</a>
+				<a class="hire-band__mail" href={`mailto:${profile.email}`} dir="ltr"
+					>{profile.email}</a
+				>
+			</div>
+		</div>
+	</section>
+
+	<svg class="defs" aria-hidden="true" focusable="false">
+		<defs>
+			<!-- Cloth in a draught: the cover of a hovered card ripples. -->
+			<filter id="cloth" x="-4%" y="-4%" width="108%" height="108%">
+				<feTurbulence
+					type="fractalNoise"
+					baseFrequency="0.006 0.018"
+					numOctaves="2"
+					seed="7"
+					result="n"
+				>
+					<animate
+						attributeName="baseFrequency"
+						dur="7s"
+						values="0.006 0.018;0.009 0.024;0.006 0.018"
+						repeatCount="indefinite"></animate>
+				</feTurbulence>
+				<feDisplacementMap
+					in="SourceGraphic"
+					in2="n"
+					scale="10"
+					xChannelSelector="R"
+					yChannelSelector="G"></feDisplacementMap>
+			</filter>
+		</defs>
+	</svg>
+</Shell>
+
+<script>
+	import { boot } from './loom';
+	boot();
+</script>
+
+<script is:inline data-astro-rerun>
+	/* Two small things the CSS cannot do: count the numbers up as they arrive,
+	   and hold the shuttle still for a reader who asked for less motion.
+	   Rerun: fresh elements after every client-side navigation. */
+	(function () {
+		const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reduce) {
+			document.querySelectorAll('svg.shuttle').forEach(function (svg) {
+				svg.pauseAnimations();
+			});
+			return;
+		}
+		const nums = document.querySelectorAll('[data-count]');
+		if (!nums.length) return;
+		const io = new IntersectionObserver(
+			function (entries) {
+				entries.forEach(function (en) {
+					if (!en.isIntersecting) return;
+					io.unobserve(en.target);
+					const el = en.target;
+					const to = Number(el.getAttribute('data-count'));
+					const t0 = performance.now();
+					(function step(now) {
+						const p = Math.min(1, (now - t0) / 1100);
+						el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3))));
+						if (p < 1) requestAnimationFrame(step);
+					})(t0);
+				});
+			},
+			{ threshold: 0.6 },
+		);
+		nums.forEach(function (n) {
+			io.observe(n);
+		});
+	})();
+</script>
+
+<style is:global>
+	/* ================================ HERO ================================ */
+
+	.hero {
+		position: relative;
+	}
+
+	/* The stage: the field of threads, and the name standing in it until the
+	   loom has woven its own. */
+	.hero__stage {
+		position: relative;
+		display: grid;
+		place-items: center;
+		height: clamp(20rem, 58vh, 40rem);
+		overflow: clip;
+		background:
+			radial-gradient(
+				120% 80% at 50% 100%,
+				color-mix(in oklab, var(--thread) 7%, transparent),
+				transparent 60%
+			),
+			var(--linen);
+	}
+
+	.hero__stage canvas {
+		position: absolute;
+		inset: 0;
+		width: 100% !important;
+		height: 100% !important;
+		opacity: 0;
+		transition: opacity 0.9s var(--slow);
+	}
+
+	.hero__stage[data-state='on'] canvas {
+		opacity: 1;
+	}
+
+	/* The CSS weave: the name set in threads, swept in from the reading side.
+	   This is what a reader gets with no WebGL, no motion, or no JavaScript —
+	   the same idea, in the cheapest material. */
+	.hero__name {
+		position: relative;
+		margin: 0;
+		padding-inline: var(--gutter);
+		font-size: var(--t5);
+		line-height: 1;
+		text-align: center;
+		color: transparent;
+		background:
+			repeating-linear-gradient(
+				180deg,
+				var(--thread) 0 0.075em,
+				color-mix(in oklab, var(--thread) 55%, var(--linen)) 0.075em 0.1em
+			),
+			var(--thread);
+		-webkit-background-clip: text;
+		background-clip: text;
+		mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+		mask-size: 240% 100%;
+		mask-position: 0 0;
+		transition: opacity 0.9s var(--slow);
+	}
+
+	[dir='rtl'] .hero__name {
+		mask-image: linear-gradient(270deg, #000 45%, transparent 55%);
+		mask-position: 100% 0;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.hero__name {
+			animation: sweep 1.8s var(--slow) both;
+		}
+
+		[dir='rtl'] .hero__name {
+			animation-name: sweep-rtl;
+		}
+	}
+
+	@keyframes sweep {
+		from {
+			mask-position: 100% 0;
+		}
+		to {
+			mask-position: 0 0;
+		}
+	}
+
+	@keyframes sweep-rtl {
+		from {
+			mask-position: 0 0;
+		}
+		to {
+			mask-position: 100% 0;
+		}
+	}
+
+	.hero__stage[data-state='on'] .hero__name {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.hero__copy {
+		display: grid;
+		gap: clamp(1.5rem, 4vw, 3rem);
+		padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(2.5rem, 5vw, 4rem);
+	}
+
+	@media (min-width: 60rem) {
+		.hero__copy {
+			grid-template-columns: minmax(0, 1.4fr) minmax(14rem, 0.6fr);
+			align-items: start;
+		}
+	}
+
+	.hero__lead .eyebrow {
+		flex-wrap: wrap;
+	}
+
+	.hero__lede {
+		max-width: 50ch;
+	}
+
+	.hero__ctas {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-block-start: 1.5rem;
+	}
+
+	.hero__spec {
+		display: grid;
+		gap: 0.75rem;
+		padding-block-start: 0.4rem;
+		border-block-start: 1px solid var(--rule);
+		padding-block: 1rem 0;
+	}
+
+	.hero__spec > div {
+		display: grid;
+		grid-template-columns: 5.5rem 1fr;
+		gap: 0.5rem;
+		padding-block: 0.45rem;
+		border-block-end: 1px dotted var(--rule-2);
+	}
+
+	.hero__spec dt {
+		color: var(--ink-3);
+		text-transform: uppercase;
+	}
+
+	.hero__spec dt :lang(ar) {
+		text-transform: none;
+	}
+
+	.hero__spec dd {
+		margin: 0;
+		color: var(--ink);
+	}
+
+	/* ============================== COUNT ============================== */
+
+	.count {
+		padding-block: clamp(2.5rem, 5vw, 4rem);
+	}
+
+	.count__row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.5rem 2rem;
+	}
+
+	@media (min-width: 50rem) {
+		.count__row {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
+
+	.count__item {
+		display: grid;
+		gap: 0.3rem;
+		padding-inline-start: 1rem;
+		border-inline-start: 2px solid var(--thread);
+	}
+
+	.count__n {
+		font-size: var(--t4);
+		font-weight: 900;
+		line-height: 0.9;
+		letter-spacing: -0.04em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.count__label {
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+
+	.count__label:lang(ar) {
+		font-family: var(--sans);
+		font-size: 0.9rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	/* =============================== WORK =============================== */
+
+	.work__head {
+		display: grid;
+		gap: 1rem 3rem;
+		align-items: end;
+		margin-block-end: clamp(2rem, 5vw, 3.5rem);
+	}
+
+	@media (min-width: 56rem) {
+		.work__head {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.cards {
+		display: grid;
+		gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
+	}
+
+	@media (min-width: 56rem) {
+		.cards {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		/* The second column runs a little lower, so the rows read as a weave
+		   and not as a grid. */
+		.card:nth-child(even) {
+			translate: 0 2.5rem;
+		}
+	}
+
+	.card {
+		position: relative;
+		display: grid;
+		gap: 1rem;
+	}
+
+	.card__link {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		border-radius: 4px;
+	}
+
+	.card__shot {
+		position: relative;
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		border: 1px solid var(--rule);
+		border-radius: 4px;
+		background: var(--linen-2);
+	}
+
+	/* The accent is the selvedge: a thread down the reading edge. */
+	.card__shot::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		width: 3px;
+		z-index: 1;
+		background: var(--accent);
+		transform-origin: top;
+		scale: 1 0;
+		transition: scale 0.5s var(--ease);
+	}
+
+	.card:hover .card__shot::before,
+	.card:focus-within .card__shot::before {
+		scale: 1 1;
+	}
+
+	.card__shot img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top;
+		transition:
+			transform 0.7s var(--slow),
+			filter 0.4s;
+	}
+
+	@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+		.card:hover .card__shot img {
+			transform: scale(1.03);
+			filter: url(#cloth);
+		}
+	}
+
+	.card__body {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.card__meta {
+		display: flex;
+		gap: 0.6rem;
+		color: var(--ink-3);
+	}
+
+	.card__title {
+		font-size: var(--t2);
+		letter-spacing: -0.02em;
+		transition: color 0.25s;
+	}
+
+	.card:hover .card__title,
+	.card:focus-within .card__title {
+		color: var(--thread);
+	}
+
+	.card__tag {
+		color: var(--ink-2);
+		max-width: 44ch;
+	}
+
+	.card .chips {
+		margin-block-start: 0.35rem;
+	}
+
+	.rest {
+		margin-block-start: clamp(3.5rem, 8vw, 6rem);
+		padding-block-start: 2rem;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.rest__title {
+		font-size: var(--t1);
+		margin-block-end: 1rem;
+	}
+
+	.rest__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.9rem;
+		max-width: 80ch;
+		margin-block-end: 1.6rem;
+		color: var(--ink-2);
+	}
+
+	.rest__a {
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule-2);
+		transition:
+			color 0.2s,
+			border-color 0.2s;
+	}
+
+	.rest__a:hover {
+		color: var(--thread);
+		border-color: var(--thread);
+	}
+
+	/* ============================== PROCESS ============================== */
+
+	.process__head {
+		margin-block-end: clamp(1.5rem, 3vw, 2.5rem);
+	}
+
+	.shuttle {
+		width: 100%;
+		height: auto;
+		overflow: visible;
+		margin-block-end: clamp(1rem, 3vw, 2rem);
+	}
+
+	[dir='rtl'] .shuttle {
+		scale: -1 1;
+	}
+
+	[dir='rtl'] .shuttle text {
+		transform: scale(-1, 1);
+	}
+
+	.shuttle__guide {
+		fill: none;
+		stroke: var(--rule-2);
+		stroke-width: 1;
+		stroke-dasharray: 3 6;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.shuttle__laid {
+		fill: none;
+		stroke: var(--thread);
+		stroke-width: 2.5;
+		stroke-linecap: round;
+		stroke-dasharray: 1;
+		stroke-dashoffset: 1;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.station__ring {
+		fill: var(--linen);
+		stroke: var(--ink);
+		stroke-width: 1.5;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.station__dot {
+		fill: var(--thread);
+	}
+
+	.station__n {
+		font-family: var(--mono);
+		font-size: 12px;
+		fill: var(--ink-3);
+		letter-spacing: 0.1em;
+	}
+
+	.shuttle__body path {
+		fill: var(--ink);
+	}
+
+	.stations {
+		display: grid;
+		gap: 1.5rem 2rem;
+		counter-reset: st;
+	}
+
+	@media (min-width: 46rem) {
+		.stations {
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+		}
+	}
+
+	.stations__item {
+		display: grid;
+		gap: 0.35rem;
+		align-content: start;
+		padding-block-start: 0.9rem;
+		border-block-start: 1px solid var(--rule-2);
+	}
+
+	.stations__n {
+		color: var(--thread);
+	}
+
+	.stations__t {
+		font-size: var(--t1);
+	}
+
+	.stations__p {
+		font-size: 0.92rem;
+		color: var(--ink-2);
+	}
+
+	/* =============================== ABOUT =============================== */
+
+	.about {
+		background: var(--linen-2);
+	}
+
+	.about__grid {
+		display: grid;
+		gap: clamp(2rem, 5vw, 4rem);
+	}
+
+	@media (min-width: 60rem) {
+		.about__grid {
+			grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+		}
+	}
+
+	.about__p {
+		margin-block-start: 1.1rem;
+		max-width: 58ch;
+	}
+
+	.about__p:first-of-type {
+		margin-block-start: 1.6rem;
+		font-size: var(--t1);
+		font-weight: 300;
+		line-height: 1.45;
+	}
+
+	.about__p:first-of-type:lang(ar) {
+		font-weight: 400;
+		line-height: 1.8;
+	}
+
+	.about__h3 {
+		margin-block: 2.2rem 0.9rem;
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		font-weight: 400;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+
+	.about__h3:lang(ar) {
+		font-family: var(--sans);
+		font-weight: 500;
+		font-size: 0.9rem;
+		letter-spacing: 0;
+		text-transform: none;
+	}
+
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+		max-width: 44rem;
+	}
+
+	.tool {
+		padding: 0.35rem 0.8rem;
+		border: 1px solid var(--rule-2);
+		border-radius: 999px;
+		background: var(--linen);
+		font-size: 0.88rem;
+		font-weight: 500;
+		transition:
+			border-color 0.2s,
+			color 0.2s,
+			transform 0.3s var(--ease);
+	}
+
+	.tool:hover {
+		border-color: var(--thread);
+		color: var(--thread);
+		transform: translateY(-2px);
+	}
+
+	.tools--ai .tool {
+		background: var(--ink);
+		border-color: var(--ink);
+		color: var(--linen);
+	}
+
+	.tools--ai .tool:hover {
+		background: var(--thread);
+		border-color: var(--thread);
+		color: #fff;
+	}
+
+	.about__side {
+		display: grid;
+		align-content: start;
+	}
+
+	.portrait {
+		position: relative;
+		max-width: 20rem;
+		margin-block-end: 0.5rem;
+	}
+
+	/* The portrait is cut on the bias: one corner clipped, the way a swatch is. */
+	.portrait img {
+		width: 100%;
+		aspect-ratio: 1;
+		object-fit: cover;
+		clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
+		filter: saturate(0.92);
+	}
+
+	.portrait figcaption {
+		margin-block-start: 0.7rem;
+		color: var(--ink-2);
+	}
+
+	.jobs {
+		display: grid;
+		gap: 0.9rem;
+	}
+
+	.job {
+		display: grid;
+		gap: 0.1rem;
+		padding-inline-start: 0.9rem;
+		border-inline-start: 2px solid var(--rule-2);
+	}
+
+	.job__co {
+		font-weight: 700;
+	}
+
+	.job__role {
+		font-size: 0.92rem;
+		color: var(--ink-2);
+	}
+
+	.job__when {
+		color: var(--ink-3);
+	}
+
+	/* =============================== HIRE =============================== */
+
+	.hire-band {
+		background: var(--ink);
+		color: var(--linen);
+		--rule: color-mix(in oklab, var(--linen) 18%, transparent);
+		--rule-2: color-mix(in oklab, var(--linen) 34%, transparent);
+	}
+
+	.hire-band__in {
+		display: grid;
+		gap: 2rem 3rem;
+		align-items: end;
+	}
+
+	@media (min-width: 56rem) {
+		.hire-band__in {
+			grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+		}
+	}
+
+	.eyebrow--light {
+		color: color-mix(in oklab, var(--linen) 72%, transparent);
+	}
+
+	.hire-band__title {
+		color: var(--linen);
+	}
+
+	.hire-band__lede {
+		margin-block-start: 1.2rem;
+		color: color-mix(in oklab, var(--linen) 80%, transparent);
+	}
+
+	.hire-band__ctas {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+	}
+
+	.btn--linen {
+		background: var(--linen);
+		border-color: var(--linen);
+		color: var(--ink);
+	}
+
+	.btn--linen:hover {
+		background: var(--thread-2);
+		border-color: var(--thread-2);
+		color: var(--ink);
+	}
+
+	.hire-band__mail {
+		font-family: var(--mono);
+		font-size: var(--t-1);
+		text-decoration: none;
+		border-block-end: 1px solid var(--rule-2);
+		color: color-mix(in oklab, var(--linen) 85%, transparent);
+		overflow-wrap: anywhere;
+	}
+
+	.hire-band__mail:hover {
+		color: var(--linen);
+		border-color: var(--linen);
+	}
+
+	.defs {
+		position: absolute;
+		width: 0;
+		height: 0;
+		overflow: hidden;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.card:hover .card__shot img {
+			transform: none;
+			filter: none;
+		}
+	}
+</style>

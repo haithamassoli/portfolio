@@ -1,13 +1,13 @@
 /* The webfonts each design asks Google for. One URL per design, because Shell
    and Home both need it and a font list copied into two files drifts into two
-   font lists. The main design serves its own faces from src/assets/fonts.
+   font lists. The main design and Signal serve their own faces from src/assets/fonts.
    ponytail: a plain record, not a config — nothing here is computed. */
 import type { DesignId } from './registry';
 
 const family = (families: string) =>
 	`https://fonts.googleapis.com/css2?${families}&display=swap`;
 
-export const fonts: Record<Exclude<DesignId, 'main'>, string> = {
+export const fonts: Record<Exclude<DesignId, 'main' | 'signal'>, string> = {
 	'quiet-room': family(
 		'family=Amiri:wght@400;700&family=Geist+Mono:wght@400..500&family=Newsreader:opsz,wght@6..72,300..500&family=Noto+Kufi+Arabic:wght@400',
 	),

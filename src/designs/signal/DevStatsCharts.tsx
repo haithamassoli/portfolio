@@ -6,8 +6,8 @@ import {
 	cumulativeContributions,
 	identityColors,
 	languageTreemap,
-} from '../charts/dev-stats';
-import type { DevStats, Slice } from '../data/dev-stats';
+} from '../../charts/dev-stats';
+import type { DevStats, Slice } from '../../data/dev-stats';
 
 /* A treemap always ends up with a tile too narrow for its own label, so the
    names live outside it. */

@@ -1,12 +1,12 @@
 ---
 import { Image } from 'astro:assets';
-import profile from '../assets/images/profile.png';
-import { featured, rest } from '../data/projects';
-import { devStats } from '../data/dev-stats';
-import { href, toolbox, useT, type Lang } from '../i18n';
-import { DevStatsCharts } from '../components/DevStatsCharts';
-import Hero from '../components/Hero.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import profile from '../../assets/images/profile.png';
+import { featured, rest } from '../../data/projects';
+import { devStats } from '../../data/dev-stats';
+import { href, toolbox, useT, type Lang } from '../../i18n';
+import { DevStatsCharts } from './DevStatsCharts';
+import Hero from './Hero.astro';
+import ProjectCard from './ProjectCard.astro';
 
 interface Props {
 	lang: Lang;

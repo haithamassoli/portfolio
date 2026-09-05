@@ -1,5 +1,5 @@
 ---
-/* All eight, on one sheet. Each tile is the real page, running live in an
+/* Every design, on one sheet. Each tile is the real page, running live in an
    iframe, so what you pick is what you saw — and each link keeps the language
    you are reading in.
 
@@ -19,26 +19,26 @@ const { lang } = Astro.props;
 const t = {
 	en: {
 		kicker: 'Contact sheet',
-		title: 'One portfolio, eight designs',
+		title: `One portfolio, ${designs.length} designs`,
 		lede: 'Every tile below is a live version of the portfolio. Open one, then use its design switch to continue on the same page. Each version includes the home page, full project index, detailed case studies, and project enquiry form.',
 		work: 'Projects',
 		project: 'A project',
 		hire: 'Hire me',
 		resume: 'Let the site choose for me again',
 		resumed: 'Done — the next visit picks up the tour.',
-		foot: 'The main design is the one search engines see. The other seven are noindex.',
+		foot: `The main design is the one search engines see. The other ${designs.length - 1} are noindex.`,
 		other: 'العربية',
 	},
 	ar: {
 		kicker: 'ورقة اللقطات',
-		title: 'ملف واحد، ثمانية تصاميم',
+		title: `ملف واحد، ${designs.length} تصاميم`,
 		lede: 'كل بطاقة أدناه نسخة حية من ملف الأعمال. افتح واحدة، ثم استخدم مبدّل التصميم للمتابعة في الصفحة نفسها. تضم كل نسخة الصفحة الرئيسية وفهرس المشاريع ودراسات الحالة المفصلة ونموذج طلب المشروع.',
 		work: 'المشاريع',
 		project: 'مشروع',
 		hire: 'وظّفني',
 		resume: 'دع الموقع يختار لي من جديد',
 		resumed: 'تم — الزيارة القادمة تكمل الجولة.',
-		foot: 'التصميم الأساسي هو ما تراه محركات البحث. والسبعة الأخرى غير مفهرسة.',
+		foot: `التصميم الأساسي هو ما تراه محركات البحث. والبقية، وعددها ${designs.length - 1}، غير مفهرسة.`,
 		other: 'English',
 	},
 }[lang];
@@ -47,7 +47,7 @@ const other = lang === 'ar' ? 'en' : 'ar';
 
 /* The main design lives at `/`, where the gate would bounce a returning
    visitor to whichever design the tour picked — so picking it here would show
-   anything but Signal. `?d=main` is the gate's own "explicit beats everything"
+   anything but the main design. `?d=main` is the gate's own "explicit beats everything"
    escape hatch; the resume button below hands the rotation back. */
 const open = (d: Design) =>
 	url(d, lang, '') + (d.id === 'main' ? '?d=main' : '');

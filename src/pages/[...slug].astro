@@ -1,70 +1,37 @@
 ---
-/* The main design, in both languages. Every other design has its own route
-   file under src/pages/<design>/ — see src/designs/paths.ts for why. */
-import { projects } from '../data/projects';
-import { langs, pages } from '../designs/routes';
-import { useT, type Lang } from '../i18n';
-import Base from '../layouts/Base.astro';
-import Home from '../sections/Home.astro';
-import HirePage from '../sections/HirePage.astro';
-import ProjectPage from '../sections/ProjectPage.astro';
-import WorkPage from '../sections/WorkPage.astro';
+/* The main design, in both languages, at `/` and `/ar`. Every other design
+   has its own route file under src/pages/<design>/ — see src/designs/paths.ts
+   for why. */
+import Home from '../designs/main/Home.astro';
+import Work from '../designs/main/Work.astro';
+import Hire from '../designs/main/Hire.astro';
+import Project from '../designs/main/Project.astro';
+import { designPaths, resolve, type RouteProps } from '../designs/paths';
+import { langs } from '../designs/routes';
 
-export function getStaticPaths() {
-	return langs.flatMap((lang) =>
-		pages().map((page) => ({
+export const getStaticPaths = () =>
+	langs.flatMap((lang) =>
+		designPaths('main', lang).map((p) => ({
+			...p,
 			params: {
-				slug: ((lang === 'ar' ? '/ar' : '') + page.path).slice(1) || undefined,
+				slug:
+					[lang === 'ar' ? 'ar' : '', p.params.slug ?? '']
+						.filter(Boolean)
+						.join('/') || undefined,
 			},
-			props: { lang, kind: page.kind, index: page.index },
 		})),
 	);
-}
 
-const { lang, kind, index } = Astro.props as {
-	lang: Lang;
-	kind: 'home' | 'work' | 'hire' | 'project';
-	index: number;
-};
-const t = useT(lang);
-const project = kind === 'project' ? projects[index] : undefined;
-const next = project ? projects[(index + 1) % projects.length] : undefined;
+const props = Astro.props as RouteProps;
+const { design, project, next } = resolve(props);
+const lang = props.lang;
 ---
 
+{props.kind === 'home' && <Home design={design} lang={lang} />}
+{props.kind === 'work' && <Work design={design} lang={lang} />}
+{props.kind === 'hire' && <Hire design={design} lang={lang} />}
 {
-	kind === 'home' && (
-		<Base lang={lang}>
-			<Home lang={lang} />
-		</Base>
-	)
-}
-
-{
-	kind === 'work' && (
-		<Base lang={lang} title={t('work.all')} description={t('work.allLede')}>
-			<WorkPage lang={lang} />
-		</Base>
-	)
-}
-
-{
-	kind === 'hire' && (
-		<Base lang={lang} title={t('hire.eyebrow')} description={t('hire.lede')}>
-			<HirePage lang={lang} />
-		</Base>
-	)
-}
-
-{
-	project && next && (
-		<Base
-			lang={lang}
-			title={project.title[lang]}
-			description={project.summary[lang]}
-			accent={project.accent}
-			image={project.image}
-		>
-			<ProjectPage project={project} next={next} lang={lang} />
-		</Base>
+	props.kind === 'project' && project && next && (
+		<Project design={design} lang={lang} project={project} next={next} />
 	)
 }

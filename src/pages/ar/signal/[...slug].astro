@@ -1,0 +1,56 @@
+---
+/* signal, in Arabic. Thin on purpose: the only reason this file exists is to
+   keep signal's stylesheet (and its Tailwind base) off the other designs. */
+import Shell from '../../../designs/signal/Shell.astro';
+import Home from '../../../designs/signal/Home.astro';
+import Work from '../../../designs/signal/Work.astro';
+import Hire from '../../../designs/signal/Hire.astro';
+import Project from '../../../designs/signal/Project.astro';
+import { designPaths, resolve, type RouteProps } from '../../../designs/paths';
+import { useT } from '../../../i18n';
+
+export const getStaticPaths = () => designPaths('signal', 'ar');
+
+const props = Astro.props as RouteProps;
+const { project, next } = resolve(props);
+const lang = props.lang;
+const t = useT(lang);
+---
+
+{
+	props.kind === 'home' && (
+		<Shell lang={lang}>
+			<Home lang={lang} />
+		</Shell>
+	)
+}
+
+{
+	props.kind === 'work' && (
+		<Shell lang={lang} title={t('work.all')} description={t('work.allLede')}>
+			<Work lang={lang} />
+		</Shell>
+	)
+}
+
+{
+	props.kind === 'hire' && (
+		<Shell lang={lang} title={t('hire.eyebrow')} description={t('hire.lede')}>
+			<Hire lang={lang} />
+		</Shell>
+	)
+}
+
+{
+	props.kind === 'project' && project && next && (
+		<Shell
+			lang={lang}
+			title={project.title[lang]}
+			description={project.summary[lang]}
+			accent={project.accent}
+			image={project.image}
+		>
+			<Project project={project} next={next} lang={lang} />
+		</Shell>
+	)
+}

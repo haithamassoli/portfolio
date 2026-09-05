@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
-import '../styles/hire-form.css';
+import './hire-form.css';
 import { useId, useState } from 'react';
 
 type Values = {

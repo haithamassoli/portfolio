@@ -25,82 +25,98 @@
 				box-sizing: border-box;
 			}
 
+			/* Linen, ink, one indigo thread: the main design's own cloth. */
 			body {
 				width: 1200px;
 				height: 630px;
-				display: grid;
-				grid-template-columns: 1fr 26rem;
-				background: #16183a;
-				color: #f0ebe1;
+				padding: 4.5rem 4.75rem;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				background:
+					repeating-linear-gradient(
+						90deg,
+						rgba(22, 23, 29, 0.05) 0 1px,
+						transparent 1px 11px
+					),
+					repeating-linear-gradient(
+						180deg,
+						rgba(22, 23, 29, 0.05) 0 1px,
+						transparent 1px 11px
+					),
+					#f3efe6;
+				color: #16171d;
 				font-family: 'Thmanyah Sans', system-ui, sans-serif;
 				overflow: hidden;
 			}
 
-			.left {
-				padding: 4.5rem;
-				display: flex;
-				flex-direction: column;
-				justify-content: space-between;
-			}
-
 			.eyebrow {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
 				font-family: ui-monospace, SFMono-Regular, monospace;
-				font-size: 1.15rem;
-				letter-spacing: 0.22em;
+				font-size: 1.1rem;
+				letter-spacing: 0.2em;
 				text-transform: uppercase;
-				color: #ff5a1f;
+				color: #4b4c57;
 			}
 
+			.eyebrow::before {
+				content: '';
+				width: 2.5rem;
+				height: 3px;
+				background: #1d35d1;
+			}
+
+			/* The name, set in threads. */
 			h1 {
-				font-size: 4.6rem;
+				font-size: 7.4rem;
 				font-weight: 900;
-				line-height: 1.02;
-				letter-spacing: -0.02em;
+				line-height: 0.95;
+				letter-spacing: -0.03em;
+				color: transparent;
+				background: repeating-linear-gradient(
+					180deg,
+					#1d35d1 0 0.075em,
+					#8a94e6 0.075em 0.1em
+				);
+				-webkit-background-clip: text;
+				background-clip: text;
+			}
+
+			.ar {
+				margin-top: 0.6rem;
+				font-size: 2.6rem;
+				font-weight: 900;
+				direction: rtl;
+				text-align: left;
 			}
 
 			p {
 				font-weight: 300;
-				font-size: 1.5rem;
-				line-height: 1.45;
-				color: #9a9cbe;
-				max-width: 30ch;
-				margin-top: 1.25rem;
+				font-size: 1.55rem;
+				line-height: 1.4;
+				color: #4b4c57;
+				max-width: 34ch;
+				margin-top: 1.4rem;
 			}
 
 			.url {
 				font-family: ui-monospace, SFMono-Regular, monospace;
-				font-size: 1.2rem;
-				color: #9a9cbe;
-			}
-
-			/* The bone panel is the seam — the same one the site is built on. */
-			.right {
-				background: #f0ebe1;
-				color: #16183a;
-				display: grid;
-				place-content: center;
-				padding: 3rem;
-				border-left: 6px solid #ff5a1f;
-			}
-
-			.right span {
-				font-size: 4rem;
-				font-weight: 900;
-				line-height: 1.35;
-				direction: rtl;
-				text-align: center;
+				font-size: 1.15rem;
+				color: #8a8b96;
 			}
 		</style>
 	</head>
 	<body>
-		<div class="left">
-			<span class="eyebrow">Mobile &amp; web engineer · Jordan</span>
-			<div>
-				<h1>Haitham Assoli</h1>
-				<p>Apps that ship in Arabic and English. Thirty-nine of them.</p>
-			</div>
-			<span class="url">assoli.site</span>
+		<span class="eyebrow">Full-stack web &amp; mobile engineer · Amman</span>
+		<div>
+			<h1>Haitham Assoli</h1>
+			<div class="ar">هيثم العسولي</div>
+			<p>
+				Web, iOS and Android products, in Arabic and English. Forty shipped.
+			</p>
 		</div>
-		<div class="right"><span>هيثم العسولي</span></div>
+		<span class="url">assoli.site</span>
 	</body>
 </html>

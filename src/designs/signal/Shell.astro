@@ -1,0 +1,105 @@
+---
+/* SIGNAL — the shell of what used to be the main design. It kept its own
+   faces (Thmanyah Sans and Martian Mono, served locally) and its Tailwind
+   base, so it does not go through the shared Head; the crawler-facing part is
+   the one Meta the other copies use. Links inside the design come from
+   `href()` in i18n.ts, which knows this design's segment. */
+import { Font, getImage } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import { dirOf, useT, type Lang } from '../../i18n';
+import Nav from './Nav.astro';
+import Footer from './Footer.astro';
+import Reveal from '../_shared/Reveal.astro';
+import Meta from '../_shared/Meta.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { byId } from '../registry';
+import { parse } from '../routes';
+import './global.css';
+
+interface Props {
+	lang: Lang;
+	title?: string;
+	description?: string;
+	accent?: string;
+	/** Overrides the default share card. Project pages pass their cover. */
+	image?: ImageMetadata;
+}
+
+const { lang, title, description, accent, image } = Astro.props;
+const design = byId('signal');
+const t = useT(lang);
+const dir = dirOf(lang);
+const siteName = lang === 'ar' ? t('name.arabic') : t('name.latin');
+const pageTitle = title ? `${title} · ${siteName}` : t('meta.title');
+const desc = description ?? t('meta.desc');
+
+const site = Astro.site ?? Astro.url.origin;
+const card =
+	image &&
+	(await getImage({
+		src: image,
+		width: 1200,
+		height: 630,
+		fit: 'cover',
+		format: 'jpeg',
+	}));
+const ogImage = new URL(card?.src ?? '/og.png', site).href;
+
+const isHome = parse(Astro.url.pathname).page === '';
+---
+
+<!doctype html>
+<html
+	lang={lang}
+	dir={dir}
+	data-design={design.id}
+	style={accent ? `--accent:${accent}` : undefined}
+>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle}</title>
+		<meta name="description" content={desc} />
+		<meta name="theme-color" content="#16183a" />
+
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={desc} />
+		<meta property="og:type" content={title ? 'article' : 'website'} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:locale" content={lang === 'ar' ? 'ar_JO' : 'en_US'} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={title ?? siteName} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={pageTitle} />
+		<meta name="twitter:description" content={desc} />
+		<meta name="twitter:image" content={ogImage} />
+
+		<Font
+			cssVariable="--font-thmanyah"
+			preload={[{ weight: 400 }, { weight: 900 }]}
+		/>
+		<Font cssVariable="--font-mono" preload={[{ weight: 400 }]} />
+		<ClientRouter />
+		<Reveal />
+		<Meta design={design} lang={lang} />
+	</head>
+	<body>
+		<a class="skip mono" href="#main">{t('nav.skip')}</a>
+		<Nav lang={lang} />
+		<main id="main" tabindex="-1">
+			<slot />
+			{
+				/* Sub-pages get the same switch, kept at the foot of the content:
+				   the hero already carries it on the home page. */
+				!isHome && (
+					<DesignSwitch design={design} lang={lang} class="dsw-row--tail" />
+				)
+			}
+		</main>
+		<Footer lang={lang} />
+	</body>
+</html>

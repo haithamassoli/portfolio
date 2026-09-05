@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { hireSchema } from './components/HireForm';
+import { hireSchema } from './designs/signal/HireForm';
 import { projects } from './data/projects';
 import { href, ui } from './i18n';
 import { otherLang } from './designs/routes';
@@ -11,8 +11,10 @@ test('language switch lands on the same page in the other language', () => {
 	expect(otherLang('/ar/work/aoun')).toBe('/work/aoun');
 	// a slug that merely starts with "ar" must not be mistaken for the prefix
 	expect(otherLang('/work/archive')).toBe('/ar/work/archive');
-	expect(href('en', 'hire')).toBe('/hire');
-	expect(href('ar', 'hire')).toBe('/ar/hire');
+	expect(href('en', 'hire')).toBe('/signal/hire');
+	expect(href('ar', 'hire')).toBe('/ar/signal/hire');
+	expect(href('en', '#work')).toBe('/signal#work');
+	expect(href('ar')).toBe('/ar/signal');
 });
 
 test('every project ships in both languages', () => {

@@ -1,5 +1,5 @@
 ---
-/* One <head> for all seven design variants. They differ in exactly three
+/* One <head> for the design variants that load webfonts from Google. They differ in exactly three
    things — the title, the description, and which webfonts they load — and
    every one of them wants the same LangBoot, Seam, Reveal and Meta in the
    same order. This was eleven hand-kept copies of that list.
@@ -25,7 +25,7 @@ interface Props {
 }
 
 const { design, lang, title, description, colorScheme } = Astro.props;
-const href = fonts[design.id as Exclude<Design['id'], 'main'>];
+const href = fonts[design.id as keyof typeof fonts];
 ---
 
 <head>
