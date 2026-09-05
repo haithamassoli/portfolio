@@ -105,11 +105,11 @@ const revs = profile.experience.map((job, i) => ({
 
 			<!-- dimensions, in the marker pencil -->
 			<g class="dim-line">
-				<path d="M0 -28H760M0 -34v12M760 -34v12"></path>
+				<path pathLength="1" d="M0 -28H760M0 -34v12M760 -34v12"></path>
 				<text x="380" y="-34" text-anchor="middle" lang="en"
 					>{projects.length} PROJECTS</text
 				>
-				<path d="M792 0V500M786 0h12M786 500h12"></path>
+				<path pathLength="1" d="M792 0V500M786 0h12M786 500h12"></path>
 				<text
 					x="800"
 					y="250"
@@ -121,9 +121,10 @@ const revs = profile.experience.map((job, i) => ({
 
 			<!-- rooms -->
 			{
-				rooms.map((r) => (
+				rooms.map((r, i) => (
 					<a
 						class="rm"
+						style={`--i:${i}`}
 						href={u(`/work#cat-${r.cat}`)}
 						aria-label={`${catWord[r.cat][lang]} · ${count(r.cat)}`}
 					>
@@ -135,7 +136,14 @@ const revs = profile.experience.map((job, i) => ({
 							height={r.h}
 							fill={'hatch' in r ? 'url(#hatch)' : 'transparent'}
 						/>
-						<rect class="wall" x={r.x} y={r.y} width={r.w} height={r.h} />
+						<rect
+							pathLength="1"
+							class="wall"
+							x={r.x}
+							y={r.y}
+							width={r.w}
+							height={r.h}
+						/>
 						<text
 							class="rm__name"
 							x={r.x + r.w / 2}
@@ -160,53 +168,74 @@ const revs = profile.experience.map((job, i) => ({
 			}
 
 			<!-- corridor -->
-			<rect class="wall" x="0" y="150" width="550" height="70"></rect>
+			<rect pathLength="1" class="wall" x="0" y="150" width="550" height="70"
+			></rect>
 			<text class="rm__no" x="275" y="176" text-anchor="middle" lang="en"
 				>CORRIDOR · ONE CODEBASE, EVERY PLATFORM</text
 			>
-			<path class="dim-line" d="M30 197H520M30 197l8 -4v8zM520 197l-8 -4v8z"
-			></path>
+			<path
+				pathLength="1"
+				class="dim-line"
+				d="M30 197H520M30 197l8 -4v8zM520 197l-8 -4v8z"></path>
 
 			<!-- furniture -->
 			<g class="furn">
-				<rect x="24" y="96" width="60" height="26"></rect>
+				<rect pathLength="1" x="24" y="96" width="60" height="26"></rect>
 				<g>
 					{
 						[...Array(10)].map((_, i) => (
-							<rect x={236 + i * 30} y="12" width="22" height="12" />
+							<rect
+								pathLength="1"
+								x={236 + i * 30}
+								y="12"
+								width="22"
+								height="12"
+							/>
 						))
 					}
 				</g>
-				<rect x="590" y="34" width="26" height="26"></rect>
-				<rect x="690" y="34" width="26" height="26"></rect>
-				<rect x="590" y="160" width="26" height="26"></rect>
-				<rect x="690" y="160" width="26" height="26"></rect>
-				<rect x="40" y="290" width="130" height="56"></rect>
-				<circle cx="110" cy="390" r="14"></circle>
+				<rect pathLength="1" x="590" y="34" width="26" height="26"></rect>
+				<rect pathLength="1" x="690" y="34" width="26" height="26"></rect>
+				<rect pathLength="1" x="590" y="160" width="26" height="26"></rect>
+				<rect pathLength="1" x="690" y="160" width="26" height="26"></rect>
+				<rect pathLength="1" x="40" y="290" width="130" height="56"></rect>
+				<circle pathLength="1" cx="110" cy="390" r="14"></circle>
 				{
 					[0, 1, 2, 3, 4].map((i) => (
-						<rect x={330 + i * 42} y="250" width="30" height="30" />
+						<rect
+							pathLength="1"
+							x={330 + i * 42}
+							y="250"
+							width="30"
+							height="30"
+						/>
 					))
 				}
 				{
 					[0, 1, 2].map((i) => (
-						<rect x={330 + i * 42} y="294" width="30" height="30" />
+						<rect
+							pathLength="1"
+							x={330 + i * 42}
+							y="294"
+							width="30"
+							height="30"
+						/>
 					))
 				}
-				<circle cx="655" cy="340" r="40"></circle>
-				<circle cx="655" cy="340" r="14"></circle>
-				<rect x="620" y="440" width="70" height="14"></rect>
+				<circle pathLength="1" cx="655" cy="340" r="40"></circle>
+				<circle pathLength="1" cx="655" cy="340" r="14"></circle>
+				<rect pathLength="1" x="620" y="440" width="70" height="14"></rect>
 			</g>
 
 			<!-- doors -->
 			{
-				doors.map((d) => {
+				doors.map((d, i) => {
 					const p = door(d);
 					return (
-						<g class="door">
-							<path class="door__gap" d={p.gap} />
-							<path class="door__leaf" d={p.leaf} />
-							<path class="door__arc" d={p.arc} />
+						<g class="door" style={`--i:${i}`}>
+							<path pathLength="1" class="door__gap" d={p.gap} />
+							<path pathLength="1" class="door__leaf" d={p.leaf} />
+							<path pathLength="1" class="door__arc" d={p.arc} />
 						</g>
 					);
 				})
@@ -577,6 +606,62 @@ const revs = profile.experience.map((job, i) => ({
 		font-size: 8px;
 		font-weight: 600;
 		letter-spacing: 1.6px;
+	}
+
+	/* ── Plotting ────────────────────────────────────────────────────────
+	   The pen draws the walls first, then the corridor, doors and furniture;
+	   the lettering and dimensions are inked once the lines are down. Every
+	   shape carries pathLength="1" so one dash covers it whatever its size.
+	   Each group sets --d; the shapes inherit it as their delay. */
+	.plan__svg :is(.wall, .furn rect, .furn circle, .door__gap, .door__leaf),
+	.plan__svg .dim-line path,
+	.plan__svg path.dim-line {
+		stroke-dasharray: 1;
+		stroke-dashoffset: 1;
+		animation: plot 0.9s cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0s) forwards;
+	}
+
+	.rm {
+		--d: calc(0.1s + var(--i) * 0.12s);
+	}
+
+	.plan__svg > .wall {
+		--d: 0.85s;
+	}
+
+	.door {
+		--d: calc(1.2s + var(--i) * 0.07s);
+	}
+
+	.furn {
+		--d: 1.5s;
+	}
+
+	.dim-line {
+		--d: 2.5s;
+	}
+
+	@keyframes plot {
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+
+	.plan__svg .door__arc,
+	.plan__svg text,
+	.plan__cap {
+		opacity: 0;
+		animation: ink 0.6s ease 2.1s forwards;
+	}
+
+	.plan__svg .dim-line text {
+		animation-delay: 2.5s;
+	}
+
+	@keyframes ink {
+		to {
+			opacity: 1;
+		}
 	}
 
 	.plan__lbl {

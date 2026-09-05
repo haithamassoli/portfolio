@@ -62,8 +62,20 @@ const about = profile.about.en.map((en, i) => pair(en, profile.about.ar[i]));
 	)[lang]}
 >
 	<section class="sec hero">
-		<T as="h1" v={pair('Web. Mobile. Shipped.', 'ويب. جوال. صدر.')} />
-		<span class="cursor" aria-hidden="true"></span>
+		<h1>
+			{
+				[
+					pair('Web.', 'ويب.'),
+					pair('Mobile.', 'جوال.'),
+					pair('Shipped.', 'صدر.'),
+				].map((l, i) => (
+					<span class="tl" style={`--i:${i};--n:${l.en.length}`}>
+						<T v={l} />
+						{i === 2 && <span class="cursor" aria-hidden="true" />}
+					</span>
+				))
+			}
+		</h1>
 		<T as="p" class="lede hero__lede" v={s('hero.lede')} />
 		<p class="hero__do">
 			<a class="bk" href={u('/work')}
@@ -232,24 +244,56 @@ const about = profile.about.en.map((en, i) => pair(en, profile.about.ar[i]));
 		padding-block-start: calc(var(--line) * 3);
 	}
 
-	.hero h1 {
-		display: inline;
+	/* Each line is typed out in turn, one character per step. */
+	.tl {
+		display: block;
+		width: max-content;
+		max-width: 100%;
+		animation: type 0.7s steps(var(--n)) calc(0.3s + var(--i) * 0.85s) both;
+	}
+
+	@keyframes type {
+		from {
+			clip-path: inset(0 100% 0 0);
+		}
+
+		to {
+			clip-path: inset(0 -1em 0 0);
+		}
+	}
+
+	html[dir='rtl'] .tl {
+		animation-name: type-rtl;
+	}
+
+	@keyframes type-rtl {
+		from {
+			clip-path: inset(0 0 0 100%);
+		}
+
+		to {
+			clip-path: inset(0 0 0 -1em);
+		}
 	}
 
 	/* The block cursor the printer left after the last character. */
 	.cursor {
 		display: inline-block;
 		width: 0.55em;
-		height: 0.9em;
+		height: 0.8em;
 		margin-inline-start: 0.15em;
-		vertical-align: -0.1em;
+		vertical-align: -0.04em;
 		background: var(--dim);
-		font-size: clamp(2.2rem, 5.6vw, 4.6rem);
-		animation: blink 1.1s steps(1) infinite;
+		opacity: 0;
+		animation: blink 1s steps(2, start) 3.2s infinite;
 	}
 
 	@keyframes blink {
-		50% {
+		from {
+			opacity: 1;
+		}
+
+		to {
 			opacity: 0;
 		}
 	}
