@@ -312,12 +312,13 @@ const nav = [
 		overflow-x: clip;
 	}
 
-	.loom :where(h1, h2, h3, h4) {
+	.loom :where(h1, h2, h3, h4, h5, h6) {
 		margin: 0;
 		font-weight: 900;
 		line-height: 1.02;
 		letter-spacing: -0.03em;
 		text-wrap: balance;
+		font-feature-settings: 'salt' 1;
 	}
 
 	.loom :where(p, ul, ol, dl, figure) {

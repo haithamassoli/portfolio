@@ -7,6 +7,7 @@
    The slot sits where a design's own before-first-paint script goes: after
    the fonts, before the transition machinery. Quiet Room reads its theme
    there; Playroom sets its `js` marker. */
+import { Font } from 'astro:assets';
 import type { Design } from '../registry';
 import { fonts } from '../fonts';
 import type { Lang } from '../../i18n';
@@ -37,6 +38,25 @@ const href = fonts[design.id as keyof typeof fonts];
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link rel="stylesheet" href={href} />
+	<Font cssVariable="--font-thmanyah" />
+	<style is:global>
+		/* Arabic runs in Thmanyah across every design; !important beats each
+		   design's own Latin+Arabic font stack. Salt gives the headings the
+		   face's stylistic alternates. ponytail: !important is the override,
+		   drop it if a design ever scopes its own :lang(ar) font. */
+		:lang(ar) {
+			font-family:
+				var(--font-thmanyah), ui-sans-serif, system-ui, sans-serif !important;
+		}
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			font-feature-settings: 'salt' 1;
+		}
+	</style>
 	<LangBoot />
 	<slot />
 	<Seam />
