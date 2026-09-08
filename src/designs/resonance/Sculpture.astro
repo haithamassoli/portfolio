@@ -1,0 +1,116 @@
+---
+import type { Lang } from '../../i18n';
+import { pair } from '../../data/variant-ui';
+const { lang } = Astro.props as { lang: Lang };
+// Each section of the folded ribbon is drawn once at build time.
+const ribbons = Array.from({ length: 72 }, (_, i) => {
+	const angle = (i / 72) * Math.PI * 2;
+	return (
+		Array.from({ length: 81 }, (_, j) => {
+			const t = (j / 80) * Math.PI * 2;
+			const radius = 155 + 64 * Math.cos(t);
+			const twist = angle + 0.24 * Math.sin(t);
+			const x = radius * Math.cos(twist);
+			const y = radius * Math.sin(twist);
+			const z =
+				78 * Math.sin(t) * Math.cos(angle * 1.5) + 48 * Math.sin(angle * 3);
+			return `${j ? 'L' : 'M'}${(300 + x * 1.06).toFixed(1)},${(300 + y * 0.8 - z * 0.75).toFixed(1)}`;
+		}).join(' ') + 'Z'
+	);
+});
+---
+
+<figure class="sculpture" data-form="bloom">
+	<div class="sculpture-label mono" dir="ltr">
+		<span>EXPERIMENT 001</span><span class="live-label"><i></i> LIVE FORM</span>
+	</div>
+	<div class="sculpture-stage">
+		<svg
+			class="sculpture-grid"
+			viewBox="0 0 600 600"
+			fill="none"
+			aria-hidden="true"
+		>
+			<circle
+				cx="300"
+				cy="300"
+				r="264"
+				stroke="currentColor"
+				stroke-dasharray="1 8"></circle>
+			<circle cx="300" cy="300" r="198" stroke="currentColor" opacity=".4"
+			></circle>
+			<path
+				d="M300 10V44M300 556V590M10 300H44M556 300H590"
+				stroke="currentColor"></path>
+			<path
+				d="M46 46H65M46 46V65M554 46H535M554 46V65M46 554H65M46 554V535M554 554H535M554 554V535"
+				stroke="currentColor"></path>
+		</svg>
+		<div class="sculpture-tilt">
+			<svg
+				class="sculpture-art"
+				viewBox="0 0 600 600"
+				fill="none"
+				role="img"
+				aria-label={pair(
+					'A copper line sculpture exploring organic forms and flowing waves',
+					'منحوتة من خطوط نحاسية تستكشف الأشكال العضوية والموجات المتدفّقة',
+				)[lang]}
+			>
+				<defs>
+					<linearGradient
+						id="copper"
+						x1="80"
+						y1="100"
+						x2="470"
+						y2="490"
+						gradientUnits="userSpaceOnUse"
+						><stop stop-color="#ffe2c3"></stop><stop
+							offset=".4"
+							stop-color="#ff9b6e"></stop><stop
+							offset=".72"
+							stop-color="#e86137"></stop><stop offset="1" stop-color="#8e3425"
+						></stop></linearGradient
+					>
+				</defs>
+				<g class="ribbon" stroke="url(#copper)" stroke-width="1.15"
+					>{
+						ribbons.map((d, i) => <path d={d} opacity={0.48 + (i % 9) / 17} />)
+					}</g
+				>
+				<g class="flow" stroke="url(#copper)" stroke-width="1.2">
+					{
+						Array.from({ length: 42 }, (_, i) => (
+							<path
+								d={`M80 ${175 + i * 5} C${140 + i * 3} ${-30 + i * 6},${430 - i * 3} ${620 - i * 5},520 ${190 + i * 5}`}
+							/>
+						))
+					}
+				</g>
+			</svg>
+		</div>
+		<span class="sculpture-coordinate mono" dir="ltr"
+			>FORM / FEELING / FUNCTION</span
+		>
+		<span class="sculpture-cross" aria-hidden="true">+</span>
+	</div>
+	<figcaption class="sculpture-bottom">
+		<span class="mono"
+			>{pair('A study in possibility.', 'دراسة في الممكن.')[lang]}</span
+		>
+		<div
+			class="form-controls"
+			data-controls
+			hidden
+			role="group"
+			aria-label={pair('Sculpture form', 'شكل المنحوتة')[lang]}
+		>
+			<button type="button" data-shape="bloom" aria-pressed="true"
+				>01 <span>{pair('Bloom', 'تفتّح')[lang]}</span></button
+			>
+			<button type="button" data-shape="flow" aria-pressed="false"
+				>02 <span>{pair('Flow', 'تدفّق')[lang]}</span></button
+			>
+		</div>
+	</figcaption>
+</figure>

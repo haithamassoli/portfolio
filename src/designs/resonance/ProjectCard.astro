@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../../data/projects';
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+import { url } from '../routes';
+import { catWord } from '../../data/variant-ui';
+import Glyph from './Glyph.astro';
+interface Props {
+	project: Project;
+	design: Design;
+	lang: Lang;
+	index: number;
+}
+const { project: p, design, lang, index } = Astro.props;
+---
+
+<article class="project-card reveal">
+	<a href={url(design, lang, `/work/${p.slug}`)}>
+		<div
+			class:list={[
+				'project-visual',
+				`project-visual--${index % 4}`,
+				{
+					'project-visual--tall':
+						p.image && p.image.height > p.image.width * 1.2,
+				},
+			]}
+		>
+			<div class="project-visual-label mono">
+				<span
+					>{String(index + 1).padStart(2, '0')} / {
+						catWord[p.category][lang]
+					}</span
+				><span aria-hidden="true">↗</span>
+			</div>
+			<Glyph kind={index % 2 ? 'wave' : 'weave'} class="project-decoration" />
+			{
+				p.image && (
+					<Image
+						src={p.image}
+						alt=""
+						widths={[400, 700, 1000]}
+						sizes="(min-width: 800px) 44vw, 90vw"
+						loading="lazy"
+					/>
+				)
+			}
+		</div>
+		<div class="project-info">
+			<h3>{p.title[lang]}</h3><span class="mono">{p.year}</span>
+		</div>
+		<p class="project-tagline">{p.tagline[lang]}</p>
+	</a>
+</article>

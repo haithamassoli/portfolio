@@ -19,7 +19,8 @@ export type DesignId =
 	| 'slip-box'
 	| 'spooler'
 	| 'blueprint'
-	| 'orbit';
+	| 'orbit'
+	| 'resonance';
 
 export interface Design {
 	id: DesignId;
@@ -173,6 +174,17 @@ export const designs: Design[] = [
 			ar: 'أزرق كهربائي، مدارات SVG مجسّمة، وأفكار تنبض بالحركة',
 		},
 		accent: '#2548f4',
+		weight: 'light',
+	},
+	{
+		id: 'resonance',
+		n: 13,
+		name: { en: 'Resonance', ar: 'رنين' },
+		note: {
+			en: 'Charcoal, copper, and living SVG sculptures. Code with character.',
+			ar: 'فحم ونحاس ومنحوتات SVG حيّة. شيفرة لها شخصية.',
+		},
+		accent: '#ff8052',
 		weight: 'light',
 	},
 ];

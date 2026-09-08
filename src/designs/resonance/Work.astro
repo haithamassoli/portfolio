@@ -1,0 +1,76 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+import Shell from './Shell.astro';
+import ProjectCard from './ProjectCard.astro';
+import T from '../../components/T.astro';
+import { projects } from '../../data/projects';
+import { catWord, pair, s } from '../../data/variant-ui';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+const { design, lang } = Astro.props;
+const categories = Object.keys(catWord).filter((category) =>
+	projects.some((p) => p.category === category),
+);
+---
+
+<Shell
+	{design}
+	{lang}
+	title={pair('The work — Haitham Assoli', 'الأعمال — هيثم العسولي')[lang]}
+	description={s('work.allLede')[lang]}
+>
+	<div class="wrap">
+		<header class="page-head">
+			<p class="eyebrow mono">
+				<span>01 /</span><T v={pair('The project index', 'فهرس المشاريع')} />
+			</p><h1>
+				<T v={pair('Built. Shipped.', 'بُنيت. أُطلقت.')} /><br /><span
+					class="muted"
+					><T v={pair('Out in the world.', 'صارت في العالم.')} /></span
+				>
+			</h1><T as="p" class="lede" v={s('work.allLede')} /><nav
+				class="work-nav"
+				aria-label={pair('Project categories', 'تصنيفات المشاريع')[lang]}
+			>
+				{
+					categories.map((category) => (
+						<a href={`#${category}`}>
+							<>
+								<T v={catWord[category]} />
+								<span class="mono">
+									{projects.filter((p) => p.category === category).length}
+								</span>
+							</>
+						</a>
+					))
+				}
+			</nav>
+		</header>
+		{
+			categories.map((category) => (
+				<section class="work-shelf" id={category}>
+					<>
+						<header class="work-shelf__head">
+							<>
+								<T as="h2" v={catWord[category]} />
+								<span class="mono">
+									({projects.filter((p) => p.category === category).length})
+								</span>
+							</>
+						</header>
+						<div class="project-grid">
+							{projects
+								.filter((p) => p.category === category)
+								.map((project, index) => (
+									<ProjectCard {project} {index} {design} {lang} />
+								))}
+						</div>
+					</>
+				</section>
+			))
+		}
+	</div>
+</Shell>

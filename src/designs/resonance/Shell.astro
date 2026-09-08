@@ -1,0 +1,104 @@
+---
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+import { dirOf } from '../../i18n';
+import { url, otherLang, parse } from '../routes';
+import Head from '../_shared/Head.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import { profile } from '../../../content/profile';
+import { pair } from '../../data/variant-ui';
+import Glyph from './Glyph.astro';
+import './resonance.css';
+interface Props {
+	design: Design;
+	lang: Lang;
+	title?: string;
+	description?: string;
+}
+const {
+	design,
+	lang,
+	title = `${profile.name[lang]} — ${design.name[lang]}`,
+	description = profile.tagline[lang],
+} = Astro.props;
+const u = (path = '') => url(design, lang, path);
+const { page } = parse(Astro.url.pathname);
+const t = (en: string, ar: string) => pair(en, ar)[lang];
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<Head {design} {lang} {title} {description} colorScheme="dark" />
+	<body>
+		<resonance-motion>
+			<a class="skip" href="#main">{t('Skip to content', 'انتقل للمحتوى')}</a>
+			<header class="top wrap">
+				<a class="brand" href={u()} aria-label={profile.name[lang]}
+					><Glyph /><span lang="en"
+						>HAITHAM<br />ASSOLI<span class="accent">.</span></span
+					></a
+				>
+				<p class="top-note mono">
+					{t('Independent developer', 'مطوّر مستقل')}<br /><span
+						>{t('Based in Amman, JO', 'من عمّان، الأردن')}</span
+					>
+				</p>
+				<nav aria-label={t('Main navigation', 'التنقل الرئيسي')}>
+					<a
+						href={u('/work')}
+						aria-current={page.startsWith('/work') ? 'page' : undefined}
+						>{t('Work', 'أعمالي')}</a
+					>
+					<a class="nav-about" href={u() + '#about'}>{t('About', 'عنّي')}</a>
+					<a
+						href={otherLang(Astro.url.pathname)}
+						data-lang-link
+						lang={lang === 'en' ? 'ar' : 'en'}>{t('عربي', 'EN')}</a
+					>
+					<a
+						class="nav-contact"
+						href={u('/hire')}
+						aria-current={page === '/hire' ? 'page' : undefined}
+						>{t('Let’s talk', 'لنتحدّث')} <span aria-hidden="true">↗</span></a
+					>
+				</nav>
+			</header>
+			<main id="main"><slot /></main>
+			<footer class="footer wrap">
+				<DesignSwitch {design} {lang} />
+				<div class="footer-row">
+					<p class="mono">
+						© {new Date().getFullYear()}
+						{profile.name[lang]}
+					</p><p class="footer-credit">
+						{
+							t(
+								'A little logic. A lot of care.',
+								'قليل من المنطق. كثير من العناية.',
+							)
+						}
+					</p><div>
+						<a href={profile.links.github}>GitHub ↗</a><a
+							href={profile.links.linkedin}>LinkedIn ↗</a
+						><a href={profile.links.resume}>{t('Résumé', 'السيرة')} ↗</a>
+					</div>
+				</div>
+			</footer>
+			<button
+				class="motion-toggle mono"
+				data-pause
+				data-controls
+				hidden
+				type="button"
+				aria-pressed="false"
+				data-stop={t('Pause motion', 'إيقاف الحركة')}
+				data-play={t('Resume motion', 'تشغيل الحركة')}
+				data-reduced={t('Motion reduced', 'حركة مخفّفة')}
+				>{t('Pause motion', 'إيقاف الحركة')}</button
+			>
+		</resonance-motion>
+		<script>
+			import './motion';
+		</script>
+	</body>
+</html>

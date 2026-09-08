@@ -1,0 +1,52 @@
+---
+interface Props {
+	kind?: 'spark' | 'wave' | 'weave';
+	class?: string;
+}
+const { kind = 'spark', class: cls } = Astro.props;
+---
+
+<svg
+	class:list={['glyph', cls]}
+	viewBox="0 0 100 100"
+	fill="none"
+	aria-hidden="true"
+	focusable="false"
+>
+	{
+		kind === 'spark' && (
+			<g class="glyph-spin" stroke="currentColor" stroke-width="3">
+				{Array.from({ length: 12 }, (_, i) => (
+					<path d="M50 8V33M50 67V92" transform={`rotate(${i * 15} 50 50)`} />
+				))}
+			</g>
+		)
+	}
+	{
+		kind === 'wave' && (
+			<g class="glyph-wave" stroke="currentColor" stroke-width="1.6">
+				{Array.from({ length: 9 }, (_, i) => (
+					<path
+						d={`M5 ${20 + i * 7} C30 ${-20 + i * 7} 70 ${120 - i * 7} 95 ${80 - i * 7}`}
+					/>
+				))}
+			</g>
+		)
+	}
+	{
+		kind === 'weave' && (
+			<g class="glyph-spin" stroke="currentColor" stroke-width="1.4">
+				{Array.from({ length: 7 }, (_, i) => (
+					<rect
+						x="20"
+						y="20"
+						width="60"
+						height="60"
+						rx="12"
+						transform={`rotate(${i * 12} 50 50)`}
+					/>
+				))}
+			</g>
+		)
+	}
+</svg>

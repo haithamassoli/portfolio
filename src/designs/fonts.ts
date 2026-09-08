@@ -8,6 +8,9 @@ const family = (families: string) =>
 	`https://fonts.googleapis.com/css2?${families}&display=swap`;
 
 export const fonts: Record<Exclude<DesignId, 'main' | 'signal'>, string> = {
+	resonance: family(
+		'family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500',
+	),
 	orbit: family(
 		'family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500',
 	),
