@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/* The eleven non-main designs, by the id that is now in their URL. */
+/* The non-main designs, by the id in their URL. */
 const designs = [
 	'quiet-room',
 	'shizukesa',
@@ -13,6 +13,7 @@ const designs = [
 	'slip-box',
 	'spooler',
 	'blueprint',
+	'orbit',
 ] as const;
 
 const KEY = 'vx-design';
@@ -68,7 +69,9 @@ for (const id of ['main', ...designs]) {
 			const sw = page.locator('a.dsw');
 			await expect(sw).toHaveCount(1);
 			await expect(sw).toBeVisible();
-			await expect(sw).toContainText(/\d\d \/ 12/);
+			await expect(sw).toContainText(
+				new RegExp(`\\d\\d / ${designs.length + 1}`),
+			);
 
 			/* Prominence, in the terms the designs can actually be held to: a
 			   full-size target inside the opening section, next to that design's
@@ -113,13 +116,13 @@ test('the switch walks the whole set and lands on the same page each time', asyn
 }) => {
 	await page.goto('/work/aoun');
 	const seen: string[] = [];
-	for (let i = 0; i < 9; i++) {
+	for (let i = 0; i < designs.length + 1; i++) {
 		seen.push((await page.locator('html').getAttribute('data-design'))!);
 		await expect(page).toHaveURL(/\/work\/aoun$/);
 		await page.locator('a.dsw').click();
 		await page.waitForLoadState('load');
 	}
-	expect(new Set(seen).size).toBe(9);
+	expect(new Set(seen).size).toBe(designs.length + 1);
 	expect(seen[0]).toBe('main');
 });
 

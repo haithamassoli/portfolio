@@ -1,0 +1,171 @@
+---
+import { Image } from 'astro:assets';
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+import type { Project } from '../../data/projects';
+import { url } from '../routes';
+import Shell from './Shell.astro';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import {
+	catWord,
+	linkWord,
+	pair,
+	s,
+	statusWord,
+	yearPair,
+} from '../../data/variant-ui';
+interface Props {
+	design: Design;
+	lang: Lang;
+	project: Project;
+	next: Project;
+}
+const { design, lang, project: p, next } = Astro.props;
+const u = (path = '') => url(design, lang, path);
+const gallery = p.shots.filter((shot) => shot.src !== p.image?.src);
+---
+
+<Shell
+	{design}
+	{lang}
+	title={`${p.title[lang]} — ${profile.name[lang]}`}
+	description={p.tagline[lang]}
+>
+	<div class="wrap">
+		<header class="page-head">
+			<a class="eyebrow mono" href={u('/work')}>← <T v={s('project.back')} /></a
+			><T as="h1" v={p.title} /><T as="p" class="lede" v={p.tagline} /><dl
+				class="case-meta"
+			>
+				<div>
+					<T as="dt" v={s('project.role')} /><T as="dd" v={p.role} />
+				</div><div>
+					<T as="dt" v={s('project.year')} /><T as="dd" v={yearPair(p.year)} />
+				</div><div>
+					<T as="dt" v={pair('Discipline', 'المجال')} /><T
+						as="dd"
+						v={catWord[p.category]}
+					/>
+				</div><div>
+					<T as="dt" v={s('project.status')} /><T
+						as="dd"
+						v={statusWord[p.status]}
+					/>
+				</div>
+			</dl><div class="actions">
+				{
+					Object.entries(p.links).map(
+						([key, href]) =>
+							href && (
+								<a class="button" href={href} rel="noreferrer">
+									<>
+										<T v={linkWord[key]} />
+										<span aria-hidden="true">↗</span>
+									</>
+								</a>
+							),
+					)
+				}
+			</div>
+		</header>
+		{
+			p.image && (
+				<figure
+					class:list={[
+						'case-cover',
+						{ 'case-cover--tall': p.image.height > p.image.width * 1.2 },
+					]}
+				>
+					<Image
+						src={p.image}
+						alt={p.title[lang]}
+						widths={[400, 800, 1200]}
+						sizes="(min-width: 900px) 80vw, 90vw"
+						loading="eager"
+					/>
+				</figure>
+			)
+		}
+		<section class="case-section">
+			<div>
+				<p class="eyebrow mono">01 /</p><T
+					as="h2"
+					v={pair('The idea', 'الفكرة')}
+				/>
+			</div><div class="case-body">
+				<T as="p" class="lede" v={p.summary} />{
+					p.overview[lang].map((block) => <p>{block}</p>)
+				}<p class="mono muted" dir="ltr">{p.stack.join(' / ')}</p>
+			</div>
+		</section>
+		{
+			p.challenges.length > 0 && (
+				<section class="case-section">
+					<>
+						<div>
+							<>
+								<p class="eyebrow mono">02 /</p>
+								<T as="h2" v={s('project.challenges')} />
+							</>
+						</div>
+						<div class="case-body">
+							{p.challenges.map((challenge) => (
+								<article class="case-challenge reveal">
+									<T as="h3" v={challenge.title} />
+									<T
+										as="h4"
+										class="mono"
+										v={pair('The challenge', 'التحدّي')}
+									/>
+									<T as="p" class="muted" v={challenge.problem} />
+									<T as="h4" class="mono" v={pair('The approach', 'الحل')} />
+									<T as="p" v={challenge.solution} />
+								</article>
+							))}
+						</div>
+					</>
+				</section>
+			)
+		}
+		<section class="case-section">
+			<div>
+				<p class="eyebrow mono">03 /</p><T as="h2" v={s('project.outcomes')} />
+			</div><ul class="case-body case-outcomes">
+				{p.outcomes[lang].map((outcome) => <li>{outcome}</li>)}
+			</ul>
+		</section>
+		{
+			gallery.length > 0 && (
+				<section class="work-shelf">
+					<>
+						<p class="eyebrow mono">
+							<T v={pair('A closer look', 'نظرة أقرب')} />
+						</p>
+						<div
+							class="case-gallery"
+							tabindex="0"
+							role="region"
+							aria-label={pair('Project screenshots', 'صور المشروع')[lang]}
+						>
+							{gallery.map((shot, i) => (
+								<Image
+									src={shot}
+									alt={`${p.title[lang]} — ${i + 1}`}
+									widths={[400, 800, 1200]}
+									sizes="(min-width: 900px) 60vw, 85vw"
+									loading="lazy"
+								/>
+							))}
+						</div>
+					</>
+				</section>
+			)
+		}
+		<a class="next-project" href={u(`/work/${next.slug}`)}
+			><T class="mono muted" v={s('project.next')} /><h2>
+				<T v={next.title} /><span aria-hidden="true">↗</span>
+			</h2></a
+		>
+	</div>
+</Shell>

@@ -1,0 +1,64 @@
+---
+interface Props {
+	kind?: 'star' | 'orbit' | 'grid';
+	class?: string;
+}
+const { kind = 'star', class: cls } = Astro.props;
+---
+
+<svg
+	class:list={['orbit-glyph', cls]}
+	viewBox="0 0 100 100"
+	fill="none"
+	aria-hidden="true"
+	focusable="false"
+>
+	{
+		kind === 'star' && (
+			<g fill="currentColor">
+				{Array.from({ length: 8 }, (_, i) => (
+					<rect
+						x="44"
+						y="2"
+						width="12"
+						height="96"
+						rx="2"
+						transform={`rotate(${i * 22.5} 50 50)`}
+					/>
+				))}
+				<circle cx="50" cy="50" r="13" fill="var(--paper, #f5f5f2)" />
+			</g>
+		)
+	}
+	{
+		kind === 'orbit' && (
+			<g stroke="currentColor" stroke-width="1.6">
+				{Array.from({ length: 6 }, (_, i) => (
+					<ellipse
+						cx="50"
+						cy="50"
+						rx="45"
+						ry="17"
+						transform={`rotate(${i * 30} 50 50)`}
+					/>
+				))}
+			</g>
+		)
+	}
+	{
+		kind === 'grid' && (
+			<g stroke="currentColor" stroke-width="1.5">
+				{Array.from({ length: 8 }, (_, i) => (
+					<rect
+						x={6 + i * 4}
+						y={6 + i * 4}
+						width={88 - i * 8}
+						height={88 - i * 8}
+						rx={i * 2}
+						transform={`rotate(${i * 5} 50 50)`}
+					/>
+				))}
+			</g>
+		)
+	}
+</svg>

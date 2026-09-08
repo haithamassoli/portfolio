@@ -18,7 +18,8 @@ export type DesignId =
 	| 'signal'
 	| 'slip-box'
 	| 'spooler'
-	| 'blueprint';
+	| 'blueprint'
+	| 'orbit';
 
 export interface Design {
 	id: DesignId;
@@ -161,6 +162,17 @@ export const designs: Design[] = [
 			ar: 'ورقة رسم كحلية، مخطّط أرضي للأعمال',
 		},
 		accent: '#ff6b52',
+		weight: 'light',
+	},
+	{
+		id: 'orbit',
+		n: 12,
+		name: { en: 'Orbit', ar: 'مدار' },
+		note: {
+			en: 'Electric blue, sculpted SVG orbits, ideas set in motion',
+			ar: 'أزرق كهربائي، مدارات SVG مجسّمة، وأفكار تنبض بالحركة',
+		},
+		accent: '#2548f4',
 		weight: 'light',
 	},
 ];

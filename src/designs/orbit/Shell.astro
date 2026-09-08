@@ -1,0 +1,115 @@
+---
+import type { Design } from '../registry';
+import { otherLang, parse, url } from '../routes';
+import { dirOf, type Lang } from '../../i18n';
+import Head from '../_shared/Head.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import T from '../../components/T.astro';
+import { profile } from '../../../content/profile';
+import { projects } from '../../data/projects';
+import { pair, s } from '../../data/variant-ui';
+import Glyph from './Glyph.astro';
+import './orbit.css';
+interface Props {
+	design: Design;
+	lang: Lang;
+	title?: string;
+	description?: string;
+}
+const {
+	design,
+	lang,
+	title = `${profile.name[lang]} — ${design.name[lang]}`,
+	description = profile.tagline[lang],
+} = Astro.props;
+const { page } = parse(Astro.url.pathname);
+const u = (path = '') => url(design, lang, path);
+---
+
+<!doctype html>
+<html lang={lang} dir={dirOf(lang)} data-design={design.id}>
+	<Head {design} {lang} {title} {description} colorScheme="light" />
+	<body>
+		<orbit-motion>
+			<a class="skip" href="#main"><T v={s('nav.skip')} /></a>
+			<header class="top wrap">
+				<a class="brand" href={u()} aria-label={profile.name[lang]}
+					><Glyph /><span lang="en"
+						>assoli<span class="brand__dot">.</span></span
+					></a
+				>
+				<p class="top__location mono">
+					<T v={profile.location} /><span>UTC +03:00</span>
+				</p>
+				<nav
+					class="top__nav"
+					aria-label={pair('Main navigation', 'التنقل الرئيسي')[lang]}
+				>
+					<a
+						href={u('/work')}
+						aria-current={page.startsWith('/work') ? 'page' : undefined}
+						><T v={s('nav.work')} /><sup
+							>({String(projects.length).padStart(2, '0')})</sup
+						></a
+					>
+					<a class="top__about" href={u() + '#about'}
+						><T v={pair('About', 'عنّي')} /></a
+					>
+					<a
+						href={otherLang(Astro.url.pathname)}
+						data-lang-link
+						lang={lang === 'en' ? 'ar' : 'en'}
+						>{lang === 'en' ? 'عربي' : 'EN'}</a
+					>
+					<a
+						class="top__contact"
+						href={u('/hire')}
+						aria-current={page === '/hire' ? 'page' : undefined}
+						><T v={pair('Let’s talk', 'لنتحدّث')} /><span aria-hidden="true"
+							>↗</span
+						></a
+					>
+				</nav>
+			</header>
+			<main id="main"><slot /></main>
+			<footer class="footer wrap">
+				{page !== '' && <DesignSwitch {design} {lang} />}
+				<div class="footer__row">
+					<a class="brand brand--small" href={u()}
+						><Glyph /><span lang="en">assoli.</span></a
+					>
+					<p class="mono">
+						© {new Date().getFullYear()} · <T
+							v={pair('Built with intent.', 'صُنع بعناية.')}
+						/>
+					</p>
+					<div class="footer__links">
+						<a href={profile.links.github}>GitHub ↗</a><a
+							href={profile.links.linkedin}>LinkedIn ↗</a
+						><a href={profile.links.resume}><T v={s('nav.cv')} /> ↗</a>
+					</div>
+					{
+						page !== '' && (
+							<button
+								class="motion-toggle mono"
+								type="button"
+								aria-pressed="false"
+								data-pause
+								data-motion-controls
+								data-play={pair('Resume motion', 'تشغيل الحركة')[lang]}
+								data-reduced={pair('Motion reduced', 'حركة مخفّفة')[lang]}
+								data-stop={pair('Pause motion', 'إيقاف الحركة')[lang]}
+								hidden
+							>
+								<T v={pair('Pause motion', 'إيقاف الحركة')} />
+							</button>
+						)
+					}
+				</div>
+			</footer>
+			<script>
+				import './motion';
+			</script>
+		</orbit-motion>
+	</body>
+</html>

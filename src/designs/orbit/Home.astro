@@ -1,0 +1,298 @@
+---
+import type { Design } from '../registry';
+import { url } from '../routes';
+import type { Lang } from '../../i18n';
+import Shell from './Shell.astro';
+import Sculpture from './Sculpture.astro';
+import Glyph from './Glyph.astro';
+import ProjectCard from './ProjectCard.astro';
+import DesignSwitch from '../_shared/DesignSwitch.astro';
+import T from '../../components/T.astro';
+import { Image } from 'astro:assets';
+import { profile } from '../../../content/profile';
+import { featured, projects } from '../../data/projects';
+import { pair, s, yearPair } from '../../data/variant-ui';
+import photo from '../../assets/images/profile.png';
+interface Props {
+	design: Design;
+	lang: Lang;
+}
+const { design, lang } = Astro.props;
+const u = (path = '') => url(design, lang, path);
+const selected = featured.slice(0, 4);
+const services = [
+	{
+		kind: 'grid' as const,
+		title: pair('Web, end to end.', 'ويب، من البداية للنهاية.'),
+		body: s('skill.webDesc'),
+		tags: 'React / Next.js / Astro',
+	},
+	{
+		kind: 'orbit' as const,
+		title: pair('Small screen. Big ideas.', 'شاشة صغيرة. أفكار كبيرة.'),
+		body: s('skill.mobileDesc'),
+		tags: 'React Native / Expo / Swift',
+	},
+	{
+		kind: 'star' as const,
+		title: pair('Intelligence, on device.', 'ذكاء على جهازك.'),
+		body: pair(
+			'Private AI tools that run where your data lives. Useful models, carefully integrated.',
+			'أدوات ذكاء اصطناعي خاصة تعمل حيث توجد بياناتك. نماذج مفيدة، بتكامل مدروس.',
+		),
+		tags: 'ONNX / Whisper / Transformers.js',
+	},
+];
+---
+
+<Shell {design} {lang}>
+	<section class="hero wrap">
+		<div class="hero__intro mono">
+			<p>
+				<span class="status-dot"></span><T
+					v={pair(
+						'Independent mind. Full-stack craft.',
+						'فكر مستقل. تطوير متكامل.',
+					)}
+				/>
+			</p><span lang="en">PORTFOLIO — {new Date().getFullYear()}</span>
+		</div>
+		<div class="hero__grid">
+			<div class="hero__copy">
+				<p class="hero__hello">
+					<T v={pair('Hello, I’m Haitham.', 'أهلًا، أنا هيثم.')} />
+					<span class="hello-line"></span>
+				</p>
+				<h1 class="hero__title">
+					<span><T v={pair('Ideas into', 'أحوّل الأفكار')} /></span><span
+						><T v={pair('things that', 'إلى تجارب')} /></span
+					><span class="hero__last"
+						><T v={pair('work.', 'تنبض.')} /><Glyph /></span
+					>
+				</h1>
+				<T
+					as="p"
+					class="hero__lede"
+					v={pair(
+						'I build thoughtful digital products. From the first sketch to the last line of code — web, mobile, and everything in between.',
+						'أبني منتجات رقمية بعناية. من الرسم الأول إلى آخر سطر برمجي — للويب والجوال، وكل ما بينهما.',
+					)}
+				/>
+				<div class="actions">
+					<a class="button" href="#work"
+						><T v={pair('Explore my work', 'اكتشف أعمالي')} /><span
+							aria-hidden="true">↘</span
+						></a
+					><a class="text-link" href={u('/hire')}
+						><T v={pair('Have something in mind?', 'عندك فكرة؟')} /><span
+							aria-hidden="true">↗</span
+						></a
+					>
+				</div>
+			</div>
+			<Sculpture {lang} />
+		</div>
+		<div class="hero__bottom">
+			<DesignSwitch {design} {lang} /><a class="scroll-note mono" href="#work"
+				><T
+					v={pair('A little scroll goes a long way', 'كل تمريرة تكشف حكاية')}
+				/><span aria-hidden="true">↓</span></a
+			>
+		</div>
+	</section>
+
+	<div class="ticker" aria-hidden="true">
+		<div class="ticker__track">
+			{
+				[0, 1].map(() => (
+					<div class="ticker__set">
+						{[
+							'GOOD IDEAS',
+							'CLEAR THINKING',
+							'CAREFUL CODE',
+							'REAL PRODUCTS',
+						].map((word) => (
+							<>
+								<span>{word}</span>
+								<Glyph />
+							</>
+						))}
+					</div>
+				))
+			}
+		</div>
+	</div>
+
+	<section class="section wrap" id="work">
+		<header class="section-head reveal">
+			<div>
+				<p class="eyebrow mono">
+					<span>01 /</span><T v={pair('Selected work', 'أعمال مختارة')} />
+				</p><h2>
+					<T v={pair('Less talk.', 'الأعمال تحكي.')} /><br /><span class="muted"
+						><T v={pair('More shipped.', 'من الفكرة للإطلاق.')} /></span
+					>
+				</h2>
+			</div><div class="section-head__aside">
+				<T
+					as="p"
+					v={pair(
+						'Real problems. Working products. A few things I’ve put out into the world.',
+						'مشكلات حقيقية. منتجات تعمل. مجموعة مما بنيته وأطلقته للعالم.',
+					)}
+				/><a class="text-link" href={u('/work')}
+					><T
+						v={pair(
+							`All ${projects.length} projects`,
+							`كل المشاريع (${projects.length})`,
+						)}
+					/><span aria-hidden="true">↗</span></a
+				>
+			</div>
+		</header>
+		<div class="project-grid">
+			{
+				selected.map((project, index) => (
+					<ProjectCard {project} {design} {lang} {index} />
+				))
+			}
+		</div>
+	</section>
+
+	<section class="about" id="about">
+		<div class="wrap about__grid">
+			<div class="about__portrait reveal">
+				<Image
+					src={photo}
+					alt={profile.name[lang]}
+					widths={[400, 640]}
+					sizes="(min-width: 850px) 32vw, 80vw"
+					loading="lazy"
+				/><span class="portrait-label mono" dir="ltr"
+					>HAITHAM ASSOLI<br />DEVELOPER & MAKER</span
+				><Glyph class="portrait-star" />
+			</div>
+			<div class="about__copy reveal">
+				<p class="eyebrow mono">
+					<span>02 /</span><T
+						v={pair('The person behind the pixels', 'خلف هذه التفاصيل')}
+					/>
+				</p><h2>
+					<T v={pair('Curious by nature.', 'فضولي بطبعي.')} /><br /><span
+						class="muted"
+						><T v={pair('Builder by choice.', 'أبني بشغف.')} /></span
+					>
+				</h2><T
+					as="p"
+					class="lede"
+					v={pair(profile.about.en[0], profile.about.ar[0])}
+				/><T
+					as="p"
+					class="muted"
+					v={pair(
+						'Based in Amman. I care about the parts you notice, and the engineering you don’t. A product should feel as good as it works.',
+						'من عمّان. أهتم بالتفاصيل التي تراها، والهندسة التي لا تراها. المنتج الجيد يجمع متعة الاستخدام وإتقان العمل.',
+					)}
+				/><div class="about__stats">
+					<div>
+						<b>{projects.length}<span>↗</span></b><T
+							v={pair('Projects in the wild', 'مشروعًا في العالم')}
+						/>
+					</div><div>
+						<b
+							>{
+								projects.filter((p) => p.links.appStore || p.links.playGoogle)
+									.length
+							}</b
+						><T v={pair('On the app stores', 'تطبيقًا على المتاجر')} />
+					</div><div>
+						<b>02</b><T
+							v={pair('Languages. One standard.', 'لغتان. مستوى واحد.')}
+						/>
+					</div>
+				</div><a class="text-link" href={profile.links.resume}
+					><T v={pair('A little more about me', 'المزيد عن رحلتي')} /> ↗</a
+				>
+			</div>
+		</div>
+	</section>
+
+	<section class="section wrap">
+		<header class="section-head reveal">
+			<div>
+				<p class="eyebrow mono">
+					<span>03 /</span><T v={pair('What I bring', 'ما أقدّمه')} />
+				</p><h2>
+					<T v={pair('From what if', 'من «ماذا لو»')} /><br /><span
+						class="muted"><T v={pair('to here it is.', 'إلى «ها هو».')} /></span
+					>
+				</h2>
+			</div><T
+				as="p"
+				class="section-head__aside"
+				v={pair(
+					'One person across the whole product. A clear path from your idea to something people can use.',
+					'شخص واحد عبر رحلة المنتج كاملة. مسار واضح من فكرتك إلى شيء يستخدمه الناس.',
+				)}
+			/>
+		</header>
+		<div class="services">
+			{
+				services.map((service, i) => (
+					<article class="service reveal">
+						<>
+							<div class="service__top">
+								<>
+									<span class="mono">0{i + 1}</span>
+									<Glyph kind={service.kind} />
+								</>
+							</div>
+							<T as="h3" v={service.title} />
+							<T as="p" v={service.body} />
+							<p class="mono service__tags" dir="ltr">
+								{service.tags}
+							</p>
+						</>
+					</article>
+				))
+			}
+		</div>
+		<div class="experience">
+			<p class="eyebrow mono">
+				<T v={pair('Along the way', 'محطات من الرحلة')} />
+			</p>{
+				profile.experience.slice(0, 3).map((job) => (
+					<div class="experience__row reveal">
+						<>
+							<T as="h3" v={job.company} />
+							<T v={job.role} />
+							<T class="mono" v={yearPair(job.period)} />
+						</>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="contact-band">
+		<div class="wrap">
+			<p class="eyebrow mono">
+				<span>04 /</span><T v={pair('The next good thing', 'الفكرة القادمة')} />
+			</p><a class="contact-band__link" href={u('/hire')}
+				><h2>
+					<T v={pair('Let’s make', 'لنصنع شيئًا')} /><br /><T
+						v={pair('something matter.', 'يستحق.')}
+					/>
+				</h2><span class="contact-band__arrow" aria-hidden="true">↗</span></a
+			><div class="contact-band__bottom">
+				<T
+					as="p"
+					v={pair(
+						'An idea, a challenge, or a hello. My inbox is open.',
+						'فكرة، تحدٍّ، أو حتى مرحبًا. يسعدني سماعك.',
+					)}
+				/><a href={`mailto:${profile.email}`} dir="ltr">{profile.email}</a>
+			</div>
+		</div>
+	</section>
+</Shell>

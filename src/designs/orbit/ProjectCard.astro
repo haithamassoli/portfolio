@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../../data/projects';
+import type { Design } from '../registry';
+import type { Lang } from '../../i18n';
+import { url } from '../routes';
+import { catWord, yearPair } from '../../data/variant-ui';
+import T from '../../components/T.astro';
+import Glyph from './Glyph.astro';
+interface Props {
+	project: Project;
+	design: Design;
+	lang: Lang;
+	index: number;
+}
+const { project: p, design, lang, index } = Astro.props;
+---
+
+<article
+	class:list={[
+		'project-card',
+		'reveal',
+		`project-card--${index % 4}`,
+		{ 'project-card--tall': p.image && p.image.height > p.image.width * 1.2 },
+	]}
+>
+	<a class="project-card__link" href={url(design, lang, `/work/${p.slug}`)}>
+		<div class="project-card__visual">
+			<span class="project-card__number mono"
+				>/ {String(index + 1).padStart(2, '0')}</span
+			><Glyph
+				kind={index % 2 ? 'grid' : 'orbit'}
+				class="project-card__glyph"
+			/>{
+				p.image && (
+					<Image
+						src={p.image}
+						alt=""
+						widths={[400, 640, 960]}
+						sizes="(min-width: 800px) 44vw, 90vw"
+						loading="lazy"
+					/>
+				)
+			}<span class="project-card__open" aria-hidden="true">↗</span>
+		</div>
+		<div class="project-card__meta mono">
+			<T v={catWord[p.category]} /><T v={yearPair(p.year)} />
+		</div>
+		<T as="h3" v={p.title} /><T
+			as="p"
+			class="project-card__tagline"
+			v={p.tagline}
+		/>
+	</a>
+</article>

@@ -1,0 +1,101 @@
+---
+import type { Lang } from '../../i18n';
+import { pair } from '../../data/variant-ui';
+import Glyph from './Glyph.astro';
+interface Props {
+	lang: Lang;
+}
+const { lang } = Astro.props;
+// Project a torus into SVG at build time: no render loop, canvas or WebGL required.
+const rings = Array.from({ length: 80 }, (_, i) => {
+	const u = (i / 80) * Math.PI * 2;
+	const points = Array.from({ length: 65 }, (_, j) => {
+		const v = (j / 64) * Math.PI * 2;
+		const x = (153 + 62 * Math.cos(v)) * Math.cos(u);
+		const y = (153 + 62 * Math.cos(v)) * Math.sin(u);
+		const z = 62 * Math.sin(v);
+		const py = y * Math.cos(0.8) - z * Math.sin(0.8);
+		return `${j ? 'L' : 'M'}${(280 + x * 0.94 - py * 0.34).toFixed(2)},${(280 + x * 0.34 + py * 0.94).toFixed(2)}`;
+	});
+	return points.join(' ') + 'Z';
+});
+---
+
+<div class="sculpture" data-sculpture>
+	<div class="sculpture__caption mono" dir="ltr">
+		<span>FIG. 01 — THE ORBIT</span><span>∞</span>
+	</div>
+	<div class="sculpture__space">
+		<svg
+			class="sculpture__coordinates"
+			viewBox="0 0 560 560"
+			fill="none"
+			aria-hidden="true"
+		>
+			<circle
+				cx="280"
+				cy="280"
+				r="244"
+				stroke="currentColor"
+				stroke-dasharray="2 7"></circle>
+			<path
+				d="M280 15V70M280 490V545M15 280H70M490 280H545"
+				stroke="currentColor"></path>
+			<ellipse
+				cx="280"
+				cy="280"
+				rx="269"
+				ry="83"
+				transform="rotate(-33 280 280)"
+				stroke="currentColor"></ellipse>
+			<circle cx="72" cy="419" r="5" fill="currentColor"></circle>
+		</svg>
+		<div class="sculpture__tilt">
+			<div class="sculpture__angle">
+				<svg
+					class="sculpture__torus"
+					viewBox="0 0 560 560"
+					fill="none"
+					aria-hidden="true"
+					focusable="false"
+				>
+					<g stroke="currentColor" stroke-width="1.15"
+						>{rings.map((d) => <path d={d} />)}</g
+					>
+				</svg>
+			</div>
+		</div>
+		<Glyph class="sculpture__star" />
+		<span class="sculpture__note mono" dir="ltr"
+			>FORM FOLLOWS<br />CURIOSITY.</span
+		>
+		<span class="sculpture__tag mono" dir="ltr"
+			><span class="status-dot"></span> IDEA → REALITY</span
+		>
+	</div>
+	<div class="sculpture__controls mono" data-motion-controls hidden>
+		<label for="orbit-angle"
+			>{pair('Give it a spin', 'حرّك المدار')[lang]}
+			<span aria-hidden="true">↔</span></label
+		>
+		<input
+			id="orbit-angle"
+			type="range"
+			min="-90"
+			max="90"
+			value="0"
+			step="1"
+		/>
+		<output for="orbit-angle" dir="ltr">0°</output>
+		<button
+			class="motion-toggle mono"
+			type="button"
+			aria-pressed="false"
+			data-pause
+			data-play={pair('Resume motion', 'تشغيل الحركة')[lang]}
+			data-stop={pair('Pause motion', 'إيقاف الحركة')[lang]}
+			data-reduced={pair('Motion reduced', 'حركة مخفّفة')[lang]}
+			>{pair('Pause motion', 'إيقاف الحركة')[lang]}</button
+		>
+	</div>
+</div>
